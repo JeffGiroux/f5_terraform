@@ -1,0 +1,158 @@
+{
+    "schemaVersion": "1.0.0",
+    "class": "Device",
+    "label": "Basic onboarding",
+    "Common": {
+        "class": "Tenant",
+        "hostname": "${local_host}.example.com",
+	"myLicense": {
+            "class": "License",
+            "licenseType": "regKey",
+            "regKey": "${regkey}"
+        },
+        "dbvars": {
+            "class": "DbVariables",
+            "ui.advisory.enabled": true,
+            "ui.advisory.color": "green",
+            "ui.advisory.text": "/Common/hostname"
+        },
+        "myDns": {
+            "class": "DNS",
+            "nameServers": [
+                "${dns_server}",
+                "2001:4860:4860::8844"
+            ],
+            "search": [
+                "f5.com"
+            ]
+        },
+        "myNtp": {
+            "class": "NTP",
+            "servers": [
+                "${ntp_server}",
+                "0.pool.ntp.org",
+                "1.pool.ntp.org"
+            ],
+            "timezone": "${timezone}"
+        },
+        "myProvisioning": {
+            "class": "Provision",
+            "ltm": "nominal"
+        },
+        "external": {
+            "class": "VLAN",
+            "tag": 1000,
+            "mtu": 1500,
+            "interfaces": [
+                {
+                    "name": "1.1",
+                    "tagged": false
+                }
+            ]
+        },
+        "external-self": {
+            "class": "SelfIp",
+            "address": "${local_selfip1}/24",
+            "vlan": "external",
+            "allowService": "default",
+            "trafficGroup": "traffic-group-local-only"
+        },
+	"toService": {
+            "class": "VLAN",
+            "tag": 2000,
+            "mtu": 1500,
+            "interfaces": [
+                {
+                    "name": "1.2",
+                    "tagged": false
+                }
+            ]
+        },
+        "toService-self": {
+            "class": "SelfIp",
+            "address": "${local_selfip2}/25",
+            "vlan": "toService",
+            "allowService": "default",
+            "trafficGroup": "traffic-group-local-only"
+        },
+	"toService-fl1": {
+            "class": "SelfIp",
+            "address": "${tosrvfl1}/25",
+            "vlan": "toService",
+            "allowService": "default",
+            "trafficGroup": "traffic-group-local-only"
+        },
+	"toService-fl2": {
+            "class": "SelfIp",
+            "address": "${tosrvfl2}/25",
+            "vlan": "toService",
+            "allowService": "default",
+            "trafficGroup": "traffic-group-local-only"
+        },
+        "frService": {
+            "class": "VLAN",
+            "tag": 3000,
+            "mtu": 1500,
+            "interfaces": [
+                {
+                    "name": "1.3",
+                    "tagged": false
+                }
+            ]
+        },
+        "frService-self": {
+            "class": "SelfIp",
+            "address": "${local_selfip3}/25",
+            "vlan": "frService",
+            "allowService": "default",
+            "trafficGroup": "traffic-group-local-only"
+        },
+	"frService-fl1": {
+            "class": "SelfIp",
+            "address": "${frsrvfl1}/25",
+            "vlan": "frService",
+            "allowService": "default",
+            "trafficGroup": "traffic-group-local-only"
+        },
+	"frService-fl2": {
+            "class": "SelfIp",
+            "address": "${frsrvfl2}/25",
+            "vlan": "frService",
+            "allowService": "default",
+            "trafficGroup": "traffic-group-local-only"
+        },
+        "default": {
+            "class": "Route",
+            "gw": "${gateway}",
+            "network": "default",
+            "mtu": 1500
+        },
+        "configsync": {
+	    "class": "ConfigSync",
+    	    "configsyncIp": "/Common/external-self/address"
+	},
+	"failoverAddress": {
+    	    "class": "FailoverUnicast",
+    	    "address": "/Common/external-self/address"
+	},
+	"failoverGroup": {
+	    "class": "DeviceGroup",
+	    "type": "sync-failover",
+	    "members": ["${host1}.example.com", "${host2}.example.com"],
+	    "owner": "/Common/failoverGroup/members/0",
+	    "autoSync": true,
+	    "saveOnAutoSync": false,
+	    "networkFailover": true,
+	    "fullLoadOnSync": false,
+	    "asmSync": false
+	},
+	"trust": {
+	    "class": "DeviceTrust",
+	    "localUsername": "${admin_user}",
+	    "localPassword": "${admin_password}",
+	    "remoteHost": "${remote_selfip}",
+	    "remoteUsername": "${admin_user}",
+	    "remotePassword": "${admin_password}"
+	}
+    }
+}
