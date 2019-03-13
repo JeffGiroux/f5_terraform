@@ -123,17 +123,17 @@ terraform apply
 
 
 This example illustrate how to upgrade the BIG-IP VEs (remember, when replace a VE, we replace both, can't be just single VE)
-  0. Change the 'bigip_version' variable to the desired release 
-  1. Revoke the problematic BIG-IP VE's license
-  2. Run command
+  1. Change the 'bigip_version' variable to the desired release 
+  2. Revoke the problematic BIG-IP VE's license
+  3. Run command
 ```
 terraform destroy -target azurerm_virtual_machine.f5vm02
 ```
-  3. Run command
+  4. Run command
 ```
 terraform apply
 ```
-  4. At this time, you have 2 standalone BIG-IP VEs behind the Azure LB, which is fine. Repeate step 1 to step 3 on the other BIG-IP VE otherwise, the Device Trust won't be configured correctly
+  5. At this time, you have 2 standalone BIG-IP VEs behind the Azure LB, which is fine. Repeate step 2 to step 4 on the other BIG-IP VE otherwise, the Device Trust won't be configured correctly
 
 ## Rerun AS3 on the Big-ip ve
 - This example illustrate how to run your own custom AS3, you can have a catalog of AS3 and repeat this steps as many times as desired
