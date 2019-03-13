@@ -5,7 +5,7 @@
 - [Introduction](#introduction)
 - [Prerequisites](#prerequisites)
 - [Important Configuration Notes](#important-configuration-notes)
-- [Security](#security)
+- [Template Parameters](#Template-parameters)
 - [Configuration Example](#configuration-example)
 
 ## Introduction
@@ -47,20 +47,38 @@ Ex.
 | Parameter | Required | Description |
 | --- | --- | --- |
 | prefix | Yes | This value is insert in the beginning of each Azure object, try keeps it alpha-numeric without any special character |
+| rest_do_uri | Yes | URI of the Declarative Onboarding REST call. |
+| rest_as3_uri | Yes | URI of the AS3 REST call. |
+| rest_do_method | Yes | Available options are GET, POST, and DELETE. |
+| rest_AS3_method | Yes | Available options are GET, POST, and DELETE. |
+| rest_vm01_do_file | Yes | Terraform will generate the vm01 DO json file, where you can manually run it again for debugging. |
+| rest_vm02_do_file | Yes | Terraform will generate the vm02 DO json file, where you can manually run it again for debugging. |
+| rest_vm_as3_file | Yes | Terraform will generate the AS3 json file, where you can manually run it again for debugging. |
+| SP | YES | This is the service principal of your Azure subscription. |
 | uname | Yes | User name for the Virtual Machine. |
 | upassword | Yes | Password for the Virtual Machine. |
 | location | Yes | Location of the deployment. |
 | region | Yes | Region of the deployment. |
-| cidr | Yes | IP Address range of the Virtual Network. |
-| subnet1 | Yes | Subnet IP range of the management network. |
-| subnet2 | Yes | Subnet IP range of the external network. |
-| subnet3 | No | Subnet IP range of the internal network. |
+| cidr | Yes | IP Address range of the DMZ Virtual Network, which contains 'subnet1' for mgmt network, 'subnet2' for external network, and 'subnet3' for internal network. |
+| app-cidr | Yes | IP Address range of the App Network, which is sitting at another VNet and being peered to the DMZ Vnet. |
+| sslo-cidr | Yes | IP Address range of the SSLO Network, which is sitting at the same DMZ VNet, where 'subnet1' is for "To-service" traffic, and 'subnet2' is for "From-service" traffic. |
 | f5vm01mgmt | Yes | IP address for 1st BIG-IP's management interface. |
 | f5vm02mgmt | Yes | IP address for 2nd BIG-IP's management interface. |
 | f5vm01ext | Yes | IP address for 1st BIG-IP's external interface. |
 | f5vm01ext_sec | Yes | Secondary IP address for 1st BIG-IP's external interface. |
 | f5vm02ext | Yes | IP address for 2nd BIG-IP's external interface. |
 | f5vm02ext_sec | Yes | Secondary IP address for 2nd BIG-IP's external interface. |
+| f5vm01tosrv | Yes | Self IP address for BIG-IP-01's To-service L3 inline interface. |
+| f5vm02tosrv | Yes | Self IP address for BIG-IP-02's To-service L3 inline interface. |
+| f5vm01tosrvf1 | Yes | Secondary IP address for BIG-IP-01's To-service L3 inline interface. |
+| f5vm02tosrvf1 | Yes | Secondary IP address for BIG-IP-02's To-service L3 inline interface. |
+| f5vm01frsrv | Yes | Self IP address for BIG-IP-01's From-service L3 inline interface. |
+| f5vm02frsrv | Yes | Self IP address for BIG-IP-02's From-service L3 inline interface. |
+| f5vm01frsrvf1 | Yes | Secondary IP address for BIG-IP-01's From-service L3 inline interface. |
+| f5vm02frsrvf1 | Yes | Secondary IP address for BIG-IP-02's From-service L3 inline interface. |
+| l3fwmgmt | Yes | L3 Firewall's management IP. |
+| l3funtrust | Yes | L3 Firewall's IP in untrust subnet. |
+| l3ftrust | Yes | L3 Firewall's IP in trust subnet. |
 | instance_type | Yes | Azure instance to be used for the BIG-IP VE. |
 | product | Yes | Azure BIG-IP VE Offer. |
 | bigip_version | Yes | It is set to default to use the latest software. |
@@ -74,26 +92,10 @@ Ex.
 | dns_server | Yes | Least the default DNS server the BIG-IP uses, or replace the default DNS server with the one you want to use. | 
 | DO_onboard_URL | Yes | This is the raw github URL for downloading the Declarative Onboarding RPM |
 | AS3_URL | Yes | This is the raw github URL for downloading the AS3 RPM. |
+| sslo_URL | Yes | This is the raw github URL for downloading the SSLO RPM. |
 | libs_dir | Yes | This is where all the temporary libs and RPM will be store in BIG-IP. |
 | onboard_log | Yes | This is where the onboarding script logs all the events. |
 
-### Programmatic deployments
-
-As an alternative to deploying through the Azure Portal (GUI) each solution provides example scripts to deploy the ARM template.  The example commands can be found below along with the name of the script file, which exists in the current directory.
-
-#### PowerShell Script Example
-
-```powershell
-## Example Command: .\Deploy_via_PS.ps1 -numberOfInstances 2 -adminUsername azureuser -authenticationType password -adminPasswordOrKey <value> -dnsLabel <value> -instanceType Standard_DS2_v2 -imageName AllTwoBootLocations -bigIpVersion 13.1.100000 -licenseKey1 <value> -licenseKey2 <value> -vnetAddressPrefix 10.0 -ntpServer 0.pool.ntp.org -timeZone UTC -customImage OPTIONAL -allowUsageAnalytics Yes -resourceGroupName <value>
-```
-
-=======
-
-#### Azure CLI (1.0) Script Example
-
-```bash
-## Example Command: ./deploy_via_bash.sh --numberOfInstances 2 --adminUsername azureuser --authenticationType password --adminPasswordOrKey <value> --dnsLabel <value> --instanceType Standard_DS2_v2 --imageName AllTwoBootLocations --bigIpVersion 13.1.100000 --licenseKey1 <value> --licenseKey2 <value> --vnetAddressPrefix 10.0 --ntpServer 0.pool.ntp.org --timeZone UTC --customImage OPTIONAL --allowUsageAnalytics Yes --resourceGroupName <value> --azureLoginUser <value> --azureLoginPassword <value>
-```
 
 ## Configuration Example
 
@@ -106,7 +108,7 @@ The following is an example configuration diagram for this solution deployment. 
 
 For more information on F5 solutions for Azure, including manual configuration procedures for some deployment scenarios, see the Azure section of [Public Cloud Docs](http://clouddocs.f5.com/cloud/public/v1/).
 
-## Rerun AS3 on the big-ip ve
+## Rerun AS3 on the Big-ip ve
 
 In order to pass traffic from your clients to the servers through the BIG-IP system, you must create a virtual server on the BIG-IP VE.
 
