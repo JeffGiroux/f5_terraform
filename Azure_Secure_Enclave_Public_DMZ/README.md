@@ -20,8 +20,8 @@ Ex.
 - Deploy the entire infrastructure with all the neccessary resources, then we use Declarative Onboarding to configure the BIG-IP Cluster; AS3 to create a sample app proxy; then lastly use Service Discovery automatically add the DVWA container app to the LTM pool (Please note currently we also hardcode the node IP in the pool due to a bug in our AS3, which will be fixed in the next release)
 
 -> Run many X
-- Redeploy BIG-IP for replacement or upgrade
-- Reconfigure BIG-IP configurations
+- [Redeploy BIG-IP for replacement or upgrade](#Redeploy-BIG-IP-for-replacement-or-upgrade)
+- [Reconfigure BIG-IP configurations](#Rerun-AS3-on-the-big-ip-ve)
 
 **Networking Stack Type:** This solution deploys into a new networking stack, which is created along with the solution.
 
@@ -39,7 +39,7 @@ Ex.
 - This template would require Declarative Onboarding and AS3 packages for the initial configuration. As part of the onboarding script, it will download the RPMs respectively. So please see the [AS3 documentation](https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/3.5.1/) and [DO documentation](https://clouddocs.f5.com/products/extensions/f5-declarative-onboarding/latest/prereqs.html) for details on how to use AS3 and Declarative Onboarding on your BIG-IP VE(s).
 - onboard.tpl is the onboarding script, which is run by commandToExecute, and it will be copy to /var/lib/waagent/CustomData upon bootup. This script is basically responsible for downloading the neccessary DO, AS3, and SSLO RPM files, and then installing them with REST calls.
 - This template uses BYOL BIGIP image for the deployment (as default), due to SSLO isn't available in PayGO SKU image
-- The initial deployment will enable you to pass traffic from your clients to the DVWA app server. See [Rerun AS3](#Rerun-AS3-on-the-big-ip-ve).
+- The initial deployment will enable you to pass traffic from your clients to the DVWA app server. See [Rerun AS3](#Rerun-AS3-on-the-big-ip-ve) if you would like to reconfigure the AS3 configuration.
 - See the **[Configuration Example](#configuration-example)** section for a configuration diagram and description for this solution.
 
 ### Template parameters
@@ -108,28 +108,36 @@ The following is an example configuration diagram for this solution deployment. 
 
 For more information on F5 solutions for Azure, including manual configuration procedures for some deployment scenarios, see the Azure section of [Public Cloud Docs](http://clouddocs.f5.com/cloud/public/v1/).
 
+## Redeploy BIG-IP for replacement or upgrade
+- This example illustrates how to replace the BIG-IP VE
+1. Revoke the problematic BIG-IP VE's license
+2. Run command
+```
+terraform destroy -target azurerm_virtual_machine.f5vm02
+```
+3. Run command
+```
+terraform apply
+```
+4. At this time, you have 2 standalone BIG-IP VEs behind the Azure LB, which is fine. Repeate step 1 to step 3 on the other BIG-IP VE otherwise, the Device Trust won't be configured correctly
+
+- This example illustrate how to upgrade the BIG-IP VEs (remember, when replace a VE, we replace both, can't be just single VE)
+0. Change the 'bigip_version' variable to the desired release 
+1. Revoke the problematic BIG-IP VE's license
+2. Run command
+```
+terraform destroy -target azurerm_virtual_machine.f5vm02
+```
+3. Run command
+```
+terraform apply
+```
+4. At this time, you have 2 standalone BIG-IP VEs behind the Azure LB, which is fine. Repeate step 1 to step 3 on the other BIG-IP VE otherwise, the Device Trust won't be configured correctly
+
 ## Rerun AS3 on the Big-ip ve
-
-In order to pass traffic from your clients to the servers through the BIG-IP system, you must create a virtual server on the BIG-IP VE.
-
-In this template, the Azure public IP address is associated with an Azure Load Balancer that forwards traffic to a backend pool that includes the primary (self) IP configurations for *each* BIG-IP network interface.  Because traffic is destined for the self IP addresses of the BIG-IP VEs, you must create a single virtual server with a wildcard destination in Traffic Group **None**.
-
-1. Once your BIG-IP VE has launched, open the BIG-IP VE Configuration utility.
-2. On the Main tab, click **Local Traffic > Virtual Servers** and then click the **Create** button.
-3. In the **Name** field, give the Virtual Server a unique name.
-4. In the **Destination/Mask** field, type the destination address ( for example: 0.0.0.0/0).
-5. In the **Service Port** field, type the appropriate port.
-6. Configure the rest of the virtual server as appropriate.
-7. If you used the Service Discovery iApp template: In the Resources section, from the **Default Pool** list, select the name of the pool created by the iApp.
-8. Click the **Finished** button.
-9. Repeat as necessary.
-
-When you have completed the virtual server configuration, you must modify the virtual addresses to use Traffic Group None using the following guidance.
-
-1. On the Main tab, click **Local Traffic > Virtual Servers**.
-2. On the Menu bar, click the **Virtual Address List** tab.
-3. Click the address of one of the virtual servers you just created.
-4. From the **Traffic Group** list, select **None**.
-5. Click **Update**.
-6. Repeat for each virtual server.
-
+- This example illustrate how to run your own custom AS3, you can have a catalog of AS3 and repeat this steps as many times as desired
+```
+terraform taint null_resource.f5vm02-run-REST
+terraform apply null_resource.f5vm02-run-REST -var "rest_do_method=GET" -var "rest_as3_method=POST" -var "REST["vm_as3_file"]=test.json"
+```
+- If you would like to re-run your DO json, just swap the above REST methods, and apply the new DO json file, then you can repeat the above steps as many time as you'd need.  
