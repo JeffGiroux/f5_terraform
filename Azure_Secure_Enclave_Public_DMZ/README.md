@@ -109,30 +109,31 @@ The following is an example configuration diagram for this solution deployment. 
 For more information on F5 solutions for Azure, including manual configuration procedures for some deployment scenarios, see the Azure section of [Public Cloud Docs](http://clouddocs.f5.com/cloud/public/v1/).
 
 ## Redeploy BIG-IP for replacement or upgrade
-- This example illustrates how to replace the BIG-IP VE
-1. Revoke the problematic BIG-IP VE's license
-2. Run command
+This example illustrates how to replace the BIG-IP VE
+  1. Revoke the problematic BIG-IP VE's license
+  2. Run command
 ```
 terraform destroy -target azurerm_virtual_machine.f5vm02
 ```
-3. Run command
+  3. Run command
 ```
 terraform apply
 ```
-4. At this time, you have 2 standalone BIG-IP VEs behind the Azure LB, which is fine. Repeate step 1 to step 3 on the other BIG-IP VE otherwise, the Device Trust won't be configured correctly
+  4. At this time, you have 2 standalone BIG-IP VEs behind the Azure LB, which is fine. Repeate step 1 to step 3 on the other BIG-IP VE otherwise, the Device Trust won't be configured correctly
 
-- This example illustrate how to upgrade the BIG-IP VEs (remember, when replace a VE, we replace both, can't be just single VE)
-0. Change the 'bigip_version' variable to the desired release 
-1. Revoke the problematic BIG-IP VE's license
-2. Run command
+
+This example illustrate how to upgrade the BIG-IP VEs (remember, when replace a VE, we replace both, can't be just single VE)
+  0. Change the 'bigip_version' variable to the desired release 
+  1. Revoke the problematic BIG-IP VE's license
+  2. Run command
 ```
 terraform destroy -target azurerm_virtual_machine.f5vm02
 ```
-3. Run command
+  3. Run command
 ```
 terraform apply
 ```
-4. At this time, you have 2 standalone BIG-IP VEs behind the Azure LB, which is fine. Repeate step 1 to step 3 on the other BIG-IP VE otherwise, the Device Trust won't be configured correctly
+  4. At this time, you have 2 standalone BIG-IP VEs behind the Azure LB, which is fine. Repeate step 1 to step 3 on the other BIG-IP VE otherwise, the Device Trust won't be configured correctly
 
 ## Rerun AS3 on the Big-ip ve
 - This example illustrate how to run your own custom AS3, you can have a catalog of AS3 and repeat this steps as many times as desired
