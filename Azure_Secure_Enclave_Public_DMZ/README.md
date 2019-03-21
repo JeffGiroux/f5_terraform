@@ -139,6 +139,6 @@ terraform apply
 - This example illustrate how to run your own custom AS3, you can have a catalog of AS3 and repeat this steps as many times as desired
 ```
 terraform taint null_resource.f5vm02-run-REST
-terraform apply null_resource.f5vm02-run-REST -var "rest_do_method=GET" -var "rest_as3_method=POST" -var "rest_vm_as3_file=test.json" -var "rest_vm02_do_file=''"
+terraform apply -target null_resource.f5vm02-run-REST -var "rest_do_method=GET" -var "rest_as3_method=POST" -var "rest_vm_as3_file=test.json" -var "rest_vm02_do_file=''"
 ```
 - If you would like to re-run your DO json, just swap the above REST methods, and apply the new DO json file, then you can repeat the above steps as many time as you'd need.  
