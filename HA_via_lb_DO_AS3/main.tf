@@ -444,11 +444,11 @@ resource "azurerm_virtual_machine" "f5vm01" {
   availability_set_id          = "${azurerm_availability_set.avset.id}"
 
   # Uncomment this line to delete the OS disk automatically when deleting the VM
-  # delete_os_disk_on_termination = true
+   delete_os_disk_on_termination = true
 
 
   # Uncomment this line to delete the data disks automatically when deleting the VM
-  # delete_data_disks_on_termination = true
+   delete_data_disks_on_termination = true
 
   storage_image_reference {
     publisher = "f5-networks"
@@ -489,26 +489,6 @@ resource "azurerm_virtual_machine" "f5vm01" {
     costcenter     = "${var.costcenter}"
     application    = "${var.application}"
   }
-
-  provisioner "file" {
-    content     = "${data.template_file.vm01_do_json.rendered}"
-    destination = "/var/tmp/vm_do.json"
-    connection {
-      user	= "${var.uname}"
-      password	= "${var.upassword}"
-      agent = false
-    }
-  }
-
-  provisioner "file" {
-    content     = "${data.template_file.as3_json.rendered}"
-    destination = "/var/tmp/as3.json"
-    connection {
-      user      = "${var.uname}"
-      password  = "${var.upassword}"
-      agent = false
-    }
-  }
 }
 
 resource "azurerm_virtual_machine" "f5vm02" {
@@ -521,11 +501,11 @@ resource "azurerm_virtual_machine" "f5vm02" {
   availability_set_id          = "${azurerm_availability_set.avset.id}"
 
   # Uncomment this line to delete the OS disk automatically when deleting the VM
-  # delete_os_disk_on_termination = true
+  delete_os_disk_on_termination = true
 
 
   # Uncomment this line to delete the data disks automatically when deleting the VM
-  # delete_data_disks_on_termination = true
+  delete_data_disks_on_termination = true
 
   storage_image_reference {
     publisher = "f5-networks"
@@ -565,26 +545,6 @@ resource "azurerm_virtual_machine" "f5vm02" {
     group          = "${var.group}"
     costcenter     = "${var.costcenter}"
     application    = "${var.application}"
-  }
-
-  provisioner "file" {
-    content     = "${data.template_file.vm02_do_json.rendered}"
-    destination = "/var/tmp/vm_do.json"
-    connection {
-      user = "${var.uname}"
-      password = "${var.upassword}"
-      agent = false
-    }
-  }
-
-  provisioner "file" {
-    content     = "${data.template_file.as3_json.rendered}"
-    destination = "/var/tmp/as3.json"
-    connection {
-      user = "${var.uname}"
-      password = "${var.upassword}"
-      agent = false
-    }
   }
 }
 
@@ -670,7 +630,7 @@ resource "azurerm_virtual_machine_extension" "f5vm01-run-startup-cmd" {
 
 resource "azurerm_virtual_machine_extension" "f5vm02-run-startup-cmd" {
   name                 = "${var.environment}-f5vm02-run-startup-cmd"
-  depends_on           = ["azurerm_virtual_machine.f5vm02", "azurerm_virtual_machine_extension.f5vm01-run-startup-cmd"]
+  depends_on           = ["azurerm_virtual_machine.f5vm02", "azurerm_virtual_machine.backendvm"]
   location             = "${var.region}"
   resource_group_name  = "${azurerm_resource_group.main.name}"
   virtual_machine_name = "${azurerm_virtual_machine.f5vm02.name}"
@@ -697,6 +657,81 @@ resource "azurerm_virtual_machine_extension" "f5vm02-run-startup-cmd" {
   }
 }
 
+# Run REST API for configuration
+resource "local_file" "vm01_do_file" {
+  content     = "${data.template_file.vm01_do_json.rendered}"
+  filename    = "${path.module}/vm01_do_data.json"
+}
+
+resource "local_file" "vm02_do_file" {
+  content     = "${data.template_file.vm02_do_json.rendered}"
+  filename    = "${path.module}/vm02_do_data.json"
+}
+
+resource "local_file" "vm_as3_file" {
+  content     = "${data.template_file.as3_json.rendered}"
+  filename    = "${path.module}/vm_as3_data.json"
+}
+
+resource "null_resource" "f5vm01-run-REST" {
+  depends_on    = ["azurerm_virtual_machine_extension.f5vm01-run-startup-cmd"]
+  # Running DO REST API
+  provisioner "local-exec" {
+    command = <<-EOF
+      #!/bin/bash
+      curl -k -X GET https://${data.azurerm_public_ip.vm01mgmtpip.ip_address}${var.rest_do_uri} \
+              -H "Content-Type: application/json" \
+              -u ${var.uname}:${var.upassword}
+      sleep 5
+      curl -k -X ${var.rest_do_method} https://${data.azurerm_public_ip.vm01mgmtpip.ip_address}${var.rest_do_uri} \
+              -H "Content-Type: application/json" \
+              -u ${var.uname}:${var.upassword} \
+              -d @${var.rest_vm01_do_file}
+    EOF
+  }
+
+  # Running AS3 REST API
+  provisioner "local-exec" {
+    command = <<-EOF
+      #!/bin/bash
+      sleep 30
+      curl -k -X ${var.rest_as3_method} https://${data.azurerm_public_ip.vm01mgmtpip.ip_address}${var.rest_as3_uri} \
+              -H "Content-Type: application/json" \
+              -u ${var.uname}:${var.upassword} \
+              -d @${var.rest_vm_as3_file}
+    EOF
+  }
+}
+
+resource "null_resource" "f5vm02-run-REST" {
+  depends_on    = ["azurerm_virtual_machine_extension.f5vm02-run-startup-cmd"]
+  # Running DO REST API
+  provisioner "local-exec" {
+    command = <<-EOF
+      #!/bin/bash
+      curl -k -X GET https://${data.azurerm_public_ip.vm02mgmtpip.ip_address}${var.rest_do_uri} \
+              -H "Content-Type: application/json" \
+              -u ${var.uname}:${var.upassword}
+      sleep 5
+      curl -k -X ${var.rest_do_method} https://${data.azurerm_public_ip.vm02mgmtpip.ip_address}${var.rest_do_uri} \
+              -H "Content-Type: application/json" \
+              -u ${var.uname}:${var.upassword} \
+              -d @${var.rest_vm02_do_file}
+    EOF
+  }
+
+  # Running AS3 REST API
+  provisioner "local-exec" {
+    command = <<-EOF
+      #!/bin/bash
+      sleep 30
+      curl -k -X ${var.rest_as3_method} https://${data.azurerm_public_ip.vm02mgmtpip.ip_address}${var.rest_as3_uri} \
+              -H "Content-Type: application/json" \
+              -u ${var.uname}:${var.upassword} \
+              -d @${var.rest_vm_as3_file}
+    EOF
+  }
+}
 
 ## OUTPUTS ###
 data "azurerm_public_ip" "vm01mgmtpip" {

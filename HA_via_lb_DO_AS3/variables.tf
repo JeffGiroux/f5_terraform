@@ -1,14 +1,23 @@
+# REST API Setting
+variable rest_do_uri { default  = "/mgmt/shared/declarative-onboarding" }
+variable rest_as3_uri { default = "/mgmt/shared/appsvcs/declare" }
+variable rest_do_method { default = "POST" }
+variable rest_as3_method { default = "POST" }
+variable rest_vm01_do_file {default = "vm01_do_data.json" }
+variable rest_vm02_do_file {default = "vm02_do_data.json" }
+variable rest_vm_as3_file {default = "vm_as3_data.json" }
+
 # Azure Environment
 variable "SP" {
 	type = "map"
 	default = {
-		subscription_id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-		client_id       = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-		client_secret   = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-		tenant_id       = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+		subscription_id = "xxxxx"
+		client_id       = "xxxxx"
+		client_secret   = "xxxxx"
+		tenant_id       = "xxxxx"
 	}
 }
-variable prefix	{ default = "zluhalb" }
+variable prefix	{ default = "zludemo" }
 variable uname	{ default = "azureuser" }
 variable upassword	{ default = "Default12345" }
 variable location	{ default = "eastus" }	 
@@ -33,7 +42,7 @@ variable f5vm02ext_sec  { default = "10.90.2.12" }
 variable backend01ext   { default = "10.90.2.101" }
 
 # BIGIP Image
-variable instance_type	{ default = "Standard_D3_v2" }
+variable instance_type	{ default = "Standard_DS4_v2" }
 variable image_name	{ default = "f5-bigip-virtual-edition-25m-best-hourly" }
 variable product	{ default = "f5-big-ip-best" }
 variable bigip_version	{ default = "latest" }
@@ -47,9 +56,9 @@ variable dns_server           { default = "8.8.8.8" }
 variable ntp_server           { default = "0.us.pool.ntp.org" }
 variable timezone             { default = "UTC" }
 ## Please check and update the latest DO URL from https://github.com/F5Networks/f5-declarative-onboarding/releases
-variable DO_onboard_URL	      { default = "https://raw.githubusercontent.com/F5Networks/f5-declarative-onboarding/master/dist/f5-declarative-onboarding-1.3.0-4.noarch.rpm" }
+variable DO_onboard_URL	      { default = "https://github.com/garyluf5/f5tools/raw/master/f5-declarative-onboarding-1.3.0-4.noarch.rpm" }
 ## Please check and update the latest AS3 URL from https://github.com/F5Networks/f5-appsvcs-extension/releases/latest 
-variable AS3_URL	      { default = "https://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/dist/latest/f5-appsvcs-3.9.0-3.noarch.rpm" }
+variable AS3_URL	      { default = "https://github.com/garyluf5/f5tools/raw/master/f5-appsvcs-3.9.0-3.noarch.rpm" }
 variable libs_dir	      { default = "/config/cloud/azure/node_modules" }
 variable onboard_log	      { default = "/var/log/startup-script.log" }
 

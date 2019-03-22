@@ -32,10 +32,10 @@ AS3_FN=$(basename "$AS3_URL")
 mkdir -p ${libs_dir}
 
 echo -e "\n"$(date) "Download Declarative Onboarding Pkg"
-curl -o ${libs_dir}/$DO_FN $DO_URL
+curl -L -o ${libs_dir}/$DO_FN $DO_URL
 
 echo -e "\n"$(date) "Download AS3 Pkg"
-curl -o ${libs_dir}/$AS3_FN $AS3_URL
+curl -L -o ${libs_dir}/$AS3_FN $AS3_URL
 sleep 20
 
 # Copy the RPM Pkg to the file location
@@ -51,12 +51,5 @@ DATA="{\"operation\":\"INSTALL\",\"packageFilePath\":\"/var/config/rest/download
 echo -e "\n"$(date) "Install AS3 Pkg"
 curl -u $CREDS -X POST http://localhost:8100/mgmt/shared/iapp/package-management-tasks -d $DATA
 
-sleep 5
+sleep 20
 
-echo -e "\n"$(date) "Setup Cluster With Declarative Onboarding"
-curl -k -u $CREDS -X POST https://localhost/mgmt/shared/declarative-onboarding -d @/var/tmp/vm_do.json
-
-sleep 10
-
-echo -e "\n"$(date) "Configure HTTPS/HTTP Virtual with AS3"
-curl -k -u $CREDS -X POST https://localhost/mgmt/shared/appsvcs/declare -d @/var/tmp/as3.json
