@@ -16,7 +16,22 @@ fi
 exec 1>$LOG_FILE 2>&1
 
 # CHECK TO SEE NETWORK IS READY
-if ! ping github.com -c 1; then echo "Not Ready, wait for 10sec" && sleep 10; fi
+CNT=0
+while true
+do
+  STATUS=$(curl -s -k -I example.com | grep HTTP)
+  if [[ $STATUS == *"200"* ]]; then
+    echo "Got 200! VE is Ready!"
+    break
+  elif [ $CNT -le 6 ]; then
+    echo "Status code: $STATUS  Not done yet..."
+    CNT=$[$CNT+1]
+  else
+    echo "GIVE UP..."
+    break
+  fi
+  sleep 10
+done
 
 ### DOWNLOAD ONBOARDING PKGS
 # Could be pre-packaged or hosted internally
