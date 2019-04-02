@@ -47,10 +47,10 @@ AS3_FN=$(basename "$AS3_URL")
 mkdir -p ${libs_dir}
 
 echo -e "\n"$(date) "Download Declarative Onboarding Pkg"
-curl -o ${libs_dir}/$DO_FN $DO_URL
+curl -o -L ${libs_dir}/$DO_FN $DO_URL
 
 echo -e "\n"$(date) "Download AS3 Pkg"
-curl -o ${libs_dir}/$AS3_FN $AS3_URL
+curl -o -L ${libs_dir}/$AS3_FN $AS3_URL
 sleep 20
 
 # Copy the RPM Pkg to the file location
