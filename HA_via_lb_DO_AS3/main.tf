@@ -680,11 +680,9 @@ resource "null_resource" "f5vm01-run-REST" {
     command = <<-EOF
       #!/bin/bash
       curl -k -X GET https://${data.azurerm_public_ip.vm01mgmtpip.ip_address}${var.rest_do_uri} \
-              -H "Content-Type: application/json" \
               -u ${var.uname}:${var.upassword}
-      sleep 5
+#      sleep 10
       curl -k -X ${var.rest_do_method} https://${data.azurerm_public_ip.vm01mgmtpip.ip_address}${var.rest_do_uri} \
-              -H "Content-Type: application/json" \
               -u ${var.uname}:${var.upassword} \
               -d @${var.rest_vm01_do_file}
     EOF
@@ -694,9 +692,8 @@ resource "null_resource" "f5vm01-run-REST" {
   provisioner "local-exec" {
     command = <<-EOF
       #!/bin/bash
-      sleep 30
+#      sleep 15
       curl -k -X ${var.rest_as3_method} https://${data.azurerm_public_ip.vm01mgmtpip.ip_address}${var.rest_as3_uri} \
-              -H "Content-Type: application/json" \
               -u ${var.uname}:${var.upassword} \
               -d @${var.rest_vm_as3_file}
     EOF
@@ -709,12 +706,8 @@ resource "null_resource" "f5vm02-run-REST" {
   provisioner "local-exec" {
     command = <<-EOF
       #!/bin/bash
-      curl -k -X GET https://${data.azurerm_public_ip.vm02mgmtpip.ip_address}${var.rest_do_uri} \
-              -H "Content-Type: application/json" \
-              -u ${var.uname}:${var.upassword}
-      sleep 5
+#      sleep 5
       curl -k -X ${var.rest_do_method} https://${data.azurerm_public_ip.vm02mgmtpip.ip_address}${var.rest_do_uri} \
-              -H "Content-Type: application/json" \
               -u ${var.uname}:${var.upassword} \
               -d @${var.rest_vm02_do_file}
     EOF
@@ -724,9 +717,8 @@ resource "null_resource" "f5vm02-run-REST" {
   provisioner "local-exec" {
     command = <<-EOF
       #!/bin/bash
-      sleep 30
+#      sleep 10
       curl -k -X ${var.rest_as3_method} https://${data.azurerm_public_ip.vm02mgmtpip.ip_address}${var.rest_as3_uri} \
-              -H "Content-Type: application/json" \
               -u ${var.uname}:${var.upassword} \
               -d @${var.rest_vm_as3_file}
     EOF
