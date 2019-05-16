@@ -844,7 +844,7 @@ resource "azurerm_virtual_machine" "backendvm" {
     resource_group_name          = "${azurerm_resource_group.main.name}"
 
     network_interface_ids = ["${azurerm_network_interface.backend01-ext-nic.id}"]
-    vm_size               = "Standard_DS3_v2"
+    vm_size               = "Standard_B1s"
 
     storage_os_disk {
         name              = "backendOsDisk"
@@ -856,7 +856,7 @@ resource "azurerm_virtual_machine" "backendvm" {
     storage_image_reference {
         publisher = "Canonical"
         offer     = "UbuntuServer"
-        sku       = "16.04.0-LTS"
+        sku       = "18.04-LTS"
         version   = "latest"
     }
 
@@ -892,12 +892,12 @@ resource "azurerm_virtual_machine" "l3fwvm" {
   resource_group_name          = "${azurerm_resource_group.main.name}"
   primary_network_interface_id = "${azurerm_network_interface.l3fw-mgmt-nic.id}"
   network_interface_ids        = ["${azurerm_network_interface.l3fw-mgmt-nic.id}", "${azurerm_network_interface.l3fw-untrust-nic.id}", "${azurerm_network_interface.l3fw-trust-nic.id}"]
-  vm_size                      = "Standard_DS3_v2"
+  vm_size                      = "Standard_B4ms"
 
   storage_image_reference {
     publisher = "Canonical"
     offer     = "UbuntuServer"
-    sku       = "16.04.0-LTS"
+    sku       = "18.04-LTS"
     version   = "latest"
   }
 

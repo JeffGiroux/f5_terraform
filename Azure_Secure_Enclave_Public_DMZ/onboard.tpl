@@ -77,6 +77,42 @@ curl -u $CREDS -X POST http://localhost:8100/mgmt/shared/iapp/package-management
 
 sleep 20
 
+# Check DO Ready
+CNT=0
+while true
+do
+  STATUS=$(curl -u $CREDS -X GET -s -k -I https://localhost/mgmt/shared/declarative-onboarding | grep HTTP)
+  if [[ $STATUS == *"200"* ]]; then
+    echo "Got 200! Declarative Onboarding is Ready!"
+    break
+  elif [ $CNT -le 6 ]; then
+    echo "Status code: $STATUS  DO Not done yet..."
+    CNT=$[$CNT+1]
+  else
+    echo "GIVE UP..."
+    break
+  fi
+  sleep 10
+done
+
+# Check AS3 Ready
+CNT=0
+while true
+do
+  STATUS=$(curl -u $CREDS -X GET -s -k -I https://localhost/mgmt/shared/appsvcs/info | grep HTTP)
+  if [[ $STATUS == *"200"* ]]; then
+    echo "Got 200! AS3 is Ready!"
+    break
+  elif [ $CNT -le 6 ]; then
+    echo "Status code: $STATUS  AS3 Not done yet..."
+    CNT=$[$CNT+1]
+  else
+    echo "GIVE UP..."
+    break
+  fi
+  sleep 10
+done
+
 tmsh modify sys provision sslo level nominal
 
 sleep 20

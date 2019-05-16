@@ -4,28 +4,21 @@
   "persist": true,
   "declaration": {
     "class": "ADC",
-    "schemaVersion": "3.0.0",
+    "schemaVersion": "3.11.0",
     "id": "123abc",
     "label": "Sample 1",
     "remark": "HTTPS with predictive-node pool",
     "Sample_01": {
       "class": "Tenant",
-      "Shared": {
-        "class":"Application",
-        "template":"shared",
-        "serviceAddress": {
-          "class":"Service_Address",
-          "virtualAddress":"0.0.0.0"}
-      },
       "A1": {
         "class": "Application",
         "template": "https",
         "serviceMain": {
           "class": "Service_HTTPS",
           "virtualPort": 8443,
-          "virtualAddresses": [{
-	    "use":"/Sample_01/Shared/serviceAddress"
-	  }],
+          "virtualAddresses": [
+	      "0.0.0.0"
+	  ],
           "pool": "web_pool",
           "serverTLS": "webtls"
         },
