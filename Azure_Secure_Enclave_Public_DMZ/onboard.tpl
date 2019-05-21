@@ -65,17 +65,21 @@ DATA="{\"operation\":\"INSTALL\",\"packageFilePath\":\"/var/config/rest/download
 echo -e "\n"$(date) "Install sslo Pkg"
 curl -u $CREDS -X POST http://localhost:8100/mgmt/shared/iapp/package-management-tasks -d $DATA
 
+sleep 10
+
 # Install Declarative Onboarding Pkg
 DATA="{\"operation\":\"INSTALL\",\"packageFilePath\":\"/var/config/rest/downloads/$DO_FN\"}"
 echo -e "\n"$(date) "Install DO Pkg"
 curl -u $CREDS -X POST http://localhost:8100/mgmt/shared/iapp/package-management-tasks -d $DATA
+
+sleep 10
 
 # Install AS3 Pkg
 DATA="{\"operation\":\"INSTALL\",\"packageFilePath\":\"/var/config/rest/downloads/$AS3_FN\"}"
 echo -e "\n"$(date) "Install AS3 Pkg"
 curl -u $CREDS -X POST http://localhost:8100/mgmt/shared/iapp/package-management-tasks -d $DATA
 
-sleep 20
+sleep 10
 
 # Check DO Ready
 CNT=0
@@ -113,6 +117,8 @@ do
   sleep 10
 done
 
+sleep 10
+
 tmsh modify sys provision sslo level nominal
 
-sleep 20
+sleep 40
