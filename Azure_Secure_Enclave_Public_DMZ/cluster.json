@@ -1,6 +1,7 @@
 {
     "schemaVersion": "1.0.0",
     "class": "Device",
+    "async": true,
     "label": "Basic onboarding",
     "Common": {
         "class": "Tenant",
@@ -37,7 +38,8 @@
         },
         "myProvisioning": {
             "class": "Provision",
-            "ltm": "nominal"
+            "ltm": "nominal",
+	    "asm": "nominal"
         },
         "external": {
             "class": "VLAN",
@@ -54,70 +56,6 @@
             "class": "SelfIp",
             "address": "${local_selfip1}/24",
             "vlan": "external",
-            "allowService": "default",
-            "trafficGroup": "traffic-group-local-only"
-        },
-	"toService": {
-            "class": "VLAN",
-            "tag": 2000,
-            "mtu": 1500,
-            "interfaces": [
-                {
-                    "name": "1.2",
-                    "tagged": false
-                }
-            ]
-        },
-        "toService-self": {
-            "class": "SelfIp",
-            "address": "${local_selfip2}/25",
-            "vlan": "toService",
-            "allowService": "default",
-            "trafficGroup": "traffic-group-local-only"
-        },
-	"toService-fl1": {
-            "class": "SelfIp",
-            "address": "${tosrvfl1}/25",
-            "vlan": "toService",
-            "allowService": "default",
-            "trafficGroup": "traffic-group-local-only"
-        },
-	"toService-fl2": {
-            "class": "SelfIp",
-            "address": "${tosrvfl2}/25",
-            "vlan": "toService",
-            "allowService": "default",
-            "trafficGroup": "traffic-group-local-only"
-        },
-        "frService": {
-            "class": "VLAN",
-            "tag": 3000,
-            "mtu": 1500,
-            "interfaces": [
-                {
-                    "name": "1.3",
-                    "tagged": false
-                }
-            ]
-        },
-        "frService-self": {
-            "class": "SelfIp",
-            "address": "${local_selfip3}/25",
-            "vlan": "frService",
-            "allowService": "default",
-            "trafficGroup": "traffic-group-local-only"
-        },
-	"frService-fl1": {
-            "class": "SelfIp",
-            "address": "${frsrvfl1}/25",
-            "vlan": "frService",
-            "allowService": "default",
-            "trafficGroup": "traffic-group-local-only"
-        },
-	"frService-fl2": {
-            "class": "SelfIp",
-            "address": "${frsrvfl2}/25",
-            "vlan": "frService",
             "allowService": "default",
             "trafficGroup": "traffic-group-local-only"
         },

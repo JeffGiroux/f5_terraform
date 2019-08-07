@@ -17,7 +17,7 @@ variable "SP" {
                 tenant_id       = "xxxxx"
         }
 }
-variable prefix	{ default = "zludmz" }
+variable prefix	{ default = "zlusca" }
 variable uname	{ default = "azureuser" }
 variable upassword	{ default = "Default12345" }
 variable location	{ default = "eastus" }	 
@@ -38,14 +38,6 @@ variable "app-subnets" {
         type = "map"
         default = {
                 "subnet1" = "10.80.1.0/24"
-        }
-}
-variable sslo-cidr   { default = "198.19.0.0/16" }
-variable "sslo-subnets" {
-        type = "map"
-        default = {
-                "subnet1" = "198.19.0.0/25"
-                "subnet2" = "198.19.0.128/25"
         }
 }
 variable f5vm01mgmt	{ default = "10.90.1.4" }
@@ -78,21 +70,20 @@ variable product	{ default = "f5-big-ip-byol" }
 variable bigip_version	{ default = "latest" }
 
 # BIGIP Setup
-## These licenses have been tested with F5-BIG-LTM-VE-1G-V16 base SKU plus SSLO and BEST add-on
+## These licenses have been tested with F5-BIG-LTM-VE-1G-V16 base SKU 
 variable license1             { default = "xxxxx" }
 variable license2             { default = "xxxxx" }
 variable host1_name           { default = "f5vm01" }
 variable host2_name           { default = "f5vm02" }
-variable sslovm_name          { default = "sslovm" }
 variable dns_server           { default = "8.8.8.8" }
 variable ntp_server           { default = "0.us.pool.ntp.org" }
 variable timezone             { default = "UTC" }
 ## Please check and update the latest DO URL from https://github.com/F5Networks/f5-declarative-onboarding/releases
-variable DO_onboard_URL	      { default = "https://github.com/garyluf5/f5tools/raw/master/f5-declarative-onboarding-1.4.0-1.noarch.rpm" }
+variable DO_onboard_URL	      { default = "https://github.com/garyluf5/f5tools/raw/master/f5-declarative-onboarding-1.6.0-1.noarch.rpm" }
 ## Please check and update the latest AS3 URL from https://github.com/F5Networks/f5-appsvcs-extension/releases/latest 
-variable AS3_URL	      { default = "https://github.com/garyluf5/f5tools/raw/master/f5-appsvcs-3.11.0-3.noarch.rpm" }
-## Please check and update the latest SSL Orchistrator from https://downloads.f5.com
-variable sslo_URL	      { default = "https://github.com/garyluf5/f5tools/raw/master/f5-iappslx-ssl-orchestrator-14.1.0-5.3.7.noarch.rpm" }
+variable AS3_URL	      { default = "https://github.com/garyluf5/f5tools/raw/master/f5-appsvcs-3.13.0-3.noarch.rpm" }
+## Please check and update the latest Telemetry Streaming from https://github.com/F5Networks/f5-telemetry-streaming/tree/master/dist
+variable TS_URL	      	      { default = "https://github.com/garyluf5/f5tools/raw/master/f5-telemetry-1.5.0-1.noarch.rpm" }
 variable libs_dir	      { default = "/config/cloud/azure/node_modules" }
 variable onboard_log	      { default = "/var/log/startup-script.log" }
 

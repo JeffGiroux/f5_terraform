@@ -7,7 +7,7 @@ resource "azurerm_resource_group" "main" {
 # Create a Virtual Network within the Resource Group
 resource "azurerm_virtual_network" "main" {
   name			= "${var.prefix}-hub"
-  address_space		= ["${var.cidr}", "${var.sslo-cidr}"]
+  address_space		= ["${var.cidr}"]
   resource_group_name	= "${azurerm_resource_group.main.name}"
   location		= "${azurerm_resource_group.main.location}"
 }
@@ -36,22 +36,6 @@ resource "azurerm_subnet" "External" {
   address_prefix	= "${var.subnets["subnet2"]}"
 }
 
-# Create the Untrust Subnet within the Hub Virtual Network
-resource "azurerm_subnet" "Untrust" {
-  name                  = "Untrust"
-  virtual_network_name  = "${azurerm_virtual_network.main.name}"
-  resource_group_name   = "${azurerm_resource_group.main.name}"
-  address_prefix        = "${var.sslo-subnets["subnet1"]}"
-}
-
-# Create the Trust Subnet within the Hub Virtual Network
-resource "azurerm_subnet" "Trust" {
-  name                  = "Trust"
-  virtual_network_name  = "${azurerm_virtual_network.main.name}"
-  resource_group_name   = "${azurerm_resource_group.main.name}"
-  address_prefix        = "${var.sslo-subnets["subnet2"]}"
-}
-
 # Create the App1 Subnet within the Spoke Virtual Network
 resource "azurerm_subnet" "App1" {
   name                  = "App1"
@@ -62,11 +46,9 @@ resource "azurerm_subnet" "App1" {
 
 # Obtain Gateway IP for each Subnet
 locals {
-  depends_on		= ["azurerm_subnet.Mgmt", "azurerm_subnet.External",  "azurerm_subnet.ssloMgmt",  "azurerm_subnet.ssloUntrust",  "azurerm_subnet.ssloTrust"]
+  depends_on		= ["azurerm_subnet.Mgmt", "azurerm_subnet.External"]
   mgmt_gw		= "${cidrhost(azurerm_subnet.Mgmt.address_prefix, 1)}"
   ext_gw		= "${cidrhost(azurerm_subnet.External.address_prefix, 1)}"
-  sslo_untrust_gw       = "${cidrhost(azurerm_subnet.Untrust.address_prefix, 1)}"
-  sslo_trust_gw         = "${cidrhost(azurerm_subnet.Trust.address_prefix, 1)}"
   app1_gw                = "${cidrhost(azurerm_subnet.App1.address_prefix, 1)}"
 }
 
@@ -98,7 +80,7 @@ resource "azurerm_public_ip" "vm01mgmtpip" {
   resource_group_name	= "${azurerm_resource_group.main.name}"
   allocation_method	= "Dynamic"
 
-  tags {
+  tags = {
     Name		= "${var.environment}-vm01-mgmt-public-ip"
     environment		= "${var.environment}"
     owner		= "${var.owner}"
@@ -114,29 +96,13 @@ resource "azurerm_public_ip" "vm02mgmtpip" {
   resource_group_name   = "${azurerm_resource_group.main.name}"
   allocation_method	= "Dynamic"
 
-  tags {
+  tags = {
     Name		= "${var.environment}-vm02-mgmt-public-ip"
     environment		= "${var.environment}"
     owner		= "${var.owner}"
     group		= "${var.group}"
     costcenter		= "${var.costcenter}"
     application		= "${var.application}"
-  }
-}
-
-resource "azurerm_public_ip" "l3fwmgmtpip" {
-  name                  = "${var.prefix}-l3fw-mgmt-pip"
-  location              = "${azurerm_resource_group.main.location}"
-  resource_group_name   = "${azurerm_resource_group.main.name}"
-  allocation_method     = "Dynamic"
-
-  tags {
-    Name                = "${var.environment}-l3fw-mgmt-public-ip"
-    environment         = "${var.environment}"
-    owner               = "${var.owner}"
-    group               = "${var.group}"
-    costcenter          = "${var.costcenter}"
-    application         = "${var.application}"
   }
 }
 
@@ -288,7 +254,7 @@ resource "azurerm_network_security_group" "main" {
     destination_address_prefix = "*"
   }
 
-  tags {
+  tags = {
     Name           = "${var.environment}-bigip-sg"
     environment    = "${var.environment}"
     owner          = "${var.owner}"
@@ -313,7 +279,7 @@ resource "azurerm_network_interface" "vm01-mgmt-nic" {
     public_ip_address_id          = "${azurerm_public_ip.vm01mgmtpip.id}"
   }
 
-  tags {
+  tags = {
     Name           = "${var.environment}-vm01-mgmt-int"
     environment    = "${var.environment}"
     owner          = "${var.owner}"
@@ -337,7 +303,7 @@ resource "azurerm_network_interface" "vm02-mgmt-nic" {
     public_ip_address_id          = "${azurerm_public_ip.vm02mgmtpip.id}"
   }
 
-  tags {
+  tags = {
     Name           = "${var.environment}-vm02-mgmt-int"
     environment    = "${var.environment}"
     owner          = "${var.owner}"
@@ -370,7 +336,7 @@ resource "azurerm_network_interface" "vm01-ext-nic" {
     private_ip_address            = "${var.f5vm01ext_sec}"
   }
 
-  tags {
+  tags = {
     Name           = "${var.environment}-vm01-ext-int"
     environment    = "${var.environment}"
     owner          = "${var.owner}"
@@ -403,7 +369,7 @@ resource "azurerm_network_interface" "vm02-ext-nic" {
     private_ip_address            = "${var.f5vm02ext_sec}"
   }
 
-  tags {
+  tags = {
     Name           = "${var.environment}-vm02-ext-int"
     environment    = "${var.environment}"
     owner          = "${var.owner}"
@@ -413,133 +379,6 @@ resource "azurerm_network_interface" "vm02-ext-nic" {
   }
 }
 
-resource "azurerm_network_interface" "vm01-tosrv-nic" {
-  name                = "${var.prefix}-vm01-tosrv-nic"
-  location            = "${azurerm_resource_group.main.location}"
-  resource_group_name = "${azurerm_resource_group.main.name}"
-  network_security_group_id = "${azurerm_network_security_group.main.id}"
-  enable_ip_forwarding      = true
-
-  ip_configuration {
-    name                          = "primary"
-    subnet_id                     = "${azurerm_subnet.Untrust.id}"
-    private_ip_address_allocation = "Static"
-    private_ip_address            = "${var.f5vm01tosrv}"
-    primary                       = true
-  }
-
-  ip_configuration {
-    name                          = "floating"
-    subnet_id                     = "${azurerm_subnet.Untrust.id}"
-    private_ip_address_allocation = "Static"
-    private_ip_address            = "${var.f5vm01tosrvfl}"
-  }
-
-  tags {
-    Name           = "${var.environment}-vm01-tosrv-int"
-    environment    = "${var.environment}"
-    owner          = "${var.owner}"
-    group          = "${var.group}"
-    costcenter     = "${var.costcenter}"
-    application    = "${var.application}"
-  }
-}
-
-resource "azurerm_network_interface" "vm02-tosrv-nic" {
-  name                = "${var.prefix}-vm02-tosrv-nic"
-  location            = "${azurerm_resource_group.main.location}"
-  resource_group_name = "${azurerm_resource_group.main.name}"
-  network_security_group_id = "${azurerm_network_security_group.main.id}"
-  enable_ip_forwarding      = true
-
-  ip_configuration {
-    name                          = "primary"
-    subnet_id                     = "${azurerm_subnet.Untrust.id}"
-    private_ip_address_allocation = "Static"
-    private_ip_address            = "${var.f5vm02tosrv}"
-    primary                       = true
-  }
-
-  ip_configuration {
-    name                          = "floating"
-    subnet_id                     = "${azurerm_subnet.Untrust.id}"
-    private_ip_address_allocation = "Static"
-    private_ip_address            = "${var.f5vm02tosrvfl}"
-  }
-
-  tags {
-    Name           = "${var.environment}-vm02-tosrv-int"
-    environment    = "${var.environment}"
-    owner          = "${var.owner}"
-    group          = "${var.group}"
-    costcenter     = "${var.costcenter}"
-    application    = "${var.application}"
-  }
-}
-
-resource "azurerm_network_interface" "vm01-frsrv-nic" {
-  name                = "${var.prefix}-vm01-frsrv-nic"
-  location            = "${azurerm_resource_group.main.location}"
-  resource_group_name = "${azurerm_resource_group.main.name}"
-  network_security_group_id = "${azurerm_network_security_group.main.id}"
-  enable_ip_forwarding      = true
-
-  ip_configuration {
-    name                          = "primary"
-    subnet_id                     = "${azurerm_subnet.Trust.id}"
-    private_ip_address_allocation = "Static"
-    private_ip_address            = "${var.f5vm01frsrv}"
-    primary                       = true
-  }
-
-  ip_configuration {
-    name                          = "floating"
-    subnet_id                     = "${azurerm_subnet.Trust.id}"
-    private_ip_address_allocation = "Static"
-    private_ip_address            = "${var.f5vm01frsrvfl}"
-  }
-
-  tags {
-    Name           = "${var.environment}-vm01-frsrv-int"
-    environment    = "${var.environment}"
-    owner          = "${var.owner}"
-    group          = "${var.group}"
-    costcenter     = "${var.costcenter}"
-    application    = "${var.application}"
-  }
-}
-
-resource "azurerm_network_interface" "vm02-frsrv-nic" {
-  name                = "${var.prefix}-vm02-frsrv-nic"
-  location            = "${azurerm_resource_group.main.location}"
-  resource_group_name = "${azurerm_resource_group.main.name}"
-  network_security_group_id = "${azurerm_network_security_group.main.id}"
-  enable_ip_forwarding      = true
-
-  ip_configuration {
-    name                          = "primary"
-    subnet_id                     = "${azurerm_subnet.Trust.id}"
-    private_ip_address_allocation = "Static"
-    private_ip_address            = "${var.f5vm02frsrv}"
-    primary                       = true
-  }
-
-  ip_configuration {
-    name                          = "floating"
-    subnet_id                     = "${azurerm_subnet.Trust.id}"
-    private_ip_address_allocation = "Static"
-    private_ip_address            = "${var.f5vm02frsrvfl}"
-  }
-
-  tags {
-    Name           = "${var.environment}-vm02-frsrv-int"
-    environment    = "${var.environment}"
-    owner          = "${var.owner}"
-    group          = "${var.group}"
-    costcenter     = "${var.costcenter}"
-    application    = "${var.application}"
-  }
-}
 
 # Create the Interface for the App server
 resource "azurerm_network_interface" "backend01-ext-nic" {
@@ -556,86 +395,8 @@ resource "azurerm_network_interface" "backend01-ext-nic" {
     primary			  = true
   }
 
-  tags {
-    Name           = "${var.environment}-backend01-ext-int"
-    environment    = "${var.environment}"
-    owner          = "${var.owner}"
-    group          = "${var.group}"
-    costcenter     = "${var.costcenter}"
-    application    = "app1"
-  }
-}
-
-# Create the Interfaces for the L3 Firewall
-resource "azurerm_network_interface" "l3fw-mgmt-nic" {
-  name                      = "${var.prefix}-l3fw-mgmt-nic"
-  location                  = "${azurerm_resource_group.main.location}"
-  resource_group_name       = "${azurerm_resource_group.main.name}"
-  network_security_group_id = "${azurerm_network_security_group.main.id}"
-
-  ip_configuration {
-    name                          = "primary"
-    subnet_id                     = "${azurerm_subnet.Mgmt.id}"
-    private_ip_address_allocation = "Static"
-    private_ip_address            = "${var.l3fwmgmt}"
-    public_ip_address_id          = "${azurerm_public_ip.l3fwmgmtpip.id}"
-  }
-
-  tags {
-    Name           = "${var.environment}-l3fw-mgmt-int"
-    environment    = "${var.environment}"
-    owner          = "${var.owner}"
-    group          = "${var.group}"
-    costcenter     = "${var.costcenter}"
-    application    = "${var.application}"
-  }
-}
-
-resource "azurerm_network_interface" "l3fw-untrust-nic" {
-  name                = "${var.prefix}-l3fw-untrust-nic"
-  location            = "${azurerm_resource_group.main.location}"
-  resource_group_name = "${azurerm_resource_group.main.name}"
-  network_security_group_id = "${azurerm_network_security_group.main.id}"
-
-  ip_configuration {
-    name                          = "primary"
-    subnet_id                     = "${azurerm_subnet.Untrust.id}"
-    private_ip_address_allocation = "Static"
-    private_ip_address            = "${var.l3fwuntrust}"
-    primary                       = true
-  }
-
-  tags {
-    Name           = "${var.environment}-l3fw-untrust-int"
-    environment    = "${var.environment}"
-    owner          = "${var.owner}"
-    group          = "${var.group}"
-    costcenter     = "${var.costcenter}"
-    application    = "${var.application}"
-  }
-}
-
-resource "azurerm_network_interface" "l3fw-trust-nic" {
-  name                = "${var.prefix}-l3fw-trust-nic"
-  location            = "${azurerm_resource_group.main.location}"
-  resource_group_name = "${azurerm_resource_group.main.name}"
-  network_security_group_id = "${azurerm_network_security_group.main.id}"
-
-  ip_configuration {
-    name                          = "primary"
-    subnet_id                     = "${azurerm_subnet.Trust.id}"
-    private_ip_address_allocation = "Static"
-    private_ip_address            = "${var.l3fwtrust}"
-    primary                       = true
-  }
-
-  tags {
-    Name           = "${var.environment}-l3fw-trust-int"
-    environment    = "${var.environment}"
-    owner          = "${var.owner}"
-    group          = "${var.group}"
-    costcenter     = "${var.costcenter}"
-    application    = "${var.application}"
+  tags = {
+    foo            = "bar"
   }
 }
 
@@ -658,12 +419,12 @@ resource "azurerm_network_interface_backend_address_pool_association" "bpool_ass
 data "template_file" "vm_onboard" {
   template = "${file("${path.module}/onboard.tpl")}"
 
-  vars {
+  vars = {
     uname        	  = "${var.uname}"
     upassword        	  = "${var.upassword}"
     DO_onboard_URL        = "${var.DO_onboard_URL}"
     AS3_URL		  = "${var.AS3_URL}"
-    sslo_URL		  = "${var.sslo_URL}"
+    TS_URL		  = "${var.TS_URL}"
     libs_dir		  = "${var.libs_dir}"
     onboard_log		  = "${var.onboard_log}"
   }
@@ -672,7 +433,7 @@ data "template_file" "vm_onboard" {
 data "template_file" "vm01_do_json" {
   template = "${file("${path.module}/cluster.json")}"
 
-  vars {
+  vars = {
     #Uncomment the following line for BYOL
     regkey	    = "${var.license1}"
 
@@ -680,12 +441,6 @@ data "template_file" "vm01_do_json" {
     host2	    = "${var.host2_name}"
     local_host      = "${var.host1_name}"
     local_selfip1   = "${var.f5vm01ext}"
-    local_selfip2   = "${var.f5vm01tosrv}"
-    local_selfip3   = "${var.f5vm01frsrv}"
-    tosrvfl1	    = "${var.f5vm01tosrvfl}"
-    tosrvfl2       = "${var.f5vm02tosrvfl}"
-    frsrvfl1	    = "${var.f5vm01frsrvfl}"
-    frsrvfl2       = "${var.f5vm02frsrvfl}"
     remote_selfip   = "${var.f5vm01ext}"
     gateway	    = "${local.ext_gw}"
     dns_server	    = "${var.dns_server}"
@@ -699,7 +454,7 @@ data "template_file" "vm01_do_json" {
 data "template_file" "vm02_do_json" {
   template = "${file("${path.module}/cluster.json")}"
 
-  vars {
+  vars = {
     #Uncomment the following line for BYOL
     regkey         = "${var.license2}"
 
@@ -707,12 +462,6 @@ data "template_file" "vm02_do_json" {
     host2           = "${var.host2_name}"
     local_host      = "${var.host2_name}"
     local_selfip1   = "${var.f5vm02ext}"
-    local_selfip2   = "${var.f5vm02tosrv}"
-    local_selfip3   = "${var.f5vm02frsrv}"
-    tosrvfl1       = "${var.f5vm01tosrvfl}"
-    tosrvfl2       = "${var.f5vm02tosrvfl}"
-    frsrvfl1       = "${var.f5vm01frsrvfl}"
-    frsrvfl2       = "${var.f5vm02frsrvfl}"
     remote_selfip   = "${var.f5vm01ext}"
     gateway         = "${local.ext_gw}"
     dns_server      = "${var.dns_server}"
@@ -726,7 +475,7 @@ data "template_file" "vm02_do_json" {
 data "template_file" "as3_json" {
   template = "${file("${path.module}/as3.json")}"
 
-  vars {
+  vars = {
     rg_name	    = "${azurerm_resource_group.main.name}"
     subscription_id = "${var.SP["subscription_id"]}"
     tenant_id	    = "${var.SP["tenant_id"]}"
@@ -741,7 +490,7 @@ resource "azurerm_virtual_machine" "f5vm01" {
   location                     = "${azurerm_resource_group.main.location}"
   resource_group_name          = "${azurerm_resource_group.main.name}"
   primary_network_interface_id = "${azurerm_network_interface.vm01-mgmt-nic.id}"
-  network_interface_ids        = ["${azurerm_network_interface.vm01-mgmt-nic.id}", "${azurerm_network_interface.vm01-ext-nic.id}", "${azurerm_network_interface.vm01-tosrv-nic.id}", "${azurerm_network_interface.vm01-frsrv-nic.id}"]
+  network_interface_ids        = ["${azurerm_network_interface.vm01-mgmt-nic.id}", "${azurerm_network_interface.vm01-ext-nic.id}"]
   vm_size                      = "${var.instance_type}"
   availability_set_id          = "${azurerm_availability_set.avset.id}"
 
@@ -784,7 +533,7 @@ resource "azurerm_virtual_machine" "f5vm01" {
     product       = "${var.product}"
   }
 
-  tags {
+  tags = {
     Name           = "${var.environment}-f5vm01"
     environment    = "${var.environment}"
     owner          = "${var.owner}"
@@ -799,7 +548,7 @@ resource "azurerm_virtual_machine" "f5vm02" {
   location                     = "${azurerm_resource_group.main.location}"
   resource_group_name          = "${azurerm_resource_group.main.name}"
   primary_network_interface_id = "${azurerm_network_interface.vm02-mgmt-nic.id}"
-  network_interface_ids        = ["${azurerm_network_interface.vm02-mgmt-nic.id}", "${azurerm_network_interface.vm02-ext-nic.id}", "${azurerm_network_interface.vm02-tosrv-nic.id}", "${azurerm_network_interface.vm02-frsrv-nic.id}"]
+  network_interface_ids        = ["${azurerm_network_interface.vm02-mgmt-nic.id}", "${azurerm_network_interface.vm02-ext-nic.id}"]
   vm_size                      = "${var.instance_type}"
   availability_set_id          = "${azurerm_availability_set.avset.id}"
 
@@ -842,7 +591,7 @@ resource "azurerm_virtual_machine" "f5vm02" {
     product       = "${var.product}"
   }
 
-  tags {
+  tags = {
     Name           = "${var.environment}-f5vm02"
     environment    = "${var.environment}"
     owner          = "${var.owner}"
@@ -891,52 +640,14 @@ resource "azurerm_virtual_machine" "backendvm" {
         disable_password_authentication = false
     }
 
-  tags {
-    Name           = "${var.environment}-backend01"
-    environment    = "${var.environment}"
-    owner          = "${var.owner}"
-    group          = "${var.group}"
-    costcenter     = "${var.costcenter}"
-    application    = "${var.application}"
-  }
-}
-
-resource "azurerm_virtual_machine" "l3fwvm" {
-  name                         = "${var.prefix}-l3fwvm"
-  location                     = "${azurerm_resource_group.main.location}"
-  resource_group_name          = "${azurerm_resource_group.main.name}"
-  primary_network_interface_id = "${azurerm_network_interface.l3fw-mgmt-nic.id}"
-  network_interface_ids        = ["${azurerm_network_interface.l3fw-mgmt-nic.id}", "${azurerm_network_interface.l3fw-untrust-nic.id}", "${azurerm_network_interface.l3fw-trust-nic.id}"]
-  vm_size                      = "Standard_B4ms"
-
-  storage_image_reference {
-    publisher = "Canonical"
-    offer     = "UbuntuServer"
-    sku       = "18.04-LTS"
-    version   = "latest"
-  }
-
-  storage_os_disk {
-    name              = "${var.prefix}l3fwvm-osdisk"
-    caching           = "ReadWrite"
-    create_option     = "FromImage"
-    managed_disk_type = "Standard_LRS"
-  }
-
-  os_profile {
-    computer_name  = "${var.prefix}l3fwvm"
-    admin_username = "${var.uname}"
-    admin_password = "${var.upassword}"
-  }
-
-  os_profile_linux_config {
-    disable_password_authentication = false
+  tags = {
+    application    = "app1"
   }
 }
 
 # Run Startup Script
-resource "azurerm_virtual_machine_extension" "f5vm01-run-startup-cmd" {
-  name                 = "${var.environment}-f5vm01-run-startup-cmd"
+resource "azurerm_virtual_machine_extension" "f5vm01_run_startup_cmd" {
+  name                 = "${var.environment}_f5vm01_run_startup_cmd"
   depends_on           = ["azurerm_virtual_machine.f5vm01", "azurerm_virtual_machine.backendvm"]
   location             = "${var.region}"
   resource_group_name  = "${azurerm_resource_group.main.name}"
@@ -944,9 +655,9 @@ resource "azurerm_virtual_machine_extension" "f5vm01-run-startup-cmd" {
   publisher            = "Microsoft.OSTCExtensions"
   type                 = "CustomScriptForLinux"
   type_handler_version = "1.2"
-  # publisher            = "Microsoft.Azure.Extensions"
-  # type                 = "CustomScript"
-  # type_handler_version = "2.0"
+  #publisher            = "Microsoft.Azure.Extensions"
+  #type                 = "CustomScript"
+  #type_handler_version = "2.0"
 
   settings = <<SETTINGS
     {
@@ -954,8 +665,8 @@ resource "azurerm_virtual_machine_extension" "f5vm01-run-startup-cmd" {
     }
   SETTINGS
 
-  tags {
-    Name           = "${var.environment}-f5vm01-startup-cmd"
+  tags = {
+    Name           = "${var.environment}_f5vm01_startup_cmd"
     environment    = "${var.environment}"
     owner          = "${var.owner}"
     group          = "${var.group}"
@@ -964,8 +675,8 @@ resource "azurerm_virtual_machine_extension" "f5vm01-run-startup-cmd" {
   }
 }
 
-resource "azurerm_virtual_machine_extension" "f5vm02-run-startup-cmd" {
-  name                 = "${var.environment}-f5vm02-run-startup-cmd"
+resource "azurerm_virtual_machine_extension" "f5vm02_run_startup_cmd" {
+  name                 = "${var.environment}_f5vm02-run_startup_cmd"
   depends_on           = ["azurerm_virtual_machine.f5vm02", "azurerm_virtual_machine.backendvm"]
   location             = "${var.region}"
   resource_group_name  = "${azurerm_resource_group.main.name}"
@@ -973,9 +684,9 @@ resource "azurerm_virtual_machine_extension" "f5vm02-run-startup-cmd" {
   publisher            = "Microsoft.OSTCExtensions"
   type                 = "CustomScriptForLinux"
   type_handler_version = "1.2"
-  # publisher            = "Microsoft.Azure.Extensions"
-  # type                 = "CustomScript"
-  # type_handler_version = "2.0"
+  #publisher            = "Microsoft.Azure.Extensions"
+  #type                 = "CustomScript"
+  #type_handler_version = "2.0"
 
   settings = <<SETTINGS
     {
@@ -983,8 +694,8 @@ resource "azurerm_virtual_machine_extension" "f5vm02-run-startup-cmd" {
     }
   SETTINGS
 
-  tags {
-    Name           = "${var.environment}-f5vm02-startup-cmd"
+  tags = {
+    Name           = "${var.environment}_f5vm02_startup_cmd"
     environment    = "${var.environment}"
     owner          = "${var.owner}"
     group          = "${var.group}"
@@ -1009,55 +720,44 @@ resource "local_file" "vm_as3_file" {
   filename    = "${path.module}/vm_as3_data.json"
 }
 
-resource "null_resource" "f5vm01-run-REST" {
-  depends_on	= ["azurerm_virtual_machine_extension.f5vm01-run-startup-cmd"]
+resource "null_resource" "f5vm01_DO" {
+  depends_on	= ["azurerm_virtual_machine_extension.f5vm01_run_startup_cmd"]
   # Running DO REST API
   provisioner "local-exec" {
     command = <<-EOF
       #!/bin/bash
-      curl -k -X ${var.rest_do_method} https://${data.azurerm_public_ip.vm01mgmtpip.ip_address}${var.rest_do_uri} \
-              -H "Content-Type: application/json" \
-	      -u ${var.uname}:${var.upassword} \
-	      -d @${var.rest_vm01_do_file} 
-    EOF
-  }
-  
-  # Running AS3 REST API
-  provisioner "local-exec" {
-    command = <<-EOF
-      #!/bin/bash
-      curl -k -X ${var.rest_as3_method} https://${data.azurerm_public_ip.vm01mgmtpip.ip_address}${var.rest_as3_uri} \
-              -H "Content-Type: application/json" \
-	      -u ${var.uname}:${var.upassword} \
-	      -d @${var.rest_vm_as3_file}
+      curl -k -X ${var.rest_do_method} https://${data.azurerm_public_ip.vm01mgmtpip.ip_address}${var.rest_do_uri} -u ${var.uname}:${var.upassword} -d @${var.rest_vm01_do_file}
+      sleep 3
     EOF
   }
 }
 
-resource "null_resource" "f5vm02-run-REST" {
-  depends_on	= ["azurerm_virtual_machine_extension.f5vm02-run-startup-cmd"]
+resource "null_resource" "f5vm02_DO" {
+  depends_on    = ["azurerm_virtual_machine_extension.f5vm02_run_startup_cmd"]
   # Running DO REST API
   provisioner "local-exec" {
     command = <<-EOF
       #!/bin/bash
-      curl -k -X ${var.rest_do_method} https://${data.azurerm_public_ip.vm02mgmtpip.ip_address}${var.rest_do_uri} \
-              -H "Content-Type: application/json" \
-	      -u ${var.uname}:${var.upassword} \
-	      -d @${var.rest_vm02_do_file}
+      curl -k -X ${var.rest_do_method} https://${data.azurerm_public_ip.vm02mgmtpip.ip_address}${var.rest_do_uri} -u ${var.uname}:${var.upassword} -d @${var.rest_vm02_do_file}
+      sleep 3
     EOF
   }
+}
 
+resource "null_resource" "f5vm_AS3" {
+  depends_on    = ["null_resource.f5vm01_DO", "null_resource.f5vm02_DO"]
   # Running AS3 REST API
   provisioner "local-exec" {
     command = <<-EOF
       #!/bin/bash
-      curl -k -X ${var.rest_as3_method} https://${data.azurerm_public_ip.vm02mgmtpip.ip_address}${var.rest_as3_uri} \
-              -H "Content-Type: application/json" \
-	      -u ${var.uname}:${var.upassword} \
-	      -d @${var.rest_vm_as3_file}
+      ((curl -u ${var.uname}:${var.upassword} -X GET -s -k https://${data.azurerm_public_ip.vm01mgmtpip.ip_address}/mgmt/shared/declarative-onboarding) | grep ":200") && sleep 3 || sleep 400
+      curl -k -X ${var.rest_as3_method} https://${data.azurerm_public_ip.vm01mgmtpip.ip_address}${var.rest_as3_uri} -u ${var.uname}:${var.upassword} -d @${var.rest_vm_as3_file}
+      sleep 20
+      curl -k -X ${var.rest_as3_method} https://${data.azurerm_public_ip.vm02mgmtpip.ip_address}${var.rest_as3_uri} -u ${var.uname}:${var.upassword} -d @${var.rest_vm_as3_file}
     EOF
   }
 }
+
 
 ## OUTPUTS ###
 data "azurerm_public_ip" "vm01mgmtpip" {
@@ -1075,18 +775,12 @@ data "azurerm_public_ip" "lbpip" {
   resource_group_name = "${azurerm_resource_group.main.name}"
   depends_on          = ["azurerm_virtual_machine.backendvm"]
 }
-data "azurerm_public_ip" "l3fwmgmtpip" {
-  name                = "${azurerm_public_ip.l3fwmgmtpip.name}"
-  resource_group_name = "${azurerm_resource_group.main.name}"
-  depends_on          = ["azurerm_virtual_machine.l3fwvm"]
-}
 
 output "sg_id" { value = "${azurerm_network_security_group.main.id}" }
 output "sg_name" { value = "${azurerm_network_security_group.main.name}" }
 output "mgmt_subnet_gw" { value = "${local.mgmt_gw}" }
 output "ext_subnet_gw" { value = "${local.ext_gw}" }
 output "ALB_app1_pip" { value = "${data.azurerm_public_ip.lbpip.ip_address}" }
-output "l3fw_mgmt_pip" { value = "${data.azurerm_public_ip.l3fwmgmtpip.ip_address}" }
 
 output "f5vm01_id" { value = "${azurerm_virtual_machine.f5vm01.id}"  }
 output "f5vm01_mgmt_private_ip" { value = "${azurerm_network_interface.vm01-mgmt-nic.private_ip_address}" }
