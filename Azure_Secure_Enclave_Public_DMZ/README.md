@@ -2,11 +2,20 @@
 
 ## Contents
 
+- [Version](#version)
 - [Introduction](#introduction)
 - [Prerequisites](#prerequisites)
 - [Important Configuration Notes](#important-configuration-notes)
 - [Template Parameters](#Template-parameters)
 - [Configuration Example](#configuration-example)
+
+## Version
+This template is tested and worked in the following version
+Terraform v0.12.6
++ provider.azurerm v1.32.1
++ provider.local v1.3.0
++ provider.null v2.1.2
++ provider.template v2.1.2
 
 ## Introduction
 
