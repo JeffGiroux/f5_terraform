@@ -12,7 +12,7 @@
 
 This solution uses an Terraform template to launch a Four NICs deployment of a cloud-focused BIG-IP VE cluster (Active/Standby) in Microsoft Azure. Traffic flows from an ALB to the BIG-IP VE which then processes the traffic to application servers. This is the standard cloud design where the BIG-IP VE instance is running with Four interfaces: Management , External, To-service, and From-service (where the later two interfaces would be use in experimental with SSL Orchestration)  .  
 
-The BIG-IP VEs have the [Local Traffic Manager (LTM)](https://f5.com/products/big-ip/local-traffic-manager-ltm) module enabled to provide advanced traffic management functionality. This means you can also configure the BIG-IP VE to enable F5's L4/L7 security features, access control, and intelligent traffic management. The suggested SKU is F5-BIG-LTM-VE-1G-V16 base SKU plus SSLO and BEST add-on, so we can also enable WAF and SSLO for future developments
+The BIG-IP VEs have the [Local Traffic Manager (LTM)](https://f5.com/products/big-ip/local-traffic-manager-ltm) module and [Application_Security_Module (ASM)](https://www.f5.com/pdf/products/big-ip-application-security-manager-overview.pdf) enabled to provide advanced traffic management functionality. This means you can also configure the BIG-IP VE to enable F5's L4/L7 security features, access control, and intelligent traffic management. The suggested SKU is F5-BIG-LTM-VE-1G-V16 base SKU, so we can also enable WAF and Telemetry Streaming for future developments
 
 The one big thing in this Terraform accounted for is composing resources a bit differently to account for dependencies into Immutable/Mutable elements. i.e. stuff you would typically frequently change/mutate, such as traditional config on the BIG-IP. Once the template is deployed, there are certain resources (like the network infrastructure) that are fixed while others (like BIG-IP VMs and configurations) can be changed   
 Ex.
@@ -36,9 +36,9 @@ Ex.
 
 - All variables are configured in variables.tf 
 - Azure Subscription and Service Principal are configured in provider.tf
-- This template would require Declarative Onboarding and AS3 packages for the initial configuration. As part of the onboarding script, it will download the RPMs respectively. So please see the [AS3 documentation](https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/3.5.1/) and [DO documentation](https://clouddocs.f5.com/products/extensions/f5-declarative-onboarding/latest/prereqs.html) for details on how to use AS3 and Declarative Onboarding on your BIG-IP VE(s).
-- onboard.tpl is the onboarding script, which is run by commandToExecute, and it will be copy to /var/lib/waagent/CustomData upon bootup. This script is basically responsible for downloading the neccessary DO, AS3, and SSLO RPM files, and then installing them with REST calls.
-- This template uses BYOL BIGIP image for the deployment (as default), due to SSLO isn't available in PayGO SKU image
+- This template would require Declarative Onboarding and AS3 packages for the initial configuration. As part of the onboarding script, it will download the RPMs respectively. So please see the [AS3 documentation](https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/) and [DO documentation](https://clouddocs.f5.com/products/extensions/f5-declarative-onboarding/latest/prereqs.html) for details on how to use AS3 and Declarative Onboarding on your BIG-IP VE(s).
+- onboard.tpl is the onboarding script, which is run by commandToExecute, and it will be copy to /var/lib/waagent/CustomData upon bootup. This script is basically responsible for downloading the neccessary DO, AS3, and TS RPM files, and then installing them with REST calls.
+- This template uses BYOL BIGIP image for the deployment (as default)
 - The initial deployment will enable you to pass traffic from your clients to the DVWA app server. See [Rerun AS3](#Rerun-AS3-on-the-big-ip-ve) if you would like to reconfigure the AS3 configuration.
 - See the **[Configuration Example](#configuration-example)** section for a configuration diagram and description for this solution.
 
@@ -61,24 +61,10 @@ Ex.
 | region | Yes | Region of the deployment. |
 | cidr | Yes | IP Address range of the DMZ Virtual Network, which contains 'subnet1' for mgmt network, 'subnet2' for external network, and 'subnet3' for internal network. |
 | app-cidr | Yes | IP Address range of the App Network, which is sitting at another VNet and being peered to the DMZ Vnet. |
-| sslo-cidr | Yes | IP Address range of the SSLO Network, which is sitting at the same DMZ VNet, where 'subnet1' is for "To-service" traffic, and 'subnet2' is for "From-service" traffic. |
 | f5vm01mgmt | Yes | IP address for 1st BIG-IP's management interface. |
 | f5vm02mgmt | Yes | IP address for 2nd BIG-IP's management interface. |
 | f5vm01ext | Yes | IP address for 1st BIG-IP's external interface. |
-| f5vm01ext_sec | Yes | Secondary IP address for 1st BIG-IP's external interface. |
 | f5vm02ext | Yes | IP address for 2nd BIG-IP's external interface. |
-| f5vm02ext_sec | Yes | Secondary IP address for 2nd BIG-IP's external interface. |
-| f5vm01tosrv | Yes | Self IP address for BIG-IP-01's To-service L3 inline interface. |
-| f5vm02tosrv | Yes | Self IP address for BIG-IP-02's To-service L3 inline interface. |
-| f5vm01tosrvf1 | Yes | Secondary IP address for BIG-IP-01's To-service L3 inline interface. |
-| f5vm02tosrvf1 | Yes | Secondary IP address for BIG-IP-02's To-service L3 inline interface. |
-| f5vm01frsrv | Yes | Self IP address for BIG-IP-01's From-service L3 inline interface. |
-| f5vm02frsrv | Yes | Self IP address for BIG-IP-02's From-service L3 inline interface. |
-| f5vm01frsrvf1 | Yes | Secondary IP address for BIG-IP-01's From-service L3 inline interface. |
-| f5vm02frsrvf1 | Yes | Secondary IP address for BIG-IP-02's From-service L3 inline interface. |
-| l3fwmgmt | Yes | L3 Firewall's management IP. |
-| l3funtrust | Yes | L3 Firewall's IP in untrust subnet. |
-| l3ftrust | Yes | L3 Firewall's IP in trust subnet. |
 | instance_type | Yes | Azure instance to be used for the BIG-IP VE. |
 | product | Yes | Azure BIG-IP VE Offer. |
 | bigip_version | Yes | It is set to default to use the latest software. |
@@ -92,7 +78,7 @@ Ex.
 | dns_server | Yes | Least the default DNS server the BIG-IP uses, or replace the default DNS server with the one you want to use. | 
 | DO_onboard_URL | Yes | This is the raw github URL for downloading the Declarative Onboarding RPM |
 | AS3_URL | Yes | This is the raw github URL for downloading the AS3 RPM. |
-| sslo_URL | Yes | This is the raw github URL for downloading the SSLO RPM. |
+| TS_URL | Yes | This is the raw github URL for downloading the Telemetry Streaming RPM. |
 | libs_dir | Yes | This is where all the temporary libs and RPM will be store in BIG-IP. |
 | onboard_log | Yes | This is where the onboarding script logs all the events. |
 
@@ -119,7 +105,7 @@ terraform destroy -target azurerm_virtual_machine.f5vm02
 ```
 terraform apply
 ```
-  4. At this time, you have 2 standalone BIG-IP VEs behind the Azure LB, which is fine. Repeate step 1 to step 3 on the other BIG-IP VE otherwise, the Device Trust won't be configured correctly
+  4. You have 2 Active/Standby BIG-IP VEs behind the Azure LB. Repeate step 1 to step 3 on the other BIG-IP VE and HA Device Trust should be configured 
 
 
 This example illustrate how to upgrade the BIG-IP VEs (remember, when replace a VE, we replace both, can't be just single VE)
@@ -133,12 +119,12 @@ terraform destroy -target azurerm_virtual_machine.f5vm02
 ```
 terraform apply
 ```
-  5. At this time, you have 2 standalone BIG-IP VEs behind the Azure LB, which is fine. Repeate step 2 to step 4 on the other BIG-IP VE otherwise, the Device Trust won't be configured correctly
+  5. You have 2 Active/Standby BIG-IP VEs behind the Azure LB. Repeate step 1 to step 3 on the other BIG-IP VE and HA Device Trust should be configured
 
 ## Rerun AS3 on the Big-ip ve
 - This example illustrate how to run your own custom AS3, you can have a catalog of AS3 and repeat this steps as many times as desired
 ```
-terraform taint null_resource.f5vm02-run-REST
-terraform apply -target null_resource.f5vm02-run-REST -var "rest_do_method=GET" -var "rest_as3_method=POST" -var "rest_vm_as3_file=test.json" -var "rest_vm02_do_file=''"
+terraform taint null_resource.f5vm_AS3
+terraform apply -target null_resource.f5vm_AS3
 ```
 - If you would like to re-run your DO json, just swap the above REST methods, and apply the new DO json file, then you can repeat the above steps as many time as you'd need.  
