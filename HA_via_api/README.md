@@ -10,9 +10,9 @@
 
 ## Introduction
 
-This solution uses an Terraform template to launch a two NIC deployment of a cloud-focused BIG-IP VE cluster (Active/Standby) in Microsoft Azure. Traffic flows from an ALB to the BIG-IP VE which then processes the traffic to application servers. This is the standard cloud design where the BIG-IP VE instance is running with a dual interface, where both management and data plane traffic is processed on each one.  
+This solution uses an Terraform template to launch a two NIC deployment of a cloud-focused BIG-IP VE cluster (Active/Standby) in Microsoft Azure. Traffic flows to the HA BIG-IP VE which then send to DVWA app server. This is the standard cloud design where the BIG-IP VE instance is running with a dual interface, where both management and data plane traffic is processed on each one.  
 
-The BIG-IP VEs have the [Local Traffic Manager (LTM)](https://f5.com/products/big-ip/local-traffic-manager-ltm) module enabled to provide advanced traffic management functionality. This means you can also configure the BIG-IP VE to enable F5's L4/L7 security features, access control, and intelligent traffic management.
+The BIG-IP VEs have both the [Local Traffic Manager (LTM)](https://f5.com/products/big-ip/local-traffic-manager-ltm) and [Application Security Module (ASM)](https://www.f5.com/products/security/advanced-waf) modules enabled to provide advanced traffic management functionality. This means you can also configure the BIG-IP VE to enable F5's L4/L7 security features, access control, Advance WAF and intelligent traffic management.
 
 The one big thing in this Terraform accounted for is composing resources a bit differently to account for dependencies into Immutable/Mutable elements. i.e. stuff you would typically frequently change/mutate, such as traditional config on the BIG-IP. Once the template is deployed, there are certain resources (like the network infrastructure) that are fixed while others (like BIG-IP VMs and configurations) can be changed   
 Ex.
@@ -28,7 +28,9 @@ Ex.
 ## Prerequisites
 
 - **Important**: When you configure the admin password for the BIG-IP VE in the template, you cannot use the character **#**.  Additionally, there are a number of other special characters that you should avoid using for F5 product user accounts.  See [K2873](https://support.f5.com/csp/article/K2873) for details.
-- This template requires a service principal.  See the [Service Principal Setup section](#service-principal-authentication) for details, including required permissions.
+- This template requires a service principal. **Important**: you MUST have "OWNER" previlidge on the SP in order to assign role to the resources in your subscription. See the [Service Principal Setup section](#service-principal-authentication) for details, including required permissions.
+- The HA BIG-IP VMs use Azure RBAC role for the failover instead of using Service Prinicipal.
+- These BIG-IP VMs are deploy across different Availability Zones, please ensure the region you've chosen can support AZ
 - This deployment will be using the Terraform Azurerm provider to build out all the neccessary Azure objects. Therefore, Azure CLI is required. for installation, please follow this [Microsoft link](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-apt?view=azure-cli-latest)
 - If this is the first time to deploy the F5 image, the subscription used in this deployment needs to be enabled to programatically deploy. For more information, please refer to [Configure Programatic Deployment](https://azure.microsoft.com/en-us/blog/working-with-marketplace-images-on-azure-resource-manager/)
 
@@ -59,11 +61,13 @@ Ex.
 | prefix | Yes | This value is insert in the beginning of each Azure object, try keeps it alpha-numeric without any special character |
 | rest_do_uri | Yes | URI of the Declarative Onboarding REST call. |
 | rest_as3_uri | Yes | URI of the AS3 REST call. |
+| rest_CF_uri | Yes | URI of the Cloud-Failover REST call. |
 | rest_do_method | Yes | Available options are GET, POST, and DELETE. |
 | rest_AS3_method | Yes | Available options are GET, POST, and DELETE. |
 | rest_vm01_do_file | Yes | Terraform will generate the vm01 DO json file, where you can manually run it again for debugging. |
 | rest_vm02_do_file | Yes | Terraform will generate the vm02 DO json file, where you can manually run it again for debugging. |
 | rest_vm_as3_file | Yes | Terraform will generate the AS3 json file, where you can manually run it again for debugging. |
+| rest_vm_CF_file | Yes | Terraform will generate the CF json file, where you can manually run it again for debugging. |
 | SP | YES | This is the service principal of your Azure subscription. |
 | uname | Yes | User name for the Virtual Machine. |
 | upassword | Yes | Password for the Virtual Machine. |
@@ -73,6 +77,7 @@ Ex.
 | subnet1 | Yes | Subnet IP range of the management network. |
 | subnet2 | Yes | Subnet IP range of the external network. |
 | subnet3 | No | Subnet IP range of the internal network. |
+| managed_route1 | Yes | A UDR route can used for testing managed-route failover. |
 | f5vm01mgmt | Yes | IP address for 1st BIG-IP's management interface. |
 | f5vm02mgmt | Yes | IP address for 2nd BIG-IP's management interface. |
 | f5vm01ext | Yes | IP address for 1st BIG-IP's external interface. |
@@ -92,49 +97,31 @@ Ex.
 | dns_server | Yes | Least the default DNS server the BIG-IP uses, or replace the default DNS server with the one you want to use. | 
 | DO_onboard_URL | Yes | This is the raw github URL for downloading the Declarative Onboarding RPM |
 | AS3_URL | Yes | This is the raw github URL for downloading the AS3 RPM. |
+| TS_URL | Yes | This is the raw github URL for downloading the Telemetry RPM. |
+| CFsdk_URL | Yes | This is the raw github URL for downloading the Cloud-Failover RPM. |
 | libs_dir | Yes | This is where all the temporary libs and RPM will be store in BIG-IP. |
 | onboard_log | Yes | This is where the onboarding script logs all the events. |
+| f5_cloud_failover_label | Yes | This is a tag used for failover. |
 
 
 ## Configuration Example
 
 The following is an example configuration diagram for this solution deployment. In this scenario, all access to the BIG-IP VE cluster (Active/Standby) is through an ALB. The IP addresses in this example may be different in your implementation.
 
-![Configuration Example](./HA_via_lb_2nics.png)
+![Configuration Example](./AzureFailoverExtensionHighLevel1.gif)
 
 
 ## Documentation
 
-For more information on F5 solutions for Azure, including manual configuration procedures for some deployment scenarios, see the Azure section of [Public Cloud Docs](http://clouddocs.f5.com/cloud/public/v1/).
+For more information on F5 solutions for Azure, including manual configuration procedures for some deployment scenarios, see the Azure section of [Cloud Failover Doc](https://clouddocs.f5networks.net/products/extensions/f5-cloud-failover/latest/userguide/azure.html).
 
 ## Creating virtual servers on the BIG-IP VE
 
-In order to pass traffic from your clients to the servers through the BIG-IP system, you must create a virtual server on the BIG-IP VE.
-
-In this template, the Azure public IP address is associated with an Azure Load Balancer that forwards traffic to a backend pool that includes the primary (self) IP configurations for *each* BIG-IP network interface.  Because traffic is destined for the self IP addresses of the BIG-IP VEs, you must create a single virtual server with a wildcard destination in Traffic Group **None**.
-
-1. Once your BIG-IP VE has launched, open the BIG-IP VE Configuration utility.
-2. On the Main tab, click **Local Traffic > Virtual Servers** and then click the **Create** button.
-3. In the **Name** field, give the Virtual Server a unique name.
-4. In the **Destination/Mask** field, type the destination address ( for example: 0.0.0.0/0).
-5. In the **Service Port** field, type the appropriate port.
-6. Configure the rest of the virtual server as appropriate.
-7. If you used the Service Discovery iApp template: In the Resources section, from the **Default Pool** list, select the name of the pool created by the iApp.
-8. Click the **Finished** button.
-9. Repeat as necessary.
-
-When you have completed the virtual server configuration, you must modify the virtual addresses to use Traffic Group None using the following guidance.
-
-1. On the Main tab, click **Local Traffic > Virtual Servers**.
-2. On the Menu bar, click the **Virtual Address List** tab.
-3. Click the address of one of the virtual servers you just created.
-4. From the **Traffic Group** list, select **None**.
-5. Click **Update**.
-6. Repeat for each virtual server.
+In order to pass traffic from your clients to the servers through the BIG-IP system, you must create a virtual server on the BIG-IP VE. In this template, it creates 2 VIPs, one for public internet facing and one for private internal usage. They are preconfigured as an example and configured the same way as on-prem BIG-IP.
 
 ## Redeploy BIG-IP for replacement or upgrade
 This example illustrates how to replace the BIG-IP VE
-  1. Revoke the problematic BIG-IP VE's license
+  1. Revoke the problematic BIG-IP VE's license (if BYOL)
   2. Run command
 ```
 terraform destroy -target azurerm_virtual_machine.f5vm02
@@ -162,7 +149,7 @@ terraform apply
 ## Rerun AS3 on the Big-ip ve
 - This example illustrate how to run your own custom AS3, you can have a catalog of AS3 and repeat this steps as many times as desired
 ```
-terraform taint null_resource.f5vm02-run-REST
-terraform apply -target null_resource.f5vm02-run-REST -var "rest_do_method=GET" -var "rest_as3_method=POST" -var "rest_vm_as3_file=test.json" -var "rest_vm02_do_file=''"
+terraform taint null_resource.f5vm_AS3
+terraform apply -target null_resource.f5vm_AS3 -var "rest_as3_method=POST" -var "rest_vm_as3_file=test.json" 
 ```
-- If you would like to re-run your DO json, just swap the above REST methods, and apply the new DO json file, then you can repeat the above steps as many time as you'd need.
+- If you would like to re-run your DO json, it would be similar to the above procedure.
