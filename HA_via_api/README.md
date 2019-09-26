@@ -1,4 +1,4 @@
-# Deploying BIG-IP VEs in Azure - ConfigSync Cluster (Active/Standby): Two NICs
+# Deploying BIG-IP VEs in Azure - High Availability (Active/Standby): Two NICs
 
 ## Contents
 
