@@ -25,6 +25,14 @@ Ex.
 
 **Networking Stack Type:** This solution deploys into a new networking stack, which is created along with the solution.
 
+## Version
+This template is tested and worked in the following version
+Terraform v0.12.6
++ provider.azurerm v1.32.1
++ provider.local v1.3.0
++ provider.null v2.1.2
++ provider.template v2.1.2
+
 ## Prerequisites
 
 - **Important**: When you configure the admin password for the BIG-IP VE in the template, you cannot use the character **#**.  Additionally, there are a number of other special characters that you should avoid using for F5 product user accounts.  See [K2873](https://support.f5.com/csp/article/K2873) for details.
@@ -98,7 +106,7 @@ Ex.
 | DO_onboard_URL | Yes | This is the raw github URL for downloading the Declarative Onboarding RPM |
 | AS3_URL | Yes | This is the raw github URL for downloading the AS3 RPM. |
 | TS_URL | Yes | This is the raw github URL for downloading the Telemetry RPM. |
-| CFsdk_URL | Yes | This is the raw github URL for downloading the Cloud-Failover RPM. |
+| CF_URL | Yes | This is the raw github URL for downloading the Cloud-Failover RPM. |
 | libs_dir | Yes | This is where all the temporary libs and RPM will be store in BIG-IP. |
 | onboard_log | Yes | This is where the onboarding script logs all the events. |
 | f5_cloud_failover_label | Yes | This is a tag used for failover. |

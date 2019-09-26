@@ -398,7 +398,7 @@ data "template_file" "vm_onboard" {
     DO_onboard_URL        = "${var.DO_onboard_URL}"
     AS3_URL		  = "${var.AS3_URL}"
     TS_URL                = "${var.TS_URL}"
-    CFsdk_URL		  = "${var.CFsdk_URL}"
+    CF_URL		  = "${var.CF_URL}"
     libs_dir		  = "${var.libs_dir}"
     onboard_log		  = "${var.onboard_log}"
     mgmt_gw		  = "${local.mgmt_gw}"

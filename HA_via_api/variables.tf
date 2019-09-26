@@ -64,8 +64,8 @@ variable DO_onboard_URL	      { default = "https://github.com/garyluf5/f5tools/r
 variable AS3_URL	      { default = "https://github.com/garyluf5/f5tools/raw/master/f5-appsvcs-3.14.0-4.noarch.rpm" }
 ## Please check and update the latest Telemtry URL from https://github.com/F5Networks/f5-telemetry-streaming/tree/master/dist
 variable TS_URL               { default = "https://github.com/garyluf5/f5tools/raw/master/f5-telemetry-1.5.0-1.noarch.rpm" }
-## Please check and update the latest Cloud Failover SDK URL from https://clouddocs.f5networks.net/products/extensions/f5-cloud-failover/latest/
-variable CFsdk_URL	      { default = "" }
+## Please check and update the latest Cloud Failover RPM URL from https://clouddocs.f5networks.net/products/extensions/f5-cloud-failover/latest/
+variable CF_URL	 	      { default = "" }
 variable libs_dir	      { default = "/config/cloud/azure/node_modules" }
 variable onboard_log	      { default = "/var/log/startup-script.log" }
 

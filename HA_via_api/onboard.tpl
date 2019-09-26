@@ -51,8 +51,8 @@ AS3_URL='${AS3_URL}'
 AS3_FN=$(basename "$AS3_URL")
 TS_URL='${TS_URL}'
 TS_FN=$(basename "$TS_URL")
-CFsdk_URL='${CFsdk_URL}'
-CFsdk_FN=$(basename "$CFsdk_URL")
+CF_URL='${CF_URL}'
+CF_FN=$(basename "$CF_URL")
 
 
 mkdir -p ${libs_dir}
@@ -66,8 +66,8 @@ curl -L -k -o ${libs_dir}/$DO_FN $DO_URL
 echo -e "\n"$(date) "Download AS3 Pkg"
 curl -L -k -o ${libs_dir}/$AS3_FN $AS3_URL
 
-echo -e "\n"$(date) "Download CFsdk Pkg"
-curl -L -k -o ${libs_dir}/$CFsdk_FN $CFsdk_URL
+echo -e "\n"$(date) "Download CF Pkg"
+curl -L -k -o ${libs_dir}/$CF_FN $CF_URL
 sleep 20
 
 # Copy the RPM Pkg to the file location
@@ -94,9 +94,9 @@ curl -u $CREDS -X POST http://localhost:8100/mgmt/shared/iapp/package-management
 
 sleep 10
 
-# Install CFsdk Pkg
-DATA="{\"operation\":\"INSTALL\",\"packageFilePath\":\"/var/config/rest/downloads/$CFsdk_FN\"}"
-echo -e "\n"$(date) "Install CFsdk Pkg"
+# Install CF Pkg
+DATA="{\"operation\":\"INSTALL\",\"packageFilePath\":\"/var/config/rest/downloads/$CF_FN\"}"
+echo -e "\n"$(date) "Install CF Pkg"
 curl -u $CREDS -X POST http://localhost:8100/mgmt/shared/iapp/package-management-tasks -d $DATA
 
 sleep 10
@@ -155,7 +155,7 @@ do
   sleep 10
 done
 
-# Check CFsdk Ready
+# Check CF Ready
 CNT=0
 while true
 do
