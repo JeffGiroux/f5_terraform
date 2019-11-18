@@ -33,6 +33,8 @@ do
   sleep 10
 done
 
+sleep 60
+
 ### DOWNLOAD ONBOARDING PKGS
 # Could be pre-packaged or hosted internally
 
@@ -135,5 +137,4 @@ do
   sleep 10
 done
 
-sleep 40
-
+sleep 60

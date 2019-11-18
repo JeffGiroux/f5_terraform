@@ -19,8 +19,28 @@
           "virtualAddresses": [
 	      "0.0.0.0"
 	  ],
+          "securityLogProfiles": [
+              {
+                "bigip": "/Common/Log all requests"
+              },
+              {
+                "use": "telemetry_security_log_profile"
+              }
+          ],
+          "snat": "auto",
           "pool": "web_pool",
-          "serverTLS": "webtls"
+          "policyWAF": {
+            "use": "My_ASM_Policy"
+          },
+          "serverTLS": "webtls",
+          "profileTrafficLog": {
+          "use": "telemetry_traffic_log_profile"
+          }
+        },
+        "My_ASM_Policy": {
+          "class": "WAF_Policy",
+          "url": "https://raw.githubusercontent.com/garyluf5/f5tools/master/asm-policies/asm-policy-linux-medium.xml",
+          "ignoreChanges": true
         },
         "web_pool": {
           "class": "Pool",
@@ -30,19 +50,109 @@
           "members": [
 	    {
               "servicePort": 80,
-	      "addressDiscovery": "azure",
-	      "updateInterval": 10,
-	      "tagKey": "foo",
-	      "tagValue": "bar",
-	      "addressRealm": "private",
-	      "resourceGroup": "${rg_name}",
-	      "subscriptionId": "${subscription_id}",
-              "directoryId": "${tenant_id}",
-              "applicationId": "${client_id}",
-              "apiAccessKey": "${client_secret}",
-              "credentialUpdate": false
+	      "serverAddresses": [
+	          "${backendvm_ip}"
+	      ]
 	    }
 	  ]
+        },
+        "telemetry": {
+          "class": "Pool",
+          "members": [
+            {
+              "enable": true,
+              "serverAddresses": [
+                "255.255.255.254"
+              ],
+              "servicePort": 6514
+            }
+          ],
+          "monitors": [
+            {
+              "bigip": "/Common/tcp"
+            }
+          ]
+        },
+        "telemetry_local_pool": {
+          "class": "Pool",
+          "monitors": [{
+            "bigip": "/Common/tcp"
+          }],
+          "members": [
+            {
+              "servicePort": 6514,
+              "serverAddresses": [
+                "255.255.255.254"
+              ]
+            }
+          ]
+        },
+        "telemetry_local_rule": {
+        	"remark": "Only required when TS is a local listener",
+        	"class": "iRule",
+        	"iRule": "when CLIENT_ACCEPTED {\n  node 127.0.0.1 6514\n}"
+        },
+        "telemetry_local": {
+        	"remark": "Only required when TS is a local listener",
+          "class": "Service_TCP",
+          "virtualAddresses": [
+            "255.255.255.254"
+          ],
+          "virtualPort": 6514,
+          "iRules": [
+          "telemetry_local_rule"
+          ]
+        },
+        "telemetry_hsl": {
+          "class": "Log_Destination",
+          "type": "remote-high-speed-log",
+          "protocol": "tcp",
+          "pool": {
+            "use": "telemetry"
+          }
+        },
+        "telemetry_formatted": {
+          "class": "Log_Destination",
+          "type": "splunk",
+          "forwardTo": {
+            "use": "telemetry_hsl"
+          }
+        },
+        "telemetry_publisher": {
+          "class": "Log_Publisher",
+          "destinations": [
+            {
+              "use": "telemetry_formatted"
+            }
+          ]
+        },
+        "telemetry_traffic_log_profile": {
+          "class": "Traffic_Log_Profile",
+          "requestSettings": {
+            "requestEnabled": true,
+            "requestProtocol": "mds-tcp",   
+            "requestPool": {
+            	"use": "telemetry_local_pool"
+            },
+            "requestTemplate": "event_source=\"request_logging\",hostname=\"$BIGIP_HOSTNAME\",client_ip=\"$CLIENT_IP\",server_ip=\"$SERVER_IP\",http_method=\"$HTTP_METHOD\",http_uri=\"$HTTP_URI\",virtual_name=\"$VIRTUAL_NAME\",event_timestamp=\"$DATE_HTTP\""
+          }
+        },
+        "telemetry_security_log_profile": {
+          "class": "Security_Log_Profile",
+          "application": {
+            "localStorage": false,
+            "remoteStorage": "splunk",
+            "protocol": "tcp",
+            "servers": [
+              {
+                "address": "255.255.255.254",
+                "port": "6514"
+              }
+            ],
+            "storageFilter": {
+            "requestType": "all"
+            }
+          }
         },
         "webtls": {
           "class": "TLS_Server",
@@ -64,4 +174,3 @@
     }
   }
 }
-

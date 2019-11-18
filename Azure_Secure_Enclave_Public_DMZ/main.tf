@@ -4,6 +4,15 @@ resource "azurerm_resource_group" "main" {
   location = "${var.location}"
 }
 
+# Create Log Analytic Workspace
+resource "azurerm_log_analytics_workspace" "law" {
+  name                  = "${var.prefix}-law"
+  sku                   = "PerNode"
+  retention_in_days     = 300
+  resource_group_name   = "${azurerm_resource_group.main.name}"
+  location              = "${azurerm_resource_group.main.location}"
+}
+
 # Create a Virtual Network within the Resource Group
 resource "azurerm_virtual_network" "main" {
   name			= "${var.prefix}-hub"
@@ -476,6 +485,7 @@ data "template_file" "as3_json" {
   template = "${file("${path.module}/as3.json")}"
 
   vars = {
+    backendvm_ip    = "${var.backend01ext}"
     rg_name	    = "${azurerm_resource_group.main.name}"
     subscription_id = "${var.SP["subscription_id"]}"
     tenant_id	    = "${var.SP["tenant_id"]}"
@@ -484,10 +494,20 @@ data "template_file" "as3_json" {
   }
 }
 
+data "template_file" "ts_json" {
+  template = "${file("${path.module}/ts.json")}"
+  depends_on           = ["azurerm_log_analytics_workspace.law"]
+  vars = {
+    law_id          = "${azurerm_log_analytics_workspace.law.workspace_id}"
+    law_primkey     = "${azurerm_log_analytics_workspace.law.primary_shared_key}"
+  }
+}
+
 # Create F5 BIGIP VMs
 resource "azurerm_virtual_machine" "f5vm01" {
   name                         = "${var.prefix}-f5vm01"
   location                     = "${azurerm_resource_group.main.location}"
+  depends_on                   = ["azurerm_virtual_machine.backendvm"]
   resource_group_name          = "${azurerm_resource_group.main.name}"
   primary_network_interface_id = "${azurerm_network_interface.vm01-mgmt-nic.id}"
   network_interface_ids        = ["${azurerm_network_interface.vm01-mgmt-nic.id}", "${azurerm_network_interface.vm01-ext-nic.id}"]
@@ -546,6 +566,7 @@ resource "azurerm_virtual_machine" "f5vm01" {
 resource "azurerm_virtual_machine" "f5vm02" {
   name                         = "${var.prefix}-f5vm02"
   location                     = "${azurerm_resource_group.main.location}"
+  depends_on                   = ["azurerm_virtual_machine.backendvm"]
   resource_group_name          = "${azurerm_resource_group.main.name}"
   primary_network_interface_id = "${azurerm_network_interface.vm02-mgmt-nic.id}"
   network_interface_ids        = ["${azurerm_network_interface.vm02-mgmt-nic.id}", "${azurerm_network_interface.vm02-ext-nic.id}"]
@@ -648,7 +669,7 @@ resource "azurerm_virtual_machine" "backendvm" {
 # Run Startup Script
 resource "azurerm_virtual_machine_extension" "f5vm01_run_startup_cmd" {
   name                 = "${var.environment}_f5vm01_run_startup_cmd"
-  depends_on           = ["azurerm_virtual_machine.f5vm01", "azurerm_virtual_machine.backendvm"]
+  depends_on           = ["azurerm_virtual_machine.f5vm01"]
   location             = "${var.region}"
   resource_group_name  = "${azurerm_resource_group.main.name}"
   virtual_machine_name = "${azurerm_virtual_machine.f5vm01.name}"
@@ -677,7 +698,7 @@ resource "azurerm_virtual_machine_extension" "f5vm01_run_startup_cmd" {
 
 resource "azurerm_virtual_machine_extension" "f5vm02_run_startup_cmd" {
   name                 = "${var.environment}_f5vm02-run_startup_cmd"
-  depends_on           = ["azurerm_virtual_machine.f5vm02", "azurerm_virtual_machine.backendvm"]
+  depends_on           = ["azurerm_virtual_machine.f5vm02"]
   location             = "${var.region}"
   resource_group_name  = "${azurerm_resource_group.main.name}"
   virtual_machine_name = "${azurerm_virtual_machine.f5vm02.name}"
@@ -707,17 +728,22 @@ resource "azurerm_virtual_machine_extension" "f5vm02_run_startup_cmd" {
 # Run REST API for configuration
 resource "local_file" "vm01_do_file" {
   content     = "${data.template_file.vm01_do_json.rendered}"
-  filename    = "${path.module}/vm01_do_data.json"
+  filename    = "${path.module}/${var.rest_vm01_do_file}"
 }
 
 resource "local_file" "vm02_do_file" {
   content     = "${data.template_file.vm02_do_json.rendered}"
-  filename    = "${path.module}/vm02_do_data.json"
+  filename    = "${path.module}/${var.rest_vm02_do_file}"
 }
 
 resource "local_file" "vm_as3_file" {
   content     = "${data.template_file.as3_json.rendered}"
-  filename    = "${path.module}/vm_as3_data.json"
+  filename    = "${path.module}/${var.rest_vm_as3_file}"
+}
+
+resource "local_file" "vm_ts_file" {
+  content     = "${data.template_file.ts_json.rendered}"
+  filename    = "${path.module}/${var.rest_vm_ts_file}"
 }
 
 resource "null_resource" "f5vm01_DO" {
@@ -727,7 +753,8 @@ resource "null_resource" "f5vm01_DO" {
     command = <<-EOF
       #!/bin/bash
       curl -k -X ${var.rest_do_method} https://${data.azurerm_public_ip.vm01mgmtpip.ip_address}${var.rest_do_uri} -u ${var.uname}:${var.upassword} -d @${var.rest_vm01_do_file}
-      sleep 3
+      x=1; while [ $x -le 30 ]; do STATUS=$(curl -k -X GET https://${data.azurerm_public_ip.vm01mgmtpip.ip_address}/mgmt/shared/declarative-onboarding/task -u ${var.uname}:${var.upassword}); if ( echo $STATUS | grep "OK" ); then break; fi; sleep 10; x=$(( $x + 1 )); done
+      sleep 120
     EOF
   }
 }
@@ -739,7 +766,30 @@ resource "null_resource" "f5vm02_DO" {
     command = <<-EOF
       #!/bin/bash
       curl -k -X ${var.rest_do_method} https://${data.azurerm_public_ip.vm02mgmtpip.ip_address}${var.rest_do_uri} -u ${var.uname}:${var.upassword} -d @${var.rest_vm02_do_file}
-      sleep 3
+      x=1; while [ $x -le 30 ]; do STATUS=$(curl -k -X GET https://${data.azurerm_public_ip.vm01mgmtpip.ip_address}/mgmt/shared/declarative-onboarding/task -u ${var.uname}:${var.upassword}); if ( echo $STATUS | grep "OK" ); then break; fi; sleep 10; x=$(( $x + 1 )); done
+      sleep 120
+    EOF
+  }
+}
+
+resource "null_resource" "f5vm01_TS" {
+  depends_on    = ["null_resource.f5vm01_DO"]
+  # Running CF REST API
+  provisioner "local-exec" {
+    command = <<-EOF
+      #!/bin/bash
+      curl -H 'Content-Type: application/json' -k -X POST https://${data.azurerm_public_ip.vm01mgmtpip.ip_address}${var.rest_ts_uri} -u ${var.uname}:${var.upassword} -d @${var.rest_vm_ts_file}
+    EOF
+  }
+}
+
+resource "null_resource" "f5vm02_TS" {
+  depends_on    = ["null_resource.f5vm02_DO"]
+  # Running CF REST API
+  provisioner "local-exec" {
+    command = <<-EOF
+      #!/bin/bash
+      curl -H 'Content-Type: application/json' -k -X POST https://${data.azurerm_public_ip.vm02mgmtpip.ip_address}${var.rest_ts_uri} -u ${var.uname}:${var.upassword} -d @${var.rest_vm_ts_file}
     EOF
   }
 }
@@ -750,10 +800,7 @@ resource "null_resource" "f5vm_AS3" {
   provisioner "local-exec" {
     command = <<-EOF
       #!/bin/bash
-      ((curl -u ${var.uname}:${var.upassword} -X GET -s -k https://${data.azurerm_public_ip.vm01mgmtpip.ip_address}/mgmt/shared/declarative-onboarding) | grep ":200") && sleep 3 || sleep 400
       curl -k -X ${var.rest_as3_method} https://${data.azurerm_public_ip.vm01mgmtpip.ip_address}${var.rest_as3_uri} -u ${var.uname}:${var.upassword} -d @${var.rest_vm_as3_file}
-      sleep 20
-      curl -k -X ${var.rest_as3_method} https://${data.azurerm_public_ip.vm02mgmtpip.ip_address}${var.rest_as3_uri} -u ${var.uname}:${var.upassword} -d @${var.rest_vm_as3_file}
     EOF
   }
 }
@@ -773,7 +820,7 @@ data "azurerm_public_ip" "vm02mgmtpip" {
 data "azurerm_public_ip" "lbpip" {
   name                = "${azurerm_public_ip.lbpip.name}"
   resource_group_name = "${azurerm_resource_group.main.name}"
-  depends_on          = ["azurerm_virtual_machine.backendvm"]
+  depends_on          = ["azurerm_virtual_machine.f5vm02"]
 }
 
 output "sg_id" { value = "${azurerm_network_security_group.main.id}" }
