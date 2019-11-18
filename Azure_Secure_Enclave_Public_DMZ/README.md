@@ -103,7 +103,7 @@ The following is an example configuration diagram for this solution deployment. 
 
 This deployment has created an Azure Log Analytic Workspace, and F5 BIG-IP would push the LTM and ASM logs via Telemetry Streaming to the Analytic Workspace. In other words, all the ASM and LTM logs are ready to be used for the Azure Sentinel Workbook. Please refer to the following screenshots.
 
-![Link LAW to Sentinel](./link_LAW_to_Sentinel.png){:height="30%" width="30%"}
+<img src="./link_LAW_to_Sentinel.png" width="50%">
 ![open workbook template](./open_workbook_template.png)
 
 
