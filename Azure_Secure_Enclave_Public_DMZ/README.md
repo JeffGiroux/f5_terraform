@@ -12,14 +12,14 @@
 ## Version
 This template is tested and worked in the following version
 Terraform v0.12.6
-+ provider.azurerm v1.32.1
-+ provider.local v1.3.0
++ provider.azurerm v1.36.1
++ provider.local v1.4.0
 + provider.null v2.1.2
 + provider.template v2.1.2
 
 ## Introduction
 
-This solution uses an Terraform template to launch a Four NICs deployment of a cloud-focused BIG-IP VE cluster (Active/Standby) in Microsoft Azure. Traffic flows from an ALB to the BIG-IP VE which then processes the traffic to application servers. This is the standard cloud design where the BIG-IP VE instance is running with Four interfaces: Management , External, To-service, and From-service (where the later two interfaces would be use in experimental with SSL Orchestration)  .  
+This solution uses an Terraform template to launch a Four NICs deployment of a cloud-focused BIG-IP VE cluster (Active/Standby) in Microsoft Azure. Traffic flows from an ALB to the BIG-IP VE which then processes the traffic to application servers. This is the standard cloud design where the BIG-IP VE instance is running with Two interfaces: Management and External.  
 
 The BIG-IP VEs have the [Local Traffic Manager (LTM)](https://f5.com/products/big-ip/local-traffic-manager-ltm) module and [Application_Security_Module (ASM)](https://www.f5.com/pdf/products/big-ip-application-security-manager-overview.pdf) enabled to provide advanced traffic management functionality. This means you can also configure the BIG-IP VE to enable F5's L4/L7 security features, access control, and intelligent traffic management. The suggested SKU is F5-BIG-LTM-VE-1G-V16 base SKU, so we can also enable WAF and Telemetry Streaming for future developments
 
@@ -99,9 +99,20 @@ The following is an example configuration diagram for this solution deployment. 
 ![Configuration Example](./Secure_Enclave_public_dmz.png)
 
 
+## Azure Sentinel integration
+
+This deployment has created an Azure Log Analytic Workspace, and F5 BIG-IP would push the LTM and ASM logs via Telemetry Streaming to the Analytic Workspace. In other words, all the ASM and LTM logs are ready to be used for the Azure Sentinel Workbook. Please refer to the following screenshots.
+
+![Link LAW to Sentinel](./link_LAW_to_Sentinel.png)
+![open workbook template](./open_workbook_template.png)
+
+
 ## Documentation
 
 For more information on F5 solutions for Azure, including manual configuration procedures for some deployment scenarios, see the Azure section of [Public Cloud Docs](http://clouddocs.f5.com/cloud/public/v1/).
+
+For more information on F5 and Sentinel Integration, please refer to [F5 Devcentral link](https://devcentral.f5.com/s/articles/Integrating-the-F5-BIGIP-with-Azure-Sentinel)
+
 
 ## Redeploy BIG-IP for replacement or upgrade
 This example illustrates how to replace the BIG-IP VE
