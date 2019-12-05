@@ -334,6 +334,7 @@ resource "azurerm_network_interface" "vm01-ext-nic" {
     costcenter     = "${var.costcenter}"
     application    = "${var.application}"
     f5_cloud_failover_label = "${var.f5_cloud_failover_label}"
+    f5_cloud_failover_nic_map = "${var.f5_cloud_failover_nic_map}"
   }
 }
 
@@ -360,6 +361,7 @@ resource "azurerm_network_interface" "vm02-ext-nic" {
     costcenter     = "${var.costcenter}"
     application    = "${var.application}"
     f5_cloud_failover_label = "${var.f5_cloud_failover_label}"
+    f5_cloud_failover_nic_map = "${var.f5_cloud_failover_nic_map}"
   }
 }
 
@@ -766,7 +768,7 @@ resource "null_resource" "f5vm01_DO" {
       #!/bin/bash
       curl -k -X ${var.rest_do_method} https://${data.azurerm_public_ip.vm01mgmtpip.ip_address}${var.rest_do_uri} -u ${var.uname}:${var.upassword} -d @${var.rest_vm01_do_file}
       x=1; while [ $x -le 30 ]; do STATUS=$(curl -k -X GET https://${data.azurerm_public_ip.vm01mgmtpip.ip_address}/mgmt/shared/declarative-onboarding/task -u ${var.uname}:${var.upassword}); if ( echo $STATUS | grep "OK" ); then break; fi; sleep 10; x=$(( $x + 1 )); done
-      sleep 60
+      sleep 120
     EOF
   }
 }
@@ -780,7 +782,7 @@ resource "null_resource" "f5vm02_DO" {
       #!/bin/bash
       curl -k -X ${var.rest_do_method} https://${data.azurerm_public_ip.vm02mgmtpip.ip_address}${var.rest_do_uri} -u ${var.uname}:${var.upassword} -d @${var.rest_vm02_do_file}
       x=1; while [ $x -le 30 ]; do STATUS=$(curl -k -X GET https://${data.azurerm_public_ip.vm02mgmtpip.ip_address}/mgmt/shared/declarative-onboarding/task -u ${var.uname}:${var.upassword}); if ( echo $STATUS | grep "OK" ); then break; fi; sleep 10; x=$(( $x + 1 )); done
-      sleep 60
+      sleep 120
     EOF
   }
 }
@@ -792,6 +794,7 @@ resource "null_resource" "f5vm01_CF" {
     command = <<-EOF
       #!/bin/bash
       curl -k -X POST https://${data.azurerm_public_ip.vm01mgmtpip.ip_address}${var.rest_CF_uri} -u ${var.uname}:${var.upassword} -d @${var.rest_vm_failover_file}
+    sleep 30
     EOF
   }
 }
@@ -809,7 +812,7 @@ resource "null_resource" "f5vm02_CF" {
 
 
 resource "null_resource" "f5vm_AS3" {
-  depends_on    = ["null_resource.f5vm01_DO", "null_resource.f5vm02_DO"]
+  depends_on    = ["null_resource.f5vm01_CF"]
   # Running AS3 REST API
   provisioner "local-exec" {
     command = <<-EOF

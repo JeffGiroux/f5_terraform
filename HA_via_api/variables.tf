@@ -59,13 +59,13 @@ variable dns_server           { default = "8.8.8.8" }
 variable ntp_server           { default = "0.us.pool.ntp.org" }
 variable timezone             { default = "UTC" }
 ## Please check and update the latest DO URL from https://github.com/F5Networks/f5-declarative-onboarding/releases
-variable DO_onboard_URL	      { default = "https://github.com/garyluf5/f5tools/raw/master/f5-declarative-onboarding-1.6.0-1.noarch.rpm" }
+variable DO_onboard_URL	      { default = "https://github.com/garyluf5/f5tools/raw/master/f5-declarative-onboarding-1.7.0-3.noarch.rpm" }
 ## Please check and update the latest AS3 URL from https://github.com/F5Networks/f5-appsvcs-extension/releases/latest 
 variable AS3_URL	      { default = "https://github.com/garyluf5/f5tools/raw/master/f5-appsvcs-3.14.0-4.noarch.rpm" }
 ## Please check and update the latest Telemtry URL from https://github.com/F5Networks/f5-telemetry-streaming/tree/master/dist
 variable TS_URL               { default = "https://github.com/garyluf5/f5tools/raw/master/f5-telemetry-1.5.0-1.noarch.rpm" }
 ## Please check and update the latest Cloud Failover RPM URL from https://clouddocs.f5networks.net/products/extensions/f5-cloud-failover/latest/
-variable CF_URL	 	      { default = "" }
+variable CF_URL               { default = "https://github.com/f5devcentral/f5-cloud-failover-extension/releases/download/v0.9.1/f5-cloud-failover-0.9.1-1.noarch.rpm" }
 variable libs_dir	      { default = "/config/cloud/azure/node_modules" }
 variable onboard_log	      { default = "/var/log/startup-script.log" }
 
@@ -77,5 +77,6 @@ variable group          { default = "f5group"      }
 variable costcenter     { default = "f5costcenter" }
 variable application    { default = "f5app"        }
 variable f5_cloud_failover_label { default = "mydeployment" }  #Cloud Failover Tag
+variable f5_cloud_failover_nic_map { default = "external" }  #NIC Tag
 
 

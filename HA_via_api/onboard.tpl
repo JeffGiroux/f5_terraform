@@ -173,3 +173,4 @@ do
   sleep 10
 done
 
+sleep 60
