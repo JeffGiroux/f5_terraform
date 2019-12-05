@@ -110,7 +110,7 @@ Terraform v0.12.6
 | libs_dir | Yes | This is where all the temporary libs and RPM will be store in BIG-IP. |
 | onboard_log | Yes | This is where the onboarding script logs all the events. |
 | f5_cloud_failover_label | Yes | This is a tag used for failover. |
-
+| f5_cloud_failover_nic_map | Yes | This is a tag used for failover NIC. |
 
 ## Configuration Example
 
