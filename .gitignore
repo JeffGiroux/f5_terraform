@@ -1,0 +1,25 @@
+#  Local .terraform directories
+**/.terraform/*
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+
+# .tfvars files
+*.tfvars
+
+# Terraform crash log
+**/crash.log
+
+# Go Tests
+**/vendor
+**/Gopkg.toml
+**/Gopkg.lock
+
+# Mac OS files
+# .tfstate files
+*.tfstate
+*DS_Store
+
+# Output json files for F5 Automation toolchain
+vm*_data.json

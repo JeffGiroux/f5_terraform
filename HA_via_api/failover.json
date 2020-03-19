@@ -1,22 +1,31 @@
 {
-    "class": "Cloud_Failover",
-    "environment": "azure",
-    "externalStorage": {
-        "scopingTags": {
-          "f5_cloud_failover_label": "${f5_cloud_failover_label}"
-        }
-    },
-    "failoverAddresses": {
-        "scopingTags": {
-          "f5_cloud_failover_label": "${f5_cloud_failover_label}"
-        }
-    },
-    "failoverRoutes": {
+  "class": "Cloud_Failover",
+  "environment": "azure",
+  "externalStorage": {
       "scopingTags": {
-        "f5_cloud_failover_label": "${f5_cloud_failover_label}"
+          "f5_cloud_failover_label": "${f5_cloud_failover_label}"
+      }
+  },
+  "failoverAddresses": {
+      "scopingTags": {
+          "f5_cloud_failover_label": "${f5_cloud_failover_label}"
+      }
+  },
+  "failoverRoutes": {
+      "scopingTags": {
+          "f5_cloud_failover_label": "${f5_cloud_failover_label}"
       },
       "scopingAddressRanges": [
-        "${managed_route1}"
-      ]
-    }
+          {
+              "range": "${managed_route1}"
+          }
+      ],
+      "defaultNextHopAddresses": {
+          "discoveryType": "static",
+          "items": [
+              "${local_selfip}",
+              "${remote_selfip}"
+          ]
+      }
+  }
 }

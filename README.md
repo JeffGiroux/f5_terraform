@@ -1,4 +1,4 @@
 # f5_terraform
 
-* HA_via_lb_DO_AS3 - This Terraform template uses the Azurerm provider to build out all the necessary Azure objects and then use F5 Declarative Onboarding and AS3 REST ochistration tool for initial onboarding and configuration 
-
+* HA_via_lb_DO_AS3 - This Terraform template uses the Azurerm provider to build out all the necessary Azure objects and then use F5 Declarative Onboarding and AS3 REST ochestration tool for initial onboarding and configuration. It uses the Azure LB to distribute traffic to the F5 BIG-IP devices for high availability and failover.
+* HA_via_api - This Terraform template uses the Azurerm provider to build out all the necessary Azure objects and then use F5 Declarative Onboarding and AS3 REST ochestration tool for initial onboarding and configuration. It uses the Azure REST API to move cloud objects (ex. IPs, routes) during failover when the BIG-IP detects a problem with its peer.
