@@ -6,13 +6,13 @@
     "Common": {
         "class": "Tenant",
         "hostname": "${local_host}.example.com",
-        "dbvars": {
+        "dbVars": {
             "class": "DbVariables",
             "ui.advisory.enabled": true,
             "ui.advisory.color": "green",
             "ui.advisory.text": "/Common/hostname",
             "config.allow.rfc3927": "enable"
-        },        
+        },
         "myDns": {
             "class": "DNS",
             "nameServers": [
@@ -34,8 +34,7 @@
         },
         "myProvisioning": {
             "class": "Provision",
-            "ltm": "nominal",
-            "asm": "nominal"
+            "ltm": "nominal"
         },
         "external": {
             "class": "VLAN",
@@ -48,7 +47,7 @@
                 }
             ]
         },
-        "external-self": {
+        "external-localself": {
             "class": "SelfIp",
             "address": "${local_selfip}/24",
             "vlan": "external",
@@ -63,11 +62,11 @@
         },
         "configsync": {
             "class": "ConfigSync",
-            "configsyncIp": "/Common/external-self/address"
+            "configsyncIp": "/Common/external-localself/address"
         },
         "failoverAddress": {
             "class": "FailoverUnicast",
-            "address": "/Common/external-self/address"
+            "address": "/Common/external-localself/address"
         },
         "failoverGroup": {
             "class": "DeviceGroup",
