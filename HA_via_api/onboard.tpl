@@ -37,6 +37,7 @@ sleep 60
 
 tmsh modify sys db config.allow.rfc3927 value enable
 tmsh create sys management-route azure_metadata network 169.254.169.254/32 gateway '${mgmt_gw}'
+tmsh modify sys global-settings mgmt-dhcp disabled
 tmsh save sys config
 
 ### DOWNLOAD ONBOARDING PKGS
@@ -177,5 +178,12 @@ do
   fi
   sleep 10
 done
+
+# Delete RPM packages
+echo -e "\n"$(date) "Removing temporary RPM install packages"
+rm -rf /var/config/rest/downloads/$DO_FN
+rm -rf /var/config/rest/downloads/$AS3_FN
+rm -rf /var/config/rest/downloads/$TS_FN
+rm -rf /var/config/rest/downloads/$CF_FN
 
 sleep 60
