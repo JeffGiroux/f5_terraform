@@ -780,7 +780,7 @@ resource "null_resource" "f5vm01_DO" {
       #!/bin/bash
       curl -k -X ${var.rest_do_method} https://${data.azurerm_public_ip.vm01mgmtpip.ip_address}${var.rest_do_uri} -u ${var.uname}:${var.upassword} -d @${var.rest_vm01_do_file}
       x=1; while [ $x -le 30 ]; do STATUS=$(curl -k -X GET https://${data.azurerm_public_ip.vm01mgmtpip.ip_address}/mgmt/shared/declarative-onboarding/task -u ${var.uname}:${var.upassword}); if ( echo $STATUS | grep "OK" ); then break; fi; sleep 10; x=$(( $x + 1 )); done
-      sleep 60
+      sleep 10
     EOF
   }
 }
@@ -793,13 +793,13 @@ resource "null_resource" "f5vm02_DO" {
       #!/bin/bash
       curl -k -X ${var.rest_do_method} https://${data.azurerm_public_ip.vm02mgmtpip.ip_address}${var.rest_do_uri} -u ${var.uname}:${var.upassword} -d @${var.rest_vm02_do_file}
       x=1; while [ $x -le 30 ]; do STATUS=$(curl -k -X GET https://${data.azurerm_public_ip.vm02mgmtpip.ip_address}/mgmt/shared/declarative-onboarding/task -u ${var.uname}:${var.upassword}); if ( echo $STATUS | grep "OK" ); then break; fi; sleep 10; x=$(( $x + 1 )); done
-      sleep 60
+      sleep 10
     EOF
   }
 }
 
 resource "null_resource" "f5vm01_CF" {
-  depends_on = ["null_resource.f5vm01_DO"]
+  depends_on = ["null_resource.f5vm01_DO", "null_resource.f5vm02_DO"]
   # Running CF REST API
   provisioner "local-exec" {
     command = <<-EOF
@@ -811,7 +811,7 @@ resource "null_resource" "f5vm01_CF" {
 }
 
 resource "null_resource" "f5vm02_CF" {
-  depends_on = ["null_resource.f5vm02_DO"]
+  depends_on = ["null_resource.f5vm01_DO", "null_resource.f5vm02_DO"]
   # Running CF REST API
   provisioner "local-exec" {
     command = <<-EOF

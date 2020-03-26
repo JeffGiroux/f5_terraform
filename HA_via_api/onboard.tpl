@@ -181,9 +181,6 @@ done
 
 # Delete RPM packages
 echo -e "\n"$(date) "Removing temporary RPM install packages"
-rm -rf /var/config/rest/downloads/$DO_FN
-rm -rf /var/config/rest/downloads/$AS3_FN
-rm -rf /var/config/rest/downloads/$TS_FN
-rm -rf /var/config/rest/downloads/$CF_FN
+rm -rf /var/config/rest/downloads/*.rpm
 
-sleep 60
+sleep 5
