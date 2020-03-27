@@ -41,7 +41,7 @@ resource "azurerm_route_table" "udr" {
     name                   = "route1"
     address_prefix         = "${var.managed_route1}"
     next_hop_type          = "VirtualAppliance"
-    next_hop_in_ip_address = "${azurerm_network_interface.vm01-ext-nic.private_ip_address}"
+    next_hop_in_ip_address = "${azurerm_network_interface.vm02-ext-nic.private_ip_address}"
   }
 
   tags = {
@@ -307,21 +307,6 @@ resource "azurerm_network_interface" "vm01-ext-nic" {
     public_ip_address_id          = "${azurerm_public_ip.vm01selfpip.id}"
   }
 
-  ip_configuration {
-    name                          = "${var.prefix}-ext-ipconfig0"
-    subnet_id                     = "${azurerm_subnet.External.id}"
-    private_ip_address_allocation = "Static"
-    private_ip_address            = "${var.f5privatevip}"
-  }
-
-  ip_configuration {
-    name                          = "${var.prefix}-ext-ipconfig1"
-    subnet_id                     = "${azurerm_subnet.External.id}"
-    private_ip_address_allocation = "Static"
-    private_ip_address            = "${var.f5publicvip}"
-    public_ip_address_id          = "${azurerm_public_ip.pubvippip.id}"
-  }
-
   tags = {
     Name                      = "${var.environment}-vm01-ext-int"
     environment               = "${var.environment}"
@@ -346,6 +331,21 @@ resource "azurerm_network_interface" "vm02-ext-nic" {
     private_ip_address            = "${var.f5vm02ext}"
     primary                       = true
     public_ip_address_id          = "${azurerm_public_ip.vm02selfpip.id}"
+  }
+
+  ip_configuration {
+    name                          = "${var.prefix}-ext-ipconfig0"
+    subnet_id                     = "${azurerm_subnet.External.id}"
+    private_ip_address_allocation = "Static"
+    private_ip_address            = "${var.f5privatevip}"
+  }
+
+  ip_configuration {
+    name                          = "${var.prefix}-ext-ipconfig1"
+    subnet_id                     = "${azurerm_subnet.External.id}"
+    private_ip_address_allocation = "Static"
+    private_ip_address            = "${var.f5publicvip}"
+    public_ip_address_id          = "${azurerm_public_ip.pubvippip.id}"
   }
 
   tags = {
