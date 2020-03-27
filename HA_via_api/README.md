@@ -6,6 +6,7 @@
 - [Prerequisites](#prerequisites)
 - [Important Configuration Notes](#important-configuration-notes)
 - [Security](#security)
+- [Installation Example](#installation-example)
 - [Configuration Example](#configuration-example)
 
 ## Introduction
@@ -40,7 +41,7 @@ Terraform v0.12.6
 ## Prerequisites
 
 - **Important**: When you configure the admin password for the BIG-IP VE in the template, you cannot use the character **#**.  Additionally, there are a number of other special characters that you should avoid using for F5 product user accounts.  See [K2873](https://support.f5.com/csp/article/K2873) for details.
-- This template requires a service principal for backend pool service discovery. **Important**: you MUST have "OWNER" previlidge on the SP in order to assign role to the resources in your subscription. See the [Service Principal Setup section](#service-principal-authentication) for details, including required permissions.
+- This template requires a service principal for backend pool service discovery. **Important**: you MUST have "OWNER" priviledge on the SP in order to assign role to the resources in your subscription. See the [Service Principal Setup section](#service-principal-authentication) for details, including required permissions.
 - The HA BIG-IP VMs use Azure RBAC role for the failover instead of using Service Prinicipal.
 - These BIG-IP VMs are deployed across different Availability Zones. Please ensure the region you've chosen can support AZ.
 - This deployment will be using the Terraform Azurerm provider to build out all the neccessary Azure objects. Therefore, Azure CLI is required. For installation, please follow this [Microsoft link](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-apt?view=azure-cli-latest)
@@ -51,22 +52,6 @@ Terraform v0.12.6
 - Variables are configured in variables.tf
 - Sensitive variables like Azure Subscription and Service Principal are configured in terraform.tfvars
   - Note: Passwords and secrets will be moved to Azure Key Vault in the future
-  - Modify terraform.tfvars with the required information
-  ```
-      # BIG-IP Environment
-      uname     = "azureuser"
-      upassword = "Default12345!"
-
-      # Azure Environment
-      sp_subscription_id = "xxxxx"
-      sp_client_id       = "xxxxx"
-      sp_client_secret   = "xxxxx"
-      sp_tenant_id       = "xxxxx"
-      location           = "West US 2"
-
-      # Prefix for objects being created
-      prefix = "mylab123"
-  ```
 - This template uses Declarative Onboarding (DO), Application Services 3 (AS3), and Cloud Failover Extension packages for the initial configuration. As part of the onboarding script, it will download the RPMs automatically. See the [AS3 documentation](https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/) and [DO documentation](https://clouddocs.f5.com/products/extensions/f5-declarative-onboarding/latest/) for details on how to use AS3 and Declarative Onboarding on your BIG-IP VE(s). The [Cloud Failover Extension](https://clouddocs.f5.com/products/extensions/f5-cloud-failover/latest/) documentation is also available. The [Telemetry Streaming](https://clouddocs.f5.com/products/extensions/f5-telemetry-streaming/latest/) extension is also downloaded but not configured to point to any remote analytics/consumers. 
 - onboard.tpl is the onboarding script which is run by commandToExecute (user data). It will be copied to /var/lib/waagent/CustomData upon bootup. This script is responsible for downloading the neccessary F5 Automation Toolchain RPM files, installing them, and then executing the onboarding REST calls.
 - This template uses PayGo BIGIP image for the deployment (as default). If you would like to use BYOL, then these following steps are needed:
@@ -135,6 +120,43 @@ Terraform v0.12.6
 | onboard_log | Yes | This is where the onboarding script logs all the events. |
 | f5_cloud_failover_label | Yes | This is a tag used for failover. |
 | f5_cloud_failover_nic_map | Yes | This is a tag used for failover NIC. |
+
+## Installation Example
+
+To run this Terraform template, perform the following steps:
+  1. Clone the repo to your favorite location
+  2. Modify terraform.tfvars with the required information
+  ```
+      # BIG-IP Environment
+      uname     = "azureuser"
+      upassword = "Default12345!"
+
+      # Azure Environment
+      sp_subscription_id = "xxxxx"
+      sp_client_id       = "xxxxx"
+      sp_client_secret   = "xxxxx"
+      sp_tenant_id       = "xxxxx"
+      location           = "West US 2"
+
+      # Prefix for objects being created
+      prefix = "mylab123"
+  ```
+  3. Initialize the directory
+  ```
+      terraform init
+  ```
+  4. Test the plan and validate errors
+  ```
+      terraform plan
+  ```
+  5. Finally, apply and deploy
+  ```
+      terraform apply
+  ```
+  6. When done with everything, don't forget to clean up!
+  ```
+      terraform destroy
+  ```
 
 ## Configuration Example
 
