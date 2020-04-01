@@ -17,8 +17,6 @@
 **/Gopkg.lock
 
 # Mac OS files
-# .tfstate files
-*.tfstate
 *DS_Store
 
 # Output json files for F5 Automation toolchain

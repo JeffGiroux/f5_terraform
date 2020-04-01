@@ -1,0 +1,91 @@
+{
+    "schemaVersion": "1.0.0",
+    "class": "Device",
+    "async": true,
+    "label": "Onboard BIG-IP into an HA Pair",
+    "Common": {
+        "class": "Tenant",
+        "hostname": "${local_host}.example.com",
+        "dbVars": {
+            "class": "DbVariables",
+            "ui.advisory.enabled": true,
+            "ui.advisory.color": "green",
+            "ui.advisory.text": "/Common/hostname",
+            "config.allow.rfc3927": "enable"
+        },
+        "myDns": {
+            "class": "DNS",
+            "nameServers": [
+                "${dns_server}",
+                "2001:4860:4860::8844"
+            ],
+            "search": [
+                "f5.com"
+            ]
+        },
+        "myNtp": {
+            "class": "NTP",
+            "servers": [
+                "${ntp_server}",
+                "1.pool.ntp.org",
+                "2.pool.ntp.org"
+            ],
+            "timezone": "${timezone}"
+        },
+        "myProvisioning": {
+            "class": "Provision",
+            "ltm": "nominal"
+        },
+        "external": {
+            "class": "VLAN",
+            "tag": 4094,
+            "mtu": 1500,
+            "interfaces": [
+                {
+                    "name": "1.1",
+                    "tagged": false
+                }
+            ]
+        },
+        "external-localself": {
+            "class": "SelfIp",
+            "address": "${local_selfip}/24",
+            "vlan": "external",
+            "allowService": "default",
+            "trafficGroup": "traffic-group-local-only"
+        },
+        "default": {
+            "class": "Route",
+            "gw": "${gateway}",
+            "network": "default",
+            "mtu": 1500
+        },
+        "configsync": {
+            "class": "ConfigSync",
+            "configsyncIp": "/Common/external-localself/address"
+        },
+        "failoverAddress": {
+            "class": "FailoverUnicast",
+            "address": "/Common/external-localself/address"
+        },
+        "failoverGroup": {
+            "class": "DeviceGroup",
+            "type": "sync-failover",
+            "members": ["${host1}.example.com", "${host2}.example.com"],
+            "owner": "/Common/failoverGroup/members/0",
+            "autoSync": true,
+            "saveOnAutoSync": false,
+            "networkFailover": true,
+            "fullLoadOnSync": false,
+            "asmSync": false
+        },
+        "trust": {
+            "class": "DeviceTrust",
+            "localUsername": "${admin_user}",
+            "localPassword": "${admin_password}",
+            "remoteHost": "${remote_selfip}",
+            "remoteUsername": "${admin_user}",
+            "remotePassword": "${admin_password}"
+        }
+    }
+}

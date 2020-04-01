@@ -1,4 +1,5 @@
-# f5_terraform
+# Deploying F5 in Public Cloud with Terraform
+Repository containing Terraform plans to deploy F5 products like BIG-IP into the public cloud. Choose between AWS or Azure clouds.
 
-* HA_via_lb_DO_AS3 - This Terraform template uses the Azurerm provider to build out all the necessary Azure objects and then use F5 Declarative Onboarding and AS3 REST ochestration tool for initial onboarding and configuration. It uses the Azure LB to distribute traffic to the F5 BIG-IP devices for high availability and failover.
-* HA_via_api - This Terraform template uses the Azurerm provider to build out all the necessary Azure objects and then use F5 Declarative Onboarding and AS3 REST ochestration tool for initial onboarding and configuration. It uses the Azure REST API to move cloud objects (ex. IPs, routes) during failover when the BIG-IP detects a problem with its peer.
+  - **[AWS](AWS)** <br>Stay tuned! This folder is currently under construction and contains no Terraform plans yet.
+  - **[Azure](Azure)** <br>This folder contains Terraforms plans to deploy BIG-IP virtual appliances into Azure cloud.
