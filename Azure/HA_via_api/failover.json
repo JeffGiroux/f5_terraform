@@ -7,11 +7,13 @@
       }
   },
   "failoverAddresses": {
+      "enabled": true,
       "scopingTags": {
           "f5_cloud_failover_label": "${f5_cloud_failover_label}"
       }
   },
   "failoverRoutes": {
+      "enabled": true,
       "scopingTags": {
           "f5_cloud_failover_label": "${f5_cloud_failover_label}"
       },

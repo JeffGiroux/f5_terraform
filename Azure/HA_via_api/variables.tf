@@ -53,10 +53,10 @@ variable host2_name { default = "f5vm02" }
 variable dns_server { default = "8.8.8.8" }
 variable ntp_server { default = "0.us.pool.ntp.org" }
 variable timezone { default = "UTC" }
-variable DO_onboard_URL { default = "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.11.0/f5-declarative-onboarding-1.11.0-1.noarch.rpm" }
-variable AS3_URL { default = "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.18.0/f5-appsvcs-3.18.0-4.noarch.rpm" }
-variable TS_URL { default = "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.10.0/f5-telemetry-1.10.0-2.noarch.rpm" }
-variable CF_URL { default = "https://github.com/f5devcentral/f5-cloud-failover-extension/releases/download/v1.1.0/f5-cloud-failover-1.1.0-0.noarch.rpm" }
+variable DO_onboard_URL { default = "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.12.0/f5-declarative-onboarding-1.12.0-1.noarch.rpm" }
+variable AS3_URL { default = "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.19.1/f5-appsvcs-3.19.1-1.noarch.rpm" }
+variable TS_URL { default = "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.11.0/f5-telemetry-1.11.0-1.noarch.rpm" }
+variable CF_URL { default = "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.2.0/f5-cloud-failover-1.2.0-0.noarch.rpm" }
 variable libs_dir { default = "/config/cloud/azure/node_modules" }
 variable onboard_log { default = "/var/log/startup-script.log" }
 

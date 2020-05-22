@@ -32,7 +32,7 @@ Example...
 
 ## Version
 This template is tested and worked in the following version
-Terraform v0.12.6
+Terraform v0.12.23
 + provider.azurerm v2.1
 + provider.local v1.4
 + provider.null v2.1
