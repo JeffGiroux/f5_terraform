@@ -2,7 +2,7 @@
 # Place these values in terraform.tfvars.
 
 provider "azurerm" {
-  version         = "=2.1.0"
+  version = "=2.1.0"
   features {}
   subscription_id = var.sp_subscription_id
   client_id       = var.sp_client_id

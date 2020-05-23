@@ -247,9 +247,9 @@ resource "azurerm_network_security_group" "main" {
 
 # Create the first network interface card for Management 
 resource "azurerm_network_interface" "vm01-mgmt-nic" {
-  name                      = "${var.prefix}-mgmt0"
-  location                  = azurerm_resource_group.main.location
-  resource_group_name       = azurerm_resource_group.main.name
+  name                = "${var.prefix}-mgmt0"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
 
   ip_configuration {
     name                          = "primary"
@@ -270,9 +270,9 @@ resource "azurerm_network_interface" "vm01-mgmt-nic" {
 }
 
 resource "azurerm_network_interface" "vm02-mgmt-nic" {
-  name                      = "${var.prefix}-mgmt1"
-  location                  = azurerm_resource_group.main.location
-  resource_group_name       = azurerm_resource_group.main.name
+  name                = "${var.prefix}-mgmt1"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
 
   ip_configuration {
     name                          = "primary"
@@ -294,9 +294,9 @@ resource "azurerm_network_interface" "vm02-mgmt-nic" {
 
 # Create the second network interface card for External
 resource "azurerm_network_interface" "vm01-ext-nic" {
-  name                      = "${var.prefix}-ext0"
-  location                  = azurerm_resource_group.main.location
-  resource_group_name       = azurerm_resource_group.main.name
+  name                = "${var.prefix}-ext0"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
 
   ip_configuration {
     name                          = "f5vm-self-ipconfig"
@@ -320,9 +320,9 @@ resource "azurerm_network_interface" "vm01-ext-nic" {
 }
 
 resource "azurerm_network_interface" "vm02-ext-nic" {
-  name                      = "${var.prefix}-ext1"
-  location                  = azurerm_resource_group.main.location
-  resource_group_name       = azurerm_resource_group.main.name
+  name                = "${var.prefix}-ext1"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
 
   ip_configuration {
     name                          = "f5vm-self-ipconfig"
@@ -361,9 +361,9 @@ resource "azurerm_network_interface" "vm02-ext-nic" {
 }
 
 resource "azurerm_network_interface" "backend01-ext-nic" {
-  name                      = "${var.prefix}-backend01-ext-nic"
-  location                  = azurerm_resource_group.main.location
-  resource_group_name       = azurerm_resource_group.main.name
+  name                = "${var.prefix}-backend01-ext-nic"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
 
   ip_configuration {
     name                          = "primary"
@@ -497,45 +497,40 @@ data "template_file" "failover_json" {
   }
 }
 
+locals {
+  backendvm_custom_data = <<EOF
+#!/bin/bash
+apt-get update -y
+apt-get install -y docker.io
+docker run -d -p 80:80 --net=host --restart unless-stopped vulnerables/web-dvwa
+EOF
+}
+
 # Create F5 BIGIP VMs
-resource "azurerm_virtual_machine" "f5vm01" {
-  name                         = "${var.prefix}-f5vm01"
-  location                     = azurerm_resource_group.main.location
-  zones                        = [1]
-  resource_group_name          = azurerm_resource_group.main.name
-  primary_network_interface_id = azurerm_network_interface.vm01-mgmt-nic.id
-  network_interface_ids        = ["${azurerm_network_interface.vm01-mgmt-nic.id}", "${azurerm_network_interface.vm01-ext-nic.id}"]
-  vm_size                      = var.instance_type
+resource "azurerm_linux_virtual_machine" "f5vm01" {
+  name                            = "${var.prefix}-f5vm01"
+  location                        = azurerm_resource_group.main.location
+  resource_group_name             = azurerm_resource_group.main.name
+  zone                            = 1
+  network_interface_ids           = ["${azurerm_network_interface.vm01-mgmt-nic.id}", "${azurerm_network_interface.vm01-ext-nic.id}"]
+  size                            = var.instance_type
+  admin_username                  = var.uname
+  admin_password                  = var.upassword
+  disable_password_authentication = false
+  computer_name                   = "${var.prefix}vm01"
+  custom_data                     = base64encode(data.template_file.vm_onboard.rendered)
 
-  # Uncomment this line to delete the OS disk automatically when deleting the VM
-  delete_os_disk_on_termination = true
+  os_disk {
+    name                 = "${var.prefix}vm01-osdisk"
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
 
-  # Uncomment this line to delete the data disks automatically when deleting the VM
-  delete_data_disks_on_termination = true
-
-  storage_image_reference {
+  source_image_reference {
     publisher = "f5-networks"
     offer     = var.product
     sku       = var.image_name
     version   = var.bigip_version
-  }
-
-  storage_os_disk {
-    name              = "${var.prefix}vm01-osdisk"
-    caching           = "ReadWrite"
-    create_option     = "FromImage"
-    managed_disk_type = "Standard_LRS"
-  }
-
-  os_profile {
-    computer_name  = "${var.prefix}vm01"
-    admin_username = var.uname
-    admin_password = var.upassword
-    custom_data    = data.template_file.vm_onboard.rendered
-  }
-
-  os_profile_linux_config {
-    disable_password_authentication = false
   }
 
   plan {
@@ -545,8 +540,7 @@ resource "azurerm_virtual_machine" "f5vm01" {
   }
 
   boot_diagnostics {
-    enabled     = "true"
-    storage_uri = azurerm_storage_account.mystorage.primary_blob_endpoint
+    storage_account_uri = azurerm_storage_account.mystorage.primary_blob_endpoint
   }
 
   identity {
@@ -563,44 +557,30 @@ resource "azurerm_virtual_machine" "f5vm01" {
   }
 }
 
-resource "azurerm_virtual_machine" "f5vm02" {
-  name                         = "${var.prefix}-f5vm02"
-  location                     = azurerm_resource_group.main.location
-  zones                        = [2]
-  resource_group_name          = azurerm_resource_group.main.name
-  primary_network_interface_id = azurerm_network_interface.vm02-mgmt-nic.id
-  network_interface_ids        = ["${azurerm_network_interface.vm02-mgmt-nic.id}", "${azurerm_network_interface.vm02-ext-nic.id}"]
-  vm_size                      = var.instance_type
+resource "azurerm_linux_virtual_machine" "f5vm02" {
+  name                            = "${var.prefix}-f5vm02"
+  location                        = azurerm_resource_group.main.location
+  resource_group_name             = azurerm_resource_group.main.name
+  zone                            = 2
+  network_interface_ids           = ["${azurerm_network_interface.vm02-mgmt-nic.id}", "${azurerm_network_interface.vm02-ext-nic.id}"]
+  size                            = var.instance_type
+  admin_username                  = var.uname
+  admin_password                  = var.upassword
+  disable_password_authentication = false
+  computer_name                   = "${var.prefix}vm02"
+  custom_data                     = base64encode(data.template_file.vm_onboard.rendered)
 
-  # Uncomment this line to delete the OS disk automatically when deleting the VM
-  delete_os_disk_on_termination = true
+  os_disk {
+    name                 = "${var.prefix}vm02-osdisk"
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
 
-  # Uncomment this line to delete the data disks automatically when deleting the VM
-  delete_data_disks_on_termination = true
-
-  storage_image_reference {
+  source_image_reference {
     publisher = "f5-networks"
     offer     = var.product
     sku       = var.image_name
     version   = var.bigip_version
-  }
-
-  storage_os_disk {
-    name              = "${var.prefix}vm02-osdisk"
-    caching           = "ReadWrite"
-    create_option     = "FromImage"
-    managed_disk_type = "Standard_LRS"
-  }
-
-  os_profile {
-    computer_name  = "${var.prefix}vm02"
-    admin_username = var.uname
-    admin_password = var.upassword
-    custom_data    = data.template_file.vm_onboard.rendered
-  }
-
-  os_profile_linux_config {
-    disable_password_authentication = false
   }
 
   plan {
@@ -610,8 +590,7 @@ resource "azurerm_virtual_machine" "f5vm02" {
   }
 
   boot_diagnostics {
-    enabled     = "true"
-    storage_uri = azurerm_storage_account.mystorage.primary_blob_endpoint
+    storage_account_uri = azurerm_storage_account.mystorage.primary_blob_endpoint
   }
 
   identity {
@@ -629,42 +608,29 @@ resource "azurerm_virtual_machine" "f5vm02" {
 }
 
 # backend VM
-resource "azurerm_virtual_machine" "backendvm" {
-  name                = "backendvm"
-  location            = azurerm_resource_group.main.location
-  resource_group_name = azurerm_resource_group.main.name
+resource "azurerm_linux_virtual_machine" "backendvm" {
+  name                            = "backendvm"
+  location                        = azurerm_resource_group.main.location
+  resource_group_name             = azurerm_resource_group.main.name
+  network_interface_ids           = ["${azurerm_network_interface.backend01-ext-nic.id}"]
+  size                            = "Standard_DS1_v2"
+  admin_username                  = var.uname
+  admin_password                  = var.upassword
+  disable_password_authentication = false
+  computer_name                   = "backend01"
+  custom_data                     = base64encode(local.backendvm_custom_data)
 
-  network_interface_ids = ["${azurerm_network_interface.backend01-ext-nic.id}"]
-  vm_size               = "Standard_DS1_v2"
-
-  storage_os_disk {
-    name              = "backendOsDisk"
-    caching           = "ReadWrite"
-    create_option     = "FromImage"
-    managed_disk_type = "Premium_LRS"
+  os_disk {
+    name                 = "backendOsDisk"
+    caching              = "ReadWrite"
+    storage_account_type = "Premium_LRS"
   }
 
-  storage_image_reference {
+  source_image_reference {
     publisher = "Canonical"
     offer     = "UbuntuServer"
     sku       = "16.04.0-LTS"
     version   = "latest"
-  }
-
-  os_profile {
-    computer_name  = "backend01"
-    admin_username = "azureuser"
-    admin_password = var.upassword
-    custom_data    = <<-EOF
-              #!/bin/bash
-              apt-get update -y
-              apt-get install -y docker.io
-              docker run -d -p 80:80 --net=host --restart unless-stopped vulnerables/web-dvwa
-              EOF
-  }
-
-  os_profile_linux_config {
-    disable_password_authentication = false
   }
 
   tags = {
@@ -679,7 +645,7 @@ resource "azurerm_virtual_machine" "backendvm" {
 # Configure VMs to use a system-assigned managed identity
 data "azurerm_resource_group" "main" {
   name       = azurerm_resource_group.main.name
-  depends_on = [azurerm_virtual_machine.f5vm01, azurerm_virtual_machine.f5vm02]
+  depends_on = [azurerm_linux_virtual_machine.f5vm01, azurerm_linux_virtual_machine.f5vm02]
 }
 
 data "azurerm_subscription" "primary" {}
@@ -687,20 +653,20 @@ data "azurerm_subscription" "primary" {}
 resource "azurerm_role_assignment" "f5vm01ra" {
   scope                = data.azurerm_resource_group.main.id
   role_definition_name = "Contributor"
-  principal_id         = lookup(azurerm_virtual_machine.f5vm01.identity[0], "principal_id")
+  principal_id         = lookup(azurerm_linux_virtual_machine.f5vm01.identity[0], "principal_id")
 }
 
 resource "azurerm_role_assignment" "f5vm02ra" {
   scope                = data.azurerm_resource_group.main.id
   role_definition_name = "Contributor"
-  principal_id         = lookup(azurerm_virtual_machine.f5vm02.identity[0], "principal_id")
+  principal_id         = lookup(azurerm_linux_virtual_machine.f5vm02.identity[0], "principal_id")
 }
 
 # Run Startup Script
 resource "azurerm_virtual_machine_extension" "f5vm01-run-startup-cmd" {
   name                 = "${var.environment}-f5vm01-run-startup-cmd"
-  depends_on           = [azurerm_virtual_machine.f5vm01, azurerm_virtual_machine.backendvm]
-  virtual_machine_id   = azurerm_virtual_machine.f5vm01.id
+  depends_on           = [azurerm_linux_virtual_machine.f5vm01, azurerm_linux_virtual_machine.backendvm]
+  virtual_machine_id   = azurerm_linux_virtual_machine.f5vm01.id
   publisher            = "Microsoft.Azure.Extensions"
   type                 = "CustomScript"
   type_handler_version = "2.0"
@@ -723,8 +689,8 @@ resource "azurerm_virtual_machine_extension" "f5vm01-run-startup-cmd" {
 
 resource "azurerm_virtual_machine_extension" "f5vm02-run-startup-cmd" {
   name                 = "${var.environment}-f5vm02-run-startup-cmd"
-  depends_on           = [azurerm_virtual_machine.f5vm02, azurerm_virtual_machine.backendvm]
-  virtual_machine_id   = azurerm_virtual_machine.f5vm02.id
+  depends_on           = [azurerm_linux_virtual_machine.f5vm02, azurerm_linux_virtual_machine.backendvm]
+  virtual_machine_id   = azurerm_linux_virtual_machine.f5vm02.id
   publisher            = "Microsoft.Azure.Extensions"
   type                 = "CustomScript"
   type_handler_version = "2.0"
@@ -850,12 +816,12 @@ output "mgmt_subnet_gw" { value = "${local.mgmt_gw}" }
 output "ext_subnet_gw" { value = "${local.ext_gw}" }
 output "Public_VIP_pip" { value = "${data.azurerm_public_ip.pubvippip.ip_address}" }
 
-output "f5vm01_id" { value = "${azurerm_virtual_machine.f5vm01.id}" }
+output "f5vm01_id" { value = "${azurerm_linux_virtual_machine.f5vm01.id}" }
 output "f5vm01_mgmt_private_ip" { value = "${azurerm_network_interface.vm01-mgmt-nic.private_ip_address}" }
 output "f5vm01_mgmt_public_ip" { value = "${data.azurerm_public_ip.vm01mgmtpip.ip_address}" }
 output "f5vm01_ext_private_ip" { value = "${azurerm_network_interface.vm01-ext-nic.private_ip_address}" }
 
-output "f5vm02_id" { value = "${azurerm_virtual_machine.f5vm02.id}" }
+output "f5vm02_id" { value = "${azurerm_linux_virtual_machine.f5vm02.id}" }
 output "f5vm02_mgmt_private_ip" { value = "${azurerm_network_interface.vm02-mgmt-nic.private_ip_address}" }
 output "f5vm02_mgmt_public_ip" { value = "${data.azurerm_public_ip.vm02mgmtpip.ip_address}" }
 output "f5vm02_ext_private_ip" { value = "${azurerm_network_interface.vm02-ext-nic.private_ip_address}" }
