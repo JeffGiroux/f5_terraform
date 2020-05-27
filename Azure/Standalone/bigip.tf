@@ -318,8 +318,8 @@ resource "null_resource" "f5vm01_DO" {
   provisioner "local-exec" {
     command = <<-EOF
       #!/bin/bash
-      curl -k -X ${var.rest_do_method} https://${data.azurerm_public_ip.vm01mgmtpip.ip_address}${var.rest_do_uri} -u ${var.uname}:${var.upassword} -d @${var.rest_vm01_do_file}
-      x=1; while [ $x -le 30 ]; do STATUS=$(curl -k -X GET https://${data.azurerm_public_ip.vm01mgmtpip.ip_address}/mgmt/shared/declarative-onboarding/task -u ${var.uname}:${var.upassword}); if ( echo $STATUS | grep "OK" ); then break; fi; sleep 10; x=$(( $x + 1 )); done
+      curl -k -X ${var.rest_do_method} https://${azurerm_public_ip.vm01mgmtpip.ip_address}${var.rest_do_uri} -u ${var.uname}:${var.upassword} -d @${var.rest_vm01_do_file}
+      x=1; while [ $x -le 30 ]; do STATUS=$(curl -k -X GET https://${azurerm_public_ip.vm01mgmtpip.ip_address}/mgmt/shared/declarative-onboarding/task -u ${var.uname}:${var.upassword}); if ( echo $STATUS | grep "OK" ); then break; fi; sleep 10; x=$(( $x + 1 )); done
       sleep 10
     EOF
   }
@@ -331,19 +331,7 @@ resource "null_resource" "f5vm_AS3" {
   provisioner "local-exec" {
     command = <<-EOF
       #!/bin/bash
-      curl -k -X ${var.rest_as3_method} https://${data.azurerm_public_ip.vm01mgmtpip.ip_address}${var.rest_as3_uri} -u ${var.uname}:${var.upassword} -d @${var.rest_vm_as3_file}
+      curl -k -X ${var.rest_as3_method} https://${azurerm_public_ip.vm01mgmtpip.ip_address}${var.rest_as3_uri} -u ${var.uname}:${var.upassword} -d @${var.rest_vm_as3_file}
     EOF
   }
-}
-
-# Data to be used for output.tf file
-data "azurerm_public_ip" "vm01mgmtpip" {
-  name                = azurerm_public_ip.vm01mgmtpip.name
-  resource_group_name = azurerm_resource_group.main.name
-  depends_on          = [azurerm_virtual_machine_extension.f5vm01-run-startup-cmd]
-}
-data "azurerm_public_ip" "pubvippip" {
-  name                = azurerm_public_ip.pubvippip.name
-  resource_group_name = azurerm_resource_group.main.name
-  depends_on          = [azurerm_virtual_machine_extension.f5vm01-run-startup-cmd]
 }
