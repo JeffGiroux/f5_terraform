@@ -2,7 +2,7 @@
 
 # Terraform Version Pinning
 terraform {
-    required_version = "~> 0.12.24"
+    required_version = "~> 0.12.25"
     required_providers {
         azurerm = "~> 2.1.0"
     }
