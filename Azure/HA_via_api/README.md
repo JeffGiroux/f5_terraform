@@ -5,7 +5,6 @@
 - [Introduction](#introduction)
 - [Prerequisites](#prerequisites)
 - [Important Configuration Notes](#important-configuration-notes)
-- [Security](#security)
 - [Installation Example](#installation-example)
 - [Configuration Example](#configuration-example)
 
@@ -32,7 +31,7 @@ Example...
 
 ## Version
 This template is tested and worked in the following version
-Terraform v0.12.23
+Terraform v0.12.25
 + provider.azurerm v2.1
 + provider.local v1.4
 + provider.null v2.1
@@ -56,7 +55,7 @@ Terraform v0.12.23
 - onboard.tpl is the onboarding script which is run by commandToExecute (user data). It will be copied to /var/lib/waagent/CustomData upon bootup. This script is responsible for downloading the neccessary F5 Automation Toolchain RPM files, installing them, and then executing the onboarding REST calls.
 - This template uses PayGo BIGIP image for the deployment (as default). If you would like to use BYOL, then these following steps are needed:
 1. In the "variables.tf", specify the BYOL image and licenses regkeys.
-2. In the "main.tf", uncomment the "local_sku" lines.
+2. In the "bigip.tf", uncomment the "local_sku" lines.
 3. To find available images/versions, use this search example on Azure CLI:
   ```
           az vm image list -f BIG-IP --all
@@ -98,9 +97,9 @@ Terraform v0.12.23
 | f5vm01mgmt | Yes | IP address for 1st BIG-IP's management interface. |
 | f5vm02mgmt | Yes | IP address for 2nd BIG-IP's management interface. |
 | f5vm01ext | Yes | IP address for 1st BIG-IP's external interface. |
-| f5vm01ext_sec | Yes | Secondary IP address for 1st BIG-IP's external interface. |
 | f5vm02ext | Yes | IP address for 2nd BIG-IP's external interface. |
-| f5vm02ext_sec | Yes | Secondary IP address for 2nd BIG-IP's external interface. |
+| f5privatevip | Yes | Secondary Private IP address for BIG-IP virtual server (internal). |
+| f5publicvip | Yes | Secondary Private IP address for BIG-IP virtual server (external). |
 | instance_type | Yes | Azure instance to be used for the BIG-IP VE. |
 | product | Yes | Azure BIG-IP VE Offer. |
 | bigip_version | Yes | It is set to default to use the latest software. |
@@ -167,11 +166,11 @@ The following is an example configuration diagram for this solution deployment. 
 
 ## Documentation
 
-For more information on F5 solutions for Azure, including manual configuration procedures for some deployment scenarios, see the Azure section of [Cloud Failover Doc](https://clouddocs.f5.com/products/extensions/f5-cloud-failover/latest/userguide/azure.html). Also check out the [Azure BIG-IP Lightboard Lessons](https://devcentral.f5.com/s/articles/Lightboard-Lessons-BIG-IP-Deployments-in-Azure-Cloud) on DevCentral.
+For more information on F5 solutions for Azure, including manual configuration procedures for some deployment scenarios, see the Azure section of [Cloud Failover Doc](https://clouddocs.f5.com/products/extensions/f5-cloud-failover/latest/userguide/azure.html). Also check out the [Azure BIG-IP Lightboard Lessons](https://devcentral.f5.com/s/articles/Lightboard-Lessons-BIG-IP-Deployments-in-Azure-Cloud) on DevCentral. This particular HA example is based on the [BIG-IP "HA Failover via API" F5 ARM Cloud Template on GitHub](https://github.com/F5Networks/f5-azure-arm-templates/tree/master/supported/failover/same-net/via-api/n-nic/new-stack/payg).
 
 ## Creating virtual servers on the BIG-IP VE
 
-In order to pass traffic from your clients to the servers through the BIG-IP system, you must create a virtual server on the BIG-IP VE. In this template, it creates 2 VIPs, one for public internet facing and one for private internal usage. They are preconfigured as an example and configured the same way as on-prem BIG-IP devices
+In order to pass traffic from your clients to the servers through the BIG-IP system, you must create a virtual server on the BIG-IP VE. In this template, it creates 2 VIPs: one for public internet facing, and one for private internal usage. They are preconfigured as an example and configured the same way as on-prem BIG-IP devices
 
 ## Redeploy BIG-IP for replacement or upgrade
 This example illustrates how to replace the BIG-IP VE:

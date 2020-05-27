@@ -38,12 +38,14 @@ variable f5vm02ext { default = "10.90.2.5" }
 variable f5privatevip { default = "10.90.2.11" }
 variable f5publicvip { default = "10.90.2.12" }
 variable backend01ext { default = "10.90.2.101" }
+variable mgmt_gw { default = "10.90.1.1" }
+variable ext_gw { default = "10.90.2.1" }
 
 # BIGIP Image
 variable instance_type { default = "Standard_DS4_v2" }
 variable image_name { default = "f5-bigip-virtual-edition-25m-best-hourly" }
 variable product { default = "f5-big-ip-best" }
-variable bigip_version { default = "latest" }
+variable bigip_version { default = "15.1.002000" }
 
 # BIGIP Setup
 variable license1 { default = "" }
