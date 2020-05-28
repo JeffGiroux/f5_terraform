@@ -7,7 +7,7 @@
 - [Important Configuration Notes](#important-configuration-notes)
 - [Installation Example](#installation-example)
 - [Configuration Example](#configuration-example)
-- [Running BIG-IPs in Active/Active](#running-big-ips-in-active/active)
+- [Running BIG-IPs in Active/Active](#running-big-ips-in-activeactive)
 
 ## Introduction
 
