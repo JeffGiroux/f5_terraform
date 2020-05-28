@@ -58,7 +58,7 @@ Terraform v0.12.25
   ```
           az vm image list -f BIG-IP --all
   ```
-4. Add the following lines to the "cluster.json" file just under the "Common" declaration:
+4. Add the following lines to the "do.json" file just under the "Common" declaration:
   ```
           "myLicense": {
             "class": "License",
