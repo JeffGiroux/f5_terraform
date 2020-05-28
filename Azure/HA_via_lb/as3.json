@@ -7,45 +7,43 @@
     "schemaVersion": "3.0.0",
     "id": "123abc",
     "label": "Sample 1",
-    "remark": "HTTPS with predictive-node pool",
+    "remark": "An HTTPS sample application",
+    "controls": {
+      "trace": true
+    },
     "Sample_01": {
       "class": "Tenant",
-      "Shared": {
-        "class":"Application",
-        "template":"shared",
-        "serviceAddress": {
-          "class":"Service_Address",
-          "virtualAddress":"0.0.0.0"}
-      },
       "A1": {
         "class": "Application",
         "template": "https",
         "serviceMain": {
           "class": "Service_HTTPS",
           "virtualPort": 8443,
-          "virtualAddresses": [{
-	    "use":"/Sample_01/Shared/serviceAddress"
-	  }],
+          "virtualAddresses": [
+            "0.0.0.0"
+          ],
           "pool": "web_pool",
           "serverTLS": "webtls"
         },
         "web_pool": {
           "class": "Pool",
-          "loadBalancingMode": "predictive-node",
+          "monitors": [
+            "tcp"
+          ],
           "members": [{
-              "servicePort": 80,
-	      "addressDiscovery": "azure",
-	      "updateInterval": 10,
-	      "tagKey": "application",
-	      "tagValue": "app1",
-	      "addressRealm": "private",
-	      "resourceGroup": "${rg_name}",
-	      "subscriptionId": "${subscription_id}",
-              "directoryId": "${tenant_id}",
-              "applicationId": "${client_id}",
-              "apiAccessKey": "${client_secret}",
-              "credentialUpdate": false
-	  }]
+            "servicePort": 80,
+            "addressDiscovery": "azure",
+            "updateInterval": 10,
+            "tagKey": "application",
+            "tagValue": "app1",
+            "addressRealm": "private",
+            "resourceGroup": "${rg_name}",
+            "subscriptionId": "${subscription_id}",
+            "directoryId": "${tenant_id}",
+            "applicationId": "${client_id}",
+            "apiAccessKey": "${client_secret}",
+            "credentialUpdate": false
+          }]
         },
         "webtls": {
           "class": "TLS_Server",
@@ -67,4 +65,3 @@
     }
   }
 }
-
