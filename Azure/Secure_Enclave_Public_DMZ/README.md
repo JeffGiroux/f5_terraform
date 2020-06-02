@@ -107,7 +107,7 @@ Terraform v0.12.26
 | ntp_server | Yes | Leave the default NTP server the BIG-IP uses, or replace the default NTP server with the one you want to use. |
 | timezone | Yes | If you would like to change the time zone the BIG-IP uses, enter the time zone you want to use. This is based on the tz database found in /usr/share/zoneinfo (see the full list [here](https://github.com/F5Networks/f5-azure-arm-templates/blob/master/azure-timezone-list.md)). Example values: UTC, US/Pacific, US/Eastern, Europe/London or Asia/Singapore. |
 | dns_server | Yes | Least the default DNS server the BIG-IP uses, or replace the default DNS server with the one you want to use. | 
-| DO_onboard_URL | Yes | This is the raw github URL for downloading the Declarative Onboarding RPM |
+| DO_URL | Yes | This is the raw github URL for downloading the Declarative Onboarding RPM |
 | AS3_URL | Yes | This is the raw github URL for downloading the AS3 RPM. |
 | TS_URL | Yes | This is the raw github URL for downloading the Telemetry Streaming RPM. |
 | libs_dir | Yes | This is where all the temporary libs and RPM will be store in BIG-IP. |
