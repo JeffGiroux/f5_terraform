@@ -1,14 +1,5 @@
 # F5 Secure Enclave for Azure Public DMZ 
 
-**Note 6/2/2020:** Azure extension (customData) fails for some reason causing DO, AS3, and TS to not run automatically. You can run DO, AS3, and TS manually post deployment by doing a terraform apply on the specific object.
-```
-terraform apply -target null_resource.f5vm01_DO
-terraform apply -target null_resource.f5vm02_DO
-terraform apply -target null_resource.f5vm01_TS
-terraform apply -target null_resource.f5vm02_TS
-terraform apply -target null_resource.f5vm_AS3
-```
-
 ## Contents
 
 - [Introduction](#introduction)
