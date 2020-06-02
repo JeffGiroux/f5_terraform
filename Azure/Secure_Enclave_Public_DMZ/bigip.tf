@@ -1,4 +1,4 @@
-# BIG-IP Cluster
+# BIG-IP Cluster in Hub VNET
 
 # Create Availability Set
 resource "azurerm_availability_set" "avset" {

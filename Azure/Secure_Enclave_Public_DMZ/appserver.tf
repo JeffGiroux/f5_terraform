@@ -1,4 +1,4 @@
-# Backend VM - web server running DVWA
+# Backend VM - web server running DVWA in Spoke VNET
 
 # Create NIC
 resource "azurerm_network_interface" "backend01-ext-nic" {
@@ -45,8 +45,8 @@ resource "azurerm_linux_virtual_machine" "backendvm" {
   name                            = "backendvm"
   location                        = azurerm_resource_group.main.location
   resource_group_name             = azurerm_resource_group.main.name
-  network_interface_ids           = ["${azurerm_network_interface.backend01-ext-nic.id}"]
-  size                            = "Standard_B1s"
+  network_interface_ids           = [azurerm_network_interface.backend01-ext-nic.id]
+  size                            = "Standard_B1ms"
   admin_username                  = var.uname
   admin_password                  = var.upassword
   disable_password_authentication = false
