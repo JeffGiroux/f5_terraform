@@ -35,29 +35,35 @@ done
 
 sleep 60
 
+# Workaround for DO issue https://github.com/F5Networks/f5-declarative-onboarding/issues/129
+tmsh modify sys global-settings mgmt-dhcp disabled
+tmsh save sys config
+
 ### DOWNLOAD ONBOARDING PKGS
 # Could be pre-packaged or hosted internally
 
 admin_username='${uname}'
 admin_password='${upassword}'
 CREDS="admin:"$admin_password
-TS_URL='${TS_URL}'
-TS_FN=$(basename "$TS_URL")
 DO_URL='${DO_onboard_URL}'
 DO_FN=$(basename "$DO_URL")
 AS3_URL='${AS3_URL}'
 AS3_FN=$(basename "$AS3_URL")
+TS_URL='${TS_URL}'
+TS_FN=$(basename "$TS_URL")
 
 mkdir -p ${libs_dir}
 
-echo -e "\n"$(date) "Download TS Pkg"
-curl -L -o ${libs_dir}/$TS_FN $TS_URL
+echo -e "\n"$(date) "Download Telemetry (TS) Pkg"
+curl -L -k -o ${libs_dir}/$TS_FN $TS_URL
 
-echo -e "\n"$(date) "Download Declarative Onboarding Pkg"
-curl -L -o ${libs_dir}/$DO_FN $DO_URL
+echo -e "\n"$(date) "Download Declarative Onboarding (DO) Pkg"
+curl -L -k -o ${libs_dir}/$DO_FN $DO_URL
 
-echo -e "\n"$(date) "Download AS3 Pkg"
-curl -L -o ${libs_dir}/$AS3_FN $AS3_URL
+echo -e "\n"$(date) "Download Application Services 3 (AS3) Pkg"
+curl -L -k -o ${libs_dir}/$AS3_FN $AS3_URL
+
+sleep 10
 
 # Copy the RPM Pkg to the file location
 cp ${libs_dir}/*.rpm /var/config/rest/downloads/
@@ -85,17 +91,18 @@ sleep 10
 
 # Check DO Ready
 CNT=0
+echo -e "\n"$(date) "Check DO Ready"
 while true
 do
-  STATUS=$(curl -u $CREDS -X GET -s -k -I https://localhost/mgmt/shared/declarative-onboarding | grep HTTP)
+  STATUS=$(curl -u $CREDS -X GET -s -k -I https://localhost/mgmt/shared/declarative-onboarding/info | grep HTTP)
   if [[ $STATUS == *"200"* ]]; then
-    echo "Got 200! Declarative Onboarding is Ready!"
+    echo -e "\n"$(date) "Got 200! DO is Ready!"
     break
   elif [ $CNT -le 6 ]; then
-    echo "Status code: $STATUS  DO Not done yet..."
+    echo -e "\n"$(date) "Status code: $STATUS  DO Not done yet..."
     CNT=$[$CNT+1]
   else
-    echo "GIVE UP..."
+    echo -e "\n"$(date) "(DO) GIVE UP..."
     break
   fi
   sleep 10
@@ -103,17 +110,18 @@ done
 
 # Check AS3 Ready
 CNT=0
+echo -e "\n"$(date) "Check AS3 Ready"
 while true
 do
   STATUS=$(curl -u $CREDS -X GET -s -k -I https://localhost/mgmt/shared/appsvcs/info | grep HTTP)
   if [[ $STATUS == *"200"* ]]; then
-    echo "Got 200! AS3 is Ready!"
+    echo -e "\n"$(date) "Got 200! AS3 is Ready!"
     break
   elif [ $CNT -le 6 ]; then
-    echo "Status code: $STATUS  AS3 Not done yet..."
+    echo -e "\n"$(date) "Status code: $STATUS  AS3 Not done yet..."
     CNT=$[$CNT+1]
   else
-    echo "GIVE UP..."
+    echo -e "\n"$(date) "(AS3) GIVE UP..."
     break
   fi
   sleep 10
@@ -121,20 +129,25 @@ done
 
 # Check TS Ready
 CNT=0
+echo -e "\n"$(date) "Check TS Ready"
 while true
 do
-  STATUS=$(curl -u $CREDS -X GET -s -k -I https://localhost/mgmt/shared/telemetry/declare | grep HTTP)
+  STATUS=$(curl -u $CREDS -X GET -s -k -I https://localhost/mgmt/shared/telemetry/info | grep HTTP)
   if [[ $STATUS == *"200"* ]]; then
-    echo "Got 200! TS is Ready!"
+    echo -e "\n"$(date) "Got 200! TS is Ready!"
     break
   elif [ $CNT -le 6 ]; then
-    echo "Status code: $STATUS  TS Not done yet..."
+    echo -e "\n"$(date) "Status code: $STATUS  TS Not done yet..."
     CNT=$[$CNT+1]
   else
-    echo "GIVE UP..."
+    echo -e "\n"$(date) "(TS) GIVE UP..."
     break
   fi
   sleep 10
 done
 
-sleep 60
+# Delete RPM packages
+echo -e "\n"$(date) "Removing temporary RPM install packages"
+rm -rf /var/config/rest/downloads/*.rpm
+
+sleep 5

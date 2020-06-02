@@ -10,20 +10,14 @@ variable rest_vm_as3_file {default = "vm_as3_data.json" }
 variable rest_vm_ts_file { default = "vm_ts_data.json" }
 
 # Azure Environment
-variable "SP" {
-        type = "map"
-        default = {
-                subscription_id = "xxxxx"
-                client_id       = "xxxxx"
-                client_secret   = "xxxxx"
-                tenant_id       = "xxxxx"
-        }
-}
-variable prefix	{ default = "zlusca" }
-variable uname	{ default = "azureuser" }
-variable upassword	{ default = "Default12345" }
-variable location	{ default = "eastus" }	 
-variable region		{ default = "East US" }
+variable sp_subscription_id {}
+variable sp_client_id {}
+variable sp_client_secret {}
+variable sp_tenant_id {}
+variable prefix {}
+variable uname {}
+variable upassword {}
+variable location {}
 
 # NETWORK
 variable cidr	{ default = "10.90.0.0/16" }

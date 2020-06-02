@@ -487,10 +487,10 @@ data "template_file" "as3_json" {
   vars = {
     backendvm_ip    = "${var.backend01ext}"
     rg_name	    = "${azurerm_resource_group.main.name}"
-    subscription_id = "${var.SP["subscription_id"]}"
-    tenant_id	    = "${var.SP["tenant_id"]}"
-    client_id	    = "${var.SP["client_id"]}"
-    client_secret   = "${var.SP["client_secret"]}"
+    subscription_id = "${var.sp_subscription_id}"
+    tenant_id	    = "${var.sp_tenant_id}"
+    client_id	    = "${var.sp_client_id}"
+    client_secret   = "${var.sp_client_secret}"
   }
 }
 
@@ -670,7 +670,7 @@ resource "azurerm_virtual_machine" "backendvm" {
 resource "azurerm_virtual_machine_extension" "f5vm01_run_startup_cmd" {
   name                 = "${var.environment}_f5vm01_run_startup_cmd"
   depends_on           = ["azurerm_virtual_machine.f5vm01"]
-  location             = "${var.region}"
+  location             = "${var.location}"
   resource_group_name  = "${azurerm_resource_group.main.name}"
   virtual_machine_name = "${azurerm_virtual_machine.f5vm01.name}"
   publisher            = "Microsoft.OSTCExtensions"
@@ -699,7 +699,7 @@ resource "azurerm_virtual_machine_extension" "f5vm01_run_startup_cmd" {
 resource "azurerm_virtual_machine_extension" "f5vm02_run_startup_cmd" {
   name                 = "${var.environment}_f5vm02-run_startup_cmd"
   depends_on           = ["azurerm_virtual_machine.f5vm02"]
-  location             = "${var.region}"
+  location             = "${var.location}"
   resource_group_name  = "${azurerm_resource_group.main.name}"
   virtual_machine_name = "${azurerm_virtual_machine.f5vm02.name}"
   publisher            = "Microsoft.OSTCExtensions"

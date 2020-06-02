@@ -1,11 +1,21 @@
 # F5 Secure Enclave for Azure Public DMZ 
 
+**Note 6/2/2020:** Azure extension (customData) fails for some reason causing DO, AS3, and TS to not run automatically. You can run DO, AS3, and TS manually post deployment by doing a terraform apply on the specific object.
+```
+terraform apply -target null_resource.f5vm01_DO
+terraform apply -target null_resource.f5vm02_DO
+terraform apply -target null_resource.f5vm01_TS
+terraform apply -target null_resource.f5vm02_TS
+terraform apply -target null_resource.f5vm_AS3
+```
+
 ## Contents
 
 - [Version](#version)
 - [Introduction](#introduction)
 - [Prerequisites](#prerequisites)
 - [Important Configuration Notes](#important-configuration-notes)
+- [Installation Example](#installation-example)
 - [Template Parameters](#Template-parameters)
 - [Configuration Example](#configuration-example)
 
@@ -91,6 +101,42 @@ Ex.
 | libs_dir | Yes | This is where all the temporary libs and RPM will be store in BIG-IP. |
 | onboard_log | Yes | This is where the onboarding script logs all the events. |
 
+## Installation Example
+
+To run this Terraform template, perform the following steps:
+  1. Clone the repo to your favorite location
+  2. Modify terraform.tfvars with the required information
+  ```
+      # BIG-IP Environment
+      uname     = "azureuser"
+      upassword = "Default12345!"
+
+      # Azure Environment
+      sp_subscription_id = "xxxxx"
+      sp_client_id       = "xxxxx"
+      sp_client_secret   = "xxxxx"
+      sp_tenant_id       = "xxxxx"
+      location           = "West US 2"
+
+      # Prefix for objects being created
+      prefix = "mylab123"
+  ```
+  3. Initialize the directory
+  ```
+      terraform init
+  ```
+  4. Test the plan and validate errors
+  ```
+      terraform plan
+  ```
+  5. Finally, apply and deploy
+  ```
+      terraform apply
+  ```
+  6. When done with everything, don't forget to clean up!
+  ```
+      terraform destroy
+  ```
 
 ## Configuration Example
 
