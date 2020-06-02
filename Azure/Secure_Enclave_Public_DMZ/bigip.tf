@@ -312,9 +312,7 @@ data "template_file" "vm01_do_json" {
   template = file("${path.module}/do.json")
 
   vars = {
-    #Uncomment the following line for BYOL
-    #regKey	    = "${var.license1}"
-
+    regKey	       = var.license1
     host1          = var.host1_name
     host2          = var.host2_name
     local_host     = var.host1_name
@@ -333,9 +331,7 @@ data "template_file" "vm02_do_json" {
   template = file("${path.module}/do.json")
 
   vars = {
-    #Uncomment the following line for BYOL
-    #regKey	    = "${var.license2}"
-
+    regKey	       = var.license2
     host1          = var.host1_name
     host2          = var.host2_name
     local_host     = var.host2_name
