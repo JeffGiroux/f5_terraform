@@ -45,7 +45,7 @@ tmsh save sys config
 admin_username='${uname}'
 admin_password='${upassword}'
 CREDS="admin:"$admin_password
-DO_URL='${DO_onboard_URL}'
+DO_URL='${DO_URL}'
 DO_FN=$(basename "$DO_URL")
 AS3_URL='${AS3_URL}'
 AS3_FN=$(basename "$AS3_URL")
