@@ -123,7 +123,6 @@ data "template_file" "as3_json" {
 
 data "template_file" "ts_json" {
   template   = file("${path.module}/ts.json")
-  depends_on = [azurerm_log_analytics_workspace.law]
 
   vars = {
     region      = var.location
