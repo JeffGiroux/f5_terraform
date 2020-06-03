@@ -141,9 +141,17 @@
           ],
           "members": [{
             "servicePort": 80,
-            "serverAddresses": [
-              "${backendvm_ip}"
-            ]
+            "addressDiscovery": "azure",
+            "updateInterval": 10,
+            "tagKey": "application",
+            "tagValue": "app1",
+            "addressRealm": "private",
+            "resourceGroup": "${rg_name}",
+            "subscriptionId": "${subscription_id}",
+            "directoryId": "${tenant_id}",
+            "applicationId": "${client_id}",
+            "apiAccessKey": "${client_secret}",
+            "credentialUpdate": false
           }]
         },
         "webtls": {
