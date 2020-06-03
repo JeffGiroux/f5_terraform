@@ -35,10 +35,6 @@ done
 
 sleep 60
 
-# Workaround for DO issue https://github.com/F5Networks/f5-declarative-onboarding/issues/129
-tmsh modify sys global-settings mgmt-dhcp disabled
-tmsh save sys config
-
 ### DOWNLOAD ONBOARDING PKGS
 # Could be pre-packaged or hosted internally
 

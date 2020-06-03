@@ -312,7 +312,7 @@ data "template_file" "vm01_do_json" {
   template = file("${path.module}/do.json")
 
   vars = {
-    regKey	       = var.license1
+    regKey         = var.license1
     host1          = var.host1_name
     host2          = var.host2_name
     local_host     = var.host1_name
@@ -331,7 +331,7 @@ data "template_file" "vm02_do_json" {
   template = file("${path.module}/do.json")
 
   vars = {
-    regKey	       = var.license2
+    regKey         = var.license2
     host1          = var.host1_name
     host2          = var.host2_name
     local_host     = var.host2_name
@@ -355,7 +355,6 @@ data "template_file" "as3_json" {
     tenant_id       = var.sp_tenant_id
     client_id       = var.sp_client_id
     client_secret   = var.sp_client_secret
-    backendvm_ip    = var.backend01ext
   }
 }
 
@@ -364,6 +363,7 @@ data "template_file" "ts_json" {
   depends_on = [azurerm_log_analytics_workspace.law]
 
   vars = {
+    region      = var.location
     law_id      = azurerm_log_analytics_workspace.law.workspace_id
     law_primkey = azurerm_log_analytics_workspace.law.primary_shared_key
   }
@@ -375,7 +375,7 @@ resource "azurerm_linux_virtual_machine" "f5vm01" {
   location                        = azurerm_resource_group.main.location
   resource_group_name             = azurerm_resource_group.main.name
   availability_set_id             = azurerm_availability_set.avset.id
-  network_interface_ids           = ["${azurerm_network_interface.vm01-mgmt-nic.id}", "${azurerm_network_interface.vm01-ext-nic.id}"]
+  network_interface_ids           = [azurerm_network_interface.vm01-mgmt-nic.id, azurerm_network_interface.vm01-ext-nic.id]
   size                            = var.instance_type
   admin_username                  = var.uname
   admin_password                  = var.upassword
