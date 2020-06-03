@@ -1,0 +1,17 @@
+# BIG-IP Environment
+uname     = "azureuser"
+upassword = "Default12345!"
+
+# BIG-IQ Environment
+bigIqUsername = "azureuser"
+bigIqPassword = "Default12345!"
+
+# Azure Environment
+sp_subscription_id = "xxxxx"
+sp_client_id       = "xxxxx"
+sp_client_secret   = "xxxxx"
+sp_tenant_id       = "xxxxx"
+location           = "westus2"
+
+# Prefix for objects being created
+prefix = "mydemo123"
