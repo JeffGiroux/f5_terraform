@@ -35,11 +35,13 @@ done
 
 sleep 60
 
-### DOWNLOAD ONBOARDING PKGS
-# Could be pre-packaged or hosted internally
+###############################################
+#### Download F5 Automation Toolchain RPMs ####
+###############################################
 
-admin_username='${uname}'
-admin_password='${upassword}'
+# Variables
+admin_username='${admin_user}'
+admin_password='${admin_password}'
 CREDS="admin:"$admin_password
 DO_URL='${DO_URL}'
 DO_FN=$(basename "$DO_URL")

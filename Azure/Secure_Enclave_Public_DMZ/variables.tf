@@ -1,3 +1,5 @@
+# Variables
+
 # REST API Setting
 variable rest_do_uri { default = "/mgmt/shared/declarative-onboarding" }
 variable rest_as3_uri { default = "/mgmt/shared/appsvcs/declare" }
