@@ -162,7 +162,7 @@ To run this Terraform template, perform the following steps:
       sp_client_id       = "xxxxx"
       sp_client_secret   = "xxxxx"
       sp_tenant_id       = "xxxxx"
-      location           = "West US 2"
+      location           = "westus2"
 
       # Prefix for objects being created
       prefix = "mylab123"
@@ -223,7 +223,7 @@ You can make this deployment of BIG-IP devices run Active/Active too. When you h
 6. Repeat for each virtual server address
 
 ## Redeploy BIG-IP for Replacement or Upgrade
-This example illustrates how to replace or upgrade the BIG-IP VE
+This example illustrates how to replace or upgrade the BIG-IP VE.
   1. Change the *bigip_version* variable to the desired release 
   2. Revoke the problematic BIG-IP VE's license (if BYOL)
   3. Run command
