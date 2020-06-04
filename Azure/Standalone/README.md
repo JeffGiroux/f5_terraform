@@ -84,11 +84,10 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
           variable product { default = "f5-big-ip-byol" }
           variable image_name { default = "f5-big-ltm-2slot-byol" }
   ```
-3. In the "variables.tf", modify *license1* and *license2* with valid regkeys
+3. In the "variables.tf", modify *license1* and with a valid regkey
   ```
           # BIGIP Setup
           variable license1 { default = "" }
-          variable license2 { default = "" }
   ```
 4. In the "do.json", add the "myLicense" block under the "Common" declaration ([full declaration example here](https://clouddocs.f5.com/products/extensions/f5-declarative-onboarding/latest/bigip-examples.html#standalone-declaration))
   ```
