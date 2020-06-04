@@ -1,13 +1,16 @@
-# Environment
-variable prefix	{ default = "zlupdmz" }
-variable uname	{ default = "azureuser" }
-variable upassword	{ default = "Default12345" }
-variable location	{ default = "eastus" }	 
-variable region		{ default = "East US" }
+# Azure Environment
+variable sp_subscription_id {}
+variable sp_client_id {}
+variable sp_client_secret {}
+variable sp_tenant_id {}
+variable prefix {}
+variable uname {}
+variable upassword {}
+variable location {}
 
 # NETWORK
 variable "onpremsite1" {
-	type = "map"
+	type = map(string)
 	default = {
 		"publicip" = "128.8.8.8"
 		"addrspace1" = "10.101.1.0/24"
@@ -17,7 +20,7 @@ variable "onpremsite1" {
 }
 variable cidr	{ default = "10.90.0.0/16" }
 variable "subnets" {
-	type = "map"
+	type = map(string)
 	default = {
                 "gwsubnet" = "10.90.255.0/24"
 		"subnet1" = "10.90.1.0/24"

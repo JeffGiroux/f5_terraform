@@ -43,7 +43,7 @@ resource "azurerm_public_ip" "vm01mgmtpip" {
   resource_group_name          = "${azurerm_resource_group.main.name}"
   allocation_method = "Dynamic"
 
-  tags {
+  tags = {
     Name           = "${var.environment}-vm01-mgmt-public-ip"
     environment    = "${var.environment}"
     owner          = "${var.owner}"
@@ -59,7 +59,7 @@ resource "azurerm_public_ip" "vm02mgmtpip" {
   resource_group_name          = "${azurerm_resource_group.main.name}"
   allocation_method = "Dynamic"
 
-  tags {
+  tags = {
     Name           = "${var.environment}-vm02-mgmt-public-ip"
     environment    = "${var.environment}"
     owner          = "${var.owner}"
@@ -75,7 +75,7 @@ resource "azurerm_public_ip" "tgwpip" {
   resource_group_name          = "${azurerm_resource_group.main.name}"
   allocation_method = "Dynamic"
 
-  tags {
+  tags = {
     Name           = "${var.environment}-tgw-public-ip"
     environment    = "${var.environment}"
     owner          = "${var.owner}"
@@ -145,7 +145,7 @@ resource "azurerm_route_table" "gwrt" {
     next_hop_in_ip_address = "${var.lb_ip}"
   }
 
-  tags {
+  tags = {
     environment = "Production"
   }
 }
@@ -288,7 +288,7 @@ resource "azurerm_network_security_group" "main" {
     destination_address_prefix = "*"
   }
 
-  tags {
+  tags = {
     Name           = "${var.environment}-bigip-sg"
     environment    = "${var.environment}"
     owner          = "${var.owner}"
@@ -313,7 +313,7 @@ resource "azurerm_network_interface" "vm01-mgmt-nic" {
     public_ip_address_id          = "${azurerm_public_ip.vm01mgmtpip.id}"
   }
 
-  tags {
+  tags = {
     Name           = "${var.environment}-vm01-mgmt-int"
     environment    = "${var.environment}"
     owner          = "${var.owner}"
@@ -337,7 +337,7 @@ resource "azurerm_network_interface" "vm02-mgmt-nic" {
     public_ip_address_id          = "${azurerm_public_ip.vm02mgmtpip.id}"
   }
 
-  tags {
+  tags = {
     Name           = "${var.environment}-vm02-mgmt-int"
     environment    = "${var.environment}"
     owner          = "${var.owner}"
@@ -370,7 +370,7 @@ resource "azurerm_network_interface" "vm01-ext-nic" {
     private_ip_address            = "${var.f5vm01ext_sec}"
   }
 
-  tags {
+  tags = {
     Name           = "${var.environment}-vm01-ext-int"
     environment    = "${var.environment}"
     owner          = "${var.owner}"
@@ -402,7 +402,7 @@ resource "azurerm_network_interface" "vm02-ext-nic" {
     private_ip_address            = "${var.f5vm02ext_sec}"
   }
 
-  tags {
+  tags = {
     Name           = "${var.environment}-vm01-ext-int"
     environment    = "${var.environment}"
     owner          = "${var.owner}"
@@ -431,7 +431,7 @@ resource "azurerm_network_interface_backend_address_pool_association" "bpool_ass
 data "template_file" "vm_onboard" {
   template = "${file("${path.module}/onboard.tpl")}"
 
-  vars {
+  vars = {
     uname        	  = "${var.uname}"
     upassword        	  = "${var.upassword}"
     DO_onboard_URL        = "${var.DO_onboard_URL}"
@@ -444,7 +444,7 @@ data "template_file" "vm_onboard" {
 data "template_file" "vm01_do_json" {
   template = "${file("${path.module}/cluster.json")}"
 
-  vars {
+  vars = {
     #Uncomment the following line for BYOL
     #local_sku	    = "${var.license1}"
 
@@ -466,7 +466,7 @@ data "template_file" "vm01_do_json" {
 data "template_file" "vm02_do_json" {
   template = "${file("${path.module}/cluster.json")}"
 
-  vars {
+  vars = {
     #Uncomment the following line for BYOL
     #local_sku      = "${var.license2}"
 
@@ -537,7 +537,7 @@ resource "azurerm_virtual_machine" "f5vm01" {
     product       = "${var.product}"
   }
 
-  tags {
+  tags = {
     Name           = "${var.environment}-f5vm01"
     environment    = "${var.environment}"
     owner          = "${var.owner}"
@@ -550,6 +550,7 @@ resource "azurerm_virtual_machine" "f5vm01" {
     content     = "${data.template_file.vm01_do_json.rendered}"
     destination = "/var/tmp/vm_do.json"
     connection {
+      host = data.azurerm_public_ip.vm01mgmtpip.ip_address
       user	= "${var.uname}"
       password	= "${var.upassword}"
       agent = false
@@ -560,6 +561,7 @@ resource "azurerm_virtual_machine" "f5vm01" {
     content     = "${data.template_file.as3_json.rendered}"
     destination = "/var/tmp/as3.json"
     connection {
+      host      = data.azurerm_public_ip.vm01mgmtpip.name
       user      = "${var.uname}"
       password  = "${var.upassword}"
       agent = false
@@ -614,7 +616,7 @@ resource "azurerm_virtual_machine" "f5vm02" {
     product       = "${var.product}"
   }
 
-  tags {
+  tags = {
     Name           = "${var.environment}-f5vm02"
     environment    = "${var.environment}"
     owner          = "${var.owner}"
@@ -627,6 +629,7 @@ resource "azurerm_virtual_machine" "f5vm02" {
     content     = "${data.template_file.vm02_do_json.rendered}"
     destination = "/var/tmp/vm_do.json"
     connection {
+      host = data.azurerm_public_ip.vm02mgmtpip.ip_address
       user = "${var.uname}"
       password = "${var.upassword}"
       agent = false
@@ -637,7 +640,7 @@ resource "azurerm_virtual_machine" "f5vm02" {
     content     = "${data.template_file.as3_json.rendered}"
     destination = "/var/tmp/as3.json"
     connection {
-      user = "${var.uname}"
+      host = data.azurerm_public_ip.vm02mgmtpip.ip_address
       password = "${var.upassword}"
       agent = false
     }
@@ -648,7 +651,7 @@ resource "azurerm_virtual_machine" "f5vm02" {
 # Run Startup Script
 resource "azurerm_virtual_machine_extension" "f5vm01-run-startup-cmd" {
   name                 = "${var.environment}-f5vm01-run-startup-cmd"
-  location             = "${var.region}"
+  location             = "${var.location}"
   resource_group_name  = "${azurerm_resource_group.main.name}"
   virtual_machine_name = "${azurerm_virtual_machine.f5vm01.name}"
   publisher            = "Microsoft.OSTCExtensions"
@@ -665,7 +668,7 @@ resource "azurerm_virtual_machine_extension" "f5vm01-run-startup-cmd" {
     }
   SETTINGS
 
-  tags {
+  tags = {
     Name           = "${var.environment}-f5vm01-startup-cmd"
     environment    = "${var.environment}"
     owner          = "${var.owner}"
@@ -677,7 +680,7 @@ resource "azurerm_virtual_machine_extension" "f5vm01-run-startup-cmd" {
 
 resource "azurerm_virtual_machine_extension" "f5vm02-run-startup-cmd" {
   name                 = "${var.environment}-f5vm02-run-startup-cmd"
-  location             = "${var.region}"
+  location             = "${var.location}"
   resource_group_name  = "${azurerm_resource_group.main.name}"
   virtual_machine_name = "${azurerm_virtual_machine.f5vm02.name}"
   publisher            = "Microsoft.OSTCExtensions"
@@ -694,7 +697,7 @@ resource "azurerm_virtual_machine_extension" "f5vm02-run-startup-cmd" {
     }
   SETTINGS
 
-  tags {
+  tags = {
     Name           = "${var.environment}-f5vm02-startup-cmd"
     environment    = "${var.environment}"
     owner          = "${var.owner}"
