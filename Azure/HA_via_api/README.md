@@ -55,7 +55,6 @@ Terraform v0.12.26
   - Note: Passwords and secrets will be moved to Azure Key Vault in the future
 - This template uses Declarative Onboarding (DO), Application Services 3 (AS3), and Cloud Failover Extension packages for the initial configuration. As part of the onboarding script, it will download the RPMs automatically. See the [AS3 documentation](https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/) and [DO documentation](https://clouddocs.f5.com/products/extensions/f5-declarative-onboarding/latest/) for details on how to use AS3 and Declarative Onboarding on your BIG-IP VE(s). The [Telemetry Streaming](https://clouddocs.f5.com/products/extensions/f5-telemetry-streaming/latest/) extension is also downloaded and can be configured to point to Azure Log Analytics. The [Cloud Failover Extension](https://clouddocs.f5.com/products/extensions/f5-cloud-failover/latest/) documentation is also available.
 - Files
-  - alb.tf - resources for Azure LB
   - appserver.tf - resources for backend web server running DVWA
   - bigip.tf - resources for BIG-IP, NICs, public IPs, network security group
   - main.tf - resources for provider, versions, resource group
