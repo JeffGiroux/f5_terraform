@@ -1,4 +1,4 @@
-# BIG-IP #1
+# BIG-IP
 
 # Create Public IPs
 resource "azurerm_public_ip" "vm01mgmtpip" {
@@ -97,6 +97,19 @@ resource "azurerm_network_security_group" "main" {
     destination_address_prefix = "*"
   }
 
+  security_rule {
+    name                       = "allow_APP_HTTPS"
+    description                = "Allow HTTPS access"
+    priority                   = 130
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "8443"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
   tags = {
     Name        = "${var.environment}-bigip-sg"
     environment = var.environment
@@ -133,12 +146,13 @@ resource "azurerm_network_interface" "vm01-mgmt-nic" {
 
 # Create NIC for External
 resource "azurerm_network_interface" "vm01-ext-nic" {
-  name                = "${var.prefix}-ext0"
-  location            = azurerm_resource_group.main.location
-  resource_group_name = azurerm_resource_group.main.name
+  name                 = "${var.prefix}-ext0"
+  location             = azurerm_resource_group.main.location
+  resource_group_name  = azurerm_resource_group.main.name
+  enable_ip_forwarding = true
 
   ip_configuration {
-    name                          = "f5vm-self-ipconfig"
+    name                          = "primary"
     subnet_id                     = azurerm_subnet.External.id
     private_ip_address_allocation = "Static"
     private_ip_address            = var.f5vm01ext
@@ -147,14 +161,14 @@ resource "azurerm_network_interface" "vm01-ext-nic" {
   }
 
   ip_configuration {
-    name                          = "${var.prefix}-ext-ipconfig0"
+    name                          = "secondary1"
     subnet_id                     = azurerm_subnet.External.id
     private_ip_address_allocation = "Static"
     private_ip_address            = var.f5privatevip
   }
 
   ip_configuration {
-    name                          = "${var.prefix}-ext-ipconfig1"
+    name                          = "secondary2"
     subnet_id                     = azurerm_subnet.External.id
     private_ip_address_allocation = "Static"
     private_ip_address            = var.f5publicvip
@@ -187,9 +201,9 @@ data "template_file" "vm_onboard" {
   template = file("${path.module}/onboard.tpl")
 
   vars = {
-    uname          = var.uname
-    upassword      = var.upassword
-    DO_onboard_URL = var.DO_onboard_URL
+    admin_user     = var.uname
+    admin_password = var.upassword
+    DO_URL         = var.DO_URL
     AS3_URL        = var.AS3_URL
     TS_URL         = var.TS_URL
     libs_dir       = var.libs_dir
@@ -201,9 +215,7 @@ data "template_file" "vm01_do_json" {
   template = file("${path.module}/do.json")
 
   vars = {
-    #Uncomment the following line for BYOL
-    #local_sku	    = "${var.license1}"
-
+    regKey         = var.license1
     host1          = var.host1_name
     local_host     = var.host1_name
     local_selfip   = var.f5vm01ext
@@ -225,8 +237,19 @@ data "template_file" "as3_json" {
     tenant_id       = var.sp_tenant_id
     client_id       = var.sp_client_id
     client_secret   = var.sp_client_secret
+    backendvm_ip    = var.backend01ext
     publicvip       = var.f5publicvip
     privatevip      = var.f5privatevip
+  }
+}
+
+data "template_file" "ts_json" {
+  template   = file("${path.module}/ts.json")
+
+  vars = {
+    region      = var.location
+    law_id      = azurerm_log_analytics_workspace.law.workspace_id
+    law_primkey = azurerm_log_analytics_workspace.law.primary_shared_key
   }
 }
 
@@ -235,7 +258,7 @@ resource "azurerm_linux_virtual_machine" "f5vm01" {
   name                            = "${var.prefix}-f5vm01"
   location                        = azurerm_resource_group.main.location
   resource_group_name             = azurerm_resource_group.main.name
-  network_interface_ids           = ["${azurerm_network_interface.vm01-mgmt-nic.id}", "${azurerm_network_interface.vm01-ext-nic.id}"]
+  network_interface_ids           = [azurerm_network_interface.vm01-mgmt-nic.id, azurerm_network_interface.vm01-ext-nic.id]
   size                            = var.instance_type
   admin_username                  = var.uname
   admin_password                  = var.upassword
@@ -279,7 +302,6 @@ resource "azurerm_linux_virtual_machine" "f5vm01" {
 # Run Startup Script
 resource "azurerm_virtual_machine_extension" "f5vm01-run-startup-cmd" {
   name                 = "${var.environment}-f5vm01-run-startup-cmd"
-  depends_on           = [azurerm_linux_virtual_machine.f5vm01, azurerm_linux_virtual_machine.backendvm]
   virtual_machine_id   = azurerm_linux_virtual_machine.f5vm01.id
   publisher            = "Microsoft.Azure.Extensions"
   type                 = "CustomScript"
@@ -312,6 +334,11 @@ resource "local_file" "vm_as3_file" {
   filename = "${path.module}/${var.rest_vm_as3_file}"
 }
 
+resource "local_file" "vm_ts_file" {
+  content  = data.template_file.ts_json.rendered
+  filename = "${path.module}/${var.rest_vm_ts_file}"
+}
+
 resource "null_resource" "f5vm01_DO" {
   depends_on = [azurerm_virtual_machine_extension.f5vm01-run-startup-cmd]
   # Running DO REST API
@@ -319,14 +346,25 @@ resource "null_resource" "f5vm01_DO" {
     command = <<-EOF
       #!/bin/bash
       curl -k -X ${var.rest_do_method} https://${azurerm_public_ip.vm01mgmtpip.ip_address}${var.rest_do_uri} -u ${var.uname}:${var.upassword} -d @${var.rest_vm01_do_file}
-      x=1; while [ $x -le 30 ]; do STATUS=$(curl -k -X GET https://${azurerm_public_ip.vm01mgmtpip.ip_address}/mgmt/shared/declarative-onboarding/task -u ${var.uname}:${var.upassword}); if ( echo $STATUS | grep "OK" ); then break; fi; sleep 10; x=$(( $x + 1 )); done
+      x=1; while [ $x -le 30 ]; do STATUS=$(curl -s -k -X GET https://${azurerm_public_ip.vm01mgmtpip.ip_address}/mgmt/shared/declarative-onboarding/task -u ${var.uname}:${var.upassword}); if ( echo $STATUS | grep "OK" ); then break; fi; sleep 10; x=$(( $x + 1 )); done
       sleep 10
     EOF
   }
 }
 
-resource "null_resource" "f5vm_AS3" {
+resource "null_resource" "f5vm01_TS" {
   depends_on = [null_resource.f5vm01_DO]
+  # Running TS REST API
+  provisioner "local-exec" {
+    command = <<-EOF
+      #!/bin/bash
+      curl -H 'Content-Type: application/json' -k -X POST https://${azurerm_public_ip.vm01mgmtpip.ip_address}${var.rest_ts_uri} -u ${var.uname}:${var.upassword} -d @${var.rest_vm_ts_file}
+    EOF
+  }
+}
+
+resource "null_resource" "f5vm_AS3" {
+  depends_on = [null_resource.f5vm01_TS]
   # Running AS3 REST API
   provisioner "local-exec" {
     command = <<-EOF

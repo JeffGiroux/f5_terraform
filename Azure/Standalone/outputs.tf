@@ -2,6 +2,7 @@
 
 output "sg_id" { value = "${azurerm_network_security_group.main.id}" }
 output "sg_name" { value = "${azurerm_network_security_group.main.name}" }
+output "mgmt_subnet_gw" { value = "${var.mgmt_gw}" }
 output "ext_subnet_gw" { value = "${var.ext_gw}" }
 output "Public_VIP_pip" { value = "${azurerm_public_ip.pubvippip.ip_address}" }
 

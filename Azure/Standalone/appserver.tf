@@ -45,8 +45,8 @@ resource "azurerm_linux_virtual_machine" "backendvm" {
   name                            = "backendvm"
   location                        = azurerm_resource_group.main.location
   resource_group_name             = azurerm_resource_group.main.name
-  network_interface_ids           = ["${azurerm_network_interface.backend01-ext-nic.id}"]
-  size                            = "Standard_DS1_v2"
+  network_interface_ids           = [azurerm_network_interface.backend01-ext-nic.id]
+  size                            = "Standard_B1ms"
   admin_username                  = var.uname
   admin_password                  = var.upassword
   disable_password_authentication = false
@@ -62,7 +62,7 @@ resource "azurerm_linux_virtual_machine" "backendvm" {
   source_image_reference {
     publisher = "Canonical"
     offer     = "UbuntuServer"
-    sku       = "16.04.0-LTS"
+    sku       = "18.04-LTS"
     version   = "latest"
   }
 

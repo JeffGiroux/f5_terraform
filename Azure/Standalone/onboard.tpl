@@ -35,16 +35,16 @@ done
 
 sleep 60
 
-tmsh modify sys global-settings mgmt-dhcp disabled
-tmsh save sys config
 
-### DOWNLOAD ONBOARDING PKGS
-# Could be pre-packaged or hosted internally
+###############################################
+#### Download F5 Automation Toolchain RPMs ####
+###############################################
 
-admin_username='${uname}'
-admin_password='${upassword}'
+# Variables
+admin_username='${admin_user}'
+admin_password='${admin_password}'
 CREDS="admin:"$admin_password
-DO_URL='${DO_onboard_URL}'
+DO_URL='${DO_URL}'
 DO_FN=$(basename "$DO_URL")
 AS3_URL='${AS3_URL}'
 AS3_FN=$(basename "$AS3_URL")
