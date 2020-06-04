@@ -171,7 +171,7 @@ tsTaskUrl="/mgmt/shared/telemetry/task"
 cat > /config/do.json <<EOF
 ${DO_Document}
 EOF
-cat > /config/as3.json <<EOF
+cat > /config/as3.json <<'EOF'
 ${AS3_Document}
 EOF
 cat > /config/ts.json <<EOF
