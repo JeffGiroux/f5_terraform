@@ -1,5 +1,7 @@
 # Deploying BIG-IP VEs in Azure - Auto Scale (Active/Active): Two NICs
 
+***To Do:*** Add auto scaling policies. Currently VMSS is manual sizing.
+
 ## Contents
 
 - [Introduction](#introduction)
