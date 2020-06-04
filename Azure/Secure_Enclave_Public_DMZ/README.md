@@ -130,6 +130,8 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | f5vm02mgmt | Yes | IP address for 2nd BIG-IP's management interface |
 | f5vm01ext | Yes | IP address for 1st BIG-IP's external interface |
 | f5vm02ext | Yes | IP address for 2nd BIG-IP's external interface |
+| f5vm01ext_sec | Yes | Secondary Private IP address for 1st BIG-IP's external interface. |
+| f5vm02ext_sec | Yes | Secondary Private IP address for 2nd BIG-IP's external interface. |
 | instance_type | Yes | Azure instance to be used for the BIG-IP VE |
 | product | Yes | Azure BIG-IP VE Offer |
 | bigip_version | Yes | BIG-IP Version |
