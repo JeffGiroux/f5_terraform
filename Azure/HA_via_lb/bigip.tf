@@ -361,7 +361,6 @@ data "template_file" "as3_json" {
 
 data "template_file" "ts_json" {
   template   = file("${path.module}/ts.json")
-  depends_on = [azurerm_log_analytics_workspace.law]
 
   vars = {
     region      = var.location
@@ -418,7 +417,7 @@ resource "azurerm_linux_virtual_machine" "f5vm02" {
   location                        = azurerm_resource_group.main.location
   resource_group_name             = azurerm_resource_group.main.name
   availability_set_id             = azurerm_availability_set.avset.id
-  network_interface_ids           = ["${azurerm_network_interface.vm02-mgmt-nic.id}", "${azurerm_network_interface.vm02-ext-nic.id}"]
+  network_interface_ids           = [azurerm_network_interface.vm02-mgmt-nic.id, azurerm_network_interface.vm02-ext-nic.id]
   size                            = var.instance_type
   admin_username                  = var.uname
   admin_password                  = var.upassword
@@ -458,7 +457,6 @@ resource "azurerm_linux_virtual_machine" "f5vm02" {
 # Run Startup Script
 resource "azurerm_virtual_machine_extension" "f5vm01-run-startup-cmd" {
   name                 = "${var.environment}-f5vm01-run-startup-cmd"
-  depends_on           = [azurerm_linux_virtual_machine.f5vm01, azurerm_linux_virtual_machine.backendvm]
   virtual_machine_id   = azurerm_linux_virtual_machine.f5vm01.id
   publisher            = "Microsoft.Azure.Extensions"
   type                 = "CustomScript"
@@ -482,7 +480,6 @@ resource "azurerm_virtual_machine_extension" "f5vm01-run-startup-cmd" {
 
 resource "azurerm_virtual_machine_extension" "f5vm02-run-startup-cmd" {
   name                 = "${var.environment}-f5vm02-run-startup-cmd"
-  depends_on           = [azurerm_linux_virtual_machine.f5vm02, azurerm_linux_virtual_machine.backendvm]
   virtual_machine_id   = azurerm_linux_virtual_machine.f5vm02.id
   publisher            = "Microsoft.Azure.Extensions"
   type                 = "CustomScript"
@@ -574,7 +571,7 @@ resource "null_resource" "f5vm02_TS" {
 }
 
 resource "null_resource" "f5vm_AS3" {
-  depends_on = [null_resource.f5vm01_DO, null_resource.f5vm02_DO]
+  depends_on = [null_resource.f5vm01_TS, null_resource.f5vm02_TS]
   # Running AS3 REST API
   provisioner "local-exec" {
     command = <<-EOF
