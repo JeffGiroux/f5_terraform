@@ -1,0 +1,19 @@
+# BIG-IP Environment
+uname            = "gcpadmin"
+upassword        = "Default12345!"
+adminAccountName = "gcpadmin"
+gceSshPubKey     = "ssh-rsa xxxxx
+projectPrefix    = "jg-bigip-"
+adminSrcAddr     = "0.0.0.0/0"
+mgmtVpc          = "xxxxx-net-mgmt"
+extVpc           = "xxxxx-net-ext"
+mgmtSubnet       = "xxxxx-subnet-mgmt"
+extSubnet        = "xxxxx-subnet-ext"
+
+# Google Environment
+GCP_PROJECT_ID = "xxxxx"
+GCP_REGION     = "us-west1"
+GCP_ZONE       = "us-west1-b"
+
+# Prefix for objects being created
+prefix = "mydemo123"
