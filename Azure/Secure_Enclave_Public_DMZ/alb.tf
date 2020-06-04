@@ -68,5 +68,4 @@ resource "azurerm_lb_rule" "lb_rule2" {
   backend_address_pool_id        = azurerm_lb_backend_address_pool.backend_pool.id
   idle_timeout_in_minutes        = 5
   probe_id                       = azurerm_lb_probe.lb_probe.id
-  depends_on                     = [azurerm_lb_probe.lb_probe]
 }
