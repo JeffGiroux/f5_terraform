@@ -2,7 +2,7 @@
 
 # Terraform Version Pinning
 terraform {
-    required_version = "~> 0.12.25"
+    required_version = "~> 0.12.26"
     required_providers {
         azurerm = "~> 2.1.0"
     }
@@ -21,6 +21,15 @@ provider "azurerm" {
 resource "azurerm_resource_group" "main" {
   name     = "${var.prefix}_rg"
   location = var.location
+}
+
+# Create Log Analytic Workspace
+resource "azurerm_log_analytics_workspace" "law" {
+  name                = "${var.prefix}-law"
+  sku                 = "PerNode"
+  retention_in_days   = 300
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
 }
 
 # Create the Storage Account
