@@ -209,8 +209,8 @@ do
 done
 
 # Submit TS Declaration
-#echo -e "\n"$(date) "Submitting TS declaration"
-#curl -u $CREDS -H "Content-Type: Application/json" -X POST -k https://localhost/$tsUrl -d @/config/ts.json
+echo -e "\n"$(date) "Submitting TS declaration"
+curl -u $CREDS -H "Content-Type: Application/json" -X POST -k https://localhost/$tsUrl -d @/config/ts.json
 
 # Submit AS3 Declaration
 echo -e "\n"$(date) "Submitting AS3 declaration"
