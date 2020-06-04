@@ -84,7 +84,7 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
           variable product { default = "f5-big-ip-byol" }
           variable image_name { default = "f5-big-ltm-2slot-byol" }
   ```
-3. In the "variables.tf", modify *license1* and with a valid regkey
+3. In the "variables.tf", modify *license1* with a valid regkey
   ```
           # BIGIP Setup
           variable license1 { default = "" }
