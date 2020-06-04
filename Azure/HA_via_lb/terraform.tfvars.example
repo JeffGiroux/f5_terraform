@@ -7,7 +7,7 @@ sp_subscription_id = "xxxxx"
 sp_client_id       = "xxxxx"
 sp_client_secret   = "xxxxx"
 sp_tenant_id       = "xxxxx"
-location           = "West US 2"
+location           = "westus2"
 
 # Prefix for objects being created
 prefix = "mydemo123"

@@ -4,7 +4,7 @@
   "persist": true,
   "declaration": {
     "class": "ADC",
-    "schemaVersion": "3.0.0",
+    "schemaVersion": "3.13.0",
     "id": "123abc",
     "label": "Sample 1",
     "remark": "An HTTPS sample application",
