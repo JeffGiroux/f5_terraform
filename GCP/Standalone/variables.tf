@@ -1,93 +1,55 @@
+# Variables
 
-# BIG-IP
+# REST API Setting
+variable rest_do_uri { default = "/mgmt/shared/declarative-onboarding" }
+variable rest_as3_uri { default = "/mgmt/shared/appsvcs/declare" }
+variable rest_do_method { default = "POST" }
+variable rest_as3_method { default = "POST" }
+variable rest_vm01_do_file { default = "vm01_do_data.json" }
+variable rest_vm_as3_file { default = "vm_as3_data.json" }
+variable rest_ts_uri { default = "/mgmt/shared/telemetry/declare" }
+variable rest_vm_ts_file { default = "vm_ts_data.json" }
 
-variable "projectPrefix" {
-  description = "Prefix for resources created by this module"
-  type        = string
-  default     = "terraform-gcp-bigip-"
-}
-variable "name" {
-  description = "device name"
-  default     = "bigip"
-}
-variable "instanceCount" {
-  description = "number of devices"
-  default     = 1
-}
-variable "bigipMachineType" {
-  description = "BIG-IP GCE machine type/size"
-  default     = "n1-standard-8"
-}
-variable "bigipImage" {
-  description = " BIG-IP GCE image name"
-  default     = "projects/f5-7626-networks-public/global/images/f5-bigip-15-1-0-2-0-0-9-payg-best-1gbps-200321032524"
-}
-variable adminAccountName {
-  description = "BIG-IP admin account name"
-}
-variable adminPass {
-  description = "BIG-IP admin password"
-  default     = ""
-}
-variable "adminSrcAddr" {
-  description = "admin source range in CIDR"
-}
-variable "gceSshPubKey" {
-  description = "GCP GCE Key name for SSH access"
-  type        = string
-}
-variable host1Name { default = "f5vm01" }
-variable host2Name { default = "f5vm02" }
-variable dnsServer { default = "8.8.8.8" }
-variable ntpServer { default = "0.us.pool.ntp.org" }
+# Google Environment
+variable svc_acct {}
+variable gcp_project_id {}
+variable gcp_region {}
+variable gcp_zone {}
+variable prefix {}
+
+# NETWORK
+variable extVpc {}
+variable mgmtVpc {}
+variable extSubnet {}
+variable mgmtSubnet {}
+variable alias_ip_range { default = "10.1.10.100/32" }
+
+# BIGIP Image
+variable bigipMachineType { default = "n1-standard-8" }
+variable image_name { default = "projects/f5-7626-networks-public/global/images/f5-bigip-15-1-0-2-0-0-9-payg-best-1gbps-200321032524" } # BIG-IP Custom image
+variable "customImage" { default = "" }
+variable "customUserData" { default = "" }
+
+# BIGIP Setup
+variable uname {}
+variable upassword {}
+variable license1 { default = "" }
+variable "adminSrcAddr" {}
+variable "gceSshPubKey" {}
+variable host1_name { default = "f5vm01" }
+variable dns_server { default = "8.8.8.8" }
+variable ntp_server { default = "0.us.pool.ntp.org" }
 variable timezone { default = "UTC" }
-variable libsDir { default = "/config/cloud/gcp/node_modules" }
-variable onboardLog { default = "/var/log/startup-script.log" }
+variable DO_URL { default = "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.13.0/f5-declarative-onboarding-1.13.0-5.noarch.rpm" }
+variable AS3_URL { default = "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.20.0/f5-appsvcs-3.20.0-3.noarch.rpm" }
+variable TS_URL { default = "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.12.0/f5-telemetry-1.12.0-3.noarch.rpm" }
+variable libs_dir { default = "/config/cloud/gcp/node_modules" }
+variable onboard_log { default = "/var/log/startup-script.log" }
 
-# BIG-IP Custom image
-variable "customImage" {
-  description = "custom build image name"
-  default     = ""
-}
-variable "customUserData" {
-  description = "custom startup script data"
-  default     = ""
-}
-
-# IAM
-variable "serviceAccounts" {
-  type = map(string)
-  default = {
-    storage = "default-compute@developer.gserviceaccount.com"
-    compute = "default-compute@developer.gserviceaccount.com"
-  }
-}
-
-#Provider 
-variable "GCP_PROJECT_ID" {
-  description = "project ID"
-}
-variable "GCP_REGION" {
-  description = "region"
-  default     = "us-east1"
-}
-variable "GCP_ZONE" {
-  description = "zone"
-  default     = "us-east1-b"
-}
-
-# Networks
-# vpcs
-variable "extVpc" {
-  description = "name of external vpc"
-}
-variable "mgmtVpc" {
-  description = "name of mgmt vpc"
-}
-# subnets
-variable "extSubnet" {
-  description = "name of external subnet"
-}
-variable "mgmtSubnet" {
-  description = "name of management subnet"
-}
+# TAGS
+variable purpose { default = "public" }
+variable environment { default = "f5env" } #ex. dev/staging/prod
+variable owner { default = "f5owner" }
+variable group { default = "f5group" }
+variable costcenter { default = "f5costcenter" }
+variable application { default = "f5app" }

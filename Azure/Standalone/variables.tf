@@ -16,8 +16,6 @@ variable sp_client_id {}
 variable sp_client_secret {}
 variable sp_tenant_id {}
 variable prefix {}
-variable uname {}
-variable upassword {}
 variable location {}
 
 # NETWORK
@@ -45,6 +43,8 @@ variable product { default = "f5-big-ip-best" }
 variable bigip_version { default = "15.1.002000" }
 
 # BIGIP Setup
+variable uname {}
+variable upassword {}
 variable license1 { default = "" }
 variable host1_name { default = "f5vm01" }
 variable dns_server { default = "8.8.8.8" }

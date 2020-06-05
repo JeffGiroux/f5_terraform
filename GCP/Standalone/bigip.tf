@@ -1,70 +1,62 @@
 # BIG-IP
 
-# Generate Random Password
-resource "random_password" "password" {
-  length           = 16
-  special          = true
-  override_special = " #%*+,-./:=?@[]^_~"
-}
-
 # Setup Onboarding scripts
 data "template_file" "vm_onboard" {
   template = file("${path.module}/onboard.sh")
 
   vars = {
-    uname         = var.adminAccountName
-    upassword     = var.adminPass != "" ? "${var.adminPass}" : "${random_password.password.result}"
-    doVersion     = "latest"
-    as3Version    = "latest"
-    tsVersion     = "latest"
-    cfVersion     = "latest"
-    fastVersion   = "latest"
-    libs_dir      = var.libsDir
-    onboard_log   = var.onboardLog
-    projectPrefix = var.projectPrefix
-    buildSuffix   = "-${random_pet.buildSuffix.id}"
+    uname       = var.uname
+    upassword   = var.upassword
+    doVersion   = "latest"
+    as3Version  = "latest"
+    tsVersion   = "latest"
+    cfVersion   = "latest"
+    fastVersion = "latest"
+    libs_dir    = var.libs_dir
+    onboard_log = var.onboard_log
   }
 }
 
 # Create F5 BIG-IP VMs
-resource "google_compute_instance" "vm_instance" {
-  count        = var.instanceCount
-  name         = "${var.projectPrefix}${var.name}-${count.index + 1}-instance-${random_pet.buildSuffix.id}"
+resource "google_compute_instance" "f5vm01" {
+  name         = "${var.prefix}-f5vm01"
   machine_type = var.bigipMachineType
-  tags         = ["allow-health-checks"]
+  zone         = var.gcp_zone
+
+  tags = ["appfw-${var.prefix}", "mgmtfw-${var.prefix}"]
+
   boot_disk {
     initialize_params {
-      image = var.customImage != "" ? "${var.customImage}" : "${var.bigipImage}"
+      image = var.customImage != "" ? var.customImage : var.image_name
       size  = "128"
     }
   }
-  metadata = {
-    ssh-keys               = "${var.adminAccountName}:${var.gceSshPubKey}"
-    block-project-ssh-keys = true
-    # this is best for a long running instance as it is only evaulated and run once, changes to the template do NOT destroy the running instance.
-    startup-script = var.customImage != "" ? "${var.customUserData}" : "${data.template_file.vm_onboard.rendered}"
-    deviceId       = "${count.index + 1}"
-  }
-  # this is best for dev, as it runs ANY time there are changes and DESTROYS the instances
-  #metadata_startup_script = var.customImage != "" ? "${var.customUserData}" : "${data.template_file.vm_onboard.rendered}"
 
   network_interface {
-    # external
     network    = var.extVpc
     subnetwork = var.extSubnet
     access_config {
     }
+    alias_ip_range {
+      ip_cidr_range = var.alias_ip_range
+    }
   }
+
   network_interface {
-    # mgmt
     network    = var.mgmtVpc
     subnetwork = var.mgmtSubnet
     access_config {
     }
   }
+
+  metadata = {
+    ssh-keys               = "${var.uname}:${var.gceSshPubKey}"
+    block-project-ssh-keys = true
+    startup-script         = var.customImage != "" ? var.customUserData : data.template_file.vm_onboard.rendered
+  }
+
   service_account {
-    # https://cloud.google.com/sdk/gcloud/reference/alpha/compute/instances/set-scopes#--scopes
-    # email = var.service_accounts.compute
-    scopes = ["storage-ro", "logging-write", "monitoring-write", "monitoring", "pubsub", "service-management", "service-control"]
+    email  = var.svc_acct
+    scopes = ["cloud-platform"]
   }
 }

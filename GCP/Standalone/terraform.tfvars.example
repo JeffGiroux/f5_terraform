@@ -1,14 +1,16 @@
 # BIG-IP Environment
-adminAccountName = "gcpadmin"
-gceSshPubKey     = "ssh-rsa xxxxx
-projectPrefix    = "mydemo123-"
-adminSrcAddr     = "0.0.0.0/0"
-mgmtVpc          = "xxxxx-net-mgmt"
-extVpc           = "xxxxx-net-ext"
-mgmtSubnet       = "xxxxx-subnet-mgmt"
-extSubnet        = "xxxxx-subnet-ext"
+uname        = "admin"
+upassword    = "Default12345!"
+gceSshPubKey = "ssh-rsa xxxxx"
+prefix       = "mydemo123"
+adminSrcAddr = "0.0.0.0/0"
+mgmtVpc      = "xxxxx-net-mgmt"
+extVpc       = "xxxxx-net-ext"
+mgmtSubnet   = "xxxxx-subnet-mgmt"
+extSubnet    = "xxxxx-subnet-ext"
 
 # Google Environment
-GCP_PROJECT_ID = "xxxxx"
-GCP_REGION     = "us-west1"
-GCP_ZONE       = "us-west1-b"
+gcp_project_id = "xxxxx"
+gcp_region     = "us-west1"
+gcp_zone       = "us-west1-b"
+svc_acct       = "xxxxx@xxxxx.iam.gserviceaccount.com"

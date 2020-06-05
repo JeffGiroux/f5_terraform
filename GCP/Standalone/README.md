@@ -44,14 +44,14 @@ Terraform v0.12.26
 ## Prerequisites
 
 - **Important**: When you configure the admin password for the BIG-IP VE in the template, you cannot use the character **#**.  Additionally, there are a number of other special characters that you should avoid using for F5 product user accounts.  See [K2873](https://support.f5.com/csp/article/K2873) for details.
-- This template requires a service principal for backend pool service discovery. **Important**: you MUST have "OWNER" priviledge on the SP in order to assign role to the resources in your subscription. See the [Service Principal Setup section](#service-principal-authentication) for details, including required permissions.
-- This deployment will be using the Terraform Googlerm provider to build out all the neccessary Google objects. Therefore, Google gcloud (and svc json...fix later) is required. For installation, please follow this [Google gcloud link](https://cloud.google.com/sdk/install)
+- This template requires a service account for backend pool service discovery. **Important**: you MUST have "compute-ro" for service discovery.
+- This deployment will be using the Terraform Google provider to build out all the neccessary Google objects. You must have "Editor" on the service account in order to create resources in your project with Terraform. See the [Terraform Google Provider "Adding Credentials"](https://www.terraform.io/docs/providers/google/guides/getting_started.html#adding-credentials) for details. Also, review the [available Google GCP permission scopes](https://cloud.google.com/sdk/gcloud/reference/alpha/compute/instances/set-scopes#--scopes) too.
 
 ## Important Configuration Notes
 
 - Variables are configured in variables.tf
 - Sensitive variables like Google SSH keys are configured in terraform.tfvars
-  - Note: Passwords and secrets will be moved to Google Key Vault in the future
+  - Note: Passwords and secrets will be moved to [Google Cloud Key Management Service (KMS)](https://cloud.google.com/kms) in the future
 - This template uses Declarative Onboarding (DO) and Application Services 3 (AS3) packages for the initial configuration. As part of the onboarding script, it will download the RPMs automatically. See the [AS3 documentation](https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/) and [DO documentation](https://clouddocs.f5.com/products/extensions/f5-declarative-onboarding/latest/) for details on how to use AS3 and Declarative Onboarding on your BIG-IP VE(s). The [Telemetry Streaming](https://clouddocs.f5.com/products/extensions/f5-telemetry-streaming/latest/) extension is also downloaded and can be configured to point to Google Cloud Monitoring (old name StackDriver). 
 - Files
   - appserver.tf - resources for backend web server running DVWA
@@ -83,8 +83,7 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 2. In the "variables.tf", modify *image_name* and *product* with the SKU and offer from gcloud CLI results
   ```
           # BIGIP Image
-          variable product { default = "f5-big-ip-byol" }
-          variable image_name { default = "f5-big-ltm-2slot-byol" }
+          variable image_name { default = "f5-bigip-14-1-2-3-0-0-5-byol-ltm-1boot-loc-191218142225" }
   ```
 3. In the "variables.tf", modify *license1* with a valid regkey
   ```
@@ -114,7 +113,9 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | svc_account | Yes | This is the GCP service account for programmatic API calls |
 | uname | Yes | User name for the Virtual Machine |
 | upassword | Yes | Password for the Virtual Machine |
-| location | Yes | Location of the deployment |
+| gcp_project_id | Yes | GCP Project ID for provider |
+| gcp_zone | Yes | GCP Zone for provider |
+| gcp_region | Yes | GCP Region for provider |
 | cidr | Yes | IP Address range of the Virtual Network |
 | subnet1 | Yes | Subnet IP range of the management network |
 | subnet2 | Yes | Subnet IP range of the external network |
@@ -122,9 +123,8 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | f5vm01ext | Yes | IP address for 1st BIG-IP's external interface |
 | f5privatevip | Yes | Secondary Private IP address for BIG-IP virtual server (internal) |
 | f5publicvip | Yes | Secondary Private IP address for BIG-IP virtual server (external) |
-| instance_type | Yes | Google instance to be used for the BIG-IP VE |
-| product | Yes | Google BIG-IP VE Offer |
-| bigip_version | Yes | BIG-IP Version |
+| alias_ip_range | No | An array of alias IP ranges for the BIG-IP network interface |
+| bigipMachineType | Yes | Google machine type to be used for the BIG-IP VE |
 | image_name | Yes | F5 SKU (image) to deploy. Note: The disk size of the VM will be determined based on the option you select.  **Important**: If intending to provision multiple modules, ensure the appropriate value is selected, such as ****AllTwoBootLocations or AllOneBootLocation****. |
 | license1 | No | The license token for the F5 BIG-IP VE (BYOL) |
 | host1_name | Yes | Hostname for the 1st BIG-IP |
@@ -144,19 +144,21 @@ To run this Terraform template, perform the following steps:
   2. Modify terraform.tfvars with the required information
   ```
       # BIG-IP Environment
-      adminAccountName = "gcpadmin"
-      gceSshPubKey     = "ssh-rsa xxxxx
-      projectPrefix    = "mydemo123-"
-      adminSrcAddr     = "0.0.0.0/0"
-      mgmtVpc          = "xxxxx-net-mgmt"
-      extVpc           = "xxxxx-net-ext"
-      mgmtSubnet       = "xxxxx-subnet-mgmt"
-      extSubnet        = "xxxxx-subnet-ext"
+      uname        = "admin"
+      upassword    = "Default12345!"
+      gceSshPubKey = "ssh-rsa xxxxx
+      prefix       = "mydemo123"
+      adminSrcAddr = "0.0.0.0/0"
+      mgmtVpc      = "xxxxx-net-mgmt"
+      extVpc       = "xxxxx-net-ext"
+      mgmtSubnet   = "xxxxx-subnet-mgmt"
+      extSubnet    = "xxxxx-subnet-ext"
 
       # Google Environment
-      GCP_PROJECT_ID = "xxxxx"
-      GCP_REGION     = "us-west1"
-      GCP_ZONE       = "us-west1-b"
+      gcp_project_id = "xxxxx"
+      gcp_region     = "us-west1"
+      gcp_zone       = "us-west1-b"
+      svc_acct       = "xxxxx@xxxxx.iam.gserviceaccount.com"
   ```
   3. Initialize the directory
   ```
@@ -203,11 +205,11 @@ In order to pass traffic from your clients to the servers through the BIG-IP sys
 
 ## Redeploy BIG-IP for Replacement or Upgrade
 This example illustrates how to replace or upgrade the BIG-IP VE.
-  1. Change the *bigip_version* variable to the desired release 
+  1. Change the *image_name* variable to the desired release 
   2. Revoke the problematic BIG-IP VE's license (if BYOL)
   3. Run command
 ```
-terraform destroy -target googlerm_virtual_machine.f5vm01
+terraform destroy -target google_compute_instance.f5vm01
 ```
   3. Run command
 ```
