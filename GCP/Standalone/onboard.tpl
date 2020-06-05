@@ -64,6 +64,9 @@ curl -L -k -o ${libs_dir}/$AS3_FN $AS3_URL
 
 sleep 10
 
+# install atc tools
+# install atc tools
+
 # Copy the RPM Pkg to the file location
 cp ${libs_dir}/*.rpm /var/config/rest/downloads/
 
@@ -89,6 +92,7 @@ curl -u $CREDS -X POST http://localhost:8100/mgmt/shared/iapp/package-management
 sleep 10
 
 # Check DO Ready
+# Check DO Ready
 CNT=0
 echo -e "\n"$(date) "Check DO Ready"
 while true
@@ -107,6 +111,7 @@ do
   sleep 10
 done
 
+# Check AS3 Ready
 # Check AS3 Ready
 CNT=0
 echo -e "\n"$(date) "Check AS3 Ready"
@@ -127,6 +132,7 @@ do
 done
 
 # Check TS Ready
+# Check TS Ready
 CNT=0
 echo -e "\n"$(date) "Check TS Ready"
 while true
@@ -144,6 +150,14 @@ do
   fi
   sleep 10
 done
+# Check CF Ready
+# Check CF Ready
+
+# Check FAST Ready
+# Check FAST Ready
+
+# start network
+# start network
 
 # Delete RPM packages
 echo -e "\n"$(date) "Removing temporary RPM install packages"
