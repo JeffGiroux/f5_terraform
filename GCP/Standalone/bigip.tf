@@ -1,16 +1,15 @@
-# password
+# BIG-IP
+
+# Generate Random Password
 resource "random_password" "password" {
   length           = 16
   special          = true
   override_special = " #%*+,-./:=?@[]^_~"
 }
-# Setup Onboarding scripts
-data "http" "template_gcp" {
-  url = "https://raw.githubusercontent.com/jeffgiroux/bigip-bash-onboard-templates/master/gcp/onboard.sh"
-}
 
+# Setup Onboarding scripts
 data "template_file" "vm_onboard" {
-  template = "${data.http.template_gcp.body}"
+  template = file("${path.module}/onboard.sh")
 
   vars = {
     uname         = var.adminAccountName
@@ -23,13 +22,14 @@ data "template_file" "vm_onboard" {
     libs_dir      = var.libsDir
     onboard_log   = var.onboardLog
     projectPrefix = var.projectPrefix
-    buildSuffix   = var.buildSuffix
+    buildSuffix   = "-${random_pet.buildSuffix.id}"
   }
 }
-# bigips
+
+# Create F5 BIG-IP VMs
 resource "google_compute_instance" "vm_instance" {
   count        = var.instanceCount
-  name         = "${var.projectPrefix}${var.name}-${count.index + 1}-instance${var.buildSuffix}"
+  name         = "${var.projectPrefix}${var.name}-${count.index + 1}-instance-${random_pet.buildSuffix.id}"
   machine_type = var.bigipMachineType
   tags         = ["allow-health-checks"]
   boot_disk {
@@ -61,13 +61,6 @@ resource "google_compute_instance" "vm_instance" {
     subnetwork = var.mgmtSubnet
     access_config {
     }
-  }
-  network_interface {
-    # internal
-    network    = var.intVpc
-    subnetwork = var.intSubnet
-    # access_config {
-    # }
   }
   service_account {
     # https://cloud.google.com/sdk/gcloud/reference/alpha/compute/instances/set-scopes#--scopes

@@ -6,9 +6,6 @@ variable "projectPrefix" {
   type        = string
   default     = "terraform-gcp-bigip-"
 }
-variable "buildSuffix" {
-  description = "resource suffix"
-}
 variable "name" {
   description = "device name"
   default     = "bigip"
@@ -87,16 +84,10 @@ variable "extVpc" {
 variable "mgmtVpc" {
   description = "name of mgmt vpc"
 }
-variable "intVpc" {
-  description = "name of internal vpc"
-}
 # subnets
 variable "extSubnet" {
   description = "name of external subnet"
 }
 variable "mgmtSubnet" {
   description = "name of management subnet"
-}
-variable "intSubnet" {
-  description = "name of internal subnet"
 }

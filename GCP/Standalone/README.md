@@ -1,5 +1,7 @@
 # Deploying BIG-IP VE in Google GCP - Standalone Two NICs
 
+***To do:*** Password is currently randomly generated and stored in TF state file. This is not secure for production use.
+
 ## Contents
 
 - [Introduction](#introduction)
@@ -33,9 +35,8 @@ Example...
 ## Version
 This template is tested and worked in the following version
 Terraform v0.12.26
-+ provider.googlerm v2.1
-+ provider.local v1.4
-+ provider.null v2.1
++ provider.google v3.24
++ provider.random v2.2
 + provider.template v2.1
 
 ## Prerequisites
@@ -141,17 +142,19 @@ To run this Terraform template, perform the following steps:
   2. Modify terraform.tfvars with the required information
   ```
       # BIG-IP Environment
-      uname     = "admin"
-      upassword = "Default12345!"
+      adminAccountName = "gcpadmin"
+      gceSshPubKey     = "ssh-rsa xxxxx
+      projectPrefix    = "mydemo123-"
+      adminSrcAddr     = "0.0.0.0/0"
+      mgmtVpc          = "xxxxx-net-mgmt"
+      extVpc           = "xxxxx-net-ext"
+      mgmtSubnet       = "xxxxx-subnet-mgmt"
+      extSubnet        = "xxxxx-subnet-ext"
 
       # Google Environment
       GCP_PROJECT_ID = "xxxxx"
       GCP_REGION     = "us-west1"
       GCP_ZONE       = "us-west1-b"
-      svc_account    = "xxxxx"
-
-      # Prefix for objects being created
-      prefix = "mylab123"
   ```
   3. Initialize the directory
   ```
