@@ -1,6 +1,7 @@
 # Deploying BIG-IP VE in Google GCP - Standalone Two NICs
 
 ***To do:*** Password is currently randomly generated and stored in TF state file. This is not secure for production use.
+***To do:*** Move networking to DO. Add app with AS3. Add analytics with TS.
 
 ## Contents
 
