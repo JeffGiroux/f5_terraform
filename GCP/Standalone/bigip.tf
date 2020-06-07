@@ -1,11 +1,5 @@
 # BIG-IP
 
-# Retrieve Google Secret Manager secret/password
-# to do: remove this data retrieval later
-data "google_secret_manager_secret_version" "bigip-upassword" {
-  secret = var.usecret
-}
-
 # Setup Onboarding scripts
 data "template_file" "vm_onboard" {
   template = file("${path.module}/onboard.tpl")

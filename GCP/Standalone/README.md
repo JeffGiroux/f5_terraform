@@ -1,8 +1,7 @@
 # Deploying BIG-IP VE in Google GCP - Standalone Two NICs
 
 ***To do:***
-1. Password is currently visible in VM metadata startup script within GCP console. This is not secure for production use.
-2. Move networking to DO. Add app with AS3. Add analytics with TS.
+1. Move networking to DO. Add app with AS3. Add analytics with TS.
 
 ## Contents
 
@@ -43,15 +42,22 @@ Terraform v0.12.26
 
 ## Prerequisites
 
-- **Important**: When you configure the admin password for the BIG-IP VE in the template, you cannot use the character **#**.  Additionally, there are a number of other special characters that you should avoid using for F5 product user accounts.  See [K2873](https://support.f5.com/csp/article/K2873) for details.
-- This template requires a service account for backend pool service discovery. **Important**: you MUST have "compute-ro" for service discovery.
-- This deployment will be using the Terraform Google provider to build out all the neccessary Google objects. You must have "Editor" on the service account in order to create resources in your project with Terraform. See the [Terraform Google Provider "Adding Credentials"](https://www.terraform.io/docs/providers/google/guides/getting_started.html#adding-credentials) for details. Also, review the [available Google GCP permission scopes](https://cloud.google.com/sdk/gcloud/reference/alpha/compute/instances/set-scopes#--scopes) too.
+- ***Important***: When you configure the admin password for the BIG-IP VE in the template, you cannot use the character **#**.  Additionally, there are a number of other special characters that you should avoid using for F5 product user accounts.  See [K2873](https://support.f5.com/csp/article/K2873) for details.
+- This template requires a service account for backend pool service discovery.
+  - ***Note***: you MUST have "compute-ro" for service discovery
+- This deployment will be using the Terraform Google provider to build out all the neccessary Google objects.
+  - ***Note***: You MUST have "Editor" on the service account in order to create resources in your project with Terraform. See the [Terraform Google Provider "Adding Credentials"](https://www.terraform.io/docs/providers/google/guides/getting_started.html#adding-credentials) for details. Also, review the [available Google GCP permission scopes](https://cloud.google.com/sdk/gcloud/reference/alpha/compute/instances/set-scopes#--scopes) too.
+- Passwords and secrets are located in [Google Cloud Secret Manager](https://cloud.google.com/secret-manager/docs/quickstart#secretmanager-quickstart-web). Make sure you have an existing Google Cloud "secret" with the data containing the clear text passwords for each relevant item: BIG-IP password, service account credentials, BIG-IQ password, etc.
+  - ***Note***: The name of your Google Cloud Secret Manager secret is for variable 'usecret'. Refer to [Template Parameters](#template-parameters).
+  
 
 ## Important Configuration Notes
 
 - Variables are configured in variables.tf
 - Sensitive variables like Google SSH keys are configured in terraform.tfvars
-  - Note: Passwords and secrets will be moved to [Google Cloud Key Management Service (KMS)](https://cloud.google.com/kms) in the future
+  - ***Note***: Other items like BIG-IP password are stored in Google Cloud Secret Manager. Refer to the [Prerequisites](#prerequisites).
+  - The BIG-IP instance will query Google Metadata API to retrieve the service account's token for authentication.
+  - The BIG-IP instance will then use the secret name and the service account's token to query Google Metadata API and dynamically retrieve the password for device onboarding.
 - This template uses Declarative Onboarding (DO) and Application Services 3 (AS3) packages for the initial configuration. As part of the onboarding script, it will download the RPMs automatically. See the [AS3 documentation](https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/) and [DO documentation](https://clouddocs.f5.com/products/extensions/f5-declarative-onboarding/latest/) for details on how to use AS3 and Declarative Onboarding on your BIG-IP VE(s). The [Telemetry Streaming](https://clouddocs.f5.com/products/extensions/f5-telemetry-streaming/latest/) extension is also downloaded and can be configured to point to Google Cloud Monitoring (old name StackDriver). 
 - Files
   - appserver.tf - resources for backend web server running DVWA
@@ -112,7 +118,7 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | rest_vm_as3_file | Yes | Terraform will generate the AS3 json file, where you can manually run it again for debugging |
 | svc_account | Yes | This is the GCP service account for programmatic API calls |
 | uname | Yes | User name for the Virtual Machine |
-| upassword | Yes | Password for the Virtual Machine |
+| usecret | Yes | Retrieved from Google Cloud Secret Manager and contains password for the Virtual Machine  |
 | gcp_project_id | Yes | GCP Project ID for provider |
 | gcp_zone | Yes | GCP Zone for provider |
 | gcp_region | Yes | GCP Region for provider |
@@ -145,7 +151,7 @@ To run this Terraform template, perform the following steps:
   ```
       # BIG-IP Environment
       uname        = "admin"
-      usecret      = "my-bigip-password"
+      usecret      = "my-secret"
       gceSshPubKey = "ssh-rsa xxxxx
       prefix       = "mydemo123"
       adminSrcAddr = "0.0.0.0/0"
