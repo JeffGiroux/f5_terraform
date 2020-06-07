@@ -32,7 +32,6 @@ variable customUserData { default = "" }
 
 # BIGIP Setup
 variable uname {}
-variable upassword {}
 variable usecret {}
 variable license1 { default = "" }
 variable adminSrcAddr {}
