@@ -24,32 +24,37 @@ echo -e $(date) "---Starting---"
 #### Variables ####
 ###################
 
-# Variables from Terraform data_file render
+# Variables
+projectId='${gcp_project_id}'
+usecret='${usecret}'
 admin_username='${uname}'
-admin_password='${upassword}'
-CREDS="admin:"$admin_password
-DO_URL='${DO_URL}'
-DO_FN=$(basename "$DO_URL")
-AS3_URL='${AS3_URL}'
-AS3_FN=$(basename "$AS3_URL")
-TS_URL='${TS_URL}'
-TS_FN=$(basename "$TS_URL")
 
-# Constants
+# BIG-IP password from Metadata
+svcacct_token=$(curl -s -f --retry 20 "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token" -H "Metadata-Flavor: Google" | jq -r ".access_token")
+admin_password=$(curl -s -f --retry 20 "https://secretmanager.googleapis.com/v1/projects/$projectId/secrets/$usecret/versions/1:access" -H "Authorization: Bearer $svcacct_token" | jq -r ".payload.data" | base64 --decode)
+
+# RPM Download/Install Folders
+CREDS="admin:"$admin_password
 local_host="http://localhost:8100"
 local_host443="https://localhost"
 rpmInstallUrl="/mgmt/shared/iapp/package-management-tasks"
 rpmFilePath="/var/config/rest/downloads"
 
-# Variables DO urls
+# DO urls
+DO_URL='${DO_URL}'
+DO_FN=$(basename "$DO_URL")
 doUrl="/mgmt/shared/declarative-onboarding"
 doCheckUrl="/mgmt/shared/declarative-onboarding/info"
 doTaskUrl="/mgmt/shared/declarative-onboarding/task"
-# Variables AS3 urls
+# AS3 urls
+AS3_URL='${AS3_URL}'
+AS3_FN=$(basename "$AS3_URL")
 as3Url="/mgmt/shared/appsvcs/declare"
 as3CheckUrl="/mgmt/shared/appsvcs/info"
 as3TaskUrl="/mgmt/shared/appsvcs/task"
-# Variables TS urls
+# TS urls
+TS_URL='${TS_URL}'
+TS_FN=$(basename "$TS_URL")
 tsUrl="/mgmt/shared/telemetry/declare"
 tsCheckUrl="/mgmt/shared/telemetry/info"
 tsTaskUrl="/mgmt/shared/telemetry/task"
@@ -236,9 +241,9 @@ while [[ $CNT -lt 6 ]]; do
   sleep 10
 done
 
-#######################################
-#### Retrieve Metadata from Google ####
-#######################################
+###############################################
+#### Retrieve Network Metadata from Google ####
+###############################################
 
 echo -e $(date) "Retrieving instance metadata from Google"
 
@@ -266,15 +271,15 @@ echo "cidr: $MGMTNETWORK,$INT2NETWORK"
 # Scripts for /config/startup
 # https://support.f5.com/csp/article/K11948
 chmod +w /config/startup
-echo "/config/startup_mgmt_route.sh &" >> /config/startup
+echo "/config/startup_mgmtroute.sh &" >> /config/startup
 echo "/config/startup_f5toolchain.sh &" >> /config/startup
 
 # Script #1 -- Mgmt reboot workaround
 # Add mgmt default route and set MTU 1460
 # https://support.f5.com/csp/article/K47835034
-cat  <<EOF > /config/startup_mgmt_route.sh
+cat  <<EOF > /config/startup_mgmtroute.sh
 #!/bin/bash
-exec &>>/var/log/startup-mgmt-route.log
+exec &>>/var/log/startup-mgmtroute.log
 echo -e \$(date) "Checking status of mcpd"
 sleep 120
 echo -e \$(date) "First try"
@@ -287,7 +292,7 @@ tmsh create sys management-route default gateway $MGMTGATEWAY mtu 1460
 tmsh save sys config
 echo -e \$(date) "Done"
 EOF
-chmod +x /config/startup_mgmt_route.sh
+chmod +x /config/startup_mgmtroute.sh
 # End Script #1 -- Mgmt reboot workaround
 
 

@@ -1,6 +1,6 @@
 # BIG-IP Environment
 uname        = "admin"
-upassword    = "Default12345!"
+usecret      = "my-bigip-password"
 gceSshPubKey = "ssh-rsa xxxxx"
 prefix       = "mydemo123"
 adminSrcAddr = "0.0.0.0/0"

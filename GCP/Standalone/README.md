@@ -134,6 +134,7 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | DO_URL | Yes | This is the raw github URL for downloading the Declarative Onboarding RPM |
 | AS3_URL | Yes | This is the raw github URL for downloading the AS3 RPM |
 | TS_URL | Yes | This is the raw github URL for downloading the Telemetry RPM |
+| libs_dir | Yes | This is where all the temporary libs and RPM will be store in BIG-IP |
 | onboard_log | Yes | This is where the onboarding script logs all the events |
 
 ## Installation Example
@@ -144,7 +145,7 @@ To run this Terraform template, perform the following steps:
   ```
       # BIG-IP Environment
       uname        = "admin"
-      upassword    = "Default12345!"
+      usecret      = "my-bigip-password"
       gceSshPubKey = "ssh-rsa xxxxx
       prefix       = "mydemo123"
       adminSrcAddr = "0.0.0.0/0"

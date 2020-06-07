@@ -27,15 +27,16 @@ variable alias_ip_range { default = "10.1.10.100/32" }
 # BIGIP Image
 variable bigipMachineType { default = "n1-standard-8" }
 variable image_name { default = "projects/f5-7626-networks-public/global/images/f5-bigip-15-1-0-2-0-0-9-payg-best-1gbps-200321032524" } # BIG-IP Custom image
-variable "customImage" { default = "" }
-variable "customUserData" { default = "" }
+variable customImage { default = "" }
+variable customUserData { default = "" }
 
 # BIGIP Setup
 variable uname {}
 variable upassword {}
+variable usecret {}
 variable license1 { default = "" }
-variable "adminSrcAddr" {}
-variable "gceSshPubKey" {}
+variable adminSrcAddr {}
+variable gceSshPubKey {}
 variable host1_name { default = "f5vm01" }
 variable dns_server { default = "8.8.8.8" }
 variable ntp_server { default = "0.us.pool.ntp.org" }
@@ -43,6 +44,7 @@ variable timezone { default = "UTC" }
 variable DO_URL { default = "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.13.0/f5-declarative-onboarding-1.13.0-5.noarch.rpm" }
 variable AS3_URL { default = "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.20.0/f5-appsvcs-3.20.0-3.noarch.rpm" }
 variable TS_URL { default = "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.12.0/f5-telemetry-1.12.0-3.noarch.rpm" }
+variable libs_dir { default = "/config/cloud/gce" }
 variable onboard_log { default = "/var/log/startup-script.log" }
 
 # TAGS
