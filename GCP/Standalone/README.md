@@ -1,7 +1,7 @@
 # Deploying BIG-IP VE in Google GCP - Standalone Two NICs
 
 ***To do:***
-1. Password is currently randomly generated and stored in TF state file. This is not secure for production use.
+1. Password is currently visible in VM metadata startup script within GCP console. This is not secure for production use.
 2. Move networking to DO. Add app with AS3. Add analytics with TS.
 
 ## Contents
@@ -134,7 +134,6 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | DO_URL | Yes | This is the raw github URL for downloading the Declarative Onboarding RPM |
 | AS3_URL | Yes | This is the raw github URL for downloading the AS3 RPM |
 | TS_URL | Yes | This is the raw github URL for downloading the Telemetry RPM |
-| libs_dir | Yes | This is where all the temporary libs and RPM will be store in BIG-IP |
 | onboard_log | Yes | This is where the onboarding script logs all the events |
 
 ## Installation Example

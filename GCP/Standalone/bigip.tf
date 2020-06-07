@@ -2,18 +2,15 @@
 
 # Setup Onboarding scripts
 data "template_file" "vm_onboard" {
-  template = file("${path.module}/onboard.sh")
+  template = file("${path.module}/onboard.tpl")
 
   vars = {
-    uname       = var.uname
-    upassword   = var.upassword
-    doVersion   = "latest"
-    as3Version  = "latest"
-    tsVersion   = "latest"
-    cfVersion   = "latest"
-    fastVersion = "latest"
-    libs_dir    = var.libs_dir
-    onboard_log = var.onboard_log
+    uname           = var.uname
+    upassword       = var.upassword
+    DO_URL          = var.DO_URL
+    AS3_URL         = var.AS3_URL
+    TS_URL          = var.TS_URL
+    onboard_log     = var.onboard_log
   }
 }
 
