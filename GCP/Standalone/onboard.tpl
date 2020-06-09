@@ -436,7 +436,7 @@ ts_wait_for_ready
 as3_wait_for_ready
 file_loc="/config/cloud/as3.json"
 echo "Submitting AS3 declaration"
-response_code=$(/usr/bin/curl -skvvu admin:$passwd -w "%%{http_code}" -X POST -H "Content-Type: application/json" -H "Expect:" https://localhost:$${mgmtGuiPort}/mgmt/shared/appsvcs/declare -d @$file_loc -o /dev/null)
+response_code=$(/usr/bin/curl -sku admin:$passwd -w "%%{http_code}" -X POST -H "Content-Type: application/json" -H "Expect:" https://localhost:$${mgmtGuiPort}/mgmt/shared/appsvcs/declare -d @$file_loc -o /dev/null)
 if [[ $response_code == *200 || $response_code == *502 ]]; then
   echo "Deployment of custom application succeeded"
 else
