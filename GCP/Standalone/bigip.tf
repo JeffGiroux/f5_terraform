@@ -39,6 +39,7 @@ data "template_file" "as3_json" {
 
   vars = {
     gcp_region = var.gcp_region
+    publicvip  = google_compute_address.vip1.address
     privatevip = var.alias_ip_range
   }
 }
@@ -87,8 +88,8 @@ resource "google_compute_instance" "f5vm01" {
   }
 }
 
-# Troubleshooting - create local output files
-resource "local_file" "onboard_file" {
-  content  = data.template_file.vm_onboard.rendered
-  filename = "${path.module}/vm_onboard.tpl_data.json"
-}
+# # Troubleshooting - create local output files
+# resource "local_file" "onboard_file" {
+#   content  = data.template_file.vm_onboard.rendered
+#   filename = "${path.module}/vm_onboard.tpl_data.json"
+# }

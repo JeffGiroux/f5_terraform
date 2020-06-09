@@ -19,7 +19,7 @@
         "serviceMain": {
           "class": "Service_HTTPS",
           "virtualAddresses": [
-            "0.0.0.0",
+            "${publicvip}",
             "${privatevip}"
           ],
           "pool": "web_pool",
