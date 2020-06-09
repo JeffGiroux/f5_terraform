@@ -1,12 +1,12 @@
 # BIG-IP
 
 # Forwarding rule for Public IP
-resource "google_compute_forwarding_rule" "default" {
+resource "google_compute_forwarding_rule" "vip1" {
   name   = "${var.prefix}-forwarding-rule"
-  target = google_compute_target_instance.default.id
+  target = google_compute_target_instance.f5vm.id
 }
 
-resource "google_compute_target_instance" "default" {
+resource "google_compute_target_instance" "f5vm" {
   name     = "${var.prefix}-ti"
   instance = google_compute_instance.f5vm01.id
 }
