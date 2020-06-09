@@ -19,7 +19,7 @@
         "serviceMain": {
           "class": "Service_HTTPS",
           "virtualAddresses": [
-            "${publicvip}",
+            "0.0.0.0",
             "${privatevip}"
           ],
           "pool": "web_pool",
@@ -37,7 +37,7 @@
             "tagKey": "application",
             "tagValue": "app1",
             "addressRealm": "private",
-            "region": "${GCP_REGION}"
+            "region": "${gcp_region}"
           }]
         },
         "webtls": {

@@ -17,7 +17,6 @@ else
 fi
 
 exec 1>$LOG_FILE 2>&1
-date
 echo "Starting onboard script"
 
 ###################
@@ -35,11 +34,6 @@ AS3_FN=$(basename "$AS3_URL")
 TS_URL='${TS_URL}'
 TS_FN=$(basename "$TS_URL")
 rpmFilePath="/var/config/rest/downloads"
-
-# BIG-IP Credentials
-svcacct_token=$(curl -s -f --retry 20 "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token" -H "Metadata-Flavor: Google" | jq -r ".access_token")
-admin_password=$(curl -s -f --retry 20 "https://secretmanager.googleapis.com/v1/projects/$projectId/secrets/$usecret/versions/1:access" -H "Authorization: Bearer $svcacct_token" | jq -r ".payload.data" | base64 --decode)
-CREDS="admin:"$admin_password
 
 ###################
 #### Functions ####
@@ -109,6 +103,11 @@ echo "Done changing interface"
 
 date
 waitNetwork
+
+# BIG-IP Credentials
+svcacct_token=$(curl -s -f --retry 20 "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token" -H "Metadata-Flavor: Google" | jq -r ".access_token")
+admin_password=$(curl -s -f --retry 20 "https://secretmanager.googleapis.com/v1/projects/$projectId/secrets/$usecret/versions/1:access" -H "Authorization: Bearer $svcacct_token" | jq -r ".payload.data" | base64 --decode)
+CREDS="admin:"$admin_password
 
 # Create admin account and password
 echo "Updating admin account"
@@ -187,6 +186,18 @@ echo "INT2MASK=$(curl -s -f --retry 20 'http://metadata.google.internal/computeM
 echo "INT2GATEWAY=$(curl -s -f --retry 20 'http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/gateway' -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
 chmod 755 /config/cloud/interface.config
 
+################################
+#### Declaration JSON Files ####
+################################
+
+# AS3
+cat <<'EOF' > /config/cloud/as3.json
+${AS3_Document}
+EOF
+
+# ********************************************************************
+# ********************************************************************
+
 #####################################
 #### Post-Reboot Startup Scripts ####
 #####################################
@@ -198,16 +209,14 @@ echo "(/config/cloud/mgmtroute.sh; /config/cloud/custom-config.sh) &" >> /config
 
 
 # Script #1 -- Mgmt reboot workaround
-# Add mgmt default route and set MTU 1460
-# https://support.f5.com/csp/article/K47835034
+# Add mgmt default route
+# https://support.f5.com/csp/article/K85730674
 cat  <<'EOF' > /config/cloud/mgmtroute.sh
 #!/bin/bash
 source /config/cloud/interface.config
-
 # Log File Setup
 LOG_FILE="/var/log/mgmtroute.log"
 exec &>>$LOG_FILE
-
 echo "Waiting for mcpd"
 sleep 120
 echo "First try"
@@ -225,7 +234,7 @@ chmod +x /config/cloud/mgmtroute.sh
 
 
 # Script #2 -- Declarations for F5 Automation Toolchain
-# Add network, vlans, IPs, profiles, etc
+# Add network, vlans, IPs, profiles, etc - runs only once
 cat  <<'EOF' > /config/cloud/custom-config.sh
 #!/bin/bash
 source /config/cloud/interface.config
@@ -353,6 +362,24 @@ function as3_wait_for_ready {
   fi
 }
 
+###################
+#### Variables ####
+###################
+
+# Variables
+projectId='${gcp_project_id}'
+usecret='${usecret}'
+mgmtGuiPort="443"
+doUrl="/mgmt/shared/declarative-onboarding"
+doCheckUrl="/mgmt/shared/declarative-onboarding/info"
+doTaskUrl="/mgmt/shared/declarative-onboarding/task"
+as3Url="/mgmt/shared/appsvcs/declare"
+as3CheckUrl="/mgmt/shared/appsvcs/info"
+as3TaskUrl="/mgmt/shared/appsvcs/task"
+tsUrl="/mgmt/shared/telemetry/declare"
+tsCheckUrl="/mgmt/shared/telemetry/info"
+tsTaskUrl="/mgmt/shared/telemetry/task"
+
 ########################################
 #### TMSH, DO, AS3, TS Declarations ####
 ########################################
@@ -361,20 +388,15 @@ function as3_wait_for_ready {
 # 1. change tmsh commands for network to DO
 # 2. optionally add AS3 too
 
-# Variables
-projectId='${gcp_project_id}'
-usecret='${usecret}'
-mgmtGuiPort="443"
+date
+waitMcpd
 
-# BIG-IP password from Metadata
+# BIG-IP Credentials
 echo "Retrieving BIG-IP password from Metadata secret"
 svcacct_token=$(curl -s -f --retry 20 "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token" -H "Metadata-Flavor: Google" | jq -r ".access_token")
 passwd=$(curl -s -f --retry 20 "https://secretmanager.googleapis.com/v1/projects/$projectId/secrets/$usecret/versions/1:access" -H "Authorization: Bearer $svcacct_token" | jq -r ".payload.data" | base64 --decode)
 
-waitMcpd
-date
-
-# Configure BIG-IP Network
+# Configure BIG-IP network settings
 echo "Set TMM networks"
 tmsh+=(
 "tmsh modify sys global-settings gui-setup disabled"
@@ -404,11 +426,27 @@ done
 
 date
 
-### START CUSTOM CONFIGURATION
+# Submit DO Declaration
 do_wait_for_ready
+
+# Submit TS Declaration
 ts_wait_for_ready
+
+# Submit AS3 Declaration
 as3_wait_for_ready
-### END CUSTOM CONFIGURATION
+file_loc="/config/cloud/as3.json"
+echo "Submitting AS3 declaration"
+response_code=$(/usr/bin/curl -skvvu admin:$passwd -w "%%{http_code}" -X POST -H "Content-Type: application/json" -H "Expect:" https://localhost:$${mgmtGuiPort}/mgmt/shared/appsvcs/declare -d @$file_loc -o /dev/null)
+if [[ $response_code == *200 || $response_code == *502 ]]; then
+  echo "Deployment of custom application succeeded"
+else
+  echo "Failed to deploy custom application; continuing..."
+  echo "Response code: $${response_code}"
+fi
+
+# Delete declaration files (do.json, as3.json) packages
+echo "Removing DO and AS3 declaration files"
+rm -rf /config/cloud/do.json /config/cloud/as3.json /config/cloud/ts.json
 
 date
 echo "Finished custom-config.sh"
@@ -418,17 +456,15 @@ EOF
 chmod +x /config/cloud/custom-config.sh
 # End Script #2 - Declarations for F5 Automation Toolchain
 
+# ********************************************************************
+# ********************************************************************
+
 #################
 #### Cleanup ####
 #################
 
+date
 echo "Removing temporary RPM install packages"
 rm -rf $rpmFilePath/*.rpm
-
-################
-#### Reboot ####
-################
-
-date
 echo "Rebooting for NIC swap to complete..."
 reboot

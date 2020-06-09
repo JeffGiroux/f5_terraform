@@ -12,6 +12,16 @@ data "template_file" "vm_onboard" {
     AS3_URL        = var.AS3_URL
     TS_URL         = var.TS_URL
     onboard_log    = var.onboard_log
+    AS3_Document   = data.template_file.as3_json.rendered
+  }
+}
+
+data "template_file" "as3_json" {
+  template = file("${path.module}/as3.json")
+
+  vars = {
+    gcp_region = var.gcp_region
+    privatevip = var.alias_ip_range
   }
 }
 
