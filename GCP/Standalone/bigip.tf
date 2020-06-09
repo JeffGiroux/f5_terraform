@@ -1,5 +1,16 @@
 # BIG-IP
 
+# Forwarding rule for Public IP
+resource "google_compute_forwarding_rule" "default" {
+  name   = "${var.prefix}-forwarding-rule"
+  target = google_compute_target_instance.default.id
+}
+
+resource "google_compute_target_instance" "default" {
+  name     = "${var.prefix}-ti"
+  instance = google_compute_instance.f5vm01.id
+}
+
 # Setup Onboarding scripts
 data "template_file" "vm_onboard" {
   template = file("${path.module}/onboard.tpl")
