@@ -1,9 +1,16 @@
 # BIG-IP
 
+# Public IP for VIP
+resource "google_compute_address" "vip1" {
+  name = "${var.prefix}-vip1"
+}
+
 # Forwarding rule for Public IP
 resource "google_compute_forwarding_rule" "vip1" {
-  name   = "${var.prefix}-forwarding-rule"
-  target = google_compute_target_instance.f5vm.id
+  name       = "${var.prefix}-forwarding-rule"
+  target     = google_compute_target_instance.f5vm.id
+  ip_address = google_compute_address.vip1.address
+  port_range = "1-65535"
 }
 
 resource "google_compute_target_instance" "f5vm" {
