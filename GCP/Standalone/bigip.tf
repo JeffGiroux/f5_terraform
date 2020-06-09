@@ -11,7 +11,6 @@ data "template_file" "vm_onboard" {
     DO_URL         = var.DO_URL
     AS3_URL        = var.AS3_URL
     TS_URL         = var.TS_URL
-    libs_dir       = var.libs_dir
     onboard_log    = var.onboard_log
   }
 }
@@ -58,4 +57,10 @@ resource "google_compute_instance" "f5vm01" {
     email  = var.svc_acct
     scopes = ["cloud-platform"]
   }
+}
+
+# Troubleshooting - create local output files
+resource "local_file" "onboard_file" {
+  content  = data.template_file.vm_onboard.rendered
+  filename = "${path.module}/vm_onboard.tpl_data.json"
 }

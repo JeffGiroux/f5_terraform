@@ -6,6 +6,8 @@
 #### Log File Setup ####
 ########################
 
+mkdir -p /var/log/cloud/google
+
 LOG_FILE=${onboard_log}
 
 # If file exists, exit as we only want to run once
@@ -259,7 +261,7 @@ INT2GATEWAY=$(curl -s -f --retry 20 'http://metadata.google.internal/computeMeta
 MGMTNETWORK=$(/bin/ipcalc -n $MGMTADDRESS $MGMTMASK | cut -d= -f2)
 INT2NETWORK=$(/bin/ipcalc -n $INT2ADDRESS $INT2MASK | cut -d= -f2)
 
-echo -e $(date) "-Network Settings---"
+echo -e $(date) "---Network Settings---"
 echo "mgmt:$MGMTADDRESS,$MGMTMASK,$MGMTGATEWAY"
 echo "external:$INT2ADDRESS,$INT2MASK,$INT2GATEWAY"
 echo "cidr: $MGMTNETWORK,$INT2NETWORK"
@@ -268,46 +270,69 @@ echo "cidr: $MGMTNETWORK,$INT2NETWORK"
 #### Additional Startup Scripts ####
 ####################################
 
+mkdir -p /config/cloud/gce
+
 # Scripts for /config/startup
 # https://support.f5.com/csp/article/K11948
 chmod +w /config/startup
-echo "/config/startup_mgmtroute.sh &" >> /config/startup
-echo "/config/startup_f5toolchain.sh &" >> /config/startup
+echo "/config/cloud/gce/mgmtroute.sh &" >> /config/startup
+echo "/config/cloud/gce/custom-config.sh &" >> /config/startup
 
 # Script #1 -- Mgmt reboot workaround
 # Add mgmt default route and set MTU 1460
 # https://support.f5.com/csp/article/K47835034
-cat  <<EOF > /config/startup_mgmtroute.sh
+cat  <<EOF > /config/cloud/gce/mgmtroute.sh
 #!/bin/bash
-exec &>>/var/log/startup-mgmtroute.log
+
+# Log File Setup
+LOG_FILE="/var/log/cloud/google/mgmtroute.log"
+exec &>>\$LOG_FILE
+
+# mcpd Wait Function
+waitMcpd () {
+CNT=0
 echo -e \$(date) "Checking status of mcpd"
-sleep 120
-echo -e \$(date) "First try"
+while [[ \$CNT -lt 120 ]]; do
+  tmsh -a show sys mcp-state field-fmt | grep -q running
+  if [ \$? == 0 ]; then
+    echo -e \$(date) "mcpd ready"
+    break
+  fi
+  echo -e \$(date) "mcpd not ready yet"
+  CNT=\$[\$CNT+1]
+  sleep 10
+done
+}
+
+echo -e \$(date) "Checking status of mcpd"
+waitMcpd
+
+echo -e \$(date) "Fixing Mgmt Route - First try"
 tmsh delete sys management-route default
 tmsh create sys management-route default gateway $MGMTGATEWAY mtu 1460
 sleep 120
-echo -e \$(date) "Second try"
+echo -e \$(date) "Fixing Mgmt Route - Second try"
 tmsh delete sys management-route default
 tmsh create sys management-route default gateway $MGMTGATEWAY mtu 1460
 tmsh save sys config
 echo -e \$(date) "Done"
 EOF
-chmod +x /config/startup_mgmtroute.sh
+chmod +x /config/cloud/gce/mgmtroute.sh
 # End Script #1 -- Mgmt reboot workaround
 
 
 # Script #2 -- Declarations for F5 Automation Toolchain
 # Add network, vlans, IPs, profiles, etc
-cat  <<EOF > /config/startup_f5toolchain.sh
+cat  <<EOF > /config/cloud/gce/custom-config.sh
 #!/bin/bash
 
-# BIG-IP F5 AUTOMATION TOOLCHAIN SCRIPT
+# BIG-IP F5 CUSTOM CONFIG SCRIPT
 
 ########################
 #### Log File Setup ####
 ########################
 
-LOG_FILE="/var/log/startup-f5toolchain.log"
+LOG_FILE="/var/log/cloud/google/custom-config.log"
 
 # If file exists, exit as we only want to run once
 if [ ! -e \$LOG_FILE ]
@@ -356,6 +381,14 @@ tmsh modify sys global-settings gui-setup disabled
 
 echo -e \$(date) "Set TMM networks"
 echo -e "create cli transaction;
+modify sys global-settings mgmt-dhcp disabled;
+delete sys management-route all;
+delete sys management-ip all;
+create sys management-ip $MGMTADDRESS/32;
+create sys management-route mgmt_gw network $MGMTGATEWAY/32 type interface mtu 1460;
+create sys management-route mgmt_net network $MGMTNETWORK/$MGMTMASK gateway $MGMTGATEWAY mtu 1460;
+create sys management-route default gateway $MGMTGATEWAY mtu 1460;
+modify sys management-dhcp sys-mgmt-dhcp-config request-options delete { ntp-servers };
 create net vlan external interfaces add { 1.0 } mtu 1460;
 create net self external-self address $INT2ADDRESS/32 vlan external;
 create net route ext_gw_interface network $INT2GATEWAY/32 interface external;
@@ -367,7 +400,7 @@ echo -e \$(date) "---Complete---"
 
 exit
 EOF
-chmod +x /config/startup_f5toolchain.sh
+chmod +x /config/cloud/gce/custom-config.sh
 # End Script #2 -- Declarations for F5 Automation Toolchain
 
 #################

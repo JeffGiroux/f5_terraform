@@ -140,8 +140,7 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | DO_URL | Yes | This is the raw github URL for downloading the Declarative Onboarding RPM |
 | AS3_URL | Yes | This is the raw github URL for downloading the AS3 RPM |
 | TS_URL | Yes | This is the raw github URL for downloading the Telemetry RPM |
-| libs_dir | Yes | This is where all the temporary libs and RPM will be store in BIG-IP |
-| onboard_log | Yes | This is where the onboarding script logs all the events |
+| onboard_log | Yes | This is where the onboarding logs all the events (MUST reside in folder /var/log/cloud/google) |
 
 ## Installation Example
 
