@@ -6,21 +6,19 @@
 #### Log File Setup ####
 ########################
 
-mkdir -p /var/log/cloud/google
-
 LOG_FILE=${onboard_log}
 
 # If file exists, exit as we only want to run once
-if [ ! -e $LOG_FILE ]
-then
-     touch $LOG_FILE
-     exec &>>$LOG_FILE
+if [ ! -e $LOG_FILE ]; then
+  touch $LOG_FILE
+  exec &>>$LOG_FILE
 else
-    exit
+  exit
 fi
 
 exec 1>$LOG_FILE 2>&1
-echo -e $(date) "---Starting---"
+date
+echo "Starting onboard script"
 
 ###################
 #### Variables ####
@@ -30,36 +28,18 @@ echo -e $(date) "---Starting---"
 projectId='${gcp_project_id}'
 usecret='${usecret}'
 admin_username='${uname}'
-
-# BIG-IP password from Metadata
-svcacct_token=$(curl -s -f --retry 20 "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token" -H "Metadata-Flavor: Google" | jq -r ".access_token")
-admin_password=$(curl -s -f --retry 20 "https://secretmanager.googleapis.com/v1/projects/$projectId/secrets/$usecret/versions/1:access" -H "Authorization: Bearer $svcacct_token" | jq -r ".payload.data" | base64 --decode)
-
-# RPM Download/Install Folders
-CREDS="admin:"$admin_password
-local_host="http://localhost:8100"
-local_host443="https://localhost"
-rpmInstallUrl="/mgmt/shared/iapp/package-management-tasks"
-rpmFilePath="/var/config/rest/downloads"
-
-# DO urls
 DO_URL='${DO_URL}'
 DO_FN=$(basename "$DO_URL")
-doUrl="/mgmt/shared/declarative-onboarding"
-doCheckUrl="/mgmt/shared/declarative-onboarding/info"
-doTaskUrl="/mgmt/shared/declarative-onboarding/task"
-# AS3 urls
 AS3_URL='${AS3_URL}'
 AS3_FN=$(basename "$AS3_URL")
-as3Url="/mgmt/shared/appsvcs/declare"
-as3CheckUrl="/mgmt/shared/appsvcs/info"
-as3TaskUrl="/mgmt/shared/appsvcs/task"
-# TS urls
 TS_URL='${TS_URL}'
 TS_FN=$(basename "$TS_URL")
-tsUrl="/mgmt/shared/telemetry/declare"
-tsCheckUrl="/mgmt/shared/telemetry/info"
-tsTaskUrl="/mgmt/shared/telemetry/task"
+rpmFilePath="/var/config/rest/downloads"
+
+# BIG-IP Credentials
+svcacct_token=$(curl -s -f --retry 20 "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token" -H "Metadata-Flavor: Google" | jq -r ".access_token")
+admin_password=$(curl -s -f --retry 20 "https://secretmanager.googleapis.com/v1/projects/$projectId/secrets/$usecret/versions/1:access" -H "Authorization: Bearer $svcacct_token" | jq -r ".payload.data" | base64 --decode)
+CREDS="admin:"$admin_password
 
 ###################
 #### Functions ####
@@ -68,14 +48,14 @@ tsTaskUrl="/mgmt/shared/telemetry/task"
 # mcpd Wait Function
 waitMcpd () {
 CNT=0
-echo -e $(date) "Checking status of mcpd"
+echo "Checking status of mcpd"
 while [[ $CNT -lt 120 ]]; do
   tmsh -a show sys mcp-state field-fmt | grep -q running
   if [ $? == 0 ]; then
-    echo -e $(date) "mcpd ready"
+    echo "mcpd ready"
     break
   fi
-  echo -e $(date) "mcpd not ready yet"
+  echo "mcpd not ready yet"
   CNT=$[$CNT+1]
   sleep 10
 done
@@ -84,14 +64,14 @@ done
 # Network Wait Function
 waitNetwork () {
 CNT=0
-echo -e $(date) "Testing network: curl http://example.com"
+echo "Testing network: curl http://example.com"
 while [[ $CNT -lt 120 ]]; do
   STATUS=$(curl -s -k -I example.com | grep HTTP)
   if [[ $STATUS == *"200"* ]]; then
-    echo -e $(date) "Got 200! VE is Ready!"
+    echo "Got 200! VE is Ready!"
     break
   fi
-  echo -e $(date) "Status code: $STATUS  Not done yet..."
+  echo "Status code: $STATUS  Not done yet..."
   CNT=$[$CNT+1]
   sleep 10
 done
@@ -104,14 +84,16 @@ done
 # Swap management interface to NIC1 (mgmt)
 # https://clouddocs.f5.com/cloud/public/v1/shared/change_mgmt_nic_google.html
 # https://cloud.google.com/load-balancing/docs/load-balancing-overview#backend_region_and_network
-echo -e $(date) "Change management interface to eth1"
+date
+echo "Change management interface to eth1"
 waitMcpd
 bigstart stop tmm
 tmsh modify sys db provision.managementeth value eth1
 tmsh modify sys db provision.1nicautoconfig value disable
 bigstart start tmm
 waitMcpd
-echo -e $(date) "---Mgmt interface setting---"
+date
+echo "---Mgmt interface setting---"
 tmsh list sys db provision.managementeth
 tmsh list sys db provision.1nicautoconfig
 
@@ -119,212 +101,137 @@ tmsh list sys db provision.1nicautoconfig
 # https://cdn.f5.com/product/bugtracker/ID726401.html
 cp /etc/ts/common/image.cfg /etc/ts/common/image.cfg.bak
 sed -i "s/iface0=eth0/iface0=eth1/g" /etc/ts/common/image.cfg
-echo -e $(date) "Done changing interface"
+echo "Done changing interface"
 
 #######################
 #### Admin Account ####
 #######################
 
+date
 waitNetwork
 
 # Create admin account and password
-echo -e $(date) "Updating admin account"
+echo "Updating admin account"
 if [[ $admin_username == "admin" ]]; then
   tmsh modify auth user $admin_username password "$admin_password";
 else
   tmsh create auth user $admin_username password "$admin_password" shell bash partition-access add { all-partitions { role admin } };
+  tmsh modify auth user admin password "$admin_password";
 fi
-tmsh list auth user $admin_username
 
 # Copy SSH key
-echo -e $(date) "Copying SSH key"
+echo "Copying SSH key"
 mkdir -p /home/$admin_username/.ssh/
 cp /home/admin/.ssh/authorized_keys /home/$admin_username/.ssh/authorized_keys
-echo -e $(date) "Admin account updated"
+echo "Admin account updated"
 
 #########################
 #### Directory Sizes ####
 #########################
 
+date
+
 # Modify appdata directory size
-echo -e $(date) "Setting app directory size"
+echo "Setting app directory size"
 tmsh show sys disk directory /appdata
 tmsh modify /sys disk directory /appdata new-size 52256768
 tmsh show sys disk directory /appdata
-echo -e $(date) "Done setting app directory size"
+echo "Done setting app directory size"
 tmsh save sys config
 
 ###############################################
 #### Download F5 Automation Toolchain RPMs ####
 ###############################################
 
+date
 mkdir -p $rpmFilePath
-
-# Download the RPM files
-echo -e "\n"$(date) "Download Telemetry (TS) Pkg"
-curl -L -k -o $rpmFilePath/$TS_FN $TS_URL
-
-echo -e "\n"$(date) "Download Declarative Onboarding (DO) Pkg"
-curl -L -k -o $rpmFilePath/$DO_FN $DO_URL
-
-echo -e "\n"$(date) "Download Application Services 3 (AS3) Pkg"
-curl -L -k -o $rpmFilePath/$AS3_FN $AS3_URL
-
+echo "Downloading toolchain RPMs"
+curl -L -s -f --retry 20 -o $rpmFilePath/$TS_FN $TS_URL
+curl -L -s -f --retry 20 -o $rpmFilePath/$DO_FN $DO_URL
+curl -L -s -f --retry 20 -o $rpmFilePath/$AS3_FN $AS3_URL
 sleep 10
 
 ##############################################
 #### Install F5 Automation Toolchain RPMs ####
 ##############################################
 
-# Install Telemetry Streaming Pkg
+echo -e "\n"$(date) "Installing TS Pkg"
 DATA="{\"operation\":\"INSTALL\",\"packageFilePath\":\"$rpmFilePath/$TS_FN\"}"
-echo -e "\n"$(date) "Install TS Pkg"
-curl -u $CREDS -X POST $local_host$rpmInstallUrl -d $DATA
-
+curl -s -u $CREDS -X POST http://localhost:8100/mgmt/shared/iapp/package-management-tasks -d $DATA
 sleep 10
 
-# Install Declarative Onboarding Pkg
+echo -e "\n"$(date) "Installing DO Pkg"
 DATA="{\"operation\":\"INSTALL\",\"packageFilePath\":\"$rpmFilePath/$DO_FN\"}"
-echo -e "\n"$(date) "Install DO Pkg"
-curl -u $CREDS -X POST $local_host$rpmInstallUrl -d $DATA
-
+curl -s -u $CREDS -X POST http://localhost:8100/mgmt/shared/iapp/package-management-tasks -d $DATA
 sleep 10
 
-# Install AS3 Pkg
+echo -e "\n"$(date) "Installing AS3 Pkg"
 DATA="{\"operation\":\"INSTALL\",\"packageFilePath\":\"$rpmFilePath/$AS3_FN\"}"
-echo -e "\n"$(date) "Install AS3 Pkg"
-curl -u $CREDS -X POST $local_host$rpmInstallUrl -d $DATA
-
+curl -s -u $CREDS -X POST http://localhost:8100/mgmt/shared/iapp/package-management-tasks -d $DATA
 sleep 10
-
-#################################################
-#### Validate F5 Automation Toolchain Status ####
-#################################################
-
-# Check DO Ready
-CNT=0
-echo -e "\n"$(date) "Check DO Ready"
-while [[ $CNT -lt 6 ]]; do
-  STATUS=$(curl -u $CREDS -X GET -s -k -I $local_host443$doCheckUrl | grep HTTP)
-  if [[ $STATUS == *"200"* ]]; then
-    echo -e $(date) "Got 200! DO is Ready!"
-    break
-  fi
-  echo -e $(date) "Status code: $STATUS  DO Not done yet..."
-  CNT=$[$CNT+1]
-  sleep 10
-done
-
-# Check AS3 Ready
-CNT=0
-echo -e "\n"$(date) "Check AS3 Ready"
-while [[ $CNT -lt 6 ]]; do
-  STATUS=$(curl -u $CREDS -X GET -s -k -I $local_host443$as3CheckUrl | grep HTTP)
-  if [[ $STATUS == *"200"* ]]; then
-    echo -e $(date) "Got 200! AS3 is Ready!"
-    break
-  fi
-  echo -e $(date) "Status code: $STATUS  AS3 Not done yet..."
-  CNT=$[$CNT+1]
-  sleep 10
-done
-
-# Check TS Ready
-CNT=0
-echo -e "\n"$(date) "Check TS Ready"
-while [[ $CNT -lt 6 ]]; do
-  STATUS=$(curl -u $CREDS -X GET -s -k -I $local_host443$tsCheckUrl | grep HTTP)
-  if [[ $STATUS == *"200"* ]]; then
-    echo -e $(date) "Got 200! TS is Ready!"
-    break
-  fi
-  echo -e $(date) "Status code: $STATUS  TS Not done yet..."
-  CNT=$[$CNT+1]
-  sleep 10
-done
 
 ###############################################
 #### Retrieve Network Metadata from Google ####
 ###############################################
 
-echo -e $(date) "Retrieving instance metadata from Google"
+date
+mkdir -p /config/cloud
+echo "Retrieving network instance metadata"
 
 # Collect network information
-MGMTADDRESS=$(curl -s -f --retry 20 'http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/1/ip' -H 'Metadata-Flavor: Google')
-MGMTMASK=$(curl -s -f --retry 20 'http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/1/subnetmask' -H 'Metadata-Flavor: Google')
-MGMTGATEWAY=$(curl -s -f --retry 20 'http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/1/gateway' -H 'Metadata-Flavor: Google')
+echo "MGMTADDRESS=$(curl -s -f --retry 20 'http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/1/ip' -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
+echo "MGMTMASK=$(curl -s -f --retry 20 'http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/1/subnetmask' -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
+echo "MGMTGATEWAY=$(curl -s -f --retry 20 'http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/1/gateway' -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
+echo "INT2ADDRESS=$(curl -s -f --retry 20 'http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/ip' -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
+echo "INT2MASK=$(curl -s -f --retry 20 'http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/subnetmask' -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
+echo "INT2GATEWAY=$(curl -s -f --retry 20 'http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/gateway' -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
+chmod 755 /config/cloud/interface.config
 
-INT2ADDRESS=$(curl -s -f --retry 20 'http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/ip' -H 'Metadata-Flavor: Google')
-INT2MASK=$(curl -s -f --retry 20 'http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/subnetmask' -H 'Metadata-Flavor: Google')
-INT2GATEWAY=$(curl -s -f --retry 20 'http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/gateway' -H 'Metadata-Flavor: Google')
-
-MGMTNETWORK=$(/bin/ipcalc -n $MGMTADDRESS $MGMTMASK | cut -d= -f2)
-INT2NETWORK=$(/bin/ipcalc -n $INT2ADDRESS $INT2MASK | cut -d= -f2)
-
-echo -e $(date) "---Network Settings---"
-echo "mgmt:$MGMTADDRESS,$MGMTMASK,$MGMTGATEWAY"
-echo "external:$INT2ADDRESS,$INT2MASK,$INT2GATEWAY"
-echo "cidr: $MGMTNETWORK,$INT2NETWORK"
-
-####################################
-#### Additional Startup Scripts ####
-####################################
-
-mkdir -p /config/cloud/gce
+#####################################
+#### Post-Reboot Startup Scripts ####
+#####################################
 
 # Scripts for /config/startup
 # https://support.f5.com/csp/article/K11948
 chmod +w /config/startup
-echo "/config/cloud/gce/mgmtroute.sh &" >> /config/startup
-echo "/config/cloud/gce/custom-config.sh &" >> /config/startup
+echo "(/config/cloud/mgmtroute.sh; /config/cloud/custom-config.sh) &" >> /config/startup
+
 
 # Script #1 -- Mgmt reboot workaround
 # Add mgmt default route and set MTU 1460
 # https://support.f5.com/csp/article/K47835034
-cat  <<EOF > /config/cloud/gce/mgmtroute.sh
+cat  <<'EOF' > /config/cloud/mgmtroute.sh
 #!/bin/bash
+source /config/cloud/interface.config
 
 # Log File Setup
-LOG_FILE="/var/log/cloud/google/mgmtroute.log"
-exec &>>\$LOG_FILE
+LOG_FILE="/var/log/mgmtroute.log"
+exec &>>$LOG_FILE
 
-# mcpd Wait Function
-waitMcpd () {
-CNT=0
-echo -e \$(date) "Checking status of mcpd"
-while [[ \$CNT -lt 120 ]]; do
-  tmsh -a show sys mcp-state field-fmt | grep -q running
-  if [ \$? == 0 ]; then
-    echo -e \$(date) "mcpd ready"
-    break
-  fi
-  echo -e \$(date) "mcpd not ready yet"
-  CNT=\$[\$CNT+1]
-  sleep 10
-done
-}
-
-echo -e \$(date) "Checking status of mcpd"
-waitMcpd
-
-echo -e \$(date) "Fixing Mgmt Route - First try"
+echo "Waiting for mcpd"
+sleep 120
+echo "First try"
 tmsh delete sys management-route default
 tmsh create sys management-route default gateway $MGMTGATEWAY mtu 1460
 sleep 120
-echo -e \$(date) "Fixing Mgmt Route - Second try"
+echo "Second try"
 tmsh delete sys management-route default
 tmsh create sys management-route default gateway $MGMTGATEWAY mtu 1460
 tmsh save sys config
-echo -e \$(date) "Done"
+echo "Done"
 EOF
-chmod +x /config/cloud/gce/mgmtroute.sh
+chmod +x /config/cloud/mgmtroute.sh
 # End Script #1 -- Mgmt reboot workaround
 
 
 # Script #2 -- Declarations for F5 Automation Toolchain
 # Add network, vlans, IPs, profiles, etc
-cat  <<EOF > /config/cloud/gce/custom-config.sh
+cat  <<'EOF' > /config/cloud/custom-config.sh
 #!/bin/bash
+source /config/cloud/interface.config
+MGMTNETWORK=$(/bin/ipcalc -n $MGMTADDRESS $MGMTMASK | cut -d= -f2)
+INT2NETWORK=$(/bin/ipcalc -n $INT2ADDRESS $INT2MASK | cut -d= -f2)
+PROGNAME=$(basename $0)
 
 # BIG-IP F5 CUSTOM CONFIG SCRIPT
 
@@ -332,88 +239,196 @@ cat  <<EOF > /config/cloud/gce/custom-config.sh
 #### Log File Setup ####
 ########################
 
-LOG_FILE="/var/log/cloud/google/custom-config.log"
+LOG_FILE="/var/log/custom-config.log"
 
 # If file exists, exit as we only want to run once
-if [ ! -e \$LOG_FILE ]
-then
-     touch \$LOG_FILE
-     exec &>>\$LOG_FILE
+if [ ! -e $LOG_FILE ]; then
+  touch $LOG_FILE
+  exec &>>$LOG_FILE
 else
-    exit
+  exit
 fi
 
-exec 1>\$LOG_FILE 2>&1
-echo -e \$(date) "---Starting---"
+exec 1>$LOG_FILE 2>&1
+date
+echo "Starting custom-config.sh"
 
 ###################
 #### Functions ####
 ###################
 
+function error_exit {
+  echo "$${PROGNAME}: $${1:-\"Unknown Error\"}" 1>&2
+  exit 1
+}
+
 # mcpd Wait Function
 waitMcpd () {
 CNT=0
-echo -e \$(date) "Checking status of mcpd"
-while [[ \$CNT -lt 120 ]]; do
+echo "Checking status of mcpd"
+while [[ $CNT -lt 120 ]]; do
   tmsh -a show sys mcp-state field-fmt | grep -q running
-  if [ \$? == 0 ]; then
-    echo -e \$(date) "mcpd ready"
+  if [ $? == 0 ]; then
+    echo "mcpd ready"
     break
   fi
-  echo -e \$(date) "mcpd not ready yet"
-  CNT=\$[\$CNT+1]
+  echo "mcpd not ready yet"
+  CNT=$[$CNT+1]
   sleep 10
 done
 }
 
-######################################
-#### POST DO and AS3 Declarations ####
-######################################
+# DO Wait Function
+function do_wait_for_ready {
+  checks=0
+  ready_response=""
+  ready_response_declare=""
+  while [ $checks -lt 120 ] ; do
+    ready_response=$(curl -sku admin:$passwd -w "%%{http_code}" -X GET  https://localhost:$${mgmtGuiPort}/mgmt/shared/declarative-onboarding/info -o /dev/null)
+    ready_response_declare=$(curl -sku admin:$passwd -w "%%{http_code}" -X GET  https://localhost:$${mgmtGuiPort}/mgmt/shared/declarative-onboarding -o /dev/null)
+    if [[ $ready_response == *200 && $ready_response_declare == *200 ]]; then
+      echo "DO is ready"
+      break
+    else
+      echo "DO" is not ready: $checks, response: $ready_response $ready_response_declare
+      let checks=checks+1
+      if [[ $checks == 60 ]]; then
+        bigstart restart restnoded
+      fi
+      sleep 5
+    fi
+  done
+  if [[ $ready_response != *200 || $ready_response_declare != *200 ]]; then
+    error_exit "$LINENO: DO was not installed correctly. Exit."
+  fi
+}
+
+# TS Wait Function
+function ts_wait_for_ready {
+  checks=0
+  ready_response=""
+  ready_response_declare=""
+  while [ $checks -lt 120 ] ; do
+    ready_response=$(curl -sku admin:$passwd -w "%%{http_code}" -X GET  https://localhost:$${mgmtGuiPort}/mgmt/shared/telemetry/info -o /dev/null)
+    ready_response_declare=$(curl -sku admin:$passwd -w "%%{http_code}" -X GET  https://localhost:$${mgmtGuiPort}/mgmt/shared/telemetry/declare -o /dev/null)
+    if [[ $ready_response == *200 && $ready_response_declare == *200 ]]; then
+      echo "TS is ready"
+      break
+    else
+      echo "TS" is not ready: $checks, response: $ready_response $ready_response_declare
+      let checks=checks+1
+      if [[ $checks == 60 ]]; then
+        bigstart restart restnoded
+      fi
+      sleep 5
+    fi
+  done
+  if [[ $ready_response != *200 || $ready_response_declare != *200 ]]; then
+    error_exit "$LINENO: TS was not installed correctly. Exit."
+  fi
+}
+
+# AS3 Wait Function
+function as3_wait_for_ready {
+  checks=0
+  ready_response=""
+  ready_response_declare=""
+  while [ $checks -lt 120 ] ; do
+    ready_response=$(curl -sku admin:$passwd -w "%%{http_code}" -X GET  https://localhost:$${mgmtGuiPort}/mgmt/shared/appsvcs/info -o /dev/null)
+    ready_response_declare=$(curl -sku admin:$passwd -w "%%{http_code}" -X GET  https://localhost:$${mgmtGuiPort}/mgmt/shared/appsvcs/declare -o /dev/null)
+    if [[ $ready_response == *200 && $ready_response_declare == *204 ]]; then
+      echo "AS3 is ready"
+      break
+    else
+      echo "AS3" is not ready: $checks, response: $ready_response $ready_response_declare
+      let checks=checks+1
+      if [[ $checks == 60 ]]; then
+        bigstart restart restnoded
+      fi
+      sleep 5
+    fi
+  done
+  if [[ $ready_response != *200 || $ready_response_declare != *204 ]]; then
+    error_exit "$LINENO: AS3 was not installed correctly. Exit."
+  fi
+}
+
+########################################
+#### TMSH, DO, AS3, TS Declarations ####
+########################################
 
 # To Do:
 # 1. change tmsh commands for network to DO
 # 2. optionally add AS3 too
 
+# Variables
+projectId='${gcp_project_id}'
+usecret='${usecret}'
+mgmtGuiPort="443"
+
+# BIG-IP password from Metadata
+echo "Retrieving BIG-IP password from Metadata secret"
+svcacct_token=$(curl -s -f --retry 20 "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token" -H "Metadata-Flavor: Google" | jq -r ".access_token")
+passwd=$(curl -s -f --retry 20 "https://secretmanager.googleapis.com/v1/projects/$projectId/secrets/$usecret/versions/1:access" -H "Authorization: Bearer $svcacct_token" | jq -r ".payload.data" | base64 --decode)
+
 waitMcpd
+date
 
-echo -e \$(date) "Disable GUI setup"
-tmsh modify sys global-settings gui-setup disabled
+# Configure BIG-IP Network
+echo "Set TMM networks"
+tmsh+=(
+"tmsh modify sys global-settings gui-setup disabled"
+"tmsh modify sys global-settings mgmt-dhcp disabled"
+"tmsh delete sys management-route all"
+"tmsh delete sys management-ip all"
+"tmsh create sys management-ip $${MGMTADDRESS}/32"
+"tmsh create sys management-route mgmt_gw network $${MGMTGATEWAY}/32 type interface mtu 1460"
+"tmsh create sys management-route mgmt_net network $${MGMTNETWORK}/$${MGMTMASK} gateway $${MGMTGATEWAY} mtu 1460"
+"tmsh create sys management-route default gateway $${MGMTGATEWAY} mtu 1460"
+"tmsh create net vlan external interfaces add { 1.0 } mtu 1460"
+"tmsh create net self self_external address $${INT2ADDRESS}/32 vlan external"
+"tmsh create net route ext_gw_interface network $${INT2GATEWAY}/32 interface external"
+"tmsh create net route ext_rt network $${INT2NETWORK}/$${INT2MASK} gw $${INT2GATEWAY}"
+"tmsh create net route default gw $${INT2GATEWAY}"
+"tmsh modify sys management-dhcp sys-mgmt-dhcp-config request-options delete { ntp-servers }"
+'tmsh save /sys config'
+)
+for CMD in "$${tmsh[@]}"
+do
+  if $CMD;then
+    echo "command $CMD successfully executed."
+  else
+    error_exit "$LINENO: An error has occurred while executing $CMD. Aborting!"
+  fi
+done
 
-echo -e \$(date) "Set TMM networks"
-echo -e "create cli transaction;
-modify sys global-settings mgmt-dhcp disabled;
-delete sys management-route all;
-delete sys management-ip all;
-create sys management-ip $MGMTADDRESS/32;
-create sys management-route mgmt_gw network $MGMTGATEWAY/32 type interface mtu 1460;
-create sys management-route mgmt_net network $MGMTNETWORK/$MGMTMASK gateway $MGMTGATEWAY mtu 1460;
-create sys management-route default gateway $MGMTGATEWAY mtu 1460;
-modify sys management-dhcp sys-mgmt-dhcp-config request-options delete { ntp-servers };
-create net vlan external interfaces add { 1.0 } mtu 1460;
-create net self external-self address $INT2ADDRESS/32 vlan external;
-create net route ext_gw_interface network $INT2GATEWAY/32 interface external;
-create net route ext_rt network $INT2NETWORK/$INT2MASK gw $INT2GATEWAY;
-create net route default gw $INT2GATEWAY;
-submit cli transaction" | tmsh -q
-tmsh save sys config
-echo -e \$(date) "---Complete---"
+date
+
+### START CUSTOM CONFIGURATION
+do_wait_for_ready
+ts_wait_for_ready
+as3_wait_for_ready
+### END CUSTOM CONFIGURATION
+
+date
+echo "Finished custom-config.sh"
 
 exit
 EOF
-chmod +x /config/cloud/gce/custom-config.sh
-# End Script #2 -- Declarations for F5 Automation Toolchain
+chmod +x /config/cloud/custom-config.sh
+# End Script #2 - Declarations for F5 Automation Toolchain
 
 #################
 #### Cleanup ####
 #################
 
-# Delete RPM packages
-echo -e $(date) "Removing temporary RPM install packages"
+echo "Removing temporary RPM install packages"
 rm -rf $rpmFilePath/*.rpm
 
 ################
 #### Reboot ####
 ################
 
-echo -e $(date) "Rebooting for NIC swap to complete..."
+date
+echo "Rebooting for NIC swap to complete..."
 reboot
