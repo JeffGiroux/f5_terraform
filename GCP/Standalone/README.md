@@ -158,6 +158,7 @@ To run this Terraform template, perform the following steps:
       extVpc       = "xxxxx-net-ext"
       mgmtSubnet   = "xxxxx-subnet-mgmt"
       extSubnet    = "xxxxx-subnet-ext"
+      dns_suffix   = "example.com"
 
       # Google Environment
       gcp_project_id = "xxxxx"

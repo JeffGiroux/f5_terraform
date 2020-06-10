@@ -21,6 +21,15 @@ echo "Starting onboard script"
 # ********************************************************************
 
 #####################################
+#### do.json - Declaration File ####
+#####################################
+
+# DO
+cat <<'EOF' > /config/cloud/do.json
+${DO_Document}
+EOF
+
+#####################################
 #### as3.json - Declaration File ####
 #####################################
 
@@ -72,6 +81,8 @@ echo "MGMTGATEWAY=$(curl -s -f --retry 20 'http://metadata.google.internal/compu
 echo "INT2ADDRESS=$(curl -s -f --retry 20 'http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/ip' -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
 echo "INT2MASK=$(curl -s -f --retry 20 'http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/subnetmask' -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
 echo "INT2GATEWAY=$(curl -s -f --retry 20 'http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/gateway' -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
+echo "MGMTNETWORK=$(/bin/ipcalc -n $MGMTADDRESS $MGMTMASK | cut -d= -f2)" >> /config/cloud/interface.config
+echo "INT2NETWORK=$(/bin/ipcalc -n $INT2ADDRESS $INT2MASK | cut -d= -f2)" >> /config/cloud/interface.config
 chmod 755 /config/cloud/interface.config
 echo "Rebooting for NIC swap to complete..."
 reboot
@@ -85,8 +96,8 @@ EOF
 cat  <<'EOF' > /config/cloud/custom-config.sh
 #!/bin/bash
 source /config/cloud/interface.config
-MGMTNETWORK=$(/bin/ipcalc -n $MGMTADDRESS $MGMTMASK | cut -d= -f2)
-INT2NETWORK=$(/bin/ipcalc -n $INT2ADDRESS $INT2MASK | cut -d= -f2)
+#MGMTNETWORK=$(/bin/ipcalc -n $MGMTADDRESS $MGMTMASK | cut -d= -f2)
+#INT2NETWORK=$(/bin/ipcalc -n $INT2ADDRESS $INT2MASK | cut -d= -f2)
 PROGNAME=$(basename $0)
 
 if [ -f /config/startupFinished ]; then
@@ -206,6 +217,8 @@ passwd=$(curl -s -f --retry 20 "https://secretmanager.googleapis.com/v1/projects
 
 # Submit DO Declaration
 #do_wait_for_ready
+#sed -i "s/\$${local_selfip}/$INT2ADDRESS/g" /config/cloud/do.json
+#sed -i "s/\$${gateway}/$INT2GATEWAY/g" /config/cloud/do.json
 echo "Set TMM networks"
 tmsh+=(
 "tmsh modify sys global-settings gui-setup disabled"

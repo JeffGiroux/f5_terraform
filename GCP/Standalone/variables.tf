@@ -38,6 +38,7 @@ variable adminSrcAddr {}
 variable gceSshPubKey {}
 variable host1_name { default = "f5vm01" }
 variable dns_server { default = "8.8.8.8" }
+variable dns_suffix {}
 variable ntp_server { default = "0.us.pool.ntp.org" }
 variable timezone { default = "UTC" }
 variable DO_URL { default = "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.13.0/f5-declarative-onboarding-1.13.0-5.noarch.rpm" }

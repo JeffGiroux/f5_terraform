@@ -1,28 +1,26 @@
 # BIG-IP
 
-# Public IP for VIP
-resource "google_compute_address" "vip1" {
-  name = "${var.prefix}-vip1"
-}
+# # Public IP for VIP
+# resource "google_compute_address" "vip1" {
+#   name = "${var.prefix}-vip1"
+# }
 
-# Forwarding rule for Public IP
-resource "google_compute_forwarding_rule" "vip1" {
-  name       = "${var.prefix}-forwarding-rule"
-  target     = google_compute_target_instance.f5vm.id
-  ip_address = google_compute_address.vip1.address
-  port_range = "1-65535"
-}
+# # Forwarding rule for Public IP
+# resource "google_compute_forwarding_rule" "vip1" {
+#   name       = "${var.prefix}-forwarding-rule"
+#   target     = google_compute_target_instance.f5vm.id
+#   ip_address = google_compute_address.vip1.address
+#   port_range = "1-65535"
+# }
 
-resource "google_compute_target_instance" "f5vm" {
-  name     = "${var.prefix}-ti"
-  instance = google_compute_instance.f5vm01.id
-}
+# resource "google_compute_target_instance" "f5vm" {
+#   name     = "${var.prefix}-ti"
+#   instance = google_compute_instance.f5vm01.id
+# }
 
 # Setup Onboarding scripts
-data "template_file" "vm_onboard" {
-  template = file("${path.module}/onboard.tpl")
-
-  vars = {
+locals {
+  vm_onboard = templatefile("${path.module}/onboard.tpl", {
     uname          = var.uname
     usecret        = var.usecret
     gcp_project_id = var.gcp_project_id
@@ -30,23 +28,27 @@ data "template_file" "vm_onboard" {
     AS3_URL        = var.AS3_URL
     TS_URL         = var.TS_URL
     onboard_log    = var.onboard_log
-    AS3_Document   = data.template_file.as3_json.rendered
-  }
-}
-
-data "template_file" "as3_json" {
-  template = file("${path.module}/as3.json")
-
-  vars = {
+    DO_Document    = local.do_json
+    AS3_Document   = local.as3_json
+  })
+  do_json = templatefile("${path.module}/do.json", {
+    local_host = "${var.prefix}-${var.host1_name}"
+    dns_server = var.dns_server
+    dns_suffix = var.dns_suffix
+    ntp_server = var.ntp_server
+    timezone   = var.timezone
+  })
+  as3_json = templatefile("${path.module}/as3.json", {
     gcp_region = var.gcp_region
-    publicvip  = google_compute_address.vip1.address
+    publicvip  = "0.0.0.0"
+    #publicvip  = google_compute_address.vip1.address
     privatevip = var.alias_ip_range
-  }
+  })
 }
 
 # Create F5 BIG-IP VMs
 resource "google_compute_instance" "f5vm01" {
-  name         = "${var.prefix}-f5vm01"
+  name         = "${var.prefix}-${var.host1_name}"
   machine_type = var.bigipMachineType
   zone         = var.gcp_zone
 
@@ -79,7 +81,7 @@ resource "google_compute_instance" "f5vm01" {
   metadata = {
     ssh-keys               = "${var.uname}:${var.gceSshPubKey}"
     block-project-ssh-keys = true
-    startup-script         = var.customImage != "" ? var.customUserData : data.template_file.vm_onboard.rendered
+    startup-script         = var.customImage != "" ? var.customUserData : local.vm_onboard
   }
 
   service_account {
@@ -88,8 +90,8 @@ resource "google_compute_instance" "f5vm01" {
   }
 }
 
-# # Troubleshooting - create local output files
-# resource "local_file" "onboard_file" {
-#   content  = data.template_file.vm_onboard.rendered
-#   filename = "${path.module}/vm_onboard.tpl_data.json"
-# }
+# Troubleshooting - create local output files
+resource "local_file" "onboard_file" {
+  content  = local.vm_onboard
+  filename = "${path.module}/vm_onboard.tpl_data.json"
+}

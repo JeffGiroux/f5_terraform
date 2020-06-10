@@ -8,6 +8,7 @@ mgmtVpc      = "xxxxx-net-mgmt"
 extVpc       = "xxxxx-net-ext"
 mgmtSubnet   = "xxxxx-subnet-mgmt"
 extSubnet    = "xxxxx-subnet-ext"
+dns_suffix   = "example.com"
 
 # Google Environment
 gcp_project_id = "xxxxx"
