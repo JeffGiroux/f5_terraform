@@ -2,9 +2,8 @@
 
 # BIG-IP ONBOARD SCRIPT
 
-########################
-#### Log File Setup ####
-########################
+mkdir -p /config/cloud
+mkdir -p /var/log/cloud
 
 LOG_FILE=${onboard_log}
 
@@ -16,207 +15,33 @@ else
   exit
 fi
 
-exec 1>$LOG_FILE 2>&1
 echo "Starting onboard script"
 
-###################
-#### Variables ####
-###################
+# ********************************************************************
+# ********************************************************************
 
-# Variables
-projectId='${gcp_project_id}'
-usecret='${usecret}'
-admin_username='${uname}'
-DO_URL='${DO_URL}'
-DO_FN=$(basename "$DO_URL")
-AS3_URL='${AS3_URL}'
-AS3_FN=$(basename "$AS3_URL")
-TS_URL='${TS_URL}'
-TS_FN=$(basename "$TS_URL")
-rpmFilePath="/var/config/rest/downloads"
-
-###################
-#### Functions ####
-###################
-
-# mcpd Wait Function
-waitMcpd () {
-CNT=0
-echo "Checking status of mcpd"
-while [[ $CNT -lt 120 ]]; do
-  tmsh -a show sys mcp-state field-fmt | grep -q running
-  if [ $? == 0 ]; then
-    echo "mcpd ready"
-    break
-  fi
-  echo "mcpd not ready yet"
-  CNT=$[$CNT+1]
-  sleep 10
-done
-}
-
-# Network Wait Function
-waitNetwork () {
-CNT=0
-echo "Testing network: curl http://example.com"
-while [[ $CNT -lt 120 ]]; do
-  STATUS=$(curl -s -k -I example.com | grep HTTP)
-  if [[ $STATUS == *"200"* ]]; then
-    echo "Got 200! VE is Ready!"
-    break
-  fi
-  echo "Status code: $STATUS  Not done yet..."
-  CNT=$[$CNT+1]
-  sleep 10
-done
-}
-
-#######################
-#### Swap Mgmt NIC ####
-#######################
-
-# Swap management interface to NIC1 (mgmt)
-# https://clouddocs.f5.com/cloud/public/v1/shared/change_mgmt_nic_google.html
-# https://cloud.google.com/load-balancing/docs/load-balancing-overview#backend_region_and_network
-date
-echo "Change management interface to eth1"
-waitMcpd
-bigstart stop tmm
-tmsh modify sys db provision.managementeth value eth1
-tmsh modify sys db provision.1nicautoconfig value disable
-bigstart start tmm
-waitMcpd
-date
-echo "---Mgmt interface setting---"
-tmsh list sys db provision.managementeth
-tmsh list sys db provision.1nicautoconfig
-
-# Modify ASM interface
-# https://cdn.f5.com/product/bugtracker/ID726401.html
-cp /etc/ts/common/image.cfg /etc/ts/common/image.cfg.bak
-sed -i "s/iface0=eth0/iface0=eth1/g" /etc/ts/common/image.cfg
-echo "Done changing interface"
-
-#######################
-#### Admin Account ####
-#######################
-
-date
-waitNetwork
-
-# BIG-IP Credentials
-svcacct_token=$(curl -s -f --retry 20 "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token" -H "Metadata-Flavor: Google" | jq -r ".access_token")
-admin_password=$(curl -s -f --retry 20 "https://secretmanager.googleapis.com/v1/projects/$projectId/secrets/$usecret/versions/1:access" -H "Authorization: Bearer $svcacct_token" | jq -r ".payload.data" | base64 --decode)
-CREDS="admin:"$admin_password
-
-# Create admin account and password
-echo "Updating admin account"
-if [[ $admin_username == "admin" ]]; then
-  tmsh modify auth user $admin_username password "$admin_password";
-else
-  tmsh create auth user $admin_username password "$admin_password" shell bash partition-access add { all-partitions { role admin } };
-  tmsh modify auth user admin password "$admin_password";
-fi
-
-# Copy SSH key
-echo "Copying SSH key"
-mkdir -p /home/$admin_username/.ssh/
-cp /home/admin/.ssh/authorized_keys /home/$admin_username/.ssh/authorized_keys
-echo "Admin account updated"
-
-#########################
-#### Directory Sizes ####
-#########################
-
-date
-
-# Modify appdata directory size
-echo "Setting app directory size"
-tmsh show sys disk directory /appdata
-tmsh modify /sys disk directory /appdata new-size 52256768
-tmsh show sys disk directory /appdata
-echo "Done setting app directory size"
-tmsh save sys config
-
-###############################################
-#### Download F5 Automation Toolchain RPMs ####
-###############################################
-
-date
-mkdir -p $rpmFilePath
-echo "Downloading toolchain RPMs"
-curl -L -s -f --retry 20 -o $rpmFilePath/$TS_FN $TS_URL
-curl -L -s -f --retry 20 -o $rpmFilePath/$DO_FN $DO_URL
-curl -L -s -f --retry 20 -o $rpmFilePath/$AS3_FN $AS3_URL
-sleep 10
-
-##############################################
-#### Install F5 Automation Toolchain RPMs ####
-##############################################
-
-echo -e "\n"$(date) "Installing TS Pkg"
-DATA="{\"operation\":\"INSTALL\",\"packageFilePath\":\"$rpmFilePath/$TS_FN\"}"
-curl -s -u $CREDS -X POST http://localhost:8100/mgmt/shared/iapp/package-management-tasks -d $DATA
-sleep 10
-
-echo -e "\n"$(date) "Installing DO Pkg"
-DATA="{\"operation\":\"INSTALL\",\"packageFilePath\":\"$rpmFilePath/$DO_FN\"}"
-curl -s -u $CREDS -X POST http://localhost:8100/mgmt/shared/iapp/package-management-tasks -d $DATA
-sleep 10
-
-echo -e "\n"$(date) "Installing AS3 Pkg"
-DATA="{\"operation\":\"INSTALL\",\"packageFilePath\":\"$rpmFilePath/$AS3_FN\"}"
-curl -s -u $CREDS -X POST http://localhost:8100/mgmt/shared/iapp/package-management-tasks -d $DATA
-sleep 10
-
-###############################################
-#### Retrieve Network Metadata from Google ####
-###############################################
-
-date
-mkdir -p /config/cloud
-echo "Retrieving network instance metadata"
-
-# Collect network information
-echo "MGMTADDRESS=$(curl -s -f --retry 20 'http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/1/ip' -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
-echo "MGMTMASK=$(curl -s -f --retry 20 'http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/1/subnetmask' -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
-echo "MGMTGATEWAY=$(curl -s -f --retry 20 'http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/1/gateway' -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
-echo "INT2ADDRESS=$(curl -s -f --retry 20 'http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/ip' -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
-echo "INT2MASK=$(curl -s -f --retry 20 'http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/subnetmask' -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
-echo "INT2GATEWAY=$(curl -s -f --retry 20 'http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/gateway' -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
-chmod 755 /config/cloud/interface.config
-
-################################
-#### Declaration JSON Files ####
-################################
+#####################################
+#### as3.json - Declaration File ####
+#####################################
 
 # AS3
 cat <<'EOF' > /config/cloud/as3.json
 ${AS3_Document}
 EOF
 
-# ********************************************************************
-# ********************************************************************
+#######################
+#### mgmt-route.sh ####
+#######################
 
-#####################################
-#### Post-Reboot Startup Scripts ####
-#####################################
-
-# Scripts for /config/startup
-# https://support.f5.com/csp/article/K11948
-chmod +w /config/startup
-echo "(/config/cloud/mgmtroute.sh; /config/cloud/custom-config.sh) &" >> /config/startup
-
-
-# Script #1 -- Mgmt reboot workaround
-# Add mgmt default route
+# Add mgmt route after each reboot
 # https://support.f5.com/csp/article/K85730674
-cat  <<'EOF' > /config/cloud/mgmtroute.sh
+cat  <<'EOF' > /config/cloud/mgmt-route.sh
 #!/bin/bash
 source /config/cloud/interface.config
 # Log File Setup
-LOG_FILE="/var/log/mgmtroute.log"
+LOG_FILE="/var/log/cloud/mgmt-route.log"
 exec &>>$LOG_FILE
+date
 echo "Waiting for mcpd"
 sleep 120
 echo "First try"
@@ -227,14 +52,36 @@ echo "Second try"
 tmsh delete sys management-route default
 tmsh create sys management-route default gateway $MGMTGATEWAY mtu 1460
 tmsh save sys config
+date
 echo "Done"
 EOF
-chmod +x /config/cloud/mgmtroute.sh
-# End Script #1 -- Mgmt reboot workaround
 
+##############################
+#### collect-interface.sh ####
+##############################
 
-# Script #2 -- Declarations for F5 Automation Toolchain
-# Add network, vlans, IPs, profiles, etc - runs only once
+# Retrieve Network Metadata from Google
+cat  <<'EOF' > /config/cloud/collect-interface.sh
+#!/bin/bash
+date
+echo "Retrieving network instance metadata"
+# Collect network information
+echo "MGMTADDRESS=$(curl -s -f --retry 20 'http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/1/ip' -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
+echo "MGMTMASK=$(curl -s -f --retry 20 'http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/1/subnetmask' -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
+echo "MGMTGATEWAY=$(curl -s -f --retry 20 'http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/1/gateway' -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
+echo "INT2ADDRESS=$(curl -s -f --retry 20 'http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/ip' -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
+echo "INT2MASK=$(curl -s -f --retry 20 'http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/subnetmask' -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
+echo "INT2GATEWAY=$(curl -s -f --retry 20 'http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/gateway' -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
+chmod 755 /config/cloud/interface.config
+echo "Rebooting for NIC swap to complete..."
+reboot
+EOF
+
+##########################
+#### custom-config.sh ####
+##########################
+
+# TMSH, DO, AS3 declarations
 cat  <<'EOF' > /config/cloud/custom-config.sh
 #!/bin/bash
 source /config/cloud/interface.config
@@ -242,30 +89,14 @@ MGMTNETWORK=$(/bin/ipcalc -n $MGMTADDRESS $MGMTMASK | cut -d= -f2)
 INT2NETWORK=$(/bin/ipcalc -n $INT2ADDRESS $INT2MASK | cut -d= -f2)
 PROGNAME=$(basename $0)
 
-# BIG-IP F5 CUSTOM CONFIG SCRIPT
-
-########################
-#### Log File Setup ####
-########################
-
-LOG_FILE="/var/log/custom-config.log"
-
-# If file exists, exit as we only want to run once
-if [ ! -e $LOG_FILE ]; then
-  touch $LOG_FILE
-  exec &>>$LOG_FILE
-else
+if [ -f /config/startupFinished ]; then
   exit
 fi
 
-exec 1>$LOG_FILE 2>&1
 date
-echo "Starting custom-config.sh"
+echo "Starting custom config"
 
-###################
-#### Functions ####
-###################
-
+# Error Exit Function
 function error_exit {
   echo "$${PROGNAME}: $${1:-\"Unknown Error\"}" 1>&2
   exit 1
@@ -273,16 +104,16 @@ function error_exit {
 
 # mcpd Wait Function
 waitMcpd () {
-CNT=0
+checks=0
 echo "Checking status of mcpd"
-while [[ $CNT -lt 120 ]]; do
+while [ $checks -lt 120 ]; do
   tmsh -a show sys mcp-state field-fmt | grep -q running
   if [ $? == 0 ]; then
     echo "mcpd ready"
     break
   fi
   echo "mcpd not ready yet"
-  CNT=$[$CNT+1]
+  let checks=checks+1
   sleep 10
 done
 }
@@ -362,41 +193,19 @@ function as3_wait_for_ready {
   fi
 }
 
-###################
-#### Variables ####
-###################
-
 # Variables
 projectId='${gcp_project_id}'
 usecret='${usecret}'
 mgmtGuiPort="443"
-doUrl="/mgmt/shared/declarative-onboarding"
-doCheckUrl="/mgmt/shared/declarative-onboarding/info"
-doTaskUrl="/mgmt/shared/declarative-onboarding/task"
-as3Url="/mgmt/shared/appsvcs/declare"
-as3CheckUrl="/mgmt/shared/appsvcs/info"
-as3TaskUrl="/mgmt/shared/appsvcs/task"
-tsUrl="/mgmt/shared/telemetry/declare"
-tsCheckUrl="/mgmt/shared/telemetry/info"
-tsTaskUrl="/mgmt/shared/telemetry/task"
-
-########################################
-#### TMSH, DO, AS3, TS Declarations ####
-########################################
-
-# To Do:
-# 1. change tmsh commands for network to DO
-# 2. optionally add AS3 too
-
-date
-waitMcpd
 
 # BIG-IP Credentials
+waitMcpd
 echo "Retrieving BIG-IP password from Metadata secret"
 svcacct_token=$(curl -s -f --retry 20 "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token" -H "Metadata-Flavor: Google" | jq -r ".access_token")
 passwd=$(curl -s -f --retry 20 "https://secretmanager.googleapis.com/v1/projects/$projectId/secrets/$usecret/versions/1:access" -H "Authorization: Bearer $svcacct_token" | jq -r ".payload.data" | base64 --decode)
 
-# Configure BIG-IP network settings
+# Submit DO Declaration
+#do_wait_for_ready
 echo "Set TMM networks"
 tmsh+=(
 "tmsh modify sys global-settings gui-setup disabled"
@@ -426,11 +235,8 @@ done
 
 date
 
-# Submit DO Declaration
-do_wait_for_ready
-
 # Submit TS Declaration
-ts_wait_for_ready
+#ts_wait_for_ready
 
 # Submit AS3 Declaration
 as3_wait_for_ready
@@ -444,27 +250,177 @@ else
   echo "Response code: $${response_code}"
 fi
 
-# Delete declaration files (do.json, as3.json) packages
+# Cleanup
 echo "Removing DO and AS3 declaration files"
-rm -rf /config/cloud/do.json /config/cloud/as3.json /config/cloud/ts.json
+#rm -rf /config/cloud/do.json /config/cloud/as3.json /config/cloud/ts.json
 
 date
-echo "Finished custom-config.sh"
-
-exit
+echo "Finished custom config"
+touch /config/startupFinished
 EOF
-chmod +x /config/cloud/custom-config.sh
-# End Script #2 - Declarations for F5 Automation Toolchain
 
 # ********************************************************************
 # ********************************************************************
 
-#################
-#### Cleanup ####
-#################
+##############
+#### Main ####
+##############
+
+# Variables
+projectId='${gcp_project_id}'
+usecret='${usecret}'
+admin_username='${uname}'
+DO_URL='${DO_URL}'
+DO_FN=$(basename "$DO_URL")
+AS3_URL='${AS3_URL}'
+AS3_FN=$(basename "$AS3_URL")
+TS_URL='${TS_URL}'
+TS_FN=$(basename "$TS_URL")
+rpmFilePath="/var/config/rest/downloads"
+
+###################
+#### Functions ####
+###################
+
+# mcpd Wait Function
+waitMcpd () {
+checks=0
+echo "Checking status of mcpd"
+while [ $checks -lt 120 ]; do
+  tmsh -a show sys mcp-state field-fmt | grep -q running
+  if [ $? == 0 ]; then
+    echo "mcpd ready"
+    break
+  fi
+  echo "mcpd not ready yet"
+  let checks=checks+1
+  sleep 10
+done
+}
+
+# Network Wait Function
+waitNetwork () {
+checks=0
+echo "Testing network: curl http://example.com"
+while [ $checks -lt 120 ]; do
+  STATUS=$(curl -s -k -I example.com | grep HTTP)
+  if [[ $STATUS == *"200"* ]]; then
+    echo "Got 200! VE is Ready!"
+    break
+  fi
+  echo "Status code: $STATUS  Not done yet..."
+  let checks=checks+1
+  sleep 10
+done
+}
+
+#######################
+#### Swap Mgmt NIC ####
+#######################
+
+# Swap management interface to NIC1 (mgmt)
+# https://clouddocs.f5.com/cloud/public/v1/shared/change_mgmt_nic_google.html
+# https://cloud.google.com/load-balancing/docs/load-balancing-overview#backend_region_and_network
+date
+echo "Change management interface to eth1"
+waitMcpd
+bigstart stop tmm
+tmsh modify sys db provision.managementeth value eth1
+tmsh modify sys db provision.1nicautoconfig value disable
+bigstart start tmm
+waitMcpd
+date
+echo "---Mgmt interface setting---"
+tmsh list sys db provision.managementeth
+tmsh list sys db provision.1nicautoconfig
+
+# Modify ASM interface
+# https://cdn.f5.com/product/bugtracker/ID726401.html
+cp /etc/ts/common/image.cfg /etc/ts/common/image.cfg.bak
+sed -i "s/iface0=eth0/iface0=eth1/g" /etc/ts/common/image.cfg
+echo "Done changing interface"
+
+#######################
+#### Admin Account ####
+#######################
 
 date
+waitNetwork
+
+# BIG-IP Credentials
+svcacct_token=$(curl -s -f --retry 20 "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token" -H "Metadata-Flavor: Google" | jq -r ".access_token")
+admin_password=$(curl -s -f --retry 20 "https://secretmanager.googleapis.com/v1/projects/$projectId/secrets/$usecret/versions/1:access" -H "Authorization: Bearer $svcacct_token" | jq -r ".payload.data" | base64 --decode)
+CREDS="admin:"$admin_password
+
+# Create admin account and password
+echo "Updating admin account"
+if [[ $admin_username != "admin" ]]; then
+  tmsh create auth user $admin_username password "$admin_password" shell bash partition-access add { all-partitions { role admin } };
+else
+  tmsh modify auth user admin password "$admin_password";
+fi
+
+# Copy SSH key
+echo "Copying SSH key"
+mkdir -p /home/$admin_username/.ssh/
+cp /home/admin/.ssh/authorized_keys /home/$admin_username/.ssh/authorized_keys
+echo "Admin account updated"
+
+#########################
+#### Directory Sizes ####
+#########################
+
+date
+# Modify appdata directory size
+echo "Setting app directory size"
+tmsh show sys disk directory /appdata
+tmsh modify /sys disk directory /appdata new-size 52256768
+tmsh show sys disk directory /appdata
+echo "Done setting app directory size"
+tmsh save sys config
+
+##############################################
+#### Install F5 Automation Toolchain RPMs ####
+##############################################
+
+date
+mkdir -p $rpmFilePath
+
+echo "Downloading toolchain RPMs"
+curl -L -s -f --retry 20 -o $rpmFilePath/$TS_FN $TS_URL
+curl -L -s -f --retry 20 -o $rpmFilePath/$DO_FN $DO_URL
+curl -L -s -f --retry 20 -o $rpmFilePath/$AS3_FN $AS3_URL
+sleep 10
+
+echo "Installing TS Pkg"
+DATA="{\"operation\":\"INSTALL\",\"packageFilePath\":\"$rpmFilePath/$TS_FN\"}"
+curl -s -u $CREDS -X POST http://localhost:8100/mgmt/shared/iapp/package-management-tasks -d $DATA
+sleep 10
+echo
+echo "Installing DO Pkg"
+DATA="{\"operation\":\"INSTALL\",\"packageFilePath\":\"$rpmFilePath/$DO_FN\"}"
+curl -s -u $CREDS -X POST http://localhost:8100/mgmt/shared/iapp/package-management-tasks -d $DATA
+sleep 10
+echo
+echo "Installing AS3 Pkg"
+DATA="{\"operation\":\"INSTALL\",\"packageFilePath\":\"$rpmFilePath/$AS3_FN\"}"
+curl -s -u $CREDS -X POST http://localhost:8100/mgmt/shared/iapp/package-management-tasks -d $DATA
+sleep 10
+echo
 echo "Removing temporary RPM install packages"
 rm -rf $rpmFilePath/*.rpm
-echo "Rebooting for NIC swap to complete..."
-reboot
+
+#############################
+#### Set and Run Scripts ####
+#############################
+
+# https://support.f5.com/csp/article/K11948
+echo "(/config/cloud/mgmt-route.sh; /config/cloud/custom-config.sh | tee /var/log/cloud/custom-config.log >> $LOG_FILE) &" >> /config/startup
+chmod +w /config/startup
+chmod +x /config/cloud/mgmt-route.sh
+chmod +x /config/cloud/custom-config.sh
+chmod +x /config/cloud/collect-interface.sh
+
+/config/cloud/collect-interface.sh >> $LOG_FILE
+# collect-interface.sh ends in 'reboot'
+# After reboot, custom-config.sh will run
