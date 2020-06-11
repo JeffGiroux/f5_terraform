@@ -16,6 +16,7 @@ else
   exit
 fi
 
+date
 echo "Starting onboard script"
 
 # ********************************************************************
@@ -55,6 +56,7 @@ exec &>>$LOG_FILE
 date
 echo "Waiting for mcpd"
 wait_bigip_ready
+date
 echo "First try"
 tmsh delete sys management-route default
 tmsh create sys management-route default gateway $MGMTGATEWAY mtu 1460
@@ -74,8 +76,6 @@ EOF
 # Retrieve Network Metadata from Google
 cat  <<'EOF' > /config/cloud/collect-interface.sh
 #!/bin/bash
-date
-echo "Retrieving network instance metadata"
 # Collect network information
 COMPUTE_BASE_URL="http://metadata.google.internal/computeMetadata/v1"
 echo "MGMTADDRESS=$(curl -s -f --retry 10 "$${COMPUTE_BASE_URL}/instance/network-interfaces/1/ip" -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
@@ -86,6 +86,7 @@ echo "INT2MASK=$(curl -s -f --retry 10 "$${COMPUTE_BASE_URL}/instance/network-in
 echo "INT2GATEWAY=$(curl -s -f --retry 10 "$${COMPUTE_BASE_URL}/instance/network-interfaces/0/gateway" -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
 echo "HOSTNAME=$(curl -s -f --retry 10 "$${COMPUTE_BASE_URL}/instance/hostname" -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
 chmod 755 /config/cloud/interface.config
+date
 echo "Rebooting for NIC swap to complete..."
 reboot
 EOF
@@ -307,9 +308,9 @@ done
 # Swap management interface to NIC1 (mgmt)
 # https://clouddocs.f5.com/cloud/public/v1/shared/change_mgmt_nic_google.html
 # https://cloud.google.com/load-balancing/docs/load-balancing-overview#backend_region_and_network
-date
-echo "Change management interface to eth1"
+echo "Waiting for mcpd"
 wait_bigip_ready
+echo "Change management interface to eth1"
 bigstart stop tmm
 tmsh modify sys db provision.managementeth value eth1
 tmsh modify sys db provision.1nicautoconfig value disable

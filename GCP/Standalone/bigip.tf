@@ -1,22 +1,22 @@
 # BIG-IP
 
-# # Public IP for VIP
-# resource "google_compute_address" "vip1" {
-#   name = "${var.prefix}-vip1"
-# }
+# Public IP for VIP
+resource "google_compute_address" "vip1" {
+  name = "${var.prefix}-vip1"
+}
 
-# # Forwarding rule for Public IP
-# resource "google_compute_forwarding_rule" "vip1" {
-#   name       = "${var.prefix}-forwarding-rule"
-#   target     = google_compute_target_instance.f5vm.id
-#   ip_address = google_compute_address.vip1.address
-#   port_range = "1-65535"
-# }
+# Forwarding rule for Public IP
+resource "google_compute_forwarding_rule" "vip1" {
+  name       = "${var.prefix}-forwarding-rule"
+  target     = google_compute_target_instance.f5vm.id
+  ip_address = google_compute_address.vip1.address
+  port_range = "1-65535"
+}
 
-# resource "google_compute_target_instance" "f5vm" {
-#   name     = "${var.prefix}-ti"
-#   instance = google_compute_instance.f5vm01.id
-# }
+resource "google_compute_target_instance" "f5vm" {
+  name     = "${var.prefix}-ti"
+  instance = google_compute_instance.f5vm01.id
+}
 
 # Setup Onboarding scripts
 locals {
@@ -40,8 +40,8 @@ locals {
   })
   as3_json = templatefile("${path.module}/as3.json", {
     gcp_region = var.gcp_region
-    publicvip  = "0.0.0.0"
-    #publicvip  = google_compute_address.vip1.address
+    #publicvip  = "0.0.0.0"
+    publicvip  = google_compute_address.vip1.address
     privatevip = var.alias_ip_range
   })
 }
