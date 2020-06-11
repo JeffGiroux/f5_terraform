@@ -48,12 +48,13 @@ EOF
 cat  <<'EOF' > /config/cloud/mgmt-route.sh
 #!/bin/bash
 source /config/cloud/interface.config
+source /usr/lib/bigstart/bigip-ready-functions
 # Log File Setup
 LOG_FILE="/var/log/cloud/mgmt-route.log"
 exec &>>$LOG_FILE
 date
 echo "Waiting for mcpd"
-sleep 120
+wait_bigip_ready
 echo "First try"
 tmsh delete sys management-route default
 tmsh create sys management-route default gateway $MGMTGATEWAY mtu 1460
@@ -98,12 +99,14 @@ cat  <<'EOF' > /config/cloud/custom-config.sh
 #!/bin/bash
 source /usr/lib/bigstart/bigip-ready-functions
 wait_bigip_ready
+
 source /config/cloud/interface.config
 MGMTNETWORK=$(/bin/ipcalc -n $MGMTADDRESS $MGMTMASK | cut -d= -f2)
 INT2NETWORK=$(/bin/ipcalc -n $INT2ADDRESS $INT2MASK | cut -d= -f2)
-PROGNAME=$(basename $0)
 echo "MGMTNETWORK=$MGMTNETWORK" >> /config/cloud/interface.config
 echo "INT2NETWORK=$INT2NETWORK" >> /config/cloud/interface.config
+
+PROGNAME=$(basename $0)
 
 if [ -f /config/startupFinished ]; then
   exit
@@ -117,22 +120,6 @@ function error_exit {
   echo "$${PROGNAME}: $${1:-\"Unknown Error\"}" 1>&2
   exit 1
 }
-
-# # mcpd Wait Function
-# waitMcpd () {
-# checks=0
-# echo "Checking status of mcpd"
-# while [ $checks -lt 120 ]; do
-#   tmsh -a show sys mcp-state field-fmt | grep -q running
-#   if [ $? == 0 ]; then
-#     echo "mcpd ready"
-#     break
-#   fi
-#   echo "mcpd not ready yet"
-#   let checks=checks+1
-#   sleep 10
-# done
-# }
 
 # Toolchain Wait Function
 function wait_for_ready {

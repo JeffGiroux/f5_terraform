@@ -90,8 +90,8 @@ resource "google_compute_instance" "f5vm01" {
   }
 }
 
-# Troubleshooting - create local output files
-resource "local_file" "onboard_file" {
-  content  = local.vm_onboard
-  filename = "${path.module}/vm_onboard.tpl_data.json"
-}
+# # Troubleshooting - create local output files
+# resource "local_file" "onboard_file" {
+#   content  = local.vm_onboard
+#   filename = "${path.module}/vm_onboard.tpl_data.json"
+# }
