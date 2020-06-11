@@ -249,7 +249,7 @@ tmsh+=(
 "tmsh create sys management-route mgmt_net network $${MGMTNETWORK}/$${MGMTMASK} gateway $${MGMTGATEWAY} mtu 1460"
 "tmsh create sys management-route default gateway $${MGMTGATEWAY} mtu 1460"
 "tmsh create net vlan external interfaces add { 1.0 } mtu 1460"
-"tmsh create net self self_external address $${INT2ADDRESS}/32 vlan external"
+"tmsh create net self self_external address $${INT2ADDRESS}/32 vlan external allow-service add { tcp:4353 udp:1026 }"
 "tmsh create net route ext_gw_interface network $${INT2GATEWAY}/32 interface external"
 "tmsh create net route ext_rt network $${INT2NETWORK}/$${INT2MASK} gw $${INT2GATEWAY}"
 "tmsh create net route default gw $${INT2GATEWAY}"
