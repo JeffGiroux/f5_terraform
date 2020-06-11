@@ -169,7 +169,7 @@ usecret='${usecret}'
 ksecret='${ksecret}'
 mgmtGuiPort="443"
 
-# START -- BIG-IP Credentials
+# BIG-IP Credentials
 wait_bigip_ready
 echo "Retrieving BIG-IP password from Metadata secret"
 svcacct_token=$(curl -s -f --retry 20 "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token" -H "Metadata-Flavor: Google" | jq -r ".access_token")
@@ -251,13 +251,13 @@ else
   echo "Response code: $${response_code}"
 fi
 
-# Submit TS Declaration
-wait_for_ready telemetry
-file_loc="/config/cloud/ts.json"
-echo "Submitting TS declaration"
-echo "Retrieving private key from Metadata secret for GCP Cloud Monitoring"
-privateKey=$(curl -s -f --retry 20 "https://secretmanager.googleapis.com/v1/projects/$projectId/secrets/$ksecret/versions/1:access" -H "Authorization: Bearer $svcacct_token" | jq -r ".payload.data" )
-sed -i "s@\$${privateKey}@$privateKey@g" $file_loc
+# # Submit TS Declaration
+# wait_for_ready telemetry
+# file_loc="/config/cloud/ts.json"
+# echo "Submitting TS declaration"
+# echo "Retrieving private key from Metadata secret for GCP Cloud Monitoring"
+# privateKey=$(curl -s -f --retry 20 "https://secretmanager.googleapis.com/v1/projects/$projectId/secrets/$ksecret/versions/1:access" -H "Authorization: Bearer $svcacct_token" | jq -r ".payload.data" )
+# sed -i "s@\$${privateKey}@$privateKey@g" $file_loc
 # response_code=$(/usr/bin/curl -sku admin:$passwd -w "%%{http_code}" -X POST -H "Content-Type: application/json" -H "Expect:" https://localhost:$${mgmtGuiPort}/mgmt/shared/telemetry/declare -d @$file_loc -o /dev/null)
 # if [[ $response_code == *200 || $response_code == *502 ]]; then
 #   echo "Deployment of TS succeeded"
@@ -268,7 +268,7 @@ sed -i "s@\$${privateKey}@$privateKey@g" $file_loc
 
 # Cleanup
 echo "Removing DO and AS3 declaration files"
-#rm -rf /config/cloud/do.json /config/cloud/as3.json /config/cloud/ts.json
+rm -rf /config/cloud/do.json /config/cloud/as3.json /config/cloud/ts.json
 
 date
 echo "Finished custom config"
