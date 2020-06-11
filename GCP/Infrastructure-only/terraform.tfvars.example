@@ -1,0 +1,6 @@
+# Google Environment
+prefix         = "mydemo123"
+adminSrcAddr   = "0.0.0.0/0"
+gcp_project_id = "xxxxx"
+gcp_region     = "us-west1"
+gcp_zone       = "us-west1-b"
