@@ -213,4 +213,3 @@ terraform destroy -target google_compute_instance.f5vm01
 ```
 terraform apply
 ```
-  4. Repeat steps 1-3 on the other BIG-IP VE in order to establish Device Trust.
