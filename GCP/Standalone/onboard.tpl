@@ -239,8 +239,20 @@ fi
 
 date
 
+# Submit AS3 Declaration
+wait_for_ready appsvcs
+file_loc="/config/cloud/as3.json"
+echo "Submitting AS3 declaration"
+response_code=$(/usr/bin/curl -sku admin:$passwd -w "%%{http_code}" -X POST -H "Content-Type: application/json" -H "Expect:" https://localhost:$${mgmtGuiPort}/mgmt/shared/appsvcs/declare -d @$file_loc -o /dev/null)
+if [[ $response_code == *200 || $response_code == *502 ]]; then
+  echo "Deployment of AS3 succeeded"
+else
+  echo "Failed to deploy AS3; continuing..."
+  echo "Response code: $${response_code}"
+fi
+
 # Submit TS Declaration
-wait_for_ready telemetry-streaming
+wait_for_ready telemetry
 file_loc="/config/cloud/ts.json"
 echo "Submitting TS declaration"
 echo "Retrieving private key from Metadata secret for GCP Cloud Monitoring"
@@ -253,18 +265,6 @@ sed -i "s/\$${privateKey}/$privateKey/g" $file_loc
 #   echo "Failed to deploy TS; continuing..."
 #   echo "Response code: $${response_code}"
 # fi
-
-# Submit AS3 Declaration
-wait_for_ready appsvcs
-file_loc="/config/cloud/as3.json"
-echo "Submitting AS3 declaration"
-response_code=$(/usr/bin/curl -sku admin:$passwd -w "%%{http_code}" -X POST -H "Content-Type: application/json" -H "Expect:" https://localhost:$${mgmtGuiPort}/mgmt/shared/appsvcs/declare -d @$file_loc -o /dev/null)
-if [[ $response_code == *200 || $response_code == *502 ]]; then
-  echo "Deployment of AS3 succeeded"
-else
-  echo "Failed to deploy AS3; continuing..."
-  echo "Response code: $${response_code}"
-fi
 
 # Cleanup
 echo "Removing DO and AS3 declaration files"
