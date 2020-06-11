@@ -1,0 +1,19 @@
+# BIG-IP Environment
+uname        = "admin"
+usecret      = "my-secret"
+gceSshPubKey = "ssh-rsa xxxxx"
+prefix       = "mydemo123"
+adminSrcAddr = "0.0.0.0/0"
+mgmtVpc      = "xxxxx-net-mgmt"
+extVpc       = "xxxxx-net-ext"
+mgmtSubnet   = "xxxxx-subnet-mgmt"
+extSubnet    = "xxxxx-subnet-ext"
+dns_suffix   = "example.com"
+
+# Google Environment
+gcp_project_id = "xxxxx"
+gcp_region     = "us-west1"
+gcp_zone       = "us-west1-b"
+svc_acct       = "xxxxx@xxxxx.iam.gserviceaccount.com"
+privateKeyId   = "keyId"
+privateKey     = "key123!"
