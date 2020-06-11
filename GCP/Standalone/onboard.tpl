@@ -81,8 +81,6 @@ echo "MGMTGATEWAY=$(curl -s -f --retry 20 'http://metadata.google.internal/compu
 echo "INT2ADDRESS=$(curl -s -f --retry 20 'http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/ip' -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
 echo "INT2MASK=$(curl -s -f --retry 20 'http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/subnetmask' -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
 echo "INT2GATEWAY=$(curl -s -f --retry 20 'http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/gateway' -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
-echo "MGMTNETWORK=$(/bin/ipcalc -n $MGMTADDRESS $MGMTMASK | cut -d= -f2)" >> /config/cloud/interface.config
-echo "INT2NETWORK=$(/bin/ipcalc -n $INT2ADDRESS $INT2MASK | cut -d= -f2)" >> /config/cloud/interface.config
 chmod 755 /config/cloud/interface.config
 echo "Rebooting for NIC swap to complete..."
 reboot
@@ -96,9 +94,11 @@ EOF
 cat  <<'EOF' > /config/cloud/custom-config.sh
 #!/bin/bash
 source /config/cloud/interface.config
-#MGMTNETWORK=$(/bin/ipcalc -n $MGMTADDRESS $MGMTMASK | cut -d= -f2)
-#INT2NETWORK=$(/bin/ipcalc -n $INT2ADDRESS $INT2MASK | cut -d= -f2)
+MGMTNETWORK=$(/bin/ipcalc -n $MGMTADDRESS $MGMTMASK | cut -d= -f2)
+INT2NETWORK=$(/bin/ipcalc -n $INT2ADDRESS $INT2MASK | cut -d= -f2)
 PROGNAME=$(basename $0)
+echo "MGMTNETWORK=$MGMTNETWORK" >> /config/cloud/interface.config
+echo "INT2NETWORK=$INT2NETWORK" >> /config/cloud/interface.config
 
 if [ -f /config/startupFinished ]; then
   exit
