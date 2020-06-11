@@ -14,7 +14,7 @@
     "class": "Telemetry_Consumer",
     "type": "Google_Cloud_Monitoring",
     "privateKey": {
-        "cipherText": "${privateKey}"
+        "cipherText": "$${privateKey}"
     },
     "projectId": "${gcp_project_id}",
     "privateKeyId": "${privateKeyId}",

@@ -41,11 +41,14 @@ Terraform v0.12.26
 - This deployment will be using the Terraform Google provider to build out all the neccessary Google objects.
   - ***Note***: You MUST have "Editor" on the service account in order to create resources in your project with Terraform. See the [Terraform Google Provider "Adding Credentials"](https://www.terraform.io/docs/providers/google/guides/getting_started.html#adding-credentials) for details. Also, review the [available Google GCP permission scopes](https://cloud.google.com/sdk/gcloud/reference/alpha/compute/instances/set-scopes#--scopes) too.
 - Passwords and secrets are located in [Google Cloud Secret Manager](https://cloud.google.com/secret-manager/docs/quickstart#secretmanager-quickstart-web). Make sure you have an existing Google Cloud "secret" with the data containing the clear text passwords for each relevant item: BIG-IP password, service account credentials, BIG-IQ password, etc.
-  - ***Note***: The name of your Google Cloud Secret Manager secret is for variable 'usecret'. Refer to [Template Parameters](#template-parameters).
+  - 'usecret' contains the value of the adminstrator password (ex. "Default12345!")
+  - 'ksecret' contains the value of the service account private key (ex. "-----BEGIN PRIVATE KEY-----\nMIIEvgIBAmorekeystuffbla123\n-----END PRIVATE KEY-----\n"). Currently used for BIG-IP telemetry streaming to Google Cloud Monitoring (aka StackDriver). If you are not using this feature, you do not need this secret in Secret Manager. 
+  - Refer to [Template Parameters](#template-parameters)
 - This template deploys into an existing network
   - You must have a VPC for management and a VPC for data traffic (client/server). The management VPC will have one subnet for management traffic. The other VPC will have one subnet for data traffic.
   - Firewall rules are required to pass traffic to the application. These ports will depend on your application and the ports you choose to use.
   - BIG-IP will require tcp/22 and tcp/443 for management access
+  - If you require a new network first, see the [Infrastructure Only folder](../Infrastructure-only) to get started.
   
 
 ## Important Configuration Notes
@@ -115,7 +118,7 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | gcp_region | Yes | GCP Region for provider |
 | svc_acct | Yes | Service Account for VM instance |
 | privateKeyId | No | ID of private key for the service account used in Telemetry Streaming to Google Cloud Monitoring |
-| privateKey | No | Private key (aka password) for the service account used in Telemetry Streaming to Google Cloud Monitoring |
+| ksecret | No | Retrieved from Google Cloud Secret Manager and contains private key of service account used in Telemetry Streaming to Google Cloud Monitoring |
 | extVpc | Yes | External VPC network |
 | mgmtVpc | Yes | Management VPC network |
 | extSubnet | Yes | External subnet |
@@ -158,7 +161,7 @@ To run this Terraform template, perform the following steps:
       gcp_zone       = "us-west1-b"
       svc_acct       = "xxxxx@xxxxx.iam.gserviceaccount.com"
       privateKeyId   = "abcdcba123321"
-      privateKey     = "-----BEGIN PRIVATE KEY-----\nMIIEvgIBAmorekeystuffbla123\n-----END PRIVATE KEY-----\n"
+      ksecret        = "svc-acct-secret"
   ```
   3. Initialize the directory
   ```
