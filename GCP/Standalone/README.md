@@ -1,7 +1,7 @@
 # Deploying BIG-IP VE in Google GCP - Standalone Two NICs
 
 ***To do:***
-1. Move networking to DO. Add app with AS3. Add analytics with TS.
+1. Add analytics with TS.
 
 ## Contents
 
@@ -27,18 +27,14 @@ Example...
 
 -> Run many X
 - [Redeploy BIG-IP for Replacement or Upgrade](#Redeploy-BIG-IP-for-replacement-or-upgrade)
-- [Reconfigure BIG-IP L1-L3 Configurations (DO)](#Rerun-Declarative-Onboarding-on-the-BIG-IP-VE)
-- [Reconfigure BIG-IP L4-L7 Configurations (AS3)](#Rerun-Application-Services-AS3-on-the-BIG-IP-VE)
-- [Reconfigure BIG-IP Telemetry Streaming (TS)](#Rerun-Telemetry-Streaming-on-the-BIG-IP-VE)
 
-**Networking Stack Type:** This solution deploys into a new networking stack, which is created along with the solution.
+**Networking Stack Type:** This solution deploys into an *EXISTING* networking stack. You are required to have existing VPC networks, firewall rules, and proper routing. Refer to the [Prerequisites](#prerequisites). Visit DevCentral to read [Service Discovery in Google Cloud with F5 BIG-IP](https://devcentral.f5.com/s/articles/Service-Discovery-in-Google-Cloud-with-F5-BIG-IP) where I show you my basic VPC setup (networks, subnets) along with firewall rules.
 
 ## Version
 This template is tested and worked in the following version
 Terraform v0.12.26
 + provider.google v3.24
-+ provider.random v2.2
-+ provider.template v2.1
++ provider.local v1.4
 
 ## Prerequisites
 
@@ -49,6 +45,10 @@ Terraform v0.12.26
   - ***Note***: You MUST have "Editor" on the service account in order to create resources in your project with Terraform. See the [Terraform Google Provider "Adding Credentials"](https://www.terraform.io/docs/providers/google/guides/getting_started.html#adding-credentials) for details. Also, review the [available Google GCP permission scopes](https://cloud.google.com/sdk/gcloud/reference/alpha/compute/instances/set-scopes#--scopes) too.
 - Passwords and secrets are located in [Google Cloud Secret Manager](https://cloud.google.com/secret-manager/docs/quickstart#secretmanager-quickstart-web). Make sure you have an existing Google Cloud "secret" with the data containing the clear text passwords for each relevant item: BIG-IP password, service account credentials, BIG-IQ password, etc.
   - ***Note***: The name of your Google Cloud Secret Manager secret is for variable 'usecret'. Refer to [Template Parameters](#template-parameters).
+- This template deploys into an existing network
+  - You must have a VPC for management and a VPC for data traffic (client/server). The management VPC will have one subnet for management traffic. The other VPC will have one subnet for data traffic.
+  - Firewall rules are required to pass traffic to the application. These ports will depend on your application and the ports you choose to use.
+  - BIG-IP will require tcp/22 and tcp/443 for management access
   
 
 ## Important Configuration Notes
@@ -60,11 +60,9 @@ Terraform v0.12.26
   - The BIG-IP instance will then use the secret name and the service account's token to query Google Metadata API and dynamically retrieve the password for device onboarding.
 - This template uses Declarative Onboarding (DO) and Application Services 3 (AS3) packages for the initial configuration. As part of the onboarding script, it will download the RPMs automatically. See the [AS3 documentation](https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/) and [DO documentation](https://clouddocs.f5.com/products/extensions/f5-declarative-onboarding/latest/) for details on how to use AS3 and Declarative Onboarding on your BIG-IP VE(s). The [Telemetry Streaming](https://clouddocs.f5.com/products/extensions/f5-telemetry-streaming/latest/) extension is also downloaded and can be configured to point to Google Cloud Monitoring (old name StackDriver). 
 - Files
-  - appserver.tf - resources for backend web server running DVWA
-  - bigip.tf - resources for BIG-IP, NICs, public IPs, network security group
-  - main.tf - resources for provider, versions, resource group
-  - network.tf - resources for VNET and subnets
-  - onboard.tpl - onboarding script which is run by commandToExecute (user data). It will be copied to **startup-script=*path-to-file*** upon bootup. This script is responsible for downloading the neccessary F5 Automation Toolchain RPM files, installing them, and then executing the onboarding REST calls.
+  - bigip.tf - resources for BIG-IP, NICs, public IPs
+  - main.tf - resources for provider, versions
+  - onboard.tpl - onboarding script which is run by startup-script (user data). It will be copied to **startup-script=*path-to-file*** upon bootup. This script is responsible for downloading the neccessary F5 Automation Toolchain RPM files, installing them, and then executing the onboarding REST calls.
   - do.json - contains the L1-L3 BIG-IP configurations used by DO for items like VLANs, IPs, and routes.
   - as3.json - contains the L4-L7 BIG-IP configurations used by AS3 for items like pool members, virtual server listeners, security policies, and more.
   - ts.json - contains the BIG-IP configurations used by TS for items like telemetry streaming, CPU, memory, application statistics, and more.
@@ -110,26 +108,20 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | Parameter | Required | Description |
 | --- | --- | --- |
 | prefix | Yes | This value is inserted at the beginning of each Google object (alpha-numeric, no special character) |
-| rest_do_uri | Yes | URI of the Declarative Onboarding REST call |
-| rest_as3_uri | Yes | URI of the AS3 REST call |
-| rest_do_method | Yes | Available options are GET, POST, and DELETE |
-| rest_AS3_method | Yes | Available options are GET, POST, and DELETE |
-| rest_vm01_do_file | Yes | Terraform will generate the vm01 DO json file, where you can manually run it again for debugging |
-| rest_vm_as3_file | Yes | Terraform will generate the AS3 json file, where you can manually run it again for debugging |
 | svc_account | Yes | This is the GCP service account for programmatic API calls |
 | uname | Yes | User name for the Virtual Machine |
 | usecret | Yes | Retrieved from Google Cloud Secret Manager and contains password for the Virtual Machine  |
+| gceSshPubKey | Yes | SSH public key for admin authentation |
+| adminSrcAddr | Yes | Trusted source network for admin access |
 | gcp_project_id | Yes | GCP Project ID for provider |
 | gcp_zone | Yes | GCP Zone for provider |
 | gcp_region | Yes | GCP Region for provider |
-| cidr | Yes | IP Address range of the Virtual Network |
-| subnet1 | Yes | Subnet IP range of the management network |
-| subnet2 | Yes | Subnet IP range of the external network |
-| f5vm01mgmt | Yes | IP address for 1st BIG-IP's management interface |
-| f5vm01ext | Yes | IP address for 1st BIG-IP's external interface |
-| f5privatevip | Yes | Secondary Private IP address for BIG-IP virtual server (internal) |
-| f5publicvip | Yes | Secondary Private IP address for BIG-IP virtual server (external) |
-| alias_ip_range | No | An array of alias IP ranges for the BIG-IP network interface |
+| svc_acct | Yes | Service Account for VM instance |
+| extVpc | Yes | External VPC network |
+| mgmtVpc | Yes | Management VPC network |
+| extSubnet | Yes | External subnet |
+| mgmtSubnet | Yes | Management subnet |
+| alias_ip_range | Yes | An array of alias IP ranges for the BIG-IP network interface (used for VIP traffic, SNAT IPs, etc) |
 | bigipMachineType | Yes | Google machine type to be used for the BIG-IP VE |
 | image_name | Yes | F5 SKU (image) to deploy. Note: The disk size of the VM will be determined based on the option you select.  **Important**: If intending to provision multiple modules, ensure the appropriate value is selected, such as ****AllTwoBootLocations or AllOneBootLocation****. |
 | license1 | No | The license token for the F5 BIG-IP VE (BYOL) |
@@ -137,6 +129,7 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | ntp_server | Yes | Leave the default NTP server the BIG-IP uses, or replace the default NTP server with the one you want to use |
 | timezone | Yes | If you would like to change the time zone the BIG-IP uses, enter the time zone you want to use. This is based on the tz database found in /usr/share/zoneinfo (see the full list [here](https://cloud.google.com/dataprep/docs/html/Supported-Time-Zone-Values_66194188)). Example values: UTC, US/Pacific, US/Eastern, Europe/London or Asia/Singapore. |
 | dns_server | Yes | Leave the default DNS server the BIG-IP uses, or replace the default DNS server with the one you want to use | 
+| dns_suffix | Yes | DNS suffix for your domain | 
 | DO_URL | Yes | This is the raw github URL for downloading the Declarative Onboarding RPM |
 | AS3_URL | Yes | This is the raw github URL for downloading the AS3 RPM |
 | TS_URL | Yes | This is the raw github URL for downloading the Telemetry RPM |
@@ -222,35 +215,3 @@ terraform destroy -target google_compute_instance.f5vm01
 terraform apply
 ```
   4. Repeat steps 1-3 on the other BIG-IP VE in order to establish Device Trust.
-
-
-## Rerun Declarative Onboarding on the BIG-IP VE
-This example illustrates how to re-configure the BIG-IP instances with DO. If you need to make changes to the L1-L3 settings of the BIG-IP device, you can follow these steps.
-  1. Update do.json as needed
-  2. Taint resources and apply
-```
-terraform taint template_file.vm01_do_json
-terraform taint null_resource.f5vm01_DO
-terraform apply
-```
-
-## Rerun Application Services AS3 on the BIG-IP VE
-This example illustrates how to run your own custom AS3 (aka application). You can have a catalog of AS3 apps/templates and repeat these steps as many times as desired.
-  1. Update as3.json as needed
-  2. Taint resources and apply
-```
-terraform taint template_file.as3_json
-terraform taint null_resource.f5vm_AS3
-terraform apply
-```
-
-## Rerun Telemetry Streaming on the BIG-IP VE
-This example illustrates how to re-configure the BIG-IP instances with TS. If you need to make changes to the push consumers (ex. Google Cloud Monitoring, StackDriver, Splunk, etc) or other telemetry configs of the BIG-IP device, you can follow these steps.
-  1. Update ts.json as needed
-  2. Taint resources and apply
-```
-terraform taint template_file.vm_ts_file
-terraform taint null_resource.f5vm01_TS
-terraform taint null_resource.f5vm02_TS
-terraform apply
-```

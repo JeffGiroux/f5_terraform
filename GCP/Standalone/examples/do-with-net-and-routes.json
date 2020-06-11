@@ -5,7 +5,7 @@
     "label": "Onboard BIG-IP standalone 2nic",
     "Common": {
         "class": "Tenant",
-        "hostname": "${local_host}.example.com",
+        "hostname": "${local_host}.${dns_suffix}",
         "dbVars": {
             "class": "DbVariables",
             "ui.advisory.enabled": true,
@@ -16,10 +16,13 @@
         "myDns": {
             "class": "DNS",
             "nameServers": [
+                "169.254.169.254",
                 "${dns_server}",
                 "2001:4860:4860::8844"
             ],
             "search": [
+                "${dns_suffix}",
+                "google.internal",
                 "f5.com"
             ]
         },

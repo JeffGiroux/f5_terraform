@@ -7,7 +7,7 @@
     "schemaVersion": "3.13.0",
     "id": "123abc",
     "label": "Sample 1",
-    "remark": "An HTTPS sample application",
+    "remark": "An HTTPS sample application with pool member service discovery",
     "controls": {
       "trace": true
     },
@@ -32,9 +32,12 @@
           ],
           "members": [{
             "servicePort": 80,
-            "addressDiscovery": "fqdn",
-            "autoPopulate": true,
-            "hostname": "httpbin.org"
+            "addressDiscovery": "gce",
+            "updateInterval": 10,
+            "tagKey": "application",
+            "tagValue": "app1",
+            "addressRealm": "private",
+            "region": "${gcp_region}"
           }]
         },
         "webtls": {

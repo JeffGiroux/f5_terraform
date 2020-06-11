@@ -1,4 +1,5 @@
 #!/bin/bash
+source /usr/lib/bigstart/bigip-ready-functions
 
 # BIG-IP ONBOARD SCRIPT
 
@@ -75,12 +76,14 @@ cat  <<'EOF' > /config/cloud/collect-interface.sh
 date
 echo "Retrieving network instance metadata"
 # Collect network information
-echo "MGMTADDRESS=$(curl -s -f --retry 20 'http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/1/ip' -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
-echo "MGMTMASK=$(curl -s -f --retry 20 'http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/1/subnetmask' -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
-echo "MGMTGATEWAY=$(curl -s -f --retry 20 'http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/1/gateway' -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
-echo "INT2ADDRESS=$(curl -s -f --retry 20 'http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/ip' -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
-echo "INT2MASK=$(curl -s -f --retry 20 'http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/subnetmask' -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
-echo "INT2GATEWAY=$(curl -s -f --retry 20 'http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/gateway' -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
+COMPUTE_BASE_URL="http://metadata.google.internal/computeMetadata/v1"
+echo "MGMTADDRESS=$(curl -s -f --retry 10 "$${COMPUTE_BASE_URL}/instance/network-interfaces/1/ip" -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
+echo "MGMTMASK=$(curl -s -f --retry 10 "$${COMPUTE_BASE_URL}/instance/network-interfaces/1/subnetmask" -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
+echo "MGMTGATEWAY=$(curl -s -f --retry 10 "$${COMPUTE_BASE_URL}/instance/network-interfaces/1/gateway" -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
+echo "INT2ADDRESS=$(curl -s -f --retry 10 "$${COMPUTE_BASE_URL}/instance/network-interfaces/0/ip" -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
+echo "INT2MASK=$(curl -s -f --retry 10 "$${COMPUTE_BASE_URL}/instance/network-interfaces/0/subnetmask" -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
+echo "INT2GATEWAY=$(curl -s -f --retry 10 "$${COMPUTE_BASE_URL}/instance/network-interfaces/0/gateway" -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
+echo "HOSTNAME=$(curl -s -f --retry 10 "$${COMPUTE_BASE_URL}/instance/hostname" -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
 chmod 755 /config/cloud/interface.config
 echo "Rebooting for NIC swap to complete..."
 reboot
@@ -93,6 +96,8 @@ EOF
 # TMSH, DO, AS3 declarations
 cat  <<'EOF' > /config/cloud/custom-config.sh
 #!/bin/bash
+source /usr/lib/bigstart/bigip-ready-functions
+wait_bigip_ready
 source /config/cloud/interface.config
 MGMTNETWORK=$(/bin/ipcalc -n $MGMTADDRESS $MGMTMASK | cut -d= -f2)
 INT2NETWORK=$(/bin/ipcalc -n $INT2ADDRESS $INT2MASK | cut -d= -f2)
@@ -113,114 +118,51 @@ function error_exit {
   exit 1
 }
 
-# mcpd Wait Function
-waitMcpd () {
-checks=0
-echo "Checking status of mcpd"
-while [ $checks -lt 120 ]; do
-  tmsh -a show sys mcp-state field-fmt | grep -q running
-  if [ $? == 0 ]; then
-    echo "mcpd ready"
-    break
-  fi
-  echo "mcpd not ready yet"
-  let checks=checks+1
-  sleep 10
-done
-}
+# # mcpd Wait Function
+# waitMcpd () {
+# checks=0
+# echo "Checking status of mcpd"
+# while [ $checks -lt 120 ]; do
+#   tmsh -a show sys mcp-state field-fmt | grep -q running
+#   if [ $? == 0 ]; then
+#     echo "mcpd ready"
+#     break
+#   fi
+#   echo "mcpd not ready yet"
+#   let checks=checks+1
+#   sleep 10
+# done
+# }
 
-# DO Wait Function
-function do_wait_for_ready {
+# Toolchain Wait Function
+function wait_for_ready {
+  app=$1
   checks=0
   ready_response=""
   ready_response_declare=""
-  while [ $checks -lt 120 ] ; do
-    ready_response=$(curl -sku admin:$passwd -w "%%{http_code}" -X GET  https://localhost:$${mgmtGuiPort}/mgmt/shared/declarative-onboarding/info -o /dev/null)
-    ready_response_declare=$(curl -sku admin:$passwd -w "%%{http_code}" -X GET  https://localhost:$${mgmtGuiPort}/mgmt/shared/declarative-onboarding -o /dev/null)
-    if [[ $ready_response == *200 && $ready_response_declare == *200 ]]; then
-      echo "DO is ready"
-      break
+  checks_max=10
+  while [ $checks -lt $checks_max ] ; do
+    ready_response=$(curl -sku admin:$passwd -w "%%{http_code}" -X GET  https://localhost:$${mgmtGuiPort}/mgmt/shared/$${app}/info -o /dev/null)
+    if [[ $app == "declarative-onboarding" ]]; then
+      ready_response_declare=$(curl -sku admin:$passwd -w "%%{http_code}" -X GET  https://localhost:$${mgmtGuiPort}/mgmt/shared/$${app} -o /dev/null)
     else
-      echo "DO is not ready: $checks, response: $ready_response $ready_response_declare"
-      let checks=checks+1
-      if [[ $checks == 60 ]]; then
-        bigstart restart restnoded
-      fi
-      sleep 5
+      ready_response_declare=$(curl -sku admin:$passwd -w "%%{http_code}" -X GET  https://localhost:$${mgmtGuiPort}/mgmt/shared/$${app}/declare -o /dev/null)
+    fi
+    if [[ $ready_response == *200 ]] && [[ $ready_response_declare == *204 || $ready_response_declare == *200 ]]; then
+        echo "$${app} is ready"
+        break
+    else
+        echo "$${app} is not ready: $checks, response: $ready_response $ready_response_declare"
+        let checks=checks+1
+        if [[ $checks == $((checks_max/2)) ]]; then
+            echo "restarting restnoded"
+            bigstart restart restnoded
+        fi
+        sleep 15
     fi
   done
-  if [[ $ready_response != *200 || $ready_response_declare != *200 ]]; then
-    error_exit "$LINENO: DO was not installed correctly. Exit."
-  fi
-}
-
-# TS Wait Function
-function ts_wait_for_ready {
-  checks=0
-  ready_response=""
-  ready_response_declare=""
-  while [ $checks -lt 120 ] ; do
-    ready_response=$(curl -sku admin:$passwd -w "%%{http_code}" -X GET  https://localhost:$${mgmtGuiPort}/mgmt/shared/telemetry/info -o /dev/null)
-    ready_response_declare=$(curl -sku admin:$passwd -w "%%{http_code}" -X GET  https://localhost:$${mgmtGuiPort}/mgmt/shared/telemetry/declare -o /dev/null)
-    if [[ $ready_response == *200 && $ready_response_declare == *200 ]]; then
-      echo "TS is ready"
-      break
-    else
-      echo "TS is not ready: $checks, response: $ready_response $ready_response_declare"
-      let checks=checks+1
-      if [[ $checks == 60 ]]; then
-        bigstart restart restnoded
-      fi
-      sleep 5
-    fi
-  done
-  if [[ $ready_response != *200 || $ready_response_declare != *200 ]]; then
-    error_exit "$LINENO: TS was not installed correctly. Exit."
-  fi
-}
-
-# AS3 Wait Function
-function as3_wait_for_ready {
-  checks=0
-  ready_response=""
-  ready_response_declare=""
-  while [ $checks -lt 120 ] ; do
-    ready_response=$(curl -sku admin:$passwd -w "%%{http_code}" -X GET  https://localhost:$${mgmtGuiPort}/mgmt/shared/appsvcs/info -o /dev/null)
-    ready_response_declare=$(curl -sku admin:$passwd -w "%%{http_code}" -X GET  https://localhost:$${mgmtGuiPort}/mgmt/shared/appsvcs/declare -o /dev/null)
-    if [[ $ready_response == *200 && $ready_response_declare == *204 ]]; then
-      echo "AS3 is ready"
-      break
-    else
-      echo "AS3 is not ready: $checks, response: $ready_response $ready_response_declare"
-      let checks=checks+1
-      if [[ $checks == 60 ]]; then
-        bigstart restart restnoded
-      fi
-      sleep 5
-    fi
-  done
-  if [[ $ready_response != *200 || $ready_response_declare != *204 ]]; then
-    error_exit "$LINENO: AS3 was not installed correctly. Exit."
-  fi
-}
-
-# DO Task Function
-function do_check_task () {
-  checks=0
-  task_response=""
-  while [ $checks -lt 30 ] ; do
-    task_response=$(curl -sku admin:$passwd -w "%%{http_code}" -X GET  https://localhost:$${mgmtGuiPort}/mgmt/shared/declarative-onboarding/task -o /dev/null)
-    if [[ $task_response == *200 ]]; then
-      echo "DO task successful"
-      break
-    else
-      echo "DO task working..."
-      let checks=checks+1
-      sleep 10
-    fi
-  done
-  if [[ $task_response != *200 ]]; then
-    error_exit "$LINENO: DO task failed. Exit."
+  if [[ $ready_response != *200 ]] && [[ $ready_response_declare != *204 || $ready_response_declare != *200 ]]; then
+    error_exit "$LINENO: $${app} was not installed correctly. Exit."
   fi
 }
 
@@ -230,7 +172,7 @@ usecret='${usecret}'
 mgmtGuiPort="443"
 
 # BIG-IP Credentials
-waitMcpd
+wait_bigip_ready
 echo "Retrieving BIG-IP password from Metadata secret"
 svcacct_token=$(curl -s -f --retry 20 "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token" -H "Metadata-Flavor: Google" | jq -r ".access_token")
 passwd=$(curl -s -f --retry 20 "https://secretmanager.googleapis.com/v1/projects/$projectId/secrets/$usecret/versions/1:access" -H "Authorization: Bearer $svcacct_token" | jq -r ".payload.data" | base64 --decode)
@@ -253,6 +195,7 @@ tmsh+=(
 "tmsh create net route ext_gw_interface network $${INT2GATEWAY}/32 interface external"
 "tmsh create net route ext_rt network $${INT2NETWORK}/$${INT2MASK} gw $${INT2GATEWAY}"
 "tmsh create net route default gw $${INT2GATEWAY}"
+"tmsh modify sys global-settings remote-host add { metadata.google.internal { hostname metadata.google.internal addr 169.254.169.254 } }"
 "tmsh modify sys management-dhcp sys-mgmt-dhcp-config request-options delete { ntp-servers }"
 'tmsh save /sys config'
 )
@@ -268,22 +211,50 @@ done
 date
 
 # Submit DO Declaration
-do_wait_for_ready
+wait_for_ready declarative-onboarding
 file_loc="/config/cloud/do.json"
 echo "Submitting DO declaration"
 response_code=$(/usr/bin/curl -sku admin:$passwd -w "%%{http_code}" -X POST -H "Content-Type: application/json" -H "Expect:" https://localhost:$${mgmtGuiPort}/mgmt/shared/declarative-onboarding -d @$file_loc -o /dev/null)
 if [[ $response_code == *200 || $response_code == *202 ]]; then
   echo "DO task created"
-  do_check_task
 else
   error_exit "$LINENO: DO creation failed. Exit."
 fi
 
-# Submit TS Declaration
-#ts_wait_for_ready
+# Check DO Task
+checks=0
+response_code=""
+while [ $checks -lt 30 ] ; do
+  response_code=$(curl -sku admin:$passwd -w "%%{http_code}" -X GET  https://localhost:$${mgmtGuiPort}/mgmt/shared/declarative-onboarding/task -o /dev/null)
+  if [[ $response_code == *200 ]]; then
+    echo "DO task successful"
+    break
+  else
+    echo "DO task working..."
+    let checks=checks+1
+    sleep 10
+  fi
+done
+if [[ $response_code != *200 ]]; then
+  error_exit "$LINENO: DO task failed. Exit."
+fi
+
+date
+
+# # Submit TS Declaration
+# wait_for_ready telemetry-streaming
+# file_loc="/config/cloud/ts.json"
+# echo "Submitting TS declaration"
+# response_code=$(/usr/bin/curl -sku admin:$passwd -w "%%{http_code}" -X POST -H "Content-Type: application/json" -H "Expect:" https://localhost:$${mgmtGuiPort}/mgmt/shared/telemetry/declare -d @$file_loc -o /dev/null)
+# if [[ $response_code == *200 || $response_code == *502 ]]; then
+#   echo "Deployment of TS succeeded"
+# else
+#   echo "Failed to deploy TS; continuing..."
+#   echo "Response code: $${response_code}"
+# fi
 
 # Submit AS3 Declaration
-as3_wait_for_ready
+wait_for_ready appsvcs
 file_loc="/config/cloud/as3.json"
 echo "Submitting AS3 declaration"
 response_code=$(/usr/bin/curl -sku admin:$passwd -w "%%{http_code}" -X POST -H "Content-Type: application/json" -H "Expect:" https://localhost:$${mgmtGuiPort}/mgmt/shared/appsvcs/declare -d @$file_loc -o /dev/null)
@@ -326,22 +297,6 @@ rpmFilePath="/var/config/rest/downloads"
 #### Functions ####
 ###################
 
-# mcpd Wait Function
-waitMcpd () {
-checks=0
-echo "Checking status of mcpd"
-while [ $checks -lt 120 ]; do
-  tmsh -a show sys mcp-state field-fmt | grep -q running
-  if [ $? == 0 ]; then
-    echo "mcpd ready"
-    break
-  fi
-  echo "mcpd not ready yet"
-  let checks=checks+1
-  sleep 10
-done
-}
-
 # Network Wait Function
 waitNetwork () {
 checks=0
@@ -367,12 +322,12 @@ done
 # https://cloud.google.com/load-balancing/docs/load-balancing-overview#backend_region_and_network
 date
 echo "Change management interface to eth1"
-waitMcpd
+wait_bigip_ready
 bigstart stop tmm
 tmsh modify sys db provision.managementeth value eth1
 tmsh modify sys db provision.1nicautoconfig value disable
 bigstart start tmm
-waitMcpd
+wait_bigip_ready
 date
 echo "---Mgmt interface setting---"
 tmsh list sys db provision.managementeth

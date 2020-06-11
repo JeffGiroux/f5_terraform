@@ -1,15 +1,5 @@
 # Variables
 
-# REST API Setting
-variable rest_do_uri { default = "/mgmt/shared/declarative-onboarding" }
-variable rest_as3_uri { default = "/mgmt/shared/appsvcs/declare" }
-variable rest_do_method { default = "POST" }
-variable rest_as3_method { default = "POST" }
-variable rest_vm01_do_file { default = "vm01_do_data.json" }
-variable rest_vm_as3_file { default = "vm_as3_data.json" }
-variable rest_ts_uri { default = "/mgmt/shared/telemetry/declare" }
-variable rest_vm_ts_file { default = "vm_ts_data.json" }
-
 # Google Environment
 variable svc_acct {}
 variable gcp_project_id {}
