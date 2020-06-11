@@ -29,7 +29,8 @@ Terraform v0.12.26
 - Sensitive variables like Google SSH keys are configured in terraform.tfvars
   - ***Note***: Other items like BIG-IP password are stored in Google Cloud Secret Manager. Refer to the [Prerequisites](#prerequisites).
 - Files
-  - main.tf - resources for provider, versions
+  - main.tf - resources for provider, versions, storage bucket
+  - network.tf - resources for VPCs, subnets, firewall rules
 
 ## Template Parameters
 
