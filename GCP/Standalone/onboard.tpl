@@ -141,7 +141,7 @@ function do_wait_for_ready {
       echo "DO is ready"
       break
     else
-      echo "DO" is not ready: $checks, response: $ready_response $ready_response_declare
+      echo "DO is not ready: $checks, response: $ready_response $ready_response_declare"
       let checks=checks+1
       if [[ $checks == 60 ]]; then
         bigstart restart restnoded
@@ -166,7 +166,7 @@ function ts_wait_for_ready {
       echo "TS is ready"
       break
     else
-      echo "TS" is not ready: $checks, response: $ready_response $ready_response_declare
+      echo "TS is not ready: $checks, response: $ready_response $ready_response_declare"
       let checks=checks+1
       if [[ $checks == 60 ]]; then
         bigstart restart restnoded
@@ -191,7 +191,7 @@ function as3_wait_for_ready {
       echo "AS3 is ready"
       break
     else
-      echo "AS3" is not ready: $checks, response: $ready_response $ready_response_declare
+      echo "AS3 is not ready: $checks, response: $ready_response $ready_response_declare"
       let checks=checks+1
       if [[ $checks == 60 ]]; then
         bigstart restart restnoded
@@ -201,6 +201,26 @@ function as3_wait_for_ready {
   done
   if [[ $ready_response != *200 || $ready_response_declare != *204 ]]; then
     error_exit "$LINENO: AS3 was not installed correctly. Exit."
+  fi
+}
+
+# DO Task Function
+function do_check_task () {
+  checks=0
+  task_response=""
+  while [ $checks -lt 30 ] ; do
+    task_response=$(curl -sku admin:$passwd -w "%%{http_code}" -X GET  https://localhost:$${mgmtGuiPort}/mgmt/shared/declarative-onboarding/task -o /dev/null)
+    if [[ $task_response == *200 ]]; then
+      echo "DO task successful"
+      break
+    else
+      echo "DO task working..."
+      let checks=checks+1
+      sleep 10
+    fi
+  done
+  if [[ $task_response != *200 ]]; then
+    error_exit "$LINENO: DO task failed. Exit."
   fi
 }
 
@@ -215,10 +235,9 @@ echo "Retrieving BIG-IP password from Metadata secret"
 svcacct_token=$(curl -s -f --retry 20 "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token" -H "Metadata-Flavor: Google" | jq -r ".access_token")
 passwd=$(curl -s -f --retry 20 "https://secretmanager.googleapis.com/v1/projects/$projectId/secrets/$usecret/versions/1:access" -H "Authorization: Bearer $svcacct_token" | jq -r ".payload.data" | base64 --decode)
 
-# Submit DO Declaration
-#do_wait_for_ready
-#sed -i "s/\$${local_selfip}/$INT2ADDRESS/g" /config/cloud/do.json
-#sed -i "s/\$${gateway}/$INT2GATEWAY/g" /config/cloud/do.json
+# Workaround: Use TMSH commands for networking
+# DO doesn't support "interface" as route target
+# https://github.com/F5Networks/f5-declarative-onboarding/issues/147
 echo "Set TMM networks"
 tmsh+=(
 "tmsh modify sys global-settings gui-setup disabled"
@@ -248,6 +267,18 @@ done
 
 date
 
+# Submit DO Declaration
+do_wait_for_ready
+file_loc="/config/cloud/do.json"
+echo "Submitting DO declaration"
+response_code=$(/usr/bin/curl -sku admin:$passwd -w "%%{http_code}" -X POST -H "Content-Type: application/json" -H "Expect:" https://localhost:$${mgmtGuiPort}/mgmt/shared/declarative-onboarding -d @$file_loc -o /dev/null)
+if [[ $response_code == *200 || $response_code == *202 ]]; then
+  echo "DO task created"
+  do_check_task
+else
+  error_exit "$LINENO: DO creation failed. Exit."
+fi
+
 # Submit TS Declaration
 #ts_wait_for_ready
 
@@ -257,9 +288,9 @@ file_loc="/config/cloud/as3.json"
 echo "Submitting AS3 declaration"
 response_code=$(/usr/bin/curl -sku admin:$passwd -w "%%{http_code}" -X POST -H "Content-Type: application/json" -H "Expect:" https://localhost:$${mgmtGuiPort}/mgmt/shared/appsvcs/declare -d @$file_loc -o /dev/null)
 if [[ $response_code == *200 || $response_code == *502 ]]; then
-  echo "Deployment of custom application succeeded"
+  echo "Deployment of AS3 succeeded"
 else
-  echo "Failed to deploy custom application; continuing..."
+  echo "Failed to deploy AS3; continuing..."
   echo "Response code: $${response_code}"
 fi
 
