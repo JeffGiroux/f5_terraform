@@ -256,7 +256,7 @@ wait_for_ready telemetry
 file_loc="/config/cloud/ts.json"
 echo "Submitting TS declaration"
 echo "Retrieving private key from Metadata secret for GCP Cloud Monitoring"
-privateKey=$(curl -s -f --retry 20 "https://secretmanager.googleapis.com/v1/projects/$projectId/secrets/$ksecret/versions/1:access" -H "Authorization: Bearer $svcacct_token" | jq -r ".payload.data" | base64 --decode)
+privateKey=$(curl -s -f --retry 20 "https://secretmanager.googleapis.com/v1/projects/$projectId/secrets/$ksecret/versions/1:access" -H "Authorization: Bearer $svcacct_token" | jq -r ".payload.data" )
 sed -i "s@\$${privateKey}@$privateKey@g" $file_loc
 # response_code=$(/usr/bin/curl -sku admin:$passwd -w "%%{http_code}" -X POST -H "Content-Type: application/json" -H "Expect:" https://localhost:$${mgmtGuiPort}/mgmt/shared/telemetry/declare -d @$file_loc -o /dev/null)
 # if [[ $response_code == *200 || $response_code == *502 ]]; then
