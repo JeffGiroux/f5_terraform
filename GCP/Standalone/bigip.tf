@@ -55,9 +55,10 @@ locals {
 
 # Create F5 BIG-IP VMs
 resource "google_compute_instance" "f5vm01" {
-  name         = "${var.prefix}-${var.host1_name}"
-  machine_type = var.bigipMachineType
-  zone         = var.gcp_zone
+  name           = "${var.prefix}-${var.host1_name}"
+  machine_type   = var.bigipMachineType
+  zone           = var.gcp_zone
+  can_ip_forward = true
 
   tags = ["appfw-${var.prefix}", "mgmtfw-${var.prefix}"]
 
