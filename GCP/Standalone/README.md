@@ -1,8 +1,5 @@
 # Deploying BIG-IP VE in Google GCP - Standalone Two NICs
 
-***To do:***
-1. Add analytics with TS.
-
 ## Contents
 
 - [Introduction](#introduction)
@@ -117,6 +114,8 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | gcp_zone | Yes | GCP Zone for provider |
 | gcp_region | Yes | GCP Region for provider |
 | svc_acct | Yes | Service Account for VM instance |
+| privateKeyId | No | ID of private key for the service account used in Telemetry Streaming to Google Cloud Monitoring |
+| privateKey | No | Private key (aka password) for the service account used in Telemetry Streaming to Google Cloud Monitoring |
 | extVpc | Yes | External VPC network |
 | mgmtVpc | Yes | Management VPC network |
 | extSubnet | Yes | External subnet |

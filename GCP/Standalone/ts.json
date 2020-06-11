@@ -12,12 +12,12 @@
   },
   "My_Consumer": {
     "class": "Telemetry_Consumer",
-    "type": "Azure_Log_Analytics",
-    "workspaceId": "${law_id}",
-    "passphrase": {
-        "cipherText": "${law_primkey}"
+    "type": "Google_Cloud_Monitoring",
+    "privateKey": {
+        "cipherText": "${privateKey}"
     },
-    "useManagedIdentity": false,
-    "region": "${region}"
+    "projectId": "${gcp_project_id}",
+    "privateKeyId": "${privateKeyId}",
+    "serviceEmail": "${svc_acct}"
   }
 }

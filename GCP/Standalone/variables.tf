@@ -2,6 +2,8 @@
 
 # Google Environment
 variable svc_acct {}
+variable privateKeyId {}
+variable privateKey {}
 variable gcp_project_id {}
 variable gcp_region {}
 variable gcp_zone {}

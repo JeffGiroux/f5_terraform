@@ -40,6 +40,15 @@ cat <<'EOF' > /config/cloud/as3.json
 ${AS3_Document}
 EOF
 
+#####################################
+#### ts.json - Declaration File ####
+#####################################
+
+# TS
+cat <<'EOF' > /config/cloud/ts.json
+${TS_Document}
+EOF
+
 #######################
 #### mgmt-route.sh ####
 #######################
@@ -255,7 +264,7 @@ fi
 
 # Cleanup
 echo "Removing DO and AS3 declaration files"
-#rm -rf /config/cloud/do.json /config/cloud/as3.json /config/cloud/ts.json
+rm -rf /config/cloud/do.json /config/cloud/as3.json /config/cloud/ts.json
 
 date
 echo "Finished custom config"

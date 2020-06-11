@@ -30,6 +30,7 @@ locals {
     onboard_log    = var.onboard_log
     DO_Document    = local.do_json
     AS3_Document   = local.as3_json
+    TS_Document    = local.ts_json
   })
   do_json = templatefile("${path.module}/do.json", {
     local_host = "${var.prefix}-${var.host1_name}"
@@ -43,6 +44,12 @@ locals {
     #publicvip  = "0.0.0.0"
     publicvip  = google_compute_address.vip1.address
     privatevip = var.alias_ip_range
+  })
+  ts_json = templatefile("${path.module}/ts.json", {
+    gcp_project_id = var.gcp_project_id
+    svc_acct       = var.svc_acct
+    privateKeyId   = var.privateKeyId
+    privateKey     = var.privateKey
   })
 }
 
