@@ -128,9 +128,8 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | Parameter | Required | Description |
 | --- | --- | --- |
 | prefix | Yes | This value is inserted at the beginning of each Google object (alpha-numeric, no special character) |
-| svc_account | Yes | This is the GCP service account for programmatic API calls |
 | uname | Yes | User name for the Virtual Machine |
-| usecret | Yes | Retrieved from Google Cloud Secret Manager and contains password for the Virtual Machine  |
+| usecret | Yes | Used during onboarding to query the Google Cloud Secret Manager API and retrieve the admin password (use the secret name, not the secret value/password) |
 | gceSshPubKey | Yes | SSH public key for admin authentation |
 | adminSrcAddr | Yes | Trusted source network for admin access |
 | gcp_project_id | Yes | GCP Project ID for provider |
@@ -138,7 +137,7 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | gcp_region | Yes | GCP Region for provider |
 | svc_acct | Yes | Service Account for VM instance |
 | privateKeyId | No | ID of private key for the service account used in Telemetry Streaming to Google Cloud Monitoring |
-| ksecret | No | Retrieved from Google Cloud Secret Manager and contains private key of service account used in Telemetry Streaming to Google Cloud Monitoring |
+| ksecret | No | Used during onboarding to query the Google Cloud Secret Manager API and retrieve the service account privateKey (use the secret name, not the secret value/privateKey) |
 | extVpc | Yes | External VPC network |
 | mgmtVpc | Yes | Management VPC network |
 | extSubnet | Yes | External subnet |
