@@ -36,10 +36,30 @@ Terraform v0.12.26
 ## Prerequisites
 
 - ***Important***: When you configure the admin password for the BIG-IP VE in the template, you cannot use the character **#**.  Additionally, there are a number of other special characters that you should avoid using for F5 product user accounts.  See [K2873](https://support.f5.com/csp/article/K2873) for details.
-- This template requires a service account for backend pool service discovery.
-  - ***Note***: you MUST have "compute-ro" for service discovery
-- This deployment will be using the Terraform Google provider to build out all the neccessary Google objects.
-  - ***Note***: You MUST have "Editor" on the service account in order to create resources in your project with Terraform. See the [Terraform Google Provider "Adding Credentials"](https://www.terraform.io/docs/providers/google/guides/getting_started.html#adding-credentials) for details. Also, review the [available Google GCP permission scopes](https://cloud.google.com/sdk/gcloud/reference/alpha/compute/instances/set-scopes#--scopes) too.
+- This template requires one or more service accounts for the BIG-IP instance to perform various tasks:
+  - See Google's [Understanding service accounts](https://cloud.google.com/iam/docs/understanding-service-accounts)
+  - Google Secret Manager secrets access - requires "Secrets Manager Secret Accessor"
+    - Performed by VM instance during onboarding to retrieve passwords and private keys
+  - Backend pool service discovery - requires "Compute Viewer"
+    - Performed by F5 Application Services AS3
+  - Google Cloud Monitoring (aka StackDriver) - requires "Monitoring Editor"
+    - Performed by F5 Telemetry Streaming
+  - Remaining tasks - covered by "Editor"
+- This template requires a service account to deploy with the Terraform Google provider and build out all the neccessary Google objects
+  - ***Note***: See the [Terraform Google Provider "Adding Credentials"](https://www.terraform.io/docs/providers/google/guides/getting_started.html#adding-credentials) for details. Also, review the [available Google GCP permission scopes](https://cloud.google.com/sdk/gcloud/reference/alpha/compute/instances/set-scopes#--scopes) too.
+  - Permissions will depend on the objects you are creating
+  - My Terraform deployments use a service account with the following persmissions:
+    - "Editor"
+    - "Compute Admin"
+    - "Pub/Sub Admin"
+    - "Secret Manager Secret Accessor"
+    - "API Keys Admin"
+    - "Storage Admin"
+  - ***Note***: Some of the permissions I listed above may or may not apply to this particular repo folder. For example, performing autoscale will require Pub/Sub permissions. However, deploying a standalone BIG-IP does not require such access. Therefore, [practice least privilege](https://cloud.google.com/iam/docs/understanding-service-accounts#granting_minimum) on your accounts when possible.
+- ***Shared Service Accounts***: For lab purposes, you can create one service account and use it for everything. Alternatively, you can create a more secure environment with separate service accounts for various functions. Example...
+  - Service Account #1 - the svc-acct used for Terraform to deploy cloud objects
+  - Service Account #2 - the svc-acct assigned to BIG-IP instance during creation (ex. service discovery, query Pub/Sub, storage)
+  - Service Account #3 - the svc-acct used in F5 Telemetry Streaming referenced in [ts.json](./ts.json) (ex. analytics)
 - Passwords and secrets are located in [Google Cloud Secret Manager](https://cloud.google.com/secret-manager/docs/quickstart#secretmanager-quickstart-web). Make sure you have an existing Google Cloud "secret" with the data containing the clear text passwords for each relevant item: BIG-IP password, service account credentials, BIG-IQ password, etc.
   - 'usecret' contains the value of the adminstrator password (ex. "Default12345!")
   - 'ksecret' contains the value of the service account private key (ex. "-----BEGIN PRIVATE KEY-----\nMIIEvgIBAmorekeystuffbla123\n-----END PRIVATE KEY-----\n"). Currently used for BIG-IP telemetry streaming to Google Cloud Monitoring (aka StackDriver). If you are not using this feature, you do not need this secret in Secret Manager. 
