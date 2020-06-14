@@ -234,6 +234,7 @@ This example illustrates how to replace or upgrade the BIG-IP VE.
   3. Run command
 ```
 terraform destroy -target google_compute_instance.f5vm01
+terraform destroy -target google_compute_instance.f5vm02
 ```
   3. Run command
 ```
