@@ -50,4 +50,3 @@ variable group { default = "f5group" }
 variable costcenter { default = "f5costcenter" }
 variable application { default = "f5app" }
 variable f5_cloud_failover_label { default = "mydeployment" } #Cloud Failover Tag
-variable f5_cloud_failover_nic_map { default = "external" }   #NIC Tag
