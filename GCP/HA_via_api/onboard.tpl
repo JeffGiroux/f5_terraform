@@ -234,7 +234,7 @@ fi
 checks=0
 response_code=""
 while [ $checks -lt 30 ] ; do
-  response_code=$(curl -sku admin:$passwd -w "%%{http_code}" -X GET  https://localhost:$${mgmtGuiPort}/mgmt/shared/declarative-onboarding/task -o /dev/null)
+  response_code=$(curl -sku admin:$passwd -X GET  https://localhost:$${mgmtGuiPort}/mgmt/shared/declarative-onboarding/task | jq -r ".[].result.code")
   if [[ $response_code == *200 ]]; then
     echo "DO task successful"
     break
@@ -434,9 +434,10 @@ DATA="{\"operation\":\"INSTALL\",\"packageFilePath\":\"$rpmFilePath/$AS3_FN\"}"
 curl -s -u $CREDS -X POST http://localhost:8100/mgmt/shared/iapp/package-management-tasks -d $DATA
 sleep 10
 echo
-echo "Installing CFE Pkg"
+echo "Installing CF Pkg"
 DATA="{\"operation\":\"INSTALL\",\"packageFilePath\":\"$rpmFilePath/$CF_FN\"}"
 curl -s -u $CREDS -X POST http://localhost:8100/mgmt/shared/iapp/package-management-tasks -d $DATA
+sleep 10
 echo
 echo "Removing temporary RPM install packages"
 rm -rf $rpmFilePath/*.rpm
