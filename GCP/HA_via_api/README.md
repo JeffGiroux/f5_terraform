@@ -44,7 +44,7 @@ Terraform v0.12.26
     - Performed by F5 Application Services AS3
   - Google Cloud Monitoring (aka StackDriver) - requires "Monitoring Editor"
     - Performed by F5 Telemetry Streaming
-  - TO DO: CFE Add more permissions needed
+  - Cloud failover via API - requires R/W access to compute and storage (see F5 CloudDocs [Create and assign an IAM role](https://clouddocs.f5.com/products/extensions/f5-cloud-failover/latest/userguide/gcp.html#create-and-assign-an-iam-role))
 - This template requires a service account to deploy with the Terraform Google provider and build out all the neccessary Google objects
   - See the [Terraform Google Provider "Adding Credentials"](https://www.terraform.io/docs/providers/google/guides/getting_started.html#adding-credentials) for details. Also, review the [available Google GCP permission scopes](https://cloud.google.com/sdk/gcloud/reference/alpha/compute/instances/set-scopes#--scopes) too.
   - Permissions will depend on the objects you are creating
