@@ -267,13 +267,13 @@ wait_for_ready cloud-failover
 file_loc="/config/cloud/cfe.json"
 echo "Submitting CFE declaration"
 sed -i "s/\$${local_selfip}/$INT2ADDRESS/g" $file_loc
-# response_code=$(/usr/bin/curl -sku admin:$passwd -w "%%{http_code}" -X POST -H "Content-Type: application/json" -H "Expect:" https://localhost:$${mgmtGuiPort}/mgmt/shared/cloud-failover/declare -d @$file_loc -o /dev/null)
-# if [[ $response_code == *200 || $response_code == *502 ]]; then
-#   echo "Deployment of CFE succeeded"
-# else
-#   echo "Failed to deploy CFE; continuing..."
-#   echo "Response code: $${response_code}"
-# fi
+response_code=$(/usr/bin/curl -sku admin:$passwd -w "%%{http_code}" -X POST -H "Content-Type: application/json" -H "Expect:" https://localhost:$${mgmtGuiPort}/mgmt/shared/cloud-failover/declare -d @$file_loc -o /dev/null)
+if [[ $response_code == *200 || $response_code == *502 ]]; then
+  echo "Deployment of CFE succeeded"
+else
+  echo "Failed to deploy CFE; continuing..."
+  echo "Response code: $${response_code}"
+fi
 
 # # Submit TS Declaration
 # wait_for_ready telemetry
