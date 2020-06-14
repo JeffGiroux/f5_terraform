@@ -12,6 +12,7 @@ compute.forwardingRules.create
 compute.forwardingRules.delete
 compute.instances.create
 compute.instances.delete
+compute.instances.get
 compute.instances.setMetadata
 compute.instances.setServiceAccount
 compute.instances.setTags
@@ -21,4 +22,9 @@ compute.subnetworks.useExternalIp
 compute.targetInstances.create
 compute.targetInstances.delete
 compute.targetInstances.use
+compute.zones.get
+iam.serviceAccounts.actAs
+iam.serviceAccounts.get
+iam.serviceAccounts.list
+resourcemanager.projects.get
 ```
