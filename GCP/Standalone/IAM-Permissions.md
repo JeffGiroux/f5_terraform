@@ -15,6 +15,7 @@ compute.forwardingRules.get
 compute.instances.create
 compute.instances.delete
 compute.instances.get
+compute.instances.setLabels
 compute.instances.setMetadata
 compute.instances.setServiceAccount
 compute.instances.setTags
