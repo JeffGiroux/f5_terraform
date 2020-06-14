@@ -44,18 +44,11 @@ Terraform v0.12.26
     - Performed by F5 Application Services AS3
   - Google Cloud Monitoring (aka StackDriver) - requires "Monitoring Editor"
     - Performed by F5 Telemetry Streaming
-  - Remaining tasks - covered by "Editor"
 - This template requires a service account to deploy with the Terraform Google provider and build out all the neccessary Google objects
-  - ***Note***: See the [Terraform Google Provider "Adding Credentials"](https://www.terraform.io/docs/providers/google/guides/getting_started.html#adding-credentials) for details. Also, review the [available Google GCP permission scopes](https://cloud.google.com/sdk/gcloud/reference/alpha/compute/instances/set-scopes#--scopes) too.
+  - See the [Terraform Google Provider "Adding Credentials"](https://www.terraform.io/docs/providers/google/guides/getting_started.html#adding-credentials) for details. Also, review the [available Google GCP permission scopes](https://cloud.google.com/sdk/gcloud/reference/alpha/compute/instances/set-scopes#--scopes) too.
   - Permissions will depend on the objects you are creating
-  - My Terraform deployments use a service account with the following persmissions:
-    - "Editor"
-    - "Compute Admin"
-    - "Pub/Sub Admin"
-    - "Secret Manager Secret Accessor"
-    - "API Keys Admin"
-    - "Storage Admin"
-  - ***Note***: Some of the permissions I listed above may or may not apply to this particular repo folder. For example, performing autoscale will require Pub/Sub permissions. However, deploying a standalone BIG-IP does not require such access. Therefore, [practice least privilege](https://cloud.google.com/iam/docs/understanding-service-accounts#granting_minimum) on your accounts when possible.
+  - Refer to [IAM-Permissions.md](./IAM-Permissions.md) to see a list of access requested by my Terraform GCP service account in this "BIG-IP Standalone" deployment
+  - ***Note***: For lab environments, you can start with "Editor" role. When you are working in other environments, make sure to [practice least privilege](https://cloud.google.com/iam/docs/understanding-service-accounts#granting_minimum).
 - ***Shared Service Accounts***: For lab purposes, you can create one service account and use it for everything. Alternatively, you can create a more secure environment with separate service accounts for various functions. Example...
   - Service Account #1 - the svc-acct used for Terraform to deploy cloud objects
   - Service Account #2 - the svc-acct assigned to BIG-IP instance during creation (ex. service discovery, query Pub/Sub, storage)
