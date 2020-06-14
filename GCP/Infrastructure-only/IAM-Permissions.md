@@ -6,7 +6,6 @@ Terraform Deployment - service account
 ```
 compute.firewalls.create
 compute.firewalls.delete
-compute.networks.updatePolicy
 compute.networks.create
 compute.networks.delete
 compute.networks.updatePolicy
