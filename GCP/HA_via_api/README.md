@@ -80,6 +80,7 @@ Terraform v0.12.26
   - do.json - contains the L1-L3 BIG-IP configurations used by DO for items like VLANs, IPs, and routes.
   - as3.json - contains the L4-L7 BIG-IP configurations used by AS3 for items like pool members, virtual server listeners, security policies, and more.
   - ts.json - contains the BIG-IP configurations used by TS for items like telemetry streaming, CPU, memory, application statistics, and more.
+  - cfe.json - contains the BIG-IP configurations used for failover operations of cloud objects like IPs and routes.
 
 ## BYOL Licensing
 This template uses PayGo BIG-IP image for the deployment (as default). If you would like to use BYOL licenses, then these following steps are needed:
