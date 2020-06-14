@@ -34,7 +34,6 @@ locals {
     AS3_Document   = ""
     TS_Document    = local.ts_json
     CFE_Document   = local.cfe_json
-    remote_host    = "${var.prefix}-${var.host2_name}"
   })
   vm2_onboard = templatefile("${path.module}/onboard.tpl", {
     uname          = var.uname
@@ -49,8 +48,7 @@ locals {
     DO_Document    = local.do2_json
     AS3_Document   = local.as3_json
     TS_Document    = local.ts_json
-    CFE_Document   = local.cfe_json
-    remote_host    = "${var.prefix}-${var.host1_name}"
+    CFE_Document   = local.cfe2_json
   })
   do_json = templatefile("${path.module}/do.json", {
     regKey         = var.license1
@@ -90,8 +88,12 @@ locals {
   cfe_json = templatefile("${path.module}/cfe.json", {
     f5_cloud_failover_label = var.f5_cloud_failover_label
     managed_route1          = var.managed_route1
-    #local_selfip            = "${var.prefix}-${var.host1_name}"
-    #remote_selfip           = "${var.prefix}-${var.host2_name}"
+    remote_selfip           = ""
+  })
+  cfe2_json = templatefile("${path.module}/cfe.json", {
+    f5_cloud_failover_label = var.f5_cloud_failover_label
+    managed_route1          = var.managed_route1
+    remote_selfip           = google_compute_instance.f5vm01.network_interface.0.network_ip
   })
 }
 

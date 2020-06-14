@@ -62,7 +62,7 @@
             "class": "DeviceTrust",
             "localUsername": "${admin_username}",
             "localPassword": "$${admin_password}",
-            "remoteHost": "${remote_host}",
+            "remoteHost": "${remote_host}.${dns_suffix}",
             "remoteUsername": "${admin_username}",
             "remotePassword": "$${admin_password}"
         }

@@ -222,6 +222,7 @@ wait_for_ready declarative-onboarding
 file_loc="/config/cloud/do.json"
 echo "Submitting DO declaration"
 sed -i "s/\$${admin_password}/$passwd/g" $file_loc
+sed -i "s/\$${local_selfip}/$INT2ADDRESS/g" $file_loc
 response_code=$(/usr/bin/curl -sku admin:$passwd -w "%%{http_code}" -X POST -H "Content-Type: application/json" -H "Expect:" https://localhost:$${mgmtGuiPort}/mgmt/shared/declarative-onboarding -d @$file_loc -o /dev/null)
 if [[ $response_code == *200 || $response_code == *202 ]]; then
   echo "DO task created"
@@ -265,9 +266,7 @@ fi
 wait_for_ready cloud-failover
 file_loc="/config/cloud/cfe.json"
 echo "Submitting CFE declaration"
-remote_selfip=$(nslookup ${remote_host} | awk -F': ' 'NR==5 { print $2 } ')
 sed -i "s/\$${local_selfip}/$INT2ADDRESS/g" $file_loc
-sed -i "s/\$${remote_selfip}/$remote_selfip/g" $file_loc
 # response_code=$(/usr/bin/curl -sku admin:$passwd -w "%%{http_code}" -X POST -H "Content-Type: application/json" -H "Expect:" https://localhost:$${mgmtGuiPort}/mgmt/shared/cloud-failover/declare -d @$file_loc -o /dev/null)
 # if [[ $response_code == *200 || $response_code == *502 ]]; then
 #   echo "Deployment of CFE succeeded"
