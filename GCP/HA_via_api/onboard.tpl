@@ -291,8 +291,8 @@ fi
 # fi
 
 # Cleanup
-echo "Removing DO and AS3 declaration files"
-#rm -rf /config/cloud/do.json /config/cloud/as3.json /config/cloud/ts.json
+echo "Removing DO/AS3/TS/CFE declaration files"
+rm -rf /config/cloud/do.json /config/cloud/as3.json /config/cloud/ts.json /config/cloud/cfe.json
 
 date
 echo "Finished custom config"

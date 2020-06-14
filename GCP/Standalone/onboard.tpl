@@ -267,7 +267,7 @@ fi
 # fi
 
 # Cleanup
-echo "Removing DO and AS3 declaration files"
+echo "Removing DO/AS3/TS declaration files"
 rm -rf /config/cloud/do.json /config/cloud/as3.json /config/cloud/ts.json
 
 date
