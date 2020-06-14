@@ -153,8 +153,7 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | TS_URL | Yes | This is the raw github URL for downloading the Telemetry RPM |
 | CF_URL | Yes | This is the raw github URL for downloading the Cloud-Failover RPM |
 | onboard_log | Yes | This is where the onboarding script logs all the events |
-| f5_cloud_failover_label | Yes | This is a tag used for failover. |
-| f5_cloud_failover_nic_map | Yes | This is a tag used for failover NIC. |
+| f5_cloud_failover_label | Yes | This is a tag used for failover |
 
 ## Installation Example
 
