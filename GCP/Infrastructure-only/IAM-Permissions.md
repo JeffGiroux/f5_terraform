@@ -18,4 +18,6 @@ storage.buckets.create
 storage.buckets.delete
 storage.buckets.get
 storage.buckets.getIamPolicy
+storage.objects.delete
+storage.objects.list
 ```
