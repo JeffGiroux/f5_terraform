@@ -8,12 +8,12 @@ resource "google_compute_address" "vip1" {
 # Forwarding rule for Public IP
 resource "google_compute_forwarding_rule" "vip1" {
   name       = "${var.prefix}-forwarding-rule"
-  target     = google_compute_target_instance.f5vm.id
+  target     = google_compute_target_instance.f5vm01.id
   ip_address = google_compute_address.vip1.address
   port_range = "1-65535"
 }
 
-resource "google_compute_target_instance" "f5vm" {
+resource "google_compute_target_instance" "f5vm01" {
   name     = "${var.prefix}-ti"
   instance = google_compute_instance.f5vm01.id
 }
