@@ -6,12 +6,16 @@ Terraform Deployment - service account
 ```
 compute.firewalls.create
 compute.firewalls.delete
+compute.firewalls.get
 compute.networks.create
 compute.networks.delete
+compute.networks.get
 compute.networks.updatePolicy
 compute.subnetworks.create
 compute.subnetworks.delete
+compute.subnetworks.get
 storage.buckets.create
 storage.buckets.delete
+storage.buckets.get
 storage.buckets.getIamPolicy
 ```
