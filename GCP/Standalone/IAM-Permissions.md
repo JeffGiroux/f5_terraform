@@ -6,10 +6,12 @@ Terraform Deployment - service account
 ```
 compute.addresses.create
 compute.addresses.delete
+compute.addresses.get
 compute.addresses.use
 compute.disks.create
 compute.forwardingRules.create
 compute.forwardingRules.delete
+compute.forwardingRules.get
 compute.instances.create
 compute.instances.delete
 compute.instances.get
@@ -17,10 +19,12 @@ compute.instances.setMetadata
 compute.instances.setServiceAccount
 compute.instances.setTags
 compute.instances.use
+compute.instances.updateNetworkInterface
 compute.subnetworks.use
 compute.subnetworks.useExternalIp
 compute.targetInstances.create
 compute.targetInstances.delete
+compute.targetInstances.get
 compute.targetInstances.use
 compute.zones.get
 iam.serviceAccounts.actAs
