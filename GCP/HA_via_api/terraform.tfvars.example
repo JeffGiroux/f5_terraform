@@ -10,6 +10,9 @@ mgmtSubnet   = "xxxxx-subnet-mgmt"
 extSubnet    = "xxxxx-subnet-ext"
 dns_suffix   = "example.com"
 
+# BIG-IQ Environment
+bigIqUsername = "admin"
+
 # Google Environment
 gcp_project_id = "xxxxx"
 gcp_region     = "us-west1"

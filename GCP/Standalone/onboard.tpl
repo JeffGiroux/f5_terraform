@@ -22,9 +22,9 @@ echo "Starting onboard script"
 # ********************************************************************
 # ********************************************************************
 
-#####################################
+####################################
 #### do.json - Declaration File ####
-#####################################
+####################################
 
 # DO
 cat <<'EOF' > /config/cloud/do.json
@@ -40,9 +40,9 @@ cat <<'EOF' > /config/cloud/as3.json
 ${AS3_Document}
 EOF
 
-#####################################
+####################################
 #### ts.json - Declaration File ####
-#####################################
+####################################
 
 # TS
 cat <<'EOF' > /config/cloud/ts.json
@@ -104,7 +104,7 @@ EOF
 #### custom-config.sh ####
 ##########################
 
-# TMSH, DO, AS3 declarations
+# TMSH, DO, AS3, TS declarations
 cat  <<'EOF' > /config/cloud/custom-config.sh
 #!/bin/bash
 source /usr/lib/bigstart/bigip-ready-functions
@@ -189,7 +189,7 @@ tmsh+=(
 "tmsh create sys management-route mgmt_net network $${MGMTNETWORK}/$${MGMTMASK} gateway $${MGMTGATEWAY} mtu 1460"
 "tmsh create sys management-route default gateway $${MGMTGATEWAY} mtu 1460"
 "tmsh create net vlan external interfaces add { 1.0 } mtu 1460"
-"tmsh create net self self_external address $${INT2ADDRESS}/32 vlan external allow-service add { tcp:4353 udp:1026 }"
+"tmsh create net self self_external address $${INT2ADDRESS}/32 vlan external allow-service add { tcp:4353 tcp:443 udp:1026 }"
 "tmsh create net route ext_gw_interface network $${INT2GATEWAY}/32 interface external"
 "tmsh create net route ext_rt network $${INT2NETWORK}/$${INT2MASK} gw $${INT2GATEWAY}"
 "tmsh create net route default gw $${INT2GATEWAY}"
@@ -212,6 +212,9 @@ date
 wait_for_ready declarative-onboarding
 file_loc="/config/cloud/do.json"
 echo "Submitting DO declaration"
+sed -i "s/\$${admin_password}/$passwd/g" $file_loc
+sed -i "s/\$${bigIqPassword}/$passwd/g" $file_loc
+sed -i "s/\$${local_selfip}/$INT2ADDRESS/g" $file_loc
 response_code=$(/usr/bin/curl -sku admin:$passwd -w "%%{http_code}" -X POST -H "Content-Type: application/json" -H "Expect:" https://localhost:$${mgmtGuiPort}/mgmt/shared/declarative-onboarding -d @$file_loc -o /dev/null)
 if [[ $response_code == *200 || $response_code == *202 ]]; then
   echo "DO task created"
@@ -223,7 +226,7 @@ fi
 checks=0
 response_code=""
 while [ $checks -lt 30 ] ; do
-  response_code=$(curl -sku admin:$passwd -w "%%{http_code}" -X GET  https://localhost:$${mgmtGuiPort}/mgmt/shared/declarative-onboarding/task -o /dev/null)
+  response_code=$(curl -sku admin:$passwd -X GET  https://localhost:$${mgmtGuiPort}/mgmt/shared/declarative-onboarding/task | jq -r ".[].result.code")
   if [[ $response_code == *200 ]]; then
     echo "DO task successful"
     break

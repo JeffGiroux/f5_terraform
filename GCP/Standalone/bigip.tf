@@ -34,13 +34,21 @@ locals {
     TS_Document    = local.ts_json
   })
   vm01_do_json = templatefile("${path.module}/do.json", {
-    regKey         = var.license1
-    local_host     = "${var.prefix}-${var.host1_name}"
-    dns_server     = var.dns_server
-    dns_suffix     = var.dns_suffix
-    ntp_server     = var.ntp_server
-    timezone       = var.timezone
-    admin_username = var.uname
+    regKey             = var.license1
+    admin_username     = var.uname
+    local_host         = "${var.prefix}-${var.host1_name}"
+    dns_server         = var.dns_server
+    dns_suffix         = var.dns_suffix
+    ntp_server         = var.ntp_server
+    timezone           = var.timezone
+    bigIqLicenseType   = var.bigIqLicenseType
+    bigIqHost          = var.bigIqHost
+    bigIqUsername      = var.bigIqUsername
+    bigIqLicensePool   = var.bigIqLicensePool
+    bigIqSkuKeyword1   = var.bigIqSkuKeyword1
+    bigIqSkuKeyword2   = var.bigIqSkuKeyword2
+    bigIqUnitOfMeasure = var.bigIqUnitOfMeasure
+    bigIqHypervisor    = var.bigIqHypervisor
   })
   as3_json = templatefile("${path.module}/as3.json", {
     gcp_region = var.gcp_region

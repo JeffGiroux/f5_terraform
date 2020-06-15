@@ -6,6 +6,7 @@
 - [Prerequisites](#prerequisites)
 - [Important Configuration Notes](#important-configuration-notes)
 - [BYOL Licensing](#byol-licensing)
+- [BIG-IQ License Manager](#big-iq-license-manager)
 - [Installation Example](#installation-example)
 - [Configuration Example](#configuration-example)
 
@@ -71,7 +72,7 @@ Terraform v0.12.26
   - ***Note***: Other items like BIG-IP password are stored in Google Cloud Secret Manager. Refer to the [Prerequisites](#prerequisites).
   - The BIG-IP instance will query Google Metadata API to retrieve the service account's token for authentication.
   - The BIG-IP instance will then use the secret name and the service account's token to query Google Metadata API and dynamically retrieve the password for device onboarding.
-- This template uses Declarative Onboarding (DO) and Application Services 3 (AS3) packages for the initial configuration. As part of the onboarding script, it will download the RPMs automatically. See the [AS3 documentation](https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/) and [DO documentation](https://clouddocs.f5.com/products/extensions/f5-declarative-onboarding/latest/) for details on how to use AS3 and Declarative Onboarding on your BIG-IP VE(s). The [Telemetry Streaming](https://clouddocs.f5.com/products/extensions/f5-telemetry-streaming/latest/) extension is also downloaded and can be configured to point to Google Cloud Monitoring (old name StackDriver). 
+- This template uses Declarative Onboarding (DO) and Application Services 3 (AS3) packages for the initial configuration. As part of the onboarding script, it will download the RPMs automatically. See the [AS3 documentation](http://f5.com/AS3Docs) and [DO documentation](http://f5.com/DODocs) for details on how to use AS3 and Declarative Onboarding on your BIG-IP VE(s). The [Telemetry Streaming](http://f5.com/TSDocs) extension is also downloaded and can be configured to point to Google Cloud Monitoring (old name StackDriver). 
 - Files
   - bigip.tf - resources for BIG-IP, NICs, public IPs
   - main.tf - resources for provider, versions
@@ -82,7 +83,7 @@ Terraform v0.12.26
 
 ## BYOL Licensing
 This template uses PayGo BIG-IP image for the deployment (as default). If you would like to use BYOL licenses, then these following steps are needed:
-1. Find available images/versions with "byol" in SKU name using Google gcloud:
+1. Find available images/versions with "byol" in the name using Google gcloud:
   ```
           gcloud compute images list --project=f5-7626-networks-public | grep f5
 
@@ -96,11 +97,12 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
           f5-bigip-14-1-2-3-0-0-5-byol-ltm-1boot-loc-191218142225
           f5-bigip-14-1-2-3-0-0-5-payg-best-1gbps-191218142340
           f5-bigip-15-1-0-2-0-0-9-payg-best-25mbps-200321032524
+          ...and more...
   ```
-2. In the "variables.tf", modify *image_name* and *product* with the SKU and offer from gcloud CLI results
+2. In the "variables.tf", modify *image_name* with the image name from gcloud CLI results
   ```
           # BIGIP Image
-          variable image_name { default = "f5-bigip-14-1-2-3-0-0-5-byol-ltm-1boot-loc-191218142225" }
+          variable image_name { default = "projects/f5-7626-networks-public/global/images/f5-bigip-14-1-2-3-0-0-5-byol-ltm-2boot-loc-191218142235" }
   ```
 3. In the "variables.tf", modify *license1* with a valid regkey
   ```
@@ -115,6 +117,30 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
             "regKey": "${regKey}"
         },
   ```
+
+## BIG-IQ License Manager
+This template uses PayGo BIG-IP image for the deployment (as default). If you would like to use BYOL/ELA/Subscription licenses from [BIG-IQ License Manager (LM)](https://devcentral.f5.com/s/articles/managing-big-ip-licensing-with-big-iq-31944), then these following steps are needed:
+1. Find BYOL image. Reference [BYOL Licensing](#byol-licensing) step #1.
+2. Replace BIG-IP *image_name* in "variables.tf". Reference [BYOL Licensing](#byol-licensing) step #2.
+3. In the "variables.tf", modify the BIG-IQ license section to match your environment
+4. In the "do.json", add the "myLicense" block under the "Common" declaration ([full declaration example here](https://clouddocs.f5.com/products/extensions/f5-declarative-onboarding/latest/bigiq-examples.html#licensing-with-big-iq-regkey-pool-route-to-big-ip))
+  ```
+        "myLicense": {
+            "class": "License",
+            "licenseType": "${bigIqLicenseType}",
+            "bigIqHost": "${bigIqHost}",
+            "bigIqUsername": "${bigIqUsername}",
+            "bigIqPassword": "$${bigIqPassword}",
+            "licensePool": "${bigIqLicensePool}",
+            "skuKeyword1": "${bigIqSkuKeyword1}",
+            "skuKeyword2": "${bigIqSkuKeyword2}",
+            "unitOfMeasure": "${bigIqUnitOfMeasure}",
+            "reachable": false,
+            "hypervisor": "${bigIqHypervisor}",
+            "overwrite": true
+        },
+  ```
+  ***Note***: The [onboard.tpl](./onboard.tpl) startup script will use the same 'usecret' payload value (aka password) for BIG-IP password AND the BIG-IQ password. In the onboard.tpl file, this happens in the 'passwd' variable. You can use a separate password for BIG-IQ by creating a new Google Secret Manager secret for the BIG-IQ password, then add a new variable for the secret in [variables.tf](./variables.tf), modify [bigip.tf](./bigip.tf) to include the secret in the local templatefile section similar to 'usecret', then update [onboard.tpl](./onboard.tpl) to query Secret Manager for the BIG-IQ secret name. Reference code example *usecret='${usecret}'*.
 
 ## Template Parameters
 
@@ -148,6 +174,14 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | AS3_URL | Yes | This is the raw github URL for downloading the AS3 RPM |
 | TS_URL | Yes | This is the raw github URL for downloading the Telemetry RPM |
 | onboard_log | Yes | This is where the onboarding script logs all the events |
+| bigIqHost | No | This is the BIG-IQ License Manager host name or IP address |
+| bigIqUsername | No | BIG-IQ user name |
+| bigIqLicenseType | No | BIG-IQ license type |
+| bigIqLicensePool | No | BIG-IQ license pool name |
+| bigIqSkuKeyword1 | No | BIG-IQ license SKU keyword 1 |
+| bigIqSkuKeyword2 | No | BIG-IQ license SKU keyword 1 |
+| bigIqUnitOfMeasure | No | BIG-IQ license unit of measure |
+| bigIqHypervisor | No | BIG-IQ hypervisor |
 
 ## Installation Example
 
@@ -166,6 +200,9 @@ To run this Terraform template, perform the following steps:
       mgmtSubnet   = "xxxxx-subnet-mgmt"
       extSubnet    = "xxxxx-subnet-ext"
       dns_suffix   = "example.com"
+
+      # BIG-IQ Environment
+      bigIqUsername = "admin"
 
       # Google Environment
       gcp_project_id = "xxxxx"
@@ -205,6 +242,8 @@ For more information on F5 solutions for Google, including manual configuration 
 ## Creating Virtual Servers on the BIG-IP VE
 
 In order to pass traffic from your clients to the servers through the BIG-IP system, you must create a virtual server on the BIG-IP VE. In this template, the AS3 declaration creates 2 VIPs: one for public internet facing, and one for private internal usage. It is preconfigured as an example.
+
+In this template, the Google public IP address is associated with the active BIG-IP device NIC0. The address is associated with a [Google Forwarding Rule](https://cloud.google.com/load-balancing/docs/forwarding-rule-concepts), and this IP address will be the same IP you see as a virtual server on the BIG-IP.
 
 ***Note:*** These next steps illustrate the manual way in the GUI to create a virtual server
 1. Open the BIG-IP VE Configuration utility
