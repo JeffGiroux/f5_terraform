@@ -25,7 +25,7 @@ resource "google_compute_target_instance" "f5vm02" {
 
 # Setup Onboarding scripts
 locals {
-  vm_onboard = templatefile("${path.module}/onboard.tpl", {
+  vm01_onboard = templatefile("${path.module}/onboard.tpl", {
     uname          = var.uname
     usecret        = var.usecret
     ksecret        = var.ksecret
@@ -35,12 +35,12 @@ locals {
     TS_URL         = var.TS_URL
     CF_URL         = var.CF_URL
     onboard_log    = var.onboard_log
-    DO_Document    = local.do_json
+    DO_Document    = local.vm01_do_json
     AS3_Document   = ""
     TS_Document    = local.ts_json
-    CFE_Document   = local.cfe_json
+    CFE_Document   = local.vm01_cfe_json
   })
-  vm2_onboard = templatefile("${path.module}/onboard.tpl", {
+  vm02_onboard = templatefile("${path.module}/onboard.tpl", {
     uname          = var.uname
     usecret        = var.usecret
     ksecret        = var.ksecret
@@ -50,12 +50,12 @@ locals {
     TS_URL         = var.TS_URL
     CF_URL         = var.CF_URL
     onboard_log    = var.onboard_log
-    DO_Document    = local.do2_json
+    DO_Document    = local.vm02_do_json
     AS3_Document   = local.as3_json
     TS_Document    = local.ts_json
-    CFE_Document   = local.cfe2_json
+    CFE_Document   = local.vm02_cfe_json
   })
-  do_json = templatefile("${path.module}/do.json", {
+  vm01_do_json = templatefile("${path.module}/do.json", {
     regKey         = var.license1
     host1          = "${var.prefix}-${var.host1_name}"
     host2          = "${var.prefix}-${var.host2_name}"
@@ -67,7 +67,7 @@ locals {
     timezone       = var.timezone
     admin_username = var.uname
   })
-  do2_json = templatefile("${path.module}/do.json", {
+  vm02_do_json = templatefile("${path.module}/do.json", {
     regKey         = var.license2
     host1          = "${var.prefix}-${var.host1_name}"
     host2          = "${var.prefix}-${var.host2_name}"
@@ -90,12 +90,12 @@ locals {
     svc_acct       = var.svc_acct
     privateKeyId   = var.privateKeyId
   })
-  cfe_json = templatefile("${path.module}/cfe.json", {
+  vm01_cfe_json = templatefile("${path.module}/cfe.json", {
     f5_cloud_failover_label = var.f5_cloud_failover_label
     managed_route1          = var.managed_route1
     remote_selfip           = ""
   })
-  cfe2_json = templatefile("${path.module}/cfe.json", {
+  vm02_cfe_json = templatefile("${path.module}/cfe.json", {
     f5_cloud_failover_label = var.f5_cloud_failover_label
     managed_route1          = var.managed_route1
     remote_selfip           = google_compute_instance.f5vm01.network_interface.0.network_ip
@@ -139,7 +139,7 @@ resource "google_compute_instance" "f5vm01" {
   metadata = {
     ssh-keys               = "${var.uname}:${var.gceSshPubKey}"
     block-project-ssh-keys = true
-    startup-script         = var.customImage != "" ? var.customUserData : local.vm_onboard
+    startup-script         = var.customImage != "" ? var.customUserData : local.vm01_onboard
   }
 
   service_account {
@@ -187,7 +187,7 @@ resource "google_compute_instance" "f5vm02" {
   metadata = {
     ssh-keys               = "${var.uname}:${var.gceSshPubKey}"
     block-project-ssh-keys = true
-    startup-script         = var.customImage != "" ? var.customUserData : local.vm2_onboard
+    startup-script         = var.customImage != "" ? var.customUserData : local.vm02_onboard
   }
 
   service_account {
@@ -198,6 +198,6 @@ resource "google_compute_instance" "f5vm02" {
 
 # # Troubleshooting - create local output files
 # resource "local_file" "onboard_file" {
-#   content  = local.vm_onboard
-#   filename = "${path.module}/vm_onboard.tpl_data.json"
+#   content  = local.vm01_onboard
+#   filename = "${path.module}/vm01_onboard.tpl_data.json"
 # }

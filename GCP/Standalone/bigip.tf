@@ -14,13 +14,13 @@ resource "google_compute_forwarding_rule" "vip1" {
 }
 
 resource "google_compute_target_instance" "f5vm01" {
-  name     = "${var.prefix}-ti"
+  name     = "${var.prefix}-${var.host1_name}-ti"
   instance = google_compute_instance.f5vm01.id
 }
 
 # Setup Onboarding scripts
 locals {
-  vm_onboard = templatefile("${path.module}/onboard.tpl", {
+  vm01_onboard = templatefile("${path.module}/onboard.tpl", {
     uname          = var.uname
     usecret        = var.usecret
     ksecret        = var.ksecret
@@ -29,16 +29,18 @@ locals {
     AS3_URL        = var.AS3_URL
     TS_URL         = var.TS_URL
     onboard_log    = var.onboard_log
-    DO_Document    = local.do_json
+    DO_Document    = local.vm01_do_json
     AS3_Document   = local.as3_json
     TS_Document    = local.ts_json
   })
-  do_json = templatefile("${path.module}/do.json", {
-    local_host = "${var.prefix}-${var.host1_name}"
-    dns_server = var.dns_server
-    dns_suffix = var.dns_suffix
-    ntp_server = var.ntp_server
-    timezone   = var.timezone
+  vm01_do_json = templatefile("${path.module}/do.json", {
+    regKey         = var.license1
+    local_host     = "${var.prefix}-${var.host1_name}"
+    dns_server     = var.dns_server
+    dns_suffix     = var.dns_suffix
+    ntp_server     = var.ntp_server
+    timezone       = var.timezone
+    admin_username = var.uname
   })
   as3_json = templatefile("${path.module}/as3.json", {
     gcp_region = var.gcp_region
@@ -89,7 +91,7 @@ resource "google_compute_instance" "f5vm01" {
   metadata = {
     ssh-keys               = "${var.uname}:${var.gceSshPubKey}"
     block-project-ssh-keys = true
-    startup-script         = var.customImage != "" ? var.customUserData : local.vm_onboard
+    startup-script         = var.customImage != "" ? var.customUserData : local.vm01_onboard
   }
 
   service_account {
@@ -100,6 +102,6 @@ resource "google_compute_instance" "f5vm01" {
 
 # # Troubleshooting - create local output files
 # resource "local_file" "onboard_file" {
-#   content  = local.vm_onboard
-#   filename = "${path.module}/vm_onboard.tpl_data.json"
+#   content  = local.vm01_onboard
+#   filename = "${path.module}/vm01_onboard.tpl_data.json"
 # }
