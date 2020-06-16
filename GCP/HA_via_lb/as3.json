@@ -4,7 +4,7 @@
   "persist": true,
   "declaration": {
     "class": "ADC",
-    "schemaVersion": "3.13.0",
+    "schemaVersion": "3.20.0",
     "id": "123abc",
     "label": "Sample 1",
     "remark": "An HTTPS sample application",
@@ -15,13 +15,14 @@
       "class": "Tenant",
       "Probe_Ext": {
         "class": "Application",
-        "service": {
+        "forwarding-rule-external-probe": {
           "class": "Service_HTTP",
           "virtualPort": 40000,
           "virtualAddresses": [
             "${publicvip}"
           ],
-          "irules": ["monitor_respond_200"]
+          "shareAddresses": true,
+          "iRules": ["monitor_respond_200"]
         },
         "monitor_respond_200": {
           "class": "iRule",
@@ -30,12 +31,13 @@
       },
       "Probe_Int": {
         "class": "Application",
-        "service": {
+        "forwarding-rule-internal-probe": {
           "class": "Service_TCP",
           "virtualPort": 40000,
           "virtualAddresses": [
             "${privatevip}"
-          ]
+          ],
+          "shareAddresses": true
         }
       }
     },
@@ -46,11 +48,11 @@
         "template": "https",
         "serviceMain": {
           "class": "Service_HTTPS",
-          "virtualPort": 8443,
           "virtualAddresses": [
             "${publicvip}",
             "${privatevip}"
           ],
+          "shareAddresses": true,
           "pool": "web_pool",
           "serverTLS": "webtls"
         },
