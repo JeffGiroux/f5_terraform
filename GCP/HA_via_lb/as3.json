@@ -11,36 +11,6 @@
     "controls": {
       "trace": true
     },
-    "GLB_Monitor": {
-      "class": "Tenant",
-      "Probe_Ext": {
-        "class": "Application",
-        "forwarding-rule-external-probe": {
-          "class": "Service_HTTP",
-          "virtualPort": 40000,
-          "virtualAddresses": [
-            "${publicvip}"
-          ],
-          "shareAddresses": true,
-          "iRules": ["monitor_respond_200"]
-        },
-        "monitor_respond_200": {
-          "class": "iRule",
-          "iRule": "when HTTP_REQUEST {\n   HTTP::respond 200 System Responding \n}\n"
-        }
-      },
-      "Probe_Int": {
-        "class": "Application",
-        "forwarding-rule-internal-probe": {
-          "class": "Service_TCP",
-          "virtualPort": 40000,
-          "virtualAddresses": [
-            "${privatevip}"
-          ],
-          "shareAddresses": true
-        }
-      }
-    },
     "Sample_01": {
       "class": "Tenant",
       "A1": {
@@ -52,7 +22,6 @@
             "${publicvip}",
             "${privatevip}"
           ],
-          "shareAddresses": true,
           "pool": "web_pool",
           "serverTLS": "webtls"
         },
@@ -83,6 +52,31 @@
             "ciphertext": "ZjVmNQ==",
             "protected": "eyJhbGciOiJkaXIiLCJlbmMiOiJub25lIn0"
           }
+        }
+      },
+      "GLB_Probe_Ext": {
+        "class": "Application",
+        "fr-probe-external": {
+          "class": "Service_HTTP",
+          "virtualPort": 40000,
+          "virtualAddresses": [
+            "${publicvip}"
+          ],
+          "iRules": ["monitor_respond_200"]
+        },
+        "monitor_respond_200": {
+          "class": "iRule",
+          "iRule": "when HTTP_REQUEST {\n   HTTP::respond 200 System Responding \n}\n"
+        }
+      },
+      "ILB_Probe_Int": {
+        "class": "Application",
+        "fr-probe-internal": {
+          "class": "Service_TCP",
+          "virtualPort": 40000,
+          "virtualAddresses": [
+            "${privatevip}"
+          ]
         }
       }
     }
