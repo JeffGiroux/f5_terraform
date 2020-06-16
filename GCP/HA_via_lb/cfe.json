@@ -7,7 +7,7 @@
       }
   },
   "failoverAddresses": {
-      "enabled": true,
+      "enabled": false,
       "scopingTags": {
           "f5_cloud_failover_label": "${f5_cloud_failover_label}"
       }

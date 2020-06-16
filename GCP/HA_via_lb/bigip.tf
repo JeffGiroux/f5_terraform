@@ -74,9 +74,8 @@ locals {
   })
   as3_json = templatefile("${path.module}/as3.json", {
     gcp_region = var.gcp_region
-    #publicvip  = "0.0.0.0"
     publicvip  = google_compute_address.vip1.address
-    privatevip = var.alias_ip_range
+    privatevip = google_compute_forwarding_rule.vip2-internal.ip_address
   })
   ts_json = templatefile("${path.module}/ts.json", {
     gcp_project_id = var.gcp_project_id
