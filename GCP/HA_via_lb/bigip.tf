@@ -75,7 +75,8 @@ locals {
   as3_json = templatefile("${path.module}/as3.json", {
     gcp_region = var.gcp_region
     publicvip  = google_compute_address.vip1.address
-    privatevip = google_compute_forwarding_rule.vip2-internal.ip_address
+    #privatevip = google_compute_forwarding_rule.vip2-internal.ip_address
+    privatevip = data.google_compute_subnetwork.vpc_ext_sub.ip_cidr_range
   })
   ts_json = templatefile("${path.module}/ts.json", {
     gcp_project_id = var.gcp_project_id
@@ -163,9 +164,6 @@ resource "google_compute_instance" "f5vm02" {
     network    = var.extVpc
     subnetwork = var.extSubnet
     access_config {
-    }
-    alias_ip_range {
-      ip_cidr_range = var.alias_ip_range
     }
   }
 

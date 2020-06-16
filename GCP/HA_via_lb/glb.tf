@@ -65,6 +65,10 @@ resource "google_compute_region_backend_service" "f5vm" {
 # Instance Group for Backend Pool
 resource "google_compute_instance_group" "f5vm" {
   name = "${var.prefix}-ig"
+  instances = [
+    google_compute_instance.f5vm01.self_link,
+    google_compute_instance.f5vm02.self_link
+  ]
 }
 
 # Health Check for Backend Pool Internal

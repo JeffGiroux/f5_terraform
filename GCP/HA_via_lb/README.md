@@ -165,7 +165,6 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | extSubnet | Yes | External subnet |
 | mgmtSubnet | Yes | Management subnet |
 | managed_route1 | Yes | A UDR route can used for testing managed-route failover. Enter address prefix like x.x.x.x/x. |
-| alias_ip_range | Yes | An array of alias IP ranges for the BIG-IP network interface (used for VIP traffic, SNAT IPs, etc) |
 | bigipMachineType | Yes | Google machine type to be used for the BIG-IP VE |
 | image_name | Yes | F5 SKU (image) to deploy. Note: The disk size of the VM will be determined based on the option you select.  **Important**: If intending to provision multiple modules, ensure the appropriate value is selected, such as ****AllTwoBootLocations or AllOneBootLocation****. |
 | license1 | No | The license token for the F5 BIG-IP VE (BYOL) |
