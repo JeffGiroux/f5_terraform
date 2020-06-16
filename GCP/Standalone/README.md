@@ -243,7 +243,7 @@ For more information on F5 solutions for Google, including manual configuration 
 
 In order to pass traffic from your clients to the servers through the BIG-IP system, you must create a virtual server on the BIG-IP VE. In this template, the AS3 declaration creates 2 VIPs: one for public internet facing, and one for private internal usage. It is preconfigured as an example.
 
-In this template, the Google public IP address is associated with the active BIG-IP device NIC0. The address is associated with a [Google Forwarding Rule](https://cloud.google.com/load-balancing/docs/forwarding-rule-concepts), and this IP address will be the same IP you see as a virtual server on the BIG-IP.
+In this template, the Google public IP address is associated with the active BIG-IP device NIC0. The address is created with a [Google Forwarding Rule](https://cloud.google.com/load-balancing/docs/forwarding-rule-concepts), and this IP address will be the same IP you see as a virtual server on the BIG-IP.
 
 ***Note:*** These next steps illustrate the manual way in the GUI to create a virtual server
 1. Open the BIG-IP VE Configuration utility
