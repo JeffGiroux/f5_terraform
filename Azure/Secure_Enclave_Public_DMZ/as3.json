@@ -12,6 +12,7 @@
       "trace": true
     },
     "Common": {
+      "class": "Tenant",
       "Shared": {
         "class": "Application",
           "template": "shared",

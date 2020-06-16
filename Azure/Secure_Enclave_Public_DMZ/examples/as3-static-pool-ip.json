@@ -12,6 +12,7 @@
       "trace": true
     },
     "Common": {
+      "class": "Tenant",
       "Shared": {
         "class": "Application",
           "template": "shared",
@@ -141,17 +142,9 @@
           ],
           "members": [{
             "servicePort": 80,
-            "addressDiscovery": "azure",
-            "updateInterval": 10,
-            "tagKey": "application",
-            "tagValue": "app1",
-            "addressRealm": "private",
-            "resourceGroup": "${rg_name}",
-            "subscriptionId": "${subscription_id}",
-            "directoryId": "${tenant_id}",
-            "applicationId": "${client_id}",
-            "apiAccessKey": "${client_secret}",
-            "credentialUpdate": false
+            "serverAddresses": [
+              "${backendvm_ip}"
+            ]
           }]
         },
         "webtls": {
