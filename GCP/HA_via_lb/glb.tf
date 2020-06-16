@@ -53,6 +53,7 @@ resource "google_compute_forwarding_rule" "vip2-internal" {
 resource "google_compute_region_backend_service" "f5vm" {
   name                  = "${var.prefix}-backend"
   load_balancing_scheme = "INTERNAL"
+  network               = var.extVpc
   backend {
     group = google_compute_instance_group.f5vm.id
   }
