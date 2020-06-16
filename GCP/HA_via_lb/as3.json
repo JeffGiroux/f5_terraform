@@ -22,6 +22,10 @@
             "${publicvip}"
           ],
           "irules": ["monitor_respond_200"]
+        },
+        "monitor_respond_200": {
+          "class": "iRule",
+          "iRule": "when HTTP_REQUEST {\n   HTTP::respond 200 System Responding \n}\n"
         }
       },
       "Probe_Int": {
