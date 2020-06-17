@@ -10,12 +10,10 @@ locals {
     DO_URL         = var.DO_URL
     AS3_URL        = var.AS3_URL
     TS_URL         = var.TS_URL
-    CF_URL         = var.CF_URL
     onboard_log    = var.onboard_log
     DO_Document    = local.vm01_do_json
     AS3_Document   = ""
     TS_Document    = local.ts_json
-    CFE_Document   = local.vm01_cfe_json
   })
   vm02_onboard = templatefile("${path.module}/onboard.tpl", {
     uname          = var.uname
@@ -25,12 +23,10 @@ locals {
     DO_URL         = var.DO_URL
     AS3_URL        = var.AS3_URL
     TS_URL         = var.TS_URL
-    CF_URL         = var.CF_URL
     onboard_log    = var.onboard_log
     DO_Document    = local.vm02_do_json
     AS3_Document   = local.as3_json
     TS_Document    = local.ts_json
-    CFE_Document   = local.vm02_cfe_json
   })
   vm01_do_json = templatefile("${path.module}/do.json", {
     regKey             = var.license1
@@ -82,16 +78,6 @@ locals {
     svc_acct       = var.svc_acct
     privateKeyId   = var.privateKeyId
   })
-  vm01_cfe_json = templatefile("${path.module}/cfe.json", {
-    f5_cloud_failover_label = var.f5_cloud_failover_label
-    managed_route1          = var.managed_route1
-    remote_selfip           = ""
-  })
-  vm02_cfe_json = templatefile("${path.module}/cfe.json", {
-    f5_cloud_failover_label = var.f5_cloud_failover_label
-    managed_route1          = var.managed_route1
-    remote_selfip           = google_compute_instance.f5vm01.network_interface.0.network_ip
-  })
 }
 
 # Create F5 BIG-IP VMs
@@ -100,10 +86,6 @@ resource "google_compute_instance" "f5vm01" {
   machine_type   = var.bigipMachineType
   zone           = var.gcp_zone
   can_ip_forward = true
-
-  labels = {
-    f5_cloud_failover_label = var.f5_cloud_failover_label
-  }
 
   tags = ["appfw-${var.prefix}", "mgmtfw-${var.prefix}"]
 
@@ -145,10 +127,6 @@ resource "google_compute_instance" "f5vm02" {
   machine_type   = var.bigipMachineType
   zone           = var.gcp_zone
   can_ip_forward = true
-
-  labels = {
-    f5_cloud_failover_label = var.f5_cloud_failover_label
-  }
 
   tags = ["appfw-${var.prefix}", "mgmtfw-${var.prefix}"]
 
