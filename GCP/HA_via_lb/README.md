@@ -245,7 +245,7 @@ For more information on F5 solutions for Google, including manual configuration 
 
 ## Creating Virtual Servers on the BIG-IP VE
 
-In order to pass traffic from your clients to the servers through the BIG-IP system, you must create a virtual server on the BIG-IP VE. In this template, the AS3 declaration creates 1 VIP listening on 0.0.0.0/0, port 8443. It is preconfigured as an example.
+In order to pass traffic from your clients to the servers through the BIG-IP system, you must create a virtual server on the BIG-IP VE. In this template, the AS3 declaration creates 2 VIPs: one for public internet facing, and one for private internal usage. It is preconfigured as an example.
 
 In this template, the Google public IP address is associated with the Google External Load Balancer (GLB) which has both BIG-IP devices as backends. The address is created with a [Google Forwarding Rule](https://cloud.google.com/load-balancing/docs/forwarding-rule-concepts), and this IP address will be the same IP you see as a virtual server on the BIG-IP. There is also a Google Internal Load Balancer (ILB) created with an IP address in the subnet of your choice. You will see this virtual server listener IP as a CIDR block (ex. 10.1.10.0/24) instead of a specific IP (ex. 10.1.10.58/32). This was purely for ease of configuration and Terraform plan (aka avoids a "cycle" dependency). Ideally, you configure the internal LB listener IP on the BIG-IP to match the Google Internal LB IP.
 
