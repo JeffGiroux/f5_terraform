@@ -58,6 +58,7 @@
         "class": "Application",
         "fr-probe-external": {
           "class": "Service_HTTP",
+          "remark": "Health check listener for external GLB",
           "virtualPort": 40000,
           "virtualAddresses": [
             "${publicvip}"
@@ -73,6 +74,7 @@
         "class": "Application",
         "fr-probe-internal": {
           "class": "Service_TCP",
+          "remark": "Health check listener for internal ILB",
           "virtualPort": 40000,
           "virtualAddresses": [
             "${privatevip}"
