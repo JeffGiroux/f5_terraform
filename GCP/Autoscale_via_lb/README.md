@@ -218,7 +218,7 @@ To run this Terraform template, perform the following steps:
 
 The following is an example configuration diagram for this solution deployment. In this scenario, all access to the BIG-IP VE cluster (Active/Active) is direct to each BIG-IP via the management interface. The IP addresses in this example may be different in your implementation.
 
-![Configuration Example](./images/gcp-bigip-ha-via-lb.png)
+![Configuration Example](./images/gcp-bigip-autoscale-via-lb.png)
 
 ## Documentation
 
