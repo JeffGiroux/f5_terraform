@@ -86,3 +86,13 @@ resource "google_compute_firewall" "app" {
     ports    = ["80", "443"]
   }
 }
+
+resource "google_compute_firewall" "app-ilb-probe" {
+  name          = "${var.prefix}-allow-app-ilb-probe"
+  network       = google_compute_network.vpc_ext.name
+  source_ranges = ["35.191.0.0/16", "130.211.0.0/22"]
+  allow {
+    protocol = "tcp"
+    ports    = ["40000"]
+  }
+}
