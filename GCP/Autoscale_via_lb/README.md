@@ -8,7 +8,6 @@
 - [BIG-IQ License Manager](#big-iq-license-manager)
 - [Installation Example](#installation-example)
 - [Configuration Example](#configuration-example)
-- [Running BIG-IPs in Active/Active](#running-big-ips-in-activeactive)
 
 ## Introduction
 
