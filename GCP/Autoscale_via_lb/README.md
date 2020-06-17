@@ -1,22 +1,24 @@
-# Deploying BIG-IP VEs in Google - High Availability (Active/Standby): Two NICs
+# Deploying BIG-IP VEs in Google - Auto Scale (Active/Active): One NIC
 
 ## Contents
 
 - [Introduction](#introduction)
 - [Prerequisites](#prerequisites)
 - [Important Configuration Notes](#important-configuration-notes)
-- [BYOL Licensing](#byol-licensing)
 - [BIG-IQ License Manager](#big-iq-license-manager)
 - [Installation Example](#installation-example)
 - [Configuration Example](#configuration-example)
+- [Running BIG-IPs in Active/Active](#running-big-ips-in-activeactive)
 
 ## Introduction
 
-This solution uses a Terraform template to launch a two NIC deployment of a cloud-focused BIG-IP VE cluster (Active/Standby) in Google GCP. Traffic flows to the BIG-IP VE which then processes the traffic to application servers. This is the standard cloud design where the BIG-IP VE instance is running with a dual interface. Management traffic is processed on NIC 1, and data plane traffic is processed NIC 0.
+This solution uses a Terraform template to launch a one NIC deployment of a cloud-focused BIG-IP VE cluster (Active/Active) in Google GCP. It uses [Google Managed Instance Groups (MIG)](https://cloud.google.com/compute/docs/instance-groups) to allow auto scaling and auto healing of the BIG-IP VE devices. Traffic flows from a Google Load Balancer (GLB) to the BIG-IP VE which then processes the traffic to application servers. The BIG-IP VE instance is running with a single interface, and therefore both management traffic and data plane traffic are processed on NIC 0.
 
 The BIG-IP VEs have the [Local Traffic Manager (LTM)](https://f5.com/products/big-ip/local-traffic-manager-ltm) module enabled to provide advanced traffic management functionality. In addition, the [Application Security Module (ASM)](https://www.f5.com/pdf/products/big-ip-application-security-manager-overview.pdf) can be enabled to provide F5's L4/L7 security features for web application firewall (WAF) and bot protection.
 
 Terraform is beneficial as it allows composing resources a bit differently to account for dependencies into Immutable/Mutable elements. For example, mutable includes items you would typically frequently change/mutate, such as traditional configs on the BIG-IP. Once the template is deployed, there are certain resources (network infrastructure) that are fixed while others (BIG-IP VMs and configurations) can be changed.
+
+This template deploys each BIG-IP in an Google MIG as a standalone device and NOT in a [BIG-IP Device Service Cluster (DSC)](https://www.youtube.com/watch?v=NEguvpkmteM). As a result, there is no traditional BIG-IP clustering in regards to config sync and/or network failover. Each device is standalone, each device retrieves its onboarding from custom-data, and each device is treated as [immutable](https://www.f5.com/company/blog/you-cant-do-immutable-infrastructure-without-a-per-app-architecture). If changes are required to the network/application config of the BIG-IP device, then you do this in custom-data via changes to Terraform TF files. The Google MIG will perform a rolling upgrade (aka replacement) of each BIG-IP device.
 
 Example...
 
@@ -45,7 +47,6 @@ Terraform v0.12.26
     - Performed by F5 Application Services AS3
   - Google Cloud Monitoring (aka StackDriver) - requires "Monitoring Editor"
     - Performed by F5 Telemetry Streaming
-  - Cloud failover via API - requires R/W access to compute and storage (see F5 CloudDocs [Create and assign an IAM role](https://clouddocs.f5.com/products/extensions/f5-cloud-failover/latest/userguide/gcp.html#create-and-assign-an-iam-role))
 - This template requires a service account to deploy with the Terraform Google provider and build out all the neccessary Google objects
   - See the [Terraform Google Provider "Adding Credentials"](https://www.terraform.io/docs/providers/google/guides/getting_started.html#adding-credentials) for details. Also, review the [available Google GCP permission scopes](https://cloud.google.com/sdk/gcloud/reference/alpha/compute/instances/set-scopes#--scopes) too.
   - Permissions will depend on the objects you are creating
@@ -53,7 +54,7 @@ Terraform v0.12.26
   - ***Note***: For lab environments, you can start with "Editor" role. When you are working in other environments, make sure to [practice least privilege](https://cloud.google.com/iam/docs/understanding-service-accounts#granting_minimum).
 - ***Shared Service Accounts***: For lab purposes, you can create one service account and use it for everything. Alternatively, you can create a more secure environment with separate service accounts for various functions. Example...
   - Service Account #1 - the svc-acct used for Terraform to deploy cloud objects
-  - Service Account #2 - the svc-acct assigned to BIG-IP instance during creation (ex. service discovery, query Pub/Sub, storage, failover)
+  - Service Account #2 - the svc-acct assigned to BIG-IP instance during creation (ex. service discovery, query Pub/Sub, storage)
   - Service Account #3 - the svc-acct used in F5 Telemetry Streaming referenced in [ts.json](./ts.json) (ex. analytics)
 - Passwords and secrets are located in [Google Cloud Secret Manager](https://cloud.google.com/secret-manager/docs/quickstart#secretmanager-quickstart-web). Make sure you have an existing Google Cloud "secret" with the data containing the clear text passwords for each relevant item: BIG-IP password, service account credentials, BIG-IQ password, etc.
   - 'usecret' contains the value of the adminstrator password (ex. "Default12345!")
@@ -73,18 +74,18 @@ Terraform v0.12.26
   - ***Note***: Other items like BIG-IP password are stored in Google Cloud Secret Manager. Refer to the [Prerequisites](#prerequisites).
   - The BIG-IP instance will query Google Metadata API to retrieve the service account's token for authentication.
   - The BIG-IP instance will then use the secret name and the service account's token to query Google Metadata API and dynamically retrieve the password for device onboarding.
-- This template uses Declarative Onboarding (DO), Application Services 3 (AS3), and Cloud Failover Extension packages for the initial configuration. As part of the onboarding script, it will download the RPMs automatically. See the [AS3 documentation](http://f5.com/AS3Docs) and [DO documentation](http://f5.com/DODocs) for details on how to use AS3 and Declarative Onboarding on your BIG-IP VE(s). The [Telemetry Streaming](http://f5.com/TSDocs) extension is also downloaded and can be configured to point to Google Cloud Monitoring (old name StackDriver). The [Cloud Failover Extension](http://f5.com/CFEDocs) documentation is also available.
+- This template uses Declarative Onboarding (DO) and Application Services 3 (AS3) for the initial configuration. As part of the onboarding script, it will download the RPMs automatically. See the [AS3 documentation](http://f5.com/AS3Docs) and [DO documentation](http://f5.com/DODocs) for details on how to use AS3 and Declarative Onboarding on your BIG-IP VE(s). The [Telemetry Streaming](http://f5.com/TSDocs) extension is also downloaded and can be configured to point to Google Cloud Monitoring (old name StackDriver).
 - Files
   - bigip.tf - resources for BIG-IP, NICs, public IPs
+  - glb.tf - resources for Google LB
   - main.tf - resources for provider, versions
   - onboard.tpl - onboarding script which is run by startup-script (user data). It will be copied to **startup-script=*path-to-file*** upon bootup. This script is responsible for downloading the neccessary F5 Automation Toolchain RPM files, installing them, and then executing the onboarding REST calls.
   - do.json - contains the L1-L3 BIG-IP configurations used by DO for items like VLANs, IPs, and routes.
   - as3.json - contains the L4-L7 BIG-IP configurations used by AS3 for items like pool members, virtual server listeners, security policies, and more.
   - ts.json - contains the BIG-IP configurations used by TS for items like telemetry streaming, CPU, memory, application statistics, and more.
-  - cfe.json - contains the BIG-IP configurations used for failover operations of cloud objects like IPs and routes.
 
-## BYOL Licensing
-This template uses PayGo BIG-IP image for the deployment (as default). If you would like to use BYOL licenses, then these following steps are needed:
+## BIG-IQ License Manager
+This template uses PayGo BIG-IP image for the deployment (as default). If you would like to use BYOL/ELA/Subscription licenses from [BIG-IQ License Manager (LM)](https://devcentral.f5.com/s/articles/managing-big-ip-licensing-with-big-iq-31944), then these following steps are needed:
 1. Find available images/versions with "byol" in the name using Google gcloud:
   ```
           gcloud compute images list --project=f5-7626-networks-public | grep f5
@@ -106,24 +107,6 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
           # BIGIP Image
           variable image_name { default = "projects/f5-7626-networks-public/global/images/f5-bigip-14-1-2-3-0-0-5-byol-ltm-2boot-loc-191218142235" }
   ```
-3. In the "variables.tf", modify *license1* with a valid regkey
-  ```
-          # BIGIP Setup
-          variable license1 { default = "" }
-  ```
-4. In the "do.json", add the "myLicense" block under the "Common" declaration ([full declaration example here](https://clouddocs.f5.com/products/extensions/f5-declarative-onboarding/latest/bigip-examples.html#standalone-declaration))
-  ```
-        "myLicense": {
-            "class": "License",
-            "licenseType": "regKey",
-            "regKey": "${regKey}"
-        },
-  ```
-
-## BIG-IQ License Manager
-This template uses PayGo BIG-IP image for the deployment (as default). If you would like to use BYOL/ELA/Subscription licenses from [BIG-IQ License Manager (LM)](https://devcentral.f5.com/s/articles/managing-big-ip-licensing-with-big-iq-31944), then these following steps are needed:
-1. Find BYOL image. Reference [BYOL Licensing](#byol-licensing) step #1.
-2. Replace BIG-IP *image_name* in "variables.tf". Reference [BYOL Licensing](#byol-licensing) step #2.
 3. In the "variables.tf", modify the BIG-IQ license section to match your environment
 4. In the "do.json", add the "myLicense" block under the "Common" declaration ([full declaration example here](https://clouddocs.f5.com/products/extensions/f5-declarative-onboarding/latest/bigiq-examples.html#licensing-with-big-iq-regkey-pool-route-to-big-ip))
   ```
@@ -163,14 +146,11 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | mgmtVpc | Yes | Management VPC network |
 | extSubnet | Yes | External subnet |
 | mgmtSubnet | Yes | Management subnet |
-| managed_route1 | Yes | A UDR route can used for testing managed-route failover. Enter address prefix like x.x.x.x/x. |
-| alias_ip_range | Yes | An array of alias IP ranges for the BIG-IP network interface (used for VIP traffic, SNAT IPs, etc) |
 | bigipMachineType | Yes | Google machine type to be used for the BIG-IP VE |
 | image_name | Yes | F5 SKU (image) to deploy. Note: The disk size of the VM will be determined based on the option you select.  **Important**: If intending to provision multiple modules, ensure the appropriate value is selected, such as ****AllTwoBootLocations or AllOneBootLocation****. |
 | license1 | No | The license token for the F5 BIG-IP VE (BYOL) |
 | license2 | No | The license token for the F5 BIG-IP VE (BYOL) |
 | host1_name | Yes | Hostname for the 1st BIG-IP |
-| host2_name | Yes | Hostname for the 2nd BIG-IP |
 | ntp_server | Yes | Leave the default NTP server the BIG-IP uses, or replace the default NTP server with the one you want to use |
 | timezone | Yes | If you would like to change the time zone the BIG-IP uses, enter the time zone you want to use. This is based on the tz database found in /usr/share/zoneinfo (see the full list [here](https://cloud.google.com/dataprep/docs/html/Supported-Time-Zone-Values_66194188)). Example values: UTC, US/Pacific, US/Eastern, Europe/London or Asia/Singapore. |
 | dns_server | Yes | Leave the default DNS server the BIG-IP uses, or replace the default DNS server with the one you want to use | 
@@ -178,7 +158,6 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | DO_URL | Yes | This is the raw github URL for downloading the Declarative Onboarding RPM |
 | AS3_URL | Yes | This is the raw github URL for downloading the AS3 RPM |
 | TS_URL | Yes | This is the raw github URL for downloading the Telemetry RPM |
-| CF_URL | Yes | This is the raw github URL for downloading the Cloud-Failover RPM |
 | onboard_log | Yes | This is where the onboarding script logs all the events |
 | bigIqHost | No | This is the BIG-IQ License Manager host name or IP address |
 | bigIqUsername | No | BIG-IQ user name |
@@ -188,7 +167,6 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | bigIqSkuKeyword2 | No | BIG-IQ license SKU keyword 1 |
 | bigIqUnitOfMeasure | No | BIG-IQ license unit of measure |
 | bigIqHypervisor | No | BIG-IQ hypervisor |
-| f5_cloud_failover_label | Yes | This is a tag used for failover |
 
 ## Installation Example
 
@@ -238,31 +216,31 @@ To run this Terraform template, perform the following steps:
 
 ## Configuration Example
 
-The following is an example configuration diagram for this solution deployment. In this scenario, all access to the BIG-IP VE cluster (Active/Standby) is direct to each BIG-IP via the management interface. The IP addresses in this example may be different in your implementation.
+The following is an example configuration diagram for this solution deployment. In this scenario, all access to the BIG-IP VE cluster (Active/Active) is direct to each BIG-IP via the management interface. The IP addresses in this example may be different in your implementation.
 
-![Configuration Example](./images/gcp-bigip-ha-via-api.png)
+![Configuration Example](./images/gcp-bigip-ha-via-lb.png)
 
 ## Documentation
 
-For more information on F5 solutions for Google, including manual configuration procedures for some deployment scenarios, see the Google GCP section of [F5 CloudDocs](https://clouddocs.f5.com/cloud/public/v1/google_index.html). Also check out the [Using Cloud Templates for BIG-IP in Google](https://devcentral.f5.com/s/articles/Using-Cloud-Templates-to-Change-BIG-IP-Versions-Google) on DevCentral. This particular HA example is based on the [BIG-IP Cluster "HA via API" F5 GDM Cloud Template on GitHub](https://github.com/F5Networks/f5-google-gdm-templates/tree/master/supported/failover/same-net/via-api/2nic/existing-stack/payg).
+For more information on F5 solutions for Google, including manual configuration procedures for some deployment scenarios, see the Google GCP section of [F5 CloudDocs](https://clouddocs.f5.com/cloud/public/v1/google_index.html). Also check out the [Using Cloud Templates for BIG-IP in Google](https://devcentral.f5.com/s/articles/Using-Cloud-Templates-to-Change-BIG-IP-Versions-Google) on DevCentral. This particular auto scale example is based on the [BIG-IP Auto Scale F5 GDM Cloud Template on GitHub](https://github.com/F5Networks/f5-google-gdm-templates/tree/master/experimental/autoscale/waf/via-lb/existing-stack/payg).
 
 ## Creating Virtual Servers on the BIG-IP VE
 
-In order to pass traffic from your clients to the servers through the BIG-IP system, you must create a virtual server on the BIG-IP VE. In this template, the AS3 declaration creates 2 VIPs: one for public internet facing, and one for private internal usage. It is preconfigured as an example.
+In order to pass traffic from your clients to the servers through the BIG-IP system, you must create a virtual server on the BIG-IP VE. In this template, the AS3 declaration creates 1 VIP listening on 0.0.0.0/0, port 443. It is preconfigured as an example.
 
-In this template, the Google public IP address is associated with the active BIG-IP device NIC0. The address is created with a [Google Forwarding Rule](https://cloud.google.com/load-balancing/docs/forwarding-rule-concepts), and this IP address will be the same IP you see as a virtual server on the BIG-IP.
+In this template, the Google public IP address is associated with the Google External Load Balancer (GLB) which has a target-pool containing both BIG-IP devices as backends. The address is created with a [Google Forwarding Rule](https://cloud.google.com/load-balancing/docs/forwarding-rule-concepts).
 
 ***Note:*** These next steps illustrate the manual way in the GUI to create a virtual server
 1. Open the BIG-IP VE Configuration utility
 2. Click **Local Traffic > Virtual Servers**
 3. Click the **Create** button
 4. Type a name in the **Name** field
-4. Type an address (ex. x.x.x.x/x) in the **Destination/Mask** field
+4. Type an address (ex. 0.0.0.0/0) in the **Destination/Mask** field
 5. Type a port (ex. 443) in the **Service Port**
 6. Configure the rest of the virtual server as appropriate
 7. Select a pool name from the **Default Pool** list
 8. Click the **Finished** button
-9. Repeat as necessary for other applications
+9. Repeat as necessary for other applications by using different ports (ex. 0.0.0.0/0:9443, 0.0.0.0/0:8444)
 
 ## Redeploy BIG-IP for Replacement or Upgrade
 This example illustrates how to replace or upgrade the BIG-IP VE.
@@ -271,10 +249,6 @@ This example illustrates how to replace or upgrade the BIG-IP VE.
   3. Run command
 ```
 terraform taint google_compute_instance.f5vm01
-terraform taint google_compute_instance.f5vm02
-terraform taint google_compute_target_instance.f5vm01
-terraform taint google_compute_target_instance.f5vm02
-terraform taint google_compute_forwarding_rule.vip1
 ```
   3. Run command
 ```
