@@ -63,6 +63,8 @@ Terraform v0.12.26
   - You must have a VPC for management and a VPC for data traffic (client/server). The management VPC will have one subnet for management traffic. The other VPC will have one subnet for data traffic.
   - Firewall rules are required to pass traffic to the application. These ports will depend on your application and the ports you choose to use.
   - BIG-IP will require tcp/22 and tcp/443 for management access
+  - Google ILB health checks are sourced from two internal Google ranges, see [Firewall Rules for Health Checks](https://cloud.google.com/load-balancing/docs/health-checks#fw-rule)
+    - Google ILB health checks to backend BIG-IP instances require tcp/40000 (in this example)
   - If you require a new network first, see the [Infrastructure Only folder](../Infrastructure-only) to get started.
   
 
