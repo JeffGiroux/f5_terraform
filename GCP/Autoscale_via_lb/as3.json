@@ -16,13 +16,9 @@
       "Shared": {
         "class": "Application",
         "template": "shared",
-        "ILB_serviceAddress":{
-          "class":"Service_Address",
-          "virtualAddress":"${privatevip}"
-        },
-        "GLB_serviceAddress":{
-          "class":"Service_Address",
-          "virtualAddress":"${publicvip}"
+        "GLB_serviceAddress": {
+          "class": "Service_Address",
+          "virtualAddress": "${publicvip}"
         }
       },
       "A1": {
@@ -31,9 +27,6 @@
         "serviceMain": {
           "class": "Service_HTTPS",
           "virtualAddresses": [
-            {
-              "use": "/Sample_01/Shared/ILB_serviceAddress"
-            },
             {
               "use": "/Sample_01/Shared/GLB_serviceAddress"
             }
@@ -86,19 +79,6 @@
         "monitor_respond_200": {
           "class": "iRule",
           "iRule": "when HTTP_REQUEST {\n   HTTP::respond 200 System Responding \n}\n"
-        }
-      },
-      "ILB_Probe_Int": {
-        "class": "Application",
-        "fr-probe-internal": {
-          "class": "Service_TCP",
-          "remark": "Health check listener for internal ILB",
-          "virtualPort": 40000,
-          "virtualAddresses": [
-            {
-              "use": "/Sample_01/Shared/ILB_serviceAddress"
-            }
-          ]
         }
       }
     }

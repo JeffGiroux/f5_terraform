@@ -5,7 +5,7 @@
     "label": "Onboard BIG-IP into an HA Pair",
     "Common": {
         "class": "Tenant",
-        "hostname": "${local_host}.${dns_suffix}",
+        "hostname": "$${local_host}",
         "dbVars": {
             "class": "DbVariables",
             "ui.advisory.enabled": true,
@@ -38,33 +38,6 @@
         "myProvisioning": {
             "class": "Provision",
             "ltm": "nominal"
-        },
-        "configsync": {
-            "class": "ConfigSync",
-            "configsyncIp": "$${local_selfip}"
-        },
-        "failoverAddress": {
-            "class": "FailoverUnicast",
-            "address": "$${local_selfip}"
-        },
-        "failoverGroup": {
-            "class": "DeviceGroup",
-            "type": "sync-failover",
-            "members": ["${host1}.${dns_suffix}", "${host2}.${dns_suffix}"],
-            "owner": "/Common/failoverGroup/members/0",
-            "autoSync": true,
-            "saveOnAutoSync": false,
-            "networkFailover": true,
-            "fullLoadOnSync": false,
-            "asmSync": false
-        },
-        "trust": {
-            "class": "DeviceTrust",
-            "localUsername": "${admin_username}",
-            "localPassword": "$${admin_password}",
-            "remoteHost": "${remote_host}.${dns_suffix}",
-            "remoteUsername": "${admin_username}",
-            "remotePassword": "$${admin_password}"
         }
     }
 }

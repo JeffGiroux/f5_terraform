@@ -215,6 +215,7 @@ echo "Submitting DO declaration"
 sed -i "s/\$${admin_password}/$passwd/g" $file_loc
 sed -i "s/\$${bigIqPassword}/$passwd/g" $file_loc
 sed -i "s/\$${local_selfip}/$INT2ADDRESS/g" $file_loc
+sed -i "s/\$${local_host}/$HOSTNAME/g" $file_loc
 response_code=$(/usr/bin/curl -sku admin:$passwd -w "%%{http_code}" -X POST -H "Content-Type: application/json" -H "Expect:" https://localhost:$${mgmtGuiPort}/mgmt/shared/declarative-onboarding -d @$file_loc -o /dev/null)
 if [[ $response_code == *200 || $response_code == *202 ]]; then
   echo "DO task created"
