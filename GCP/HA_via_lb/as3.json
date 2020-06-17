@@ -13,14 +13,30 @@
     },
     "Sample_01": {
       "class": "Tenant",
+      "Shared": {
+        "class": "Application",
+        "template": "shared",
+        "ILB_serviceAddress":{
+          "class":"Service_Address",
+          "virtualAddress":"${privatevip}"
+        },
+        "GLB_serviceAddress":{
+          "class":"Service_Address",
+          "virtualAddress":"${publicvip}"
+        }
+      },
       "A1": {
         "class": "Application",
         "template": "https",
         "serviceMain": {
           "class": "Service_HTTPS",
           "virtualAddresses": [
-            "${publicvip}",
-            "${privatevip}"
+            {
+              "use": "/Sample_01/Shared/ILB_serviceAddress"
+            },
+            {
+              "use": "/Sample_01/Shared/GLB_serviceAddress"
+            }
           ],
           "pool": "web_pool",
           "serverTLS": "webtls"
@@ -61,7 +77,9 @@
           "remark": "Health check listener for external GLB",
           "virtualPort": 40000,
           "virtualAddresses": [
-            "${publicvip}"
+            {
+              "use": "/Sample_01/Shared/GLB_serviceAddress"
+            }
           ],
           "iRules": ["monitor_respond_200"]
         },
@@ -77,7 +95,9 @@
           "remark": "Health check listener for internal ILB",
           "virtualPort": 40000,
           "virtualAddresses": [
-            "${privatevip}"
+            {
+              "use": "/Sample_01/Shared/ILB_serviceAddress"
+            }
           ]
         }
       }
