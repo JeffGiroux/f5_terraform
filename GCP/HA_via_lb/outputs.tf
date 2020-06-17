@@ -14,3 +14,5 @@ output "f5vm02_mgmt_pip_url" { value = "https://${google_compute_instance.f5vm02
 output "f5vm02_mgmt_name" { value = google_compute_instance.f5vm02.name }
 output "public_vip" { value = google_compute_forwarding_rule.vip1.ip_address }
 output "public_vip_url" { value = "https://${google_compute_forwarding_rule.vip1.ip_address}" }
+output "internal_vip" { value = google_compute_forwarding_rule.vip2-internal.ip_address }
+output "internal_vip_url" { value = "https://${google_compute_forwarding_rule.vip2-internal.ip_address}" }
