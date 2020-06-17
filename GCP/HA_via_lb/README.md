@@ -1,4 +1,4 @@
-# Deploying BIG-IP VEs in Google - High Availability (Active/Standby): Two NICs
+# Deploying BIG-IP VEs in Google - High Availability (Active/Standby): Two NICs, Failover via LB
 
 ## Contents
 
