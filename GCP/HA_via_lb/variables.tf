@@ -14,7 +14,6 @@ variable extVpc {}
 variable mgmtVpc {}
 variable extSubnet {}
 variable mgmtSubnet {}
-variable managed_route1 { default = "192.0.2.0/24" } # adjust to your environment
 
 # BIGIP Image
 variable bigipMachineType { default = "n1-standard-8" }
@@ -58,4 +57,3 @@ variable owner { default = "f5owner" }
 variable group { default = "f5group" }
 variable costcenter { default = "f5costcenter" }
 variable application { default = "f5app" }
-variable f5_cloud_failover_label { default = "mydeployment" } #Cloud Failover Tag

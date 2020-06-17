@@ -49,15 +49,6 @@ cat <<'EOF' > /config/cloud/ts.json
 ${TS_Document}
 EOF
 
-#####################################
-#### cfe.json - Declaration File ####
-#####################################
-
-# CFE
-cat <<'EOF' > /config/cloud/cfe.json
-${CFE_Document}
-EOF
-
 #######################
 #### mgmt-route.sh ####
 #######################
@@ -113,7 +104,7 @@ EOF
 #### custom-config.sh ####
 ##########################
 
-# TMSH, DO, AS3, TS, CFE declarations
+# TMSH, DO, AS3, TS declarations
 cat  <<'EOF' > /config/cloud/custom-config.sh
 #!/bin/bash
 source /usr/lib/bigstart/bigip-ready-functions
@@ -263,19 +254,6 @@ else
   echo "Response code: $${response_code}"
 fi
 
-# Submit CFE Declaration
-wait_for_ready cloud-failover
-file_loc="/config/cloud/cfe.json"
-echo "Submitting CFE declaration"
-sed -i "s/\$${local_selfip}/$INT2ADDRESS/g" $file_loc
-response_code=$(/usr/bin/curl -sku admin:$passwd -w "%%{http_code}" -X POST -H "Content-Type: application/json" -H "Expect:" https://localhost:$${mgmtGuiPort}/mgmt/shared/cloud-failover/declare -d @$file_loc -o /dev/null)
-if [[ $response_code == *200 || $response_code == *502 ]]; then
-  echo "Deployment of CFE succeeded"
-else
-  echo "Failed to deploy CFE; continuing..."
-  echo "Response code: $${response_code}"
-fi
-
 # # Submit TS Declaration
 # wait_for_ready telemetry
 # file_loc="/config/cloud/ts.json"
@@ -292,8 +270,8 @@ fi
 # fi
 
 # Cleanup
-echo "Removing DO/AS3/TS/CFE declaration files"
-rm -rf /config/cloud/do.json /config/cloud/as3.json /config/cloud/ts.json /config/cloud/cfe.json
+echo "Removing DO/AS3/TS declaration files"
+rm -rf /config/cloud/do.json /config/cloud/as3.json /config/cloud/ts.json
 
 date
 echo "Finished custom config"
@@ -317,8 +295,6 @@ AS3_URL='${AS3_URL}'
 AS3_FN=$(basename "$AS3_URL")
 TS_URL='${TS_URL}'
 TS_FN=$(basename "$TS_URL")
-CF_URL='${CF_URL}'
-CF_FN=$(basename "$CF_URL")
 rpmFilePath="/var/config/rest/downloads"
 
 ###################
@@ -417,7 +393,6 @@ echo "Downloading toolchain RPMs"
 curl -L -s -f --retry 20 -o $rpmFilePath/$TS_FN $TS_URL
 curl -L -s -f --retry 20 -o $rpmFilePath/$DO_FN $DO_URL
 curl -L -s -f --retry 20 -o $rpmFilePath/$AS3_FN $AS3_URL
-curl -L -s -f --retry 20 -o $rpmFilePath/$CF_FN $CF_URL
 sleep 10
 
 echo "Installing TS Pkg"
@@ -432,11 +407,6 @@ sleep 10
 echo
 echo "Installing AS3 Pkg"
 DATA="{\"operation\":\"INSTALL\",\"packageFilePath\":\"$rpmFilePath/$AS3_FN\"}"
-curl -s -u $CREDS -X POST http://localhost:8100/mgmt/shared/iapp/package-management-tasks -d $DATA
-sleep 10
-echo
-echo "Installing CF Pkg"
-DATA="{\"operation\":\"INSTALL\",\"packageFilePath\":\"$rpmFilePath/$CF_FN\"}"
 curl -s -u $CREDS -X POST http://localhost:8100/mgmt/shared/iapp/package-management-tasks -d $DATA
 sleep 10
 echo

@@ -46,7 +46,6 @@ Terraform v0.12.26
     - Performed by F5 Application Services AS3
   - Google Cloud Monitoring (aka StackDriver) - requires "Monitoring Editor"
     - Performed by F5 Telemetry Streaming
-  - Cloud failover via API - requires R/W access to compute and storage (see F5 CloudDocs [Create and assign an IAM role](https://clouddocs.f5.com/products/extensions/f5-cloud-failover/latest/userguide/gcp.html#create-and-assign-an-iam-role))
 - This template requires a service account to deploy with the Terraform Google provider and build out all the neccessary Google objects
   - See the [Terraform Google Provider "Adding Credentials"](https://www.terraform.io/docs/providers/google/guides/getting_started.html#adding-credentials) for details. Also, review the [available Google GCP permission scopes](https://cloud.google.com/sdk/gcloud/reference/alpha/compute/instances/set-scopes#--scopes) too.
   - Permissions will depend on the objects you are creating
@@ -54,7 +53,7 @@ Terraform v0.12.26
   - ***Note***: For lab environments, you can start with "Editor" role. When you are working in other environments, make sure to [practice least privilege](https://cloud.google.com/iam/docs/understanding-service-accounts#granting_minimum).
 - ***Shared Service Accounts***: For lab purposes, you can create one service account and use it for everything. Alternatively, you can create a more secure environment with separate service accounts for various functions. Example...
   - Service Account #1 - the svc-acct used for Terraform to deploy cloud objects
-  - Service Account #2 - the svc-acct assigned to BIG-IP instance during creation (ex. service discovery, query Pub/Sub, storage, failover)
+  - Service Account #2 - the svc-acct assigned to BIG-IP instance during creation (ex. service discovery, query Pub/Sub, storage)
   - Service Account #3 - the svc-acct used in F5 Telemetry Streaming referenced in [ts.json](./ts.json) (ex. analytics)
 - Passwords and secrets are located in [Google Cloud Secret Manager](https://cloud.google.com/secret-manager/docs/quickstart#secretmanager-quickstart-web). Make sure you have an existing Google Cloud "secret" with the data containing the clear text passwords for each relevant item: BIG-IP password, service account credentials, BIG-IQ password, etc.
   - 'usecret' contains the value of the adminstrator password (ex. "Default12345!")
@@ -74,7 +73,7 @@ Terraform v0.12.26
   - ***Note***: Other items like BIG-IP password are stored in Google Cloud Secret Manager. Refer to the [Prerequisites](#prerequisites).
   - The BIG-IP instance will query Google Metadata API to retrieve the service account's token for authentication.
   - The BIG-IP instance will then use the secret name and the service account's token to query Google Metadata API and dynamically retrieve the password for device onboarding.
-- This template uses Declarative Onboarding (DO), Application Services 3 (AS3), and Cloud Failover Extension packages for the initial configuration. As part of the onboarding script, it will download the RPMs automatically. See the [AS3 documentation](http://f5.com/AS3Docs) and [DO documentation](http://f5.com/DODocs) for details on how to use AS3 and Declarative Onboarding on your BIG-IP VE(s). The [Telemetry Streaming](http://f5.com/TSDocs) extension is also downloaded and can be configured to point to Google Cloud Monitoring (old name StackDriver).  The [Cloud Failover Extension](http://f5.com/CFEDocs) documentation is also available.
+- This template uses Declarative Onboarding (DO) and Application Services 3 (AS3) for the initial configuration. As part of the onboarding script, it will download the RPMs automatically. See the [AS3 documentation](http://f5.com/AS3Docs) and [DO documentation](http://f5.com/DODocs) for details on how to use AS3 and Declarative Onboarding on your BIG-IP VE(s). The [Telemetry Streaming](http://f5.com/TSDocs) extension is also downloaded and can be configured to point to Google Cloud Monitoring (old name StackDriver).
 - Files
   - bigip.tf - resources for BIG-IP, NICs, public IPs
   - main.tf - resources for provider, versions
@@ -82,7 +81,6 @@ Terraform v0.12.26
   - do.json - contains the L1-L3 BIG-IP configurations used by DO for items like VLANs, IPs, and routes.
   - as3.json - contains the L4-L7 BIG-IP configurations used by AS3 for items like pool members, virtual server listeners, security policies, and more.
   - ts.json - contains the BIG-IP configurations used by TS for items like telemetry streaming, CPU, memory, application statistics, and more.
-  - cfe.json - contains the BIG-IP configurations used for failover operations of cloud objects like IPs and routes.
 
 ## BYOL Licensing
 This template uses PayGo BIG-IP image for the deployment (as default). If you would like to use BYOL licenses, then these following steps are needed:
@@ -164,7 +162,6 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | mgmtVpc | Yes | Management VPC network |
 | extSubnet | Yes | External subnet |
 | mgmtSubnet | Yes | Management subnet |
-| managed_route1 | Yes | A UDR route can used for testing managed-route failover. Enter address prefix like x.x.x.x/x. |
 | bigipMachineType | Yes | Google machine type to be used for the BIG-IP VE |
 | image_name | Yes | F5 SKU (image) to deploy. Note: The disk size of the VM will be determined based on the option you select.  **Important**: If intending to provision multiple modules, ensure the appropriate value is selected, such as ****AllTwoBootLocations or AllOneBootLocation****. |
 | license1 | No | The license token for the F5 BIG-IP VE (BYOL) |
@@ -178,7 +175,6 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | DO_URL | Yes | This is the raw github URL for downloading the Declarative Onboarding RPM |
 | AS3_URL | Yes | This is the raw github URL for downloading the AS3 RPM |
 | TS_URL | Yes | This is the raw github URL for downloading the Telemetry RPM |
-| CF_URL | Yes | This is the raw github URL for downloading the Cloud-Failover RPM |
 | onboard_log | Yes | This is where the onboarding script logs all the events |
 | bigIqHost | No | This is the BIG-IQ License Manager host name or IP address |
 | bigIqUsername | No | BIG-IQ user name |
@@ -188,7 +184,6 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | bigIqSkuKeyword2 | No | BIG-IQ license SKU keyword 1 |
 | bigIqUnitOfMeasure | No | BIG-IQ license unit of measure |
 | bigIqHypervisor | No | BIG-IQ hypervisor |
-| f5_cloud_failover_label | Yes | This is a tag used for failover |
 
 ## Installation Example
 
@@ -258,7 +253,7 @@ In this template, the Google public IP address is associated with the Google Loa
 3. Click the **Create** button
 4. Type a name in the **Name** field
 4. Type an address (ex. 0.0.0.0/0) in the **Destination/Mask** field
-5. Type a port (ex. 8443) in the **Service Port**
+5. Type a port (ex. 443) in the **Service Port**
 6. Configure the rest of the virtual server as appropriate
 7. Select a pool name from the **Default Pool** list
 8. Click the **Finished** button
@@ -280,7 +275,6 @@ This example illustrates how to replace or upgrade the BIG-IP VE.
   2. Revoke the problematic BIG-IP VE's license (if BYOL)
   3. Run command
 ```
-#change this
 terraform taint google_compute_instance.f5vm01
 terraform taint google_compute_instance.f5vm02
 ```
