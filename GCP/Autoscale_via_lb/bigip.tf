@@ -99,6 +99,7 @@ resource "google_compute_region_instance_group_manager" "f5vm" {
   name               = "${var.prefix}-igm"
   base_instance_name = "${var.prefix}-f5vm"
   region             = var.gcp_region
+  target_pools       = [google_compute_target_pool.f5vm.id]
   wait_for_instances = false
 
   version {
