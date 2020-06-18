@@ -120,7 +120,7 @@ resource "google_compute_region_instance_group_manager" "f5vm" {
   }
 }
 
-# Auto scaling policies
+# Autoscaling policies
 resource "google_compute_region_autoscaler" "f5vm" {
   name   = "${var.prefix}-f5vm-as"
   target = google_compute_region_instance_group_manager.f5vm.id
