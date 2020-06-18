@@ -93,6 +93,6 @@ resource "google_compute_firewall" "app-ilb-probe" {
   source_ranges = ["35.191.0.0/16", "130.211.0.0/22"]
   allow {
     protocol = "tcp"
-    ports    = ["40000"]
+    ports    = ["80", "443", "40000"]
   }
 }
