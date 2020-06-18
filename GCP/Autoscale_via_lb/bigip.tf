@@ -120,6 +120,7 @@ resource "google_compute_region_instance_group_manager" "f5vm" {
     minimal_action        = var.update_policy_minimal_action
     max_surge_fixed       = var.update_policy_max_surge_fixed
     max_unavailable_fixed = var.update_policy_max_unavailable_fixed
+    min_ready_sec         = var.update_policy_min_ready_sec
   }
 }
 
