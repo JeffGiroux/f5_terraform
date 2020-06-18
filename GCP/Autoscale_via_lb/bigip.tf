@@ -32,8 +32,8 @@ locals {
   })
   as3_json = templatefile("${path.module}/as3.json", {
     gcp_region = var.gcp_region
-    #publicvip  = google_compute_address.vip1.address
-    publicvip = "0.0.0.0/0"
+    publicvip  = google_compute_address.vip1.address
+    #publicvip = "0.0.0.0/0"
   })
   ts_json = templatefile("${path.module}/ts.json", {
     gcp_project_id = var.gcp_project_id
@@ -84,13 +84,16 @@ resource "google_compute_instance_template" "f5vm" {
   }
 }
 
-# Health Check for BIG-IP instance group
+# Health Check for BIG-IP instance group for auto healing
 resource "google_compute_health_check" "f5vm" {
-  name = "${var.prefix}-hc-f5vm"
-  https_health_check {
-    port         = 443
-    host         = var.health_check_host_header
-    request_path = var.health_check_request_path
+  name                = "${var.prefix}-hc-f5vm"
+  timeout_sec         = 10
+  check_interval_sec  = 30
+  healthy_threshold   = 2
+  unhealthy_threshold = 5
+
+  http_health_check {
+    port = 40000
   }
 }
 
