@@ -28,6 +28,10 @@ resource "google_compute_target_pool" "f5vm" {
 
 # Health Check for Backend Pool External
 resource "google_compute_http_health_check" "hc-ext" {
-  name = "${var.prefix}-hc-ext"
-  port = "40000"
+  name                = "${var.prefix}-hc-ext"
+  port                = "40000"
+  timeout_sec         = 2
+  check_interval_sec  = 5
+  healthy_threshold   = 2
+  unhealthy_threshold = 2
 }
