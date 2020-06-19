@@ -16,20 +16,20 @@
       "Shared": {
         "class": "Application",
         "template": "shared",
-        "lb_healthProbe_rule": {
+        "mig_healthCheck_rule": {
           "remark": "Respond to MIG health check",
           "class": "iRule",
           "iRule": "when CLIENT_ACCEPTED {\n  TCP::close\n}"
         },
-        "lb_healthProbe_vs": {
+        "mig_healthCheck_vs": {
           "class": "Service_TCP",
-          "remark": "LB Health Probe VS",
+          "remark": "MIG Health Check VS",
           "virtualPort": 40000,
           "virtualAddresses": [
             "$${local_selfip}"
           ],
           "iRules": [
-              "lb_healthProbe_rule"
+              "mig_healthCheck_rule"
           ]
         }
       }
