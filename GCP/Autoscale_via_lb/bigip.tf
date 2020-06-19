@@ -93,7 +93,7 @@ resource "google_compute_health_check" "f5vm" {
   unhealthy_threshold = 5
 
   tcp_health_check {
-    port = 443
+    port = 40000
   }
 }
 
