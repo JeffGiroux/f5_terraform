@@ -16,15 +16,15 @@ variable extSubnet {}
 variable mgmtSubnet {}
 
 # Google LB, auto healing, and auto scaling
-variable auto_healing_initial_delay_sec { default = 600 }
+variable auto_healing_initial_delay_sec { default = 500 }
 variable update_policy_type { default = "PROACTIVE" }
 variable update_policy_minimal_action { default = "REPLACE" }
 variable update_policy_max_surge_fixed { default = 3 }
 variable update_policy_max_unavailable_fixed { default = 0 }
-variable update_policy_min_ready_sec { default = 600 }
+variable update_policy_min_ready_sec { default = 0 }
 variable autoscaling_max_replicas { default = 2 }
 variable autoscaling_min_replicas { default = 1 }
-variable autoscaling_cooldown_period { default = 600 }
+variable autoscaling_cooldown_period { default = 500 }
 variable autoscaling_cpu_target { default = ".7" }
 
 # BIGIP Image
