@@ -169,12 +169,6 @@ usecret='${usecret}'
 ksecret='${ksecret}'
 mgmtGuiPort="443"
 
-# BIG-IP Credentials
-wait_bigip_ready
-echo "Retrieving BIG-IP password from Metadata secret"
-svcacct_token=$(curl -s -f --retry 20 "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token" -H "Metadata-Flavor: Google" | jq -r ".access_token")
-passwd=$(curl -s -f --retry 20 "https://secretmanager.googleapis.com/v1/projects/$projectId/secrets/$usecret/versions/1:access" -H "Authorization: Bearer $svcacct_token" | jq -r ".payload.data" | base64 --decode)
-
 # Workaround: Use TMSH commands for networking
 # DO doesn't support "interface" as route target
 # https://github.com/F5Networks/f5-declarative-onboarding/issues/147
@@ -205,6 +199,14 @@ do
     error_exit "$LINENO: An error has occurred while executing $CMD. Aborting!"
   fi
 done
+
+date
+
+# BIG-IP Credentials
+wait_bigip_ready
+echo "Retrieving BIG-IP password from Metadata secret"
+svcacct_token=$(curl -s -f --retry 20 "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token" -H "Metadata-Flavor: Google" | jq -r ".access_token")
+passwd=$(curl -s -f --retry 20 "https://secretmanager.googleapis.com/v1/projects/$projectId/secrets/$usecret/versions/1:access" -H "Authorization: Bearer $svcacct_token" | jq -r ".payload.data" | base64 --decode)
 
 date
 
@@ -273,7 +275,7 @@ fi
 
 # Cleanup
 echo "Removing DO/AS3/TS declaration files"
-rm -rf /config/cloud/do.json /config/cloud/as3.json /config/cloud/ts.json
+#rm -rf /config/cloud/do.json /config/cloud/as3.json /config/cloud/ts.json
 
 date
 echo "Finished custom config"
@@ -388,15 +390,15 @@ tmsh save sys config
 #### restjavad memory ####
 ##########################
 
-date
-wait_bigip_ready
-# Modify restjavad memory
-echo "Increasing extramb for restjavad"
-tmsh modify sys db provision.extramb value 1000
-tmsh modify sys db restjavad.useextramb value true
-tmsh save sys config
-tmsh restart sys service restjavad
-wait_bigip_ready
+# date
+# wait_bigip_ready
+# # Modify restjavad memory
+# echo "Increasing extramb for restjavad"
+# tmsh modify sys db provision.extramb value 1000
+# tmsh modify sys db restjavad.useextramb value true
+# tmsh save sys config
+# tmsh restart sys service restjavad
+# wait_bigip_ready
 
 ##############################################
 #### Install F5 Automation Toolchain RPMs ####
@@ -434,7 +436,7 @@ rm -rf $rpmFilePath/*.rpm
 #############################
 
 # https://support.f5.com/csp/article/K11948
-echo "(/config/cloud/mgmt-route.sh; /config/cloud/custom-config.sh | tee /var/log/cloud/custom-config.log >> $LOG_FILE) &" >> /config/startup
+echo "(/config/cloud/custom-config.sh | tee /var/log/cloud/custom-config.log >> $LOG_FILE) &" >> /config/startup
 chmod +w /config/startup
 chmod +x /config/cloud/mgmt-route.sh
 chmod +x /config/cloud/custom-config.sh
