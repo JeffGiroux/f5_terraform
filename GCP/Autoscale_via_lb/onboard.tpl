@@ -390,15 +390,15 @@ tmsh save sys config
 #### restjavad memory ####
 ##########################
 
-# date
-# wait_bigip_ready
-# # Modify restjavad memory
-# echo "Increasing extramb for restjavad"
-# tmsh modify sys db provision.extramb value 1000
-# tmsh modify sys db restjavad.useextramb value true
-# tmsh save sys config
-# tmsh restart sys service restjavad
-# wait_bigip_ready
+date
+wait_bigip_ready
+# Modify restjavad memory
+echo "Increasing extramb for restjavad"
+tmsh modify sys db provision.extramb value 1000
+tmsh modify sys db restjavad.useextramb value true
+tmsh save sys config
+tmsh restart sys service restjavad
+wait_bigip_ready
 
 ##############################################
 #### Install F5 Automation Toolchain RPMs ####
