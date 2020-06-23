@@ -68,7 +68,7 @@ Terraform v0.12.26
   - You must have a VPC for management and a VPC for data traffic (client/server). The management VPC will have one subnet for management traffic. The other VPC will have one subnet for data traffic.
   - Firewall rules are required to pass traffic to the application. These ports will depend on your application and the ports you choose to use.
   - BIG-IP will require tcp/22 and tcp/443 for management access
-  - Google Health Checks will require tcp/40000 for this lab. Refer to [Google Health Check Concepts](https://cloud.google.com/load-balancing/docs/health-check-concepts) to see source IP ranges for the Google probes. These IP ranges and ports (tcp/40000 in this example) need to be open in your firewall rules.
+  - Google Health Checks will require tcp/40000 on the external network. Refer to [Google Health Check Concepts](https://cloud.google.com/load-balancing/docs/health-check-concepts) to see source IP ranges for the Google probes. These IP ranges and ports (tcp/40000 in this example) need to be open in your firewall rules on the external network.
   - If you require a new network first, see the [Infrastructure Only folder](../Infrastructure-only) to get started.
   
 
