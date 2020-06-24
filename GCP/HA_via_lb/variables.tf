@@ -11,8 +11,10 @@ variable prefix {}
 
 # NETWORK
 variable extVpc {}
+variable intVpc {}
 variable mgmtVpc {}
 variable extSubnet {}
+variable intSubnet {}
 variable mgmtSubnet {}
 
 # BIGIP Image
@@ -37,7 +39,6 @@ variable timezone { default = "UTC" }
 variable DO_URL { default = "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.13.0/f5-declarative-onboarding-1.13.0-5.noarch.rpm" }
 variable AS3_URL { default = "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.20.0/f5-appsvcs-3.20.0-3.noarch.rpm" }
 variable TS_URL { default = "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.12.0/f5-telemetry-1.12.0-3.noarch.rpm" }
-variable CF_URL { default = "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.3.0/f5-cloud-failover-1.3.0-0.noarch.rpm" }
 variable onboard_log { default = "/var/log/cloud/onboard.log" }
 
 # BIGIQ License Manager Setup

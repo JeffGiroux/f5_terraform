@@ -90,9 +90,12 @@ COMPUTE_BASE_URL="http://metadata.google.internal/computeMetadata/v1"
 echo "MGMTADDRESS=$(curl -s -f --retry 10 "$${COMPUTE_BASE_URL}/instance/network-interfaces/1/ip" -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
 echo "MGMTMASK=$(curl -s -f --retry 10 "$${COMPUTE_BASE_URL}/instance/network-interfaces/1/subnetmask" -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
 echo "MGMTGATEWAY=$(curl -s -f --retry 10 "$${COMPUTE_BASE_URL}/instance/network-interfaces/1/gateway" -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
-echo "INT2ADDRESS=$(curl -s -f --retry 10 "$${COMPUTE_BASE_URL}/instance/network-interfaces/0/ip" -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
-echo "INT2MASK=$(curl -s -f --retry 10 "$${COMPUTE_BASE_URL}/instance/network-interfaces/0/subnetmask" -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
-echo "INT2GATEWAY=$(curl -s -f --retry 10 "$${COMPUTE_BASE_URL}/instance/network-interfaces/0/gateway" -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
+echo "INT1ADDRESS=$(curl -s -f --retry 10 "$${COMPUTE_BASE_URL}/instance/network-interfaces/0/ip" -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
+echo "INT1MASK=$(curl -s -f --retry 10 "$${COMPUTE_BASE_URL}/instance/network-interfaces/0/subnetmask" -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
+echo "INT1GATEWAY=$(curl -s -f --retry 10 "$${COMPUTE_BASE_URL}/instance/network-interfaces/0/gateway" -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
+echo "INT2ADDRESS=$(curl -s -f --retry 10 "$${COMPUTE_BASE_URL}/instance/network-interfaces/2/ip" -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
+echo "INT2MASK=$(curl -s -f --retry 10 "$${COMPUTE_BASE_URL}/instance/network-interfaces/2/subnetmask" -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
+echo "INT2GATEWAY=$(curl -s -f --retry 10 "$${COMPUTE_BASE_URL}/instance/network-interfaces/2/gateway" -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
 echo "HOSTNAME=$(curl -s -f --retry 10 "$${COMPUTE_BASE_URL}/instance/hostname" -H 'Metadata-Flavor: Google')" >> /config/cloud/interface.config
 chmod 755 /config/cloud/interface.config
 date
@@ -112,8 +115,10 @@ wait_bigip_ready
 
 source /config/cloud/interface.config
 MGMTNETWORK=$(/bin/ipcalc -n $MGMTADDRESS $MGMTMASK | cut -d= -f2)
+INT1NETWORK=$(/bin/ipcalc -n $INT1ADDRESS $INT1MASK | cut -d= -f2)
 INT2NETWORK=$(/bin/ipcalc -n $INT2ADDRESS $INT2MASK | cut -d= -f2)
 echo "MGMTNETWORK=$MGMTNETWORK" >> /config/cloud/interface.config
+echo "INT1NETWORK=$INT1NETWORK" >> /config/cloud/interface.config
 echo "INT2NETWORK=$INT2NETWORK" >> /config/cloud/interface.config
 
 PROGNAME=$(basename $0)
@@ -136,20 +141,14 @@ function wait_for_ready {
   app=$1
   checks=0
   ready_response=""
-  ready_response_declare=""
   checks_max=10
   while [ $checks -lt $checks_max ] ; do
     ready_response=$(curl -sku admin:$passwd -w "%%{http_code}" -X GET  https://localhost:$${mgmtGuiPort}/mgmt/shared/$${app}/info -o /dev/null)
-    if [[ $app == "declarative-onboarding" ]]; then
-      ready_response_declare=$(curl -sku admin:$passwd -w "%%{http_code}" -X GET  https://localhost:$${mgmtGuiPort}/mgmt/shared/$${app} -o /dev/null)
-    else
-      ready_response_declare=$(curl -sku admin:$passwd -w "%%{http_code}" -X GET  https://localhost:$${mgmtGuiPort}/mgmt/shared/$${app}/declare -o /dev/null)
-    fi
-    if [[ $ready_response == *200 ]] && [[ $ready_response_declare == *204 || $ready_response_declare == *200 ]]; then
+    if [[ $ready_response == *200 ]]; then
         echo "$${app} is ready"
         break
     else
-        echo "$${app} is not ready: $checks, response: $ready_response $ready_response_declare"
+        echo "$${app} is not ready: $checks, response: $ready_response"
         let checks=checks+1
         if [[ $checks == $((checks_max/2)) ]]; then
             echo "restarting restnoded"
@@ -158,7 +157,7 @@ function wait_for_ready {
         sleep 15
     fi
   done
-  if [[ $ready_response != *200 ]] && [[ $ready_response_declare != *204 || $ready_response_declare != *200 ]]; then
+  if [[ $ready_response != *200 ]]; then
     error_exit "$LINENO: $${app} was not installed correctly. Exit."
   fi
 }
@@ -168,12 +167,6 @@ projectId='${gcp_project_id}'
 usecret='${usecret}'
 ksecret='${ksecret}'
 mgmtGuiPort="443"
-
-# BIG-IP Credentials
-wait_bigip_ready
-echo "Retrieving BIG-IP password from Metadata secret"
-svcacct_token=$(curl -s -f --retry 20 "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token" -H "Metadata-Flavor: Google" | jq -r ".access_token")
-passwd=$(curl -s -f --retry 20 "https://secretmanager.googleapis.com/v1/projects/$projectId/secrets/$usecret/versions/1:access" -H "Authorization: Bearer $svcacct_token" | jq -r ".payload.data" | base64 --decode)
 
 # Workaround: Use TMSH commands for networking
 # DO doesn't support "interface" as route target
@@ -189,10 +182,14 @@ tmsh+=(
 "tmsh create sys management-route mgmt_net network $${MGMTNETWORK}/$${MGMTMASK} gateway $${MGMTGATEWAY} mtu 1460"
 "tmsh create sys management-route default gateway $${MGMTGATEWAY} mtu 1460"
 "tmsh create net vlan external interfaces add { 1.0 } mtu 1460"
-"tmsh create net self self_external address $${INT2ADDRESS}/32 vlan external allow-service add { tcp:4353 tcp:443 udp:1026 }"
-"tmsh create net route ext_gw_interface network $${INT2GATEWAY}/32 interface external"
-"tmsh create net route ext_rt network $${INT2NETWORK}/$${INT2MASK} gw $${INT2GATEWAY}"
-"tmsh create net route default gw $${INT2GATEWAY}"
+"tmsh create net self self_external address $${INT1ADDRESS}/32 vlan external"
+"tmsh create net route ext_gw_interface network $${INT1GATEWAY}/32 interface external"
+"tmsh create net route ext_rt network $${INT1NETWORK}/$${INT1MASK} gw $${INT1GATEWAY}"
+"tmsh create net route default gw $${INT1GATEWAY}"
+"tmsh create net vlan internal interfaces add { 1.2 } mtu 1460"
+"tmsh create net self self_internal address $${INT2ADDRESS}/32 vlan internal allow-service add { tcp:4353 udp:1026 }"
+"tmsh create net route int_gw_interface network $${INT2GATEWAY}/32 interface internal"
+"tmsh create net route int_rt network $${INT2NETWORK}/$${INT2MASK} gw $${INT2GATEWAY}"
 "tmsh modify sys global-settings remote-host add { metadata.google.internal { hostname metadata.google.internal addr 169.254.169.254 } }"
 "tmsh modify sys management-dhcp sys-mgmt-dhcp-config request-options delete { ntp-servers }"
 'tmsh save /sys config'
@@ -208,13 +205,23 @@ done
 
 date
 
+# BIG-IP Credentials
+wait_bigip_ready
+echo "Retrieving BIG-IP password from Metadata secret"
+svcacct_token=$(curl -s -f --retry 20 "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token" -H "Metadata-Flavor: Google" | jq -r ".access_token")
+passwd=$(curl -s -f --retry 20 "https://secretmanager.googleapis.com/v1/projects/$projectId/secrets/$usecret/versions/1:access" -H "Authorization: Bearer $svcacct_token" | jq -r ".payload.data" | base64 --decode)
+
+date
+
 # Submit DO Declaration
 wait_for_ready declarative-onboarding
 file_loc="/config/cloud/do.json"
 echo "Submitting DO declaration"
 sed -i "s/\$${admin_password}/$passwd/g" $file_loc
 sed -i "s/\$${bigIqPassword}/$passwd/g" $file_loc
-sed -i "s/\$${local_selfip}/$INT2ADDRESS/g" $file_loc
+sed -i "s/\$${local_selfip_ext}/$INT1ADDRESS/g" $file_loc
+sed -i "s/\$${local_selfip_int}/$INT2ADDRESS/g" $file_loc
+sed -i "s/\$${local_host}/$HOSTNAME/g" $file_loc
 response_code=$(/usr/bin/curl -sku admin:$passwd -w "%%{http_code}" -X POST -H "Content-Type: application/json" -H "Expect:" https://localhost:$${mgmtGuiPort}/mgmt/shared/declarative-onboarding -d @$file_loc -o /dev/null)
 if [[ $response_code == *200 || $response_code == *202 ]]; then
   echo "DO task created"
@@ -246,6 +253,7 @@ date
 wait_for_ready appsvcs
 file_loc="/config/cloud/as3.json"
 echo "Submitting AS3 declaration"
+sed -i "s/\$${local_selfip_ext}/$INT1ADDRESS/g" $file_loc
 response_code=$(/usr/bin/curl -sku admin:$passwd -w "%%{http_code}" -X POST -H "Content-Type: application/json" -H "Expect:" https://localhost:$${mgmtGuiPort}/mgmt/shared/appsvcs/declare -d @$file_loc -o /dev/null)
 if [[ $response_code == *200 || $response_code == *502 ]]; then
   echo "Deployment of AS3 succeeded"
@@ -271,7 +279,7 @@ fi
 
 # Cleanup
 echo "Removing DO/AS3/TS declaration files"
-rm -rf /config/cloud/do.json /config/cloud/as3.json /config/cloud/ts.json
+#rm -rf /config/cloud/do.json /config/cloud/as3.json /config/cloud/ts.json
 
 date
 echo "Finished custom config"
@@ -382,6 +390,20 @@ tmsh show sys disk directory /appdata
 echo "Done setting app directory size"
 tmsh save sys config
 
+##########################
+#### restjavad memory ####
+##########################
+
+# date
+# wait_bigip_ready
+# # Modify restjavad memory
+# echo "Increasing extramb for restjavad"
+# tmsh modify sys db provision.extramb value 1000
+# tmsh modify sys db restjavad.useextramb value true
+# tmsh save sys config
+# tmsh restart sys service restjavad
+# wait_bigip_ready
+
 ##############################################
 #### Install F5 Automation Toolchain RPMs ####
 ##############################################
@@ -418,7 +440,7 @@ rm -rf $rpmFilePath/*.rpm
 #############################
 
 # https://support.f5.com/csp/article/K11948
-echo "(/config/cloud/mgmt-route.sh; /config/cloud/custom-config.sh | tee /var/log/cloud/custom-config.log >> $LOG_FILE) &" >> /config/startup
+echo "(/config/cloud/custom-config.sh | tee /var/log/cloud/custom-config.log >> $LOG_FILE) &" >> /config/startup
 chmod +w /config/startup
 chmod +x /config/cloud/mgmt-route.sh
 chmod +x /config/cloud/custom-config.sh
