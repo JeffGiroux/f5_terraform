@@ -24,7 +24,7 @@ resource "azurerm_resource_group" "main" {
 }
 
 # Create the Storage Account
-resource "azurerm_storage_account" "mystorage" {
+resource "azurerm_storage_account" "main" {
   name                     = "${var.prefix}mystorage"
   resource_group_name      = azurerm_resource_group.main.name
   location                 = azurerm_resource_group.main.location
