@@ -58,14 +58,13 @@ locals {
   vm01_do_json = templatefile("${path.module}/do.json", {
     regKey             = var.license1
     admin_username     = var.uname
-    local_host         = "${var.prefix}-${var.host1_name}"
+    host1              = "${var.prefix}-${var.host1_name}"
+    host2              = "${var.prefix}-${var.host2_name}"
+    remote_host        = "${var.prefix}-${var.host2_name}"
     dns_server         = var.dns_server
     dns_suffix         = var.dns_suffix
     ntp_server         = var.ntp_server
     timezone           = var.timezone
-    host1              = "${var.prefix}-${var.host1_name}"
-    host2              = "${var.prefix}-${var.host2_name}"
-    remote_host        = "${var.prefix}-${var.host2_name}"
     bigIqLicenseType   = var.bigIqLicenseType
     bigIqHost          = var.bigIqHost
     bigIqUsername      = var.bigIqUsername
@@ -77,15 +76,14 @@ locals {
   })
   vm02_do_json = templatefile("${path.module}/do.json", {
     regKey             = var.license2
+    admin_username     = var.uname
     host1              = "${var.prefix}-${var.host1_name}"
     host2              = "${var.prefix}-${var.host2_name}"
-    local_host         = "${var.prefix}-${var.host2_name}"
-    remote_host        = "${var.prefix}-${var.host1_name}"
+    remote_host        = google_compute_instance.f5vm01.network_interface.1.network_ip
     dns_server         = var.dns_server
     dns_suffix         = var.dns_suffix
     ntp_server         = var.ntp_server
     timezone           = var.timezone
-    admin_username     = var.uname
     bigIqLicenseType   = var.bigIqLicenseType
     bigIqHost          = var.bigIqHost
     bigIqUsername      = var.bigIqUsername
@@ -152,6 +150,11 @@ resource "google_compute_instance" "f5vm01" {
     }
   }
 
+  network_interface {
+    network    = var.intVpc
+    subnetwork = var.intSubnet
+  }
+
   metadata = {
     ssh-keys               = "${var.uname}:${var.gceSshPubKey}"
     block-project-ssh-keys = true
@@ -198,6 +201,11 @@ resource "google_compute_instance" "f5vm02" {
     subnetwork = var.mgmtSubnet
     access_config {
     }
+  }
+
+  network_interface {
+    network    = var.intVpc
+    subnetwork = var.intSubnet
   }
 
   metadata = {

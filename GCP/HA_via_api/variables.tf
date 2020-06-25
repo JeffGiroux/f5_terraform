@@ -11,8 +11,10 @@ variable prefix {}
 
 # NETWORK
 variable extVpc {}
+variable intVpc {}
 variable mgmtVpc {}
 variable extSubnet {}
+variable intSubnet {}
 variable mgmtSubnet {}
 variable alias_ip_range { default = "10.1.10.100/32" }
 variable managed_route1 { default = "192.0.2.0/24" } # adjust to your environment
