@@ -8,6 +8,7 @@ variable prefix {}
 variable adminSrcAddr {}
 variable cidr_range_mgmt { default = "10.1.1.0/24" }
 variable cidr_range_ext { default = "10.1.10.0/24" }
+variable cidr_range_int { default = "10.1.20.0/24" }
 
 # Tags
 variable purpose { default = "public" }

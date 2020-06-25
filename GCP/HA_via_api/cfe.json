@@ -25,7 +25,7 @@
       "defaultNextHopAddresses": {
           "discoveryType": "static",
           "items": [
-              "$${local_selfip}",
+              "$${local_selfip_ext}",
               "${remote_selfip}"
           ]
       }

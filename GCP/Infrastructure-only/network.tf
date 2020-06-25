@@ -26,6 +26,19 @@ resource "google_compute_subnetwork" "vpc_ext_sub" {
   network       = google_compute_network.vpc_ext.id
 }
 
+# VPC Internal
+resource "google_compute_network" "vpc_int" {
+  name                    = "${var.prefix}-net-int"
+  auto_create_subnetworks = "false"
+  routing_mode            = "REGIONAL"
+}
+resource "google_compute_subnetwork" "vpc_int_sub" {
+  name          = "${var.prefix}-subnet-int"
+  ip_cidr_range = var.cidr_range_int
+  region        = var.gcp_region
+  network       = google_compute_network.vpc_int.id
+}
+
 # Firewall Rules
 resource "google_compute_firewall" "default-allow-internal-mgmt" {
   name          = "${var.prefix}-default-allow-internal-mgmt"
@@ -48,6 +61,23 @@ resource "google_compute_firewall" "default-allow-internal-ext" {
   name          = "${var.prefix}-default-allow-internal-ext"
   network       = google_compute_network.vpc_ext.name
   source_ranges = [var.cidr_range_ext]
+  allow {
+    protocol = "icmp"
+  }
+  allow {
+    protocol = "tcp"
+    ports    = ["0-65535"]
+  }
+  allow {
+    protocol = "udp"
+    ports    = ["0-65535"]
+  }
+}
+
+resource "google_compute_firewall" "default-allow-internal-int" {
+  name          = "${var.prefix}-default-allow-internal-int"
+  network       = google_compute_network.vpc_int.name
+  source_ranges = [var.cidr_range_int]
   allow {
     protocol = "icmp"
   }

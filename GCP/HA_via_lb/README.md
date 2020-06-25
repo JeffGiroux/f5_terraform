@@ -1,4 +1,4 @@
-# Deploying BIG-IP VEs in Google - High Availability (Active/Standby): Two NICs, Failover via LB
+# Deploying BIG-IP VEs in Google - High Availability (Active/Standby): 3-NIC, Failover via LB
 
 ## Contents
 
@@ -13,7 +13,7 @@
 
 ## Introduction
 
-This solution uses a Terraform template to launch a two NIC deployment of a cloud-focused BIG-IP VE cluster (Active/Standby) in Google GCP. Traffic flows from a Google Load Balancer (GLB) to the BIG-IP VE which then processes the traffic to application servers. This is the standard cloud design where the BIG-IP VE instance is running with a dual interface. Management traffic is processed on NIC 1, and data plane traffic is processed NIC 0.
+This solution uses a Terraform template to launch a 3-NIC deployment of a cloud-focused BIG-IP VE cluster (Active/Standby) in Google GCP. Traffic flows from a Google Load Balancer (GLB) to the BIG-IP VE which then processes the traffic to application servers. The BIG-IP VE instance is running with multiple interfaces: management, external, internal. NIC0 is associated with the external network and used in Google LBs.
 
 The BIG-IP VEs have the [Local Traffic Manager (LTM)](https://f5.com/products/big-ip/local-traffic-manager-ltm) module enabled to provide advanced traffic management functionality. In addition, the [Application Security Module (ASM)](https://www.f5.com/pdf/products/big-ip-application-security-manager-overview.pdf) can be enabled to provide F5's L4/L7 security features for web application firewall (WAF) and bot protection.
 
@@ -49,8 +49,13 @@ Terraform v0.12.26
 - This template requires a service account to deploy with the Terraform Google provider and build out all the neccessary Google objects
   - See the [Terraform Google Provider "Adding Credentials"](https://www.terraform.io/docs/providers/google/guides/getting_started.html#adding-credentials) for details. Also, review the [available Google GCP permission scopes](https://cloud.google.com/sdk/gcloud/reference/alpha/compute/instances/set-scopes#--scopes) too.
   - Permissions will depend on the objects you are creating
-  - Refer to [IAM-Permissions.md](./IAM-Permissions.md) to see a list of access requested by my Terraform GCP service account in this "BIG-IP Standalone" deployment
-  - ***Note***: For lab environments, you can start with "Editor" role. When you are working in other environments, make sure to [practice least privilege](https://cloud.google.com/iam/docs/understanding-service-accounts#granting_minimum).
+  - My service account for Terraform deployments in GCP uses the following roles:
+    - Compute Admin
+    - Storage Admin
+    - Service Account User
+    - Service Account Admin
+    - Project IAM Admin
+  - ***Note***: Make sure to [practice least privilege](https://cloud.google.com/iam/docs/understanding-service-accounts#granting_minimum)
 - ***Shared Service Accounts***: For lab purposes, you can create one service account and use it for everything. Alternatively, you can create a more secure environment with separate service accounts for various functions. Example...
   - Service Account #1 - the svc-acct used for Terraform to deploy cloud objects
   - Service Account #2 - the svc-acct assigned to BIG-IP instance during creation (ex. service discovery, query Pub/Sub, storage)
@@ -60,11 +65,11 @@ Terraform v0.12.26
   - 'ksecret' contains the value of the service account private key (ex. "-----BEGIN PRIVATE KEY-----\nMIIEvgIBAmorekeystuffbla123\n-----END PRIVATE KEY-----\n"). Currently used for BIG-IP telemetry streaming to Google Cloud Monitoring (aka StackDriver). If you are not using this feature, you do not need this secret in Secret Manager. 
   - Refer to [Template Parameters](#template-parameters)
 - This template deploys into an existing network
-  - You must have a VPC for management and a VPC for data traffic (client/server). The management VPC will have one subnet for management traffic. The other VPC will have one subnet for data traffic.
-  - Firewall rules are required to pass traffic to the application. These ports will depend on your application and the ports you choose to use.
-  - BIG-IP will require tcp/22 and tcp/443 for management access
-  - Google ILB health checks are sourced from two internal Google ranges, see [Firewall Rules for Health Checks](https://cloud.google.com/load-balancing/docs/health-checks#fw-rule)
-    - Google ILB health checks to backend BIG-IP instances require tcp/40000 (in this example)
+  - You must have a VPC for management and a VPC for data traffic (client/server). The management VPC will have one subnet for management traffic. The External VPC will have one subnet for data traffic. The Internal VPC will have one subnet as well. 
+  - Firewall rules are required to pass traffic to the application
+    - BIG-IP will require tcp/22 and tcp/443 on the mgmt network
+    - Application access will require tcp/80 and tcp/443 on the external network
+    - Google Health Checks will require tcp/40000 on the external network. Refer to [Google Health Check Concepts](https://cloud.google.com/load-balancing/docs/health-check-concepts) to see source IP ranges for the Google probes. These IP ranges and ports (tcp/40000 in this example) need to be open in your firewall rules on the external network.
   - If you require a new network first, see the [Infrastructure Only folder](../Infrastructure-only) to get started.
   
 
@@ -162,8 +167,10 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | privateKeyId | No | ID of private key for the service account used in Telemetry Streaming to Google Cloud Monitoring |
 | ksecret | No | Used during onboarding to query the Google Cloud Secret Manager API and retrieve the service account privateKey (use the secret name, not the secret value/privateKey) |
 | extVpc | Yes | External VPC network |
+| intVpc | Yes | Internal VPC network |
 | mgmtVpc | Yes | Management VPC network |
 | extSubnet | Yes | External subnet |
+| intSubnet | Yes | Internal subnet |
 | mgmtSubnet | Yes | Management subnet |
 | bigipMachineType | Yes | Google machine type to be used for the BIG-IP VE |
 | image_name | Yes | F5 SKU (image) to deploy. Note: The disk size of the VM will be determined based on the option you select.  **Important**: If intending to provision multiple modules, ensure the appropriate value is selected, such as ****AllTwoBootLocations or AllOneBootLocation****. |
@@ -202,8 +209,10 @@ To run this Terraform template, perform the following steps:
       adminSrcAddr = "0.0.0.0/0"
       mgmtVpc      = "xxxxx-net-mgmt"
       extVpc       = "xxxxx-net-ext"
+      intVpc       = "xxxxx-net-int"
       mgmtSubnet   = "xxxxx-subnet-mgmt"
       extSubnet    = "xxxxx-subnet-ext"
+      intSubnet    = "xxxxx-subnet-int"
       dns_suffix   = "example.com"
 
       # BIG-IQ Environment

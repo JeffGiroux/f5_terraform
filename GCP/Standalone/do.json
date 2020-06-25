@@ -5,7 +5,7 @@
     "label": "Onboard BIG-IP standalone 2nic",
     "Common": {
         "class": "Tenant",
-        "hostname": "${local_host}.${dns_suffix}",
+        "hostname": "$${local_host}",
         "dbVars": {
             "class": "DbVariables",
             "ui.advisory.enabled": true,

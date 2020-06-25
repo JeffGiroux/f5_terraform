@@ -9,7 +9,7 @@
 
 ## Introduction
 
-This solution uses a Terraform template to launch a new networking stack. It will create one VPC network and subnet for management traffic, and it will create a second VPC network and subnet for data traffic (client/server). Use this terraform template to create your Google VPC infrastructure, and then head back to the [BIG-IP GCP Terraform folder](../) to get started!
+This solution uses a Terraform template to launch a new networking stack. It will create three VPC networks with one subnet each: mgmt, external, internal. Use this terraform template to create your Google VPC infrastructure, and then head back to the [BIG-IP GCP Terraform folder](../) to get started!
 
 Terraform is beneficial as it allows composing resources a bit differently to account for dependencies into Immutable/Mutable elements. For example, mutable includes items you would typically frequently change/mutate, such as traditional configs on the BIG-IP. Once the template is deployed, there are certain resources (network infrastructure) that are fixed while others (BIG-IP VMs and configurations) can be changed.
 
@@ -23,8 +23,13 @@ Terraform v0.12.26
 - This template requires a service account to deploy with the Terraform Google provider and build out all the neccessary Google objects
   - See the [Terraform Google Provider "Adding Credentials"](https://www.terraform.io/docs/providers/google/guides/getting_started.html#adding-credentials) for details. Also, review the [available Google GCP permission scopes](https://cloud.google.com/sdk/gcloud/reference/alpha/compute/instances/set-scopes#--scopes) too.
   - Permissions will depend on the objects you are creating
-  - Refer to [IAM-Permissions.md](./IAM-Permissions.md) to see a list of access requested by my Terraform GCP service account in this "Infrastructure Only" deployment
-  - ***Note***: For lab environments, you can start with "Editor" role. When you are working in other environments, make sure to [practice least privilege](https://cloud.google.com/iam/docs/understanding-service-accounts#granting_minimum).
+  - My service account for Terraform deployments in GCP uses the following roles:
+    - Compute Admin
+    - Storage Admin
+    - Service Account User
+    - Service Account Admin
+    - Project IAM Admin
+  - ***Note***: Make sure to [practice least privilege](https://cloud.google.com/iam/docs/understanding-service-accounts#granting_minimum)
 
 ## Important Configuration Notes
 
@@ -46,6 +51,7 @@ Terraform v0.12.26
 | gcp_region | Yes | GCP Region for provider |
 | cidr_range_mgmt | Yes | IP CIDR range for management VPC network |
 | cidr_range_ext | Yes | IP CIDR range for external VPC network |
+| cidr_range_int | Yes | IP CIDR range for internal VPC network |
 
 ## Installation Example
 

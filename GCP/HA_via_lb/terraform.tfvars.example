@@ -6,8 +6,10 @@ prefix       = "mydemo123"
 adminSrcAddr = "0.0.0.0/0"
 mgmtVpc      = "xxxxx-net-mgmt"
 extVpc       = "xxxxx-net-ext"
+intVpc       = "xxxxx-net-int"
 mgmtSubnet   = "xxxxx-subnet-mgmt"
 extSubnet    = "xxxxx-subnet-ext"
+intSubnet    = "xxxxx-subnet-int"
 dns_suffix   = "example.com"
 
 # BIG-IQ Environment

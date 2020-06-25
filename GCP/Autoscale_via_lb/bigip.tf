@@ -68,6 +68,11 @@ resource "google_compute_instance_template" "f5vm" {
     }
   }
 
+  network_interface {
+    network    = var.intVpc
+    subnetwork = var.intSubnet
+  }
+
   metadata = {
     ssh-keys               = "${var.uname}:${var.gceSshPubKey}"
     block-project-ssh-keys = true

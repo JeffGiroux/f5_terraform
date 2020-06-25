@@ -11,8 +11,10 @@ variable prefix {}
 
 # NETWORK
 variable extVpc {}
+variable intVpc {}
 variable mgmtVpc {}
 variable extSubnet {}
+variable intSubnet {}
 variable mgmtSubnet {}
 
 # Google LB, auto healing, and auto scaling

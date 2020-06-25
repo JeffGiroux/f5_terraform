@@ -1,4 +1,4 @@
-# Deploying BIG-IP VEs in Google - High Availability (Active/Standby): Two NICs, Failover via API
+# Deploying BIG-IP VEs in Google - High Availability (Active/Standby): 3-NIC, Failover via API
 
 ## Contents
 
@@ -12,7 +12,7 @@
 
 ## Introduction
 
-This solution uses a Terraform template to launch a two NIC deployment of a cloud-focused BIG-IP VE cluster (Active/Standby) in Google GCP. Traffic flows to the BIG-IP VE which then processes the traffic to application servers. This is the standard cloud design where the BIG-IP VE instance is running with a dual interface. Management traffic is processed on NIC 1, and data plane traffic is processed NIC 0.
+This solution uses a Terraform template to launch a 3-NIC deployment of a cloud-focused BIG-IP VE cluster (Active/Standby) in Google GCP. Traffic flows to the BIG-IP VE which then processes the traffic to application servers. The BIG-IP VE instance is running with multiple interfaces: management, external, internal. NIC0 is associated with the external network.
 
 The BIG-IP VEs have the [Local Traffic Manager (LTM)](https://f5.com/products/big-ip/local-traffic-manager-ltm) module enabled to provide advanced traffic management functionality. In addition, the [Application Security Module (ASM)](https://www.f5.com/pdf/products/big-ip-application-security-manager-overview.pdf) can be enabled to provide F5's L4/L7 security features for web application firewall (WAF) and bot protection.
 
@@ -49,8 +49,13 @@ Terraform v0.12.26
 - This template requires a service account to deploy with the Terraform Google provider and build out all the neccessary Google objects
   - See the [Terraform Google Provider "Adding Credentials"](https://www.terraform.io/docs/providers/google/guides/getting_started.html#adding-credentials) for details. Also, review the [available Google GCP permission scopes](https://cloud.google.com/sdk/gcloud/reference/alpha/compute/instances/set-scopes#--scopes) too.
   - Permissions will depend on the objects you are creating
-  - Refer to [IAM-Permissions.md](./IAM-Permissions.md) to see a list of access requested by my Terraform GCP service account in this "BIG-IP Standalone" deployment
-  - ***Note***: For lab environments, you can start with "Editor" role. When you are working in other environments, make sure to [practice least privilege](https://cloud.google.com/iam/docs/understanding-service-accounts#granting_minimum).
+  - My service account for Terraform deployments in GCP uses the following roles:
+    - Compute Admin
+    - Storage Admin
+    - Service Account User
+    - Service Account Admin
+    - Project IAM Admin
+  - ***Note***: Make sure to [practice least privilege](https://cloud.google.com/iam/docs/understanding-service-accounts#granting_minimum)
 - ***Shared Service Accounts***: For lab purposes, you can create one service account and use it for everything. Alternatively, you can create a more secure environment with separate service accounts for various functions. Example...
   - Service Account #1 - the svc-acct used for Terraform to deploy cloud objects
   - Service Account #2 - the svc-acct assigned to BIG-IP instance during creation (ex. service discovery, query Pub/Sub, storage, failover)
@@ -60,9 +65,10 @@ Terraform v0.12.26
   - 'ksecret' contains the value of the service account private key (ex. "-----BEGIN PRIVATE KEY-----\nMIIEvgIBAmorekeystuffbla123\n-----END PRIVATE KEY-----\n"). Currently used for BIG-IP telemetry streaming to Google Cloud Monitoring (aka StackDriver). If you are not using this feature, you do not need this secret in Secret Manager. 
   - Refer to [Template Parameters](#template-parameters)
 - This template deploys into an existing network
-  - You must have a VPC for management and a VPC for data traffic (client/server). The management VPC will have one subnet for management traffic. The other VPC will have one subnet for data traffic.
-  - Firewall rules are required to pass traffic to the application. These ports will depend on your application and the ports you choose to use.
-  - BIG-IP will require tcp/22 and tcp/443 for management access
+  - You must have a VPC for management and a VPC for data traffic (client/server). The management VPC will have one subnet for management traffic. The External VPC will have one subnet for data traffic. The Internal VPC will have one subnet as well. 
+  - Firewall rules are required to pass traffic to the application
+    - BIG-IP will require tcp/22 and tcp/443 on the mgmt network
+    - Application access will require tcp/80 and tcp/443 on the external network
   - If you require a new network first, see the [Infrastructure Only folder](../Infrastructure-only) to get started.
   
 
@@ -81,7 +87,7 @@ Terraform v0.12.26
   - do.json - contains the L1-L3 BIG-IP configurations used by DO for items like VLANs, IPs, and routes
   - as3.json - contains the L4-L7 BIG-IP configurations used by AS3 for items like pool members, virtual server listeners, security policies, and more
   - ts.json - contains the BIG-IP configurations used by TS for items like telemetry streaming, CPU, memory, application statistics, and more
-  - cfe.json - contains the BIG-IP configurations used for failover operations of cloud objects like IPs and routes.
+  - cfe.json - contains the BIG-IP configurations used for failover operations of cloud objects like IPs and routes
 
 ## BYOL Licensing
 This template uses PayGo BIG-IP image for the deployment (as default). If you would like to use BYOL licenses, then these following steps are needed:
@@ -160,8 +166,10 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | privateKeyId | No | ID of private key for the service account used in Telemetry Streaming to Google Cloud Monitoring |
 | ksecret | No | Used during onboarding to query the Google Cloud Secret Manager API and retrieve the service account privateKey (use the secret name, not the secret value/privateKey) |
 | extVpc | Yes | External VPC network |
+| intVpc | Yes | Internal VPC network |
 | mgmtVpc | Yes | Management VPC network |
 | extSubnet | Yes | External subnet |
+| intSubnet | Yes | Internal subnet |
 | mgmtSubnet | Yes | Management subnet |
 | managed_route1 | Yes | A UDR route can used for testing managed-route failover. Enter address prefix like x.x.x.x/x. |
 | alias_ip_range | Yes | An array of alias IP ranges for the BIG-IP network interface (used for VIP traffic, SNAT IPs, etc) |
@@ -204,8 +212,10 @@ To run this Terraform template, perform the following steps:
       adminSrcAddr = "0.0.0.0/0"
       mgmtVpc      = "xxxxx-net-mgmt"
       extVpc       = "xxxxx-net-ext"
+      intVpc       = "xxxxx-net-int"
       mgmtSubnet   = "xxxxx-subnet-mgmt"
       extSubnet    = "xxxxx-subnet-ext"
+      intSubnet    = "xxxxx-subnet-int"
       dns_suffix   = "example.com"
 
       # BIG-IQ Environment
@@ -244,7 +254,7 @@ The following is an example configuration diagram for this solution deployment. 
 
 ## Documentation
 
-For more information on F5 solutions for Google, including manual configuration procedures for some deployment scenarios, see the Google GCP section of [F5 CloudDocs](https://clouddocs.f5.com/cloud/public/v1/google_index.html). Also check out the [Using Cloud Templates for BIG-IP in Google](https://devcentral.f5.com/s/articles/Using-Cloud-Templates-to-Change-BIG-IP-Versions-Google) on DevCentral. This particular HA example is based on the [BIG-IP Cluster "HA via API" F5 GDM Cloud Template on GitHub](https://github.com/F5Networks/f5-google-gdm-templates/tree/master/supported/failover/same-net/via-api/2nic/existing-stack/payg).
+For more information on F5 solutions for Google, including manual configuration procedures for some deployment scenarios, see the Google GCP section of [F5 CloudDocs](https://clouddocs.f5.com/cloud/public/v1/google_index.html). Also check out the [Using Cloud Templates for BIG-IP in Google](https://devcentral.f5.com/s/articles/Using-Cloud-Templates-to-Change-BIG-IP-Versions-Google) on DevCentral. This particular HA example is based on the [BIG-IP Cluster "HA via API" F5 GDM Cloud Template on GitHub](https://github.com/F5Networks/f5-google-gdm-templates/tree/master/supported/failover/same-net/via-api/3nic/existing-stack/payg).
 
 ## Creating Virtual Servers on the BIG-IP VE
 
