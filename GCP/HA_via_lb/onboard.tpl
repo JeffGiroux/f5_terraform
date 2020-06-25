@@ -136,12 +136,28 @@ function error_exit {
   exit 1
 }
 
+# Network Wait Function
+waitNetwork () {
+checks=0
+echo "Testing network: curl http://example.com"
+while [ $checks -lt 120 ]; do
+  STATUS=$(curl -s -k -I example.com | grep HTTP)
+  if [[ $STATUS == *"200"* ]]; then
+    echo "Got 200! VE is Ready!"
+    break
+  fi
+  echo "Status code: $STATUS  Not done yet..."
+  let checks=checks+1
+  sleep 10
+done
+}
+
 # Toolchain Wait Function
 function wait_for_ready {
   app=$1
   checks=0
-  ready_response=""
   checks_max=10
+  ready_response=""
   while [ $checks -lt $checks_max ] ; do
     ready_response=$(curl -sku admin:$passwd -w "%%{http_code}" -X GET  https://localhost:$${mgmtGuiPort}/mgmt/shared/$${app}/info -o /dev/null)
     if [[ $ready_response == *200 ]]; then
@@ -206,7 +222,7 @@ done
 date
 
 # BIG-IP Credentials
-wait_bigip_ready
+waitNetwork
 echo "Retrieving BIG-IP password from Metadata secret"
 svcacct_token=$(curl -s -f --retry 20 "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token" -H "Metadata-Flavor: Google" | jq -r ".access_token")
 passwd=$(curl -s -f --retry 20 "https://secretmanager.googleapis.com/v1/projects/$projectId/secrets/$usecret/versions/1:access" -H "Authorization: Bearer $svcacct_token" | jq -r ".payload.data" | base64 --decode)
@@ -261,6 +277,8 @@ else
   echo "Failed to deploy AS3; continuing..."
   echo "Response code: $${response_code}"
 fi
+
+date
 
 # # Submit TS Declaration
 # wait_for_ready telemetry
