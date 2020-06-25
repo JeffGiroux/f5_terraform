@@ -36,7 +36,6 @@ locals {
   vm01_do_json = templatefile("${path.module}/do.json", {
     regKey             = var.license1
     admin_username     = var.uname
-    local_host         = "${var.prefix}-${var.host1_name}"
     dns_server         = var.dns_server
     dns_suffix         = var.dns_suffix
     ntp_server         = var.ntp_server
@@ -94,6 +93,11 @@ resource "google_compute_instance" "f5vm01" {
     subnetwork = var.mgmtSubnet
     access_config {
     }
+  }
+
+  network_interface {
+    network    = var.intVpc
+    subnetwork = var.intSubnet
   }
 
   metadata = {

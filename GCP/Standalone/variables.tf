@@ -11,8 +11,10 @@ variable prefix {}
 
 # NETWORK
 variable extVpc {}
+variable intVpc {}
 variable mgmtVpc {}
 variable extSubnet {}
+variable intSubnet {}
 variable mgmtSubnet {}
 variable alias_ip_range { default = "10.1.10.100/32" }
 
