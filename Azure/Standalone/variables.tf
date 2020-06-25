@@ -17,17 +17,14 @@ variable sp_client_secret {}
 variable sp_tenant_id {}
 variable prefix {}
 variable location {}
+variable storage_name {}
 
 # NETWORK
-variable cidr { default = "10.90.0.0/16" }
-variable "subnets" {
-  type = map
-  default = {
-    "subnet1" = "10.90.1.0/24"
-    "subnet2" = "10.90.2.0/24"
-    "subnet3" = "10.90.3.0/24"
-  }
-}
+variable vnet_rg {}
+variable vnet_name {}
+variable mgmtSubnet {}
+variable extSubnet {}
+variable intSubnet {}
 variable f5vm01mgmt { default = "10.90.1.4" }
 variable f5vm01ext { default = "10.90.2.4" }
 variable f5privatevip { default = "10.90.2.11" }
