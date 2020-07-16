@@ -48,7 +48,7 @@ variable ext_gw { default = "10.90.2.1" }
 variable instance_type { default = "Standard_DS4_v2" }
 variable image_name { default = "f5-bigip-virtual-edition-25m-best-hourly" }
 variable product { default = "f5-big-ip-best" }
-variable bigip_version { default = "15.1.002000" }
+variable bigip_version { default = "15.1.004000" }
 
 # BIGIP Setup
 variable license1 { default = "" }
