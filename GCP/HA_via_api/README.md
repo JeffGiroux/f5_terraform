@@ -69,6 +69,7 @@ Terraform v0.12.26
   - Firewall rules are required to pass traffic to the application
     - BIG-IP will require tcp/22 and tcp/443 on the mgmt network
     - Application access will require tcp/80 and tcp/443 on the external network
+  - Storage bucket is used for F5 Cloud Failover. See [F5 Cloud Failover GCP Setup](https://clouddocs.f5.com/products/extensions/f5-cloud-failover/latest/userguide/gcp.html).
   - If you require a new network first, see the [Infrastructure Only folder](../Infrastructure-only) to get started.
   
 
