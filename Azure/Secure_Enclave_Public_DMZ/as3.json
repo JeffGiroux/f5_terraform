@@ -132,7 +132,7 @@
         },
         "My_ASM_Policy": {
           "class": "WAF_Policy",
-          "url": "https://raw.githubusercontent.com/JeffGiroux/f5_terraform/master/Azure/Secure_Enclave_Public_DMZ/asm-policy-linux-medium.xml",
+          "url": "https://raw.githubusercontent.com/JeffGiroux/f5_terraform/main/Azure/Secure_Enclave_Public_DMZ/asm-policy-linux-medium.xml",
           "ignoreChanges": true
         },
         "web_pool": {
