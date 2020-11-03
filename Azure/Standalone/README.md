@@ -55,6 +55,13 @@ Terraform v0.12.26
   - My service account for Terraform deployments in Azure uses the following roles:
     - Contributor
   - ***Note***: Make sure to [practice least privilege](https://docs.microsoft.com/en-us/azure/security/fundamentals/identity-management-best-practices#lower-exposure-of-privileged-accounts)
+- This template deploys into an existing network
+  - You must have a VNET with three (3) subnets: management, external, internal
+  - Firewall rules are required to pass traffic to the application
+    - BIG-IP will require tcp/22 and tcp/443 on the mgmt network
+    - Application access will require tcp/80 and tcp/443 on the external network
+  - If you require a new network first, see the [Infrastructure Only folder](../Infrastructure-only) to get started.
+
 
 ## Important Configuration Notes
 
