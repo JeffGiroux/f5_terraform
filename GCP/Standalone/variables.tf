@@ -35,9 +35,9 @@ variable dns_server { default = "8.8.8.8" }
 variable dns_suffix {}
 variable ntp_server { default = "0.us.pool.ntp.org" }
 variable timezone { default = "UTC" }
-variable DO_URL { default = "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.14.0/f5-declarative-onboarding-1.14.0-1.noarch.rpm" }
-variable AS3_URL { default = "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.21.0/f5-appsvcs-3.21.0-4.noarch.rpm" }
-variable TS_URL { default = "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.13.0/f5-telemetry-1.13.0-2.noarch.rpm" }
+variable DO_URL { default = "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.16.0/f5-declarative-onboarding-1.16.0-8.noarch.rpm" }
+variable AS3_URL { default = "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.23.0/f5-appsvcs-3.23.0-5.noarch.rpm" }
+variable TS_URL { default = "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.15.0/f5-telemetry-1.15.0-4.noarch.rpm" }
 variable onboard_log { default = "/var/log/cloud/onboard.log" }
 
 # BIGIQ License Manager Setup
