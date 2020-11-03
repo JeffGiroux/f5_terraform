@@ -52,74 +52,6 @@ resource "azurerm_public_ip" "pubvippip" {
   }
 }
 
-# Create a Network Security Group and rules
-resource "azurerm_network_security_group" "main" {
-  name                = "${var.prefix}-nsg"
-  location            = azurerm_resource_group.main.location
-  resource_group_name = azurerm_resource_group.main.name
-
-  security_rule {
-    name                       = "allow_SSH"
-    description                = "Allow SSH access"
-    priority                   = 100
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "22"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-
-  security_rule {
-    name                       = "allow_HTTP"
-    description                = "Allow HTTP access"
-    priority                   = 110
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "80"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-
-  security_rule {
-    name                       = "allow_HTTPS"
-    description                = "Allow HTTPS access"
-    priority                   = 120
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "443"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-
-  security_rule {
-    name                       = "allow_APP_HTTPS"
-    description                = "Allow HTTPS access"
-    priority                   = 130
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "8443"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-
-  tags = {
-    Name        = "${var.environment}-bigip-sg"
-    environment = var.environment
-    owner       = var.owner
-    group       = var.group
-    costcenter  = var.costcenter
-    application = var.application
-  }
-}
-
 # Create NIC for Management 
 resource "azurerm_network_interface" "vm01-mgmt-nic" {
   name                = "${var.prefix}-mgmt0"
@@ -128,14 +60,14 @@ resource "azurerm_network_interface" "vm01-mgmt-nic" {
 
   ip_configuration {
     name                          = "primary"
-    subnet_id                     = azurerm_subnet.Mgmt.id
+    subnet_id                     = data.azurerm_subnet.mgmt.id
     private_ip_address_allocation = "Static"
     private_ip_address            = var.f5vm01mgmt
     public_ip_address_id          = azurerm_public_ip.vm01mgmtpip.id
   }
 
   tags = {
-    Name        = "${var.environment}-vm01-mgmt-int"
+    Name        = "${var.environment}-vm01-mgmt"
     environment = var.environment
     owner       = var.owner
     group       = var.group
@@ -153,7 +85,7 @@ resource "azurerm_network_interface" "vm01-ext-nic" {
 
   ip_configuration {
     name                          = "primary"
-    subnet_id                     = azurerm_subnet.External.id
+    subnet_id                     = data.azurerm_subnet.external.id
     private_ip_address_allocation = "Static"
     private_ip_address            = var.f5vm01ext
     primary                       = true
@@ -162,39 +94,59 @@ resource "azurerm_network_interface" "vm01-ext-nic" {
 
   ip_configuration {
     name                          = "secondary1"
-    subnet_id                     = azurerm_subnet.External.id
+    subnet_id                     = data.azurerm_subnet.external.id
     private_ip_address_allocation = "Static"
     private_ip_address            = var.f5privatevip
   }
 
   ip_configuration {
     name                          = "secondary2"
-    subnet_id                     = azurerm_subnet.External.id
+    subnet_id                     = data.azurerm_subnet.external.id
     private_ip_address_allocation = "Static"
     private_ip_address            = var.f5publicvip
     public_ip_address_id          = azurerm_public_ip.pubvippip.id
   }
 
   tags = {
-    Name                      = "${var.environment}-vm01-ext-int"
-    environment               = var.environment
-    owner                     = var.owner
-    group                     = var.group
-    costcenter                = var.costcenter
-    application               = var.application
+    Name        = "${var.environment}-vm01-ext"
+    environment = var.environment
+    owner       = var.owner
+    group       = var.group
+    costcenter  = var.costcenter
+    application = var.application
   }
 }
 
-# Associate network security groups with NICs
-resource "azurerm_network_interface_security_group_association" "vm01-mgmt-nsg" {
-  network_interface_id      = azurerm_network_interface.vm01-mgmt-nic.id
-  network_security_group_id = azurerm_network_security_group.main.id
+# Create NIC for Internal
+resource "azurerm_network_interface" "vm01-int-nic" {
+  name                 = "${var.prefix}-int0"
+  location             = azurerm_resource_group.main.location
+  resource_group_name  = azurerm_resource_group.main.name
+  enable_ip_forwarding = true
+
+  ip_configuration {
+    name                          = "primary"
+    subnet_id                     = data.azurerm_subnet.internal.id
+    private_ip_address_allocation = "Dynamic"
+    primary                       = true
+  }
+
+  ip_configuration {
+    name                          = "secondary"
+    subnet_id                     = data.azurerm_subnet.internal.id
+    private_ip_address_allocation = "Dynamic"
+  }
+
+  tags = {
+    Name        = "${var.environment}-vm01-int"
+    environment = var.environment
+    owner       = var.owner
+    group       = var.group
+    costcenter  = var.costcenter
+    application = var.application
+  }
 }
 
-resource "azurerm_network_interface_security_group_association" "vm01-ext-nsg" {
-  network_interface_id      = azurerm_network_interface.vm01-ext-nic.id
-  network_security_group_id = azurerm_network_security_group.main.id
-}
 
 # Setup Onboarding scripts
 data "template_file" "vm_onboard" {
@@ -244,7 +196,7 @@ data "template_file" "as3_json" {
 }
 
 data "template_file" "ts_json" {
-  template   = file("${path.module}/ts.json")
+  template = file("${path.module}/ts.json")
 
   vars = {
     region      = var.location
@@ -258,7 +210,7 @@ resource "azurerm_linux_virtual_machine" "f5vm01" {
   name                            = "${var.prefix}-f5vm01"
   location                        = azurerm_resource_group.main.location
   resource_group_name             = azurerm_resource_group.main.name
-  network_interface_ids           = [azurerm_network_interface.vm01-mgmt-nic.id, azurerm_network_interface.vm01-ext-nic.id]
+  network_interface_ids           = [azurerm_network_interface.vm01-mgmt-nic.id, azurerm_network_interface.vm01-ext-nic.id, azurerm_network_interface.vm01-int-nic.id]
   size                            = var.instance_type
   admin_username                  = var.uname
   admin_password                  = var.upassword
@@ -286,7 +238,7 @@ resource "azurerm_linux_virtual_machine" "f5vm01" {
   }
 
   boot_diagnostics {
-    storage_account_uri = azurerm_storage_account.mystorage.primary_blob_endpoint
+    storage_account_uri = data.azurerm_storage_account.main.primary_blob_endpoint
   }
 
   tags = {
