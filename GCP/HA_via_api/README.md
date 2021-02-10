@@ -30,9 +30,8 @@ Example...
 
 ## Version
 This template is tested and worked in the following version
-Terraform v0.12.26
-+ provider.google v3.24
-+ provider.local v1.4
+Terraform v0.14.6
++ provider.google v3.56
 
 ## Prerequisites
 
@@ -71,6 +70,7 @@ Terraform v0.12.26
     - Application access will require tcp/80 and tcp/443 on the external network
   - Storage bucket is used for F5 Cloud Failover. See [F5 Cloud Failover GCP Setup](https://clouddocs.f5.com/products/extensions/f5-cloud-failover/latest/userguide/gcp.html).
   - If you require a new network first, see the [Infrastructure Only folder](../Infrastructure-only) to get started.
+  - The parameter 'dns_suffix' must match the DNS suffix assigned by the GCP project. You can retrieve this value by logging into an existing VM in the same project and running 'uname -a' or reviewing the /etc/resolv.conf file. Failure to properly set 'dns_suffix' will result in failed hostname lookup during HA setup.
   
 
 ## Important Configuration Notes
@@ -183,7 +183,7 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | ntp_server | Yes | Leave the default NTP server the BIG-IP uses, or replace the default NTP server with the one you want to use |
 | timezone | Yes | If you would like to change the time zone the BIG-IP uses, enter the time zone you want to use. This is based on the tz database found in /usr/share/zoneinfo (see the full list [here](https://cloud.google.com/dataprep/docs/html/Supported-Time-Zone-Values_66194188)). Example values: UTC, US/Pacific, US/Eastern, Europe/London or Asia/Singapore. |
 | dns_server | Yes | Leave the default DNS server the BIG-IP uses, or replace the default DNS server with the one you want to use | 
-| dns_suffix | Yes | DNS suffix for your domain | 
+| dns_suffix | Yes | DNS suffix for your domain in the GCP project | 
 | DO_URL | Yes | This is the raw github URL for downloading the Declarative Onboarding RPM |
 | AS3_URL | Yes | This is the raw github URL for downloading the AS3 RPM |
 | TS_URL | Yes | This is the raw github URL for downloading the Telemetry RPM |
@@ -217,7 +217,7 @@ To run this Terraform template, perform the following steps:
       mgmtSubnet   = "xxxxx-subnet-mgmt"
       extSubnet    = "xxxxx-subnet-ext"
       intSubnet    = "xxxxx-subnet-int"
-      dns_suffix   = "example.com"
+      dns_suffix   = "c.xxxxx.xxxxx.internal"
 
       # BIG-IQ Environment
       bigIqUsername = "admin"
