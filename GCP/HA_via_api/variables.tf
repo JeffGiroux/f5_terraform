@@ -21,7 +21,7 @@ variable managed_route1 { default = "192.0.2.0/24" } # adjust to your environmen
 
 # BIGIP Image
 variable bigipMachineType { default = "n1-standard-8" }
-variable image_name { default = "projects/f5-7626-networks-public/global/images/f5-bigip-15-1-0-4-0-0-6-payg-best-1gbps-200618231635" }
+variable image_name { default = "projects/f5-7626-networks-public/global/images/f5-bigip-15-1-2-1-0-0-10-payg-best-10gbps-210115161130" }
 variable customImage { default = "" }
 variable customUserData { default = "" }
 
