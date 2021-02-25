@@ -15,8 +15,8 @@ Terraform is beneficial as it allows composing resources a bit differently to ac
 
 ## Version
 This template is tested and worked in the following version
-Terraform v0.12.26
-+ provider.azurerm v2.1
+Terraform v0.14.6
++ provider.azurerm v2.48
 
 ## Prerequisites
 

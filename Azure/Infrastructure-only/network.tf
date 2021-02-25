@@ -13,7 +13,7 @@ resource "azurerm_subnet" "mgmt" {
   name                 = "mgmt"
   virtual_network_name = azurerm_virtual_network.main.name
   resource_group_name  = azurerm_resource_group.main.name
-  address_prefix       = var.mgmt_address_prefix
+  address_prefixes     = [var.mgmt_address_prefix]
 }
 
 # Create External Subnet
@@ -21,7 +21,7 @@ resource "azurerm_subnet" "external" {
   name                 = "external"
   virtual_network_name = azurerm_virtual_network.main.name
   resource_group_name  = azurerm_resource_group.main.name
-  address_prefix       = var.ext_address_prefix
+  address_prefixes     = [var.ext_address_prefix]
 }
 
 # Create Internal Subnet
@@ -29,7 +29,7 @@ resource "azurerm_subnet" "internal" {
   name                 = "internal"
   virtual_network_name = azurerm_virtual_network.main.name
   resource_group_name  = azurerm_resource_group.main.name
-  address_prefix       = var.int_address_prefix
+  address_prefixes     = [var.int_address_prefix]
 }
 
 # Create Network Security Group and rules
