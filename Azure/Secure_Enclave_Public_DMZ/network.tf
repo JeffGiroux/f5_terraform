@@ -13,7 +13,7 @@ resource "azurerm_subnet" "Mgmt" {
   name                 = "Mgmt"
   virtual_network_name = azurerm_virtual_network.main.name
   resource_group_name  = azurerm_resource_group.main.name
-  address_prefix       = var.subnets["subnet1"]
+  address_prefixes     = [var.subnets["subnet1"]]
 }
 
 # Create External Subnet for Hub
@@ -21,7 +21,7 @@ resource "azurerm_subnet" "External" {
   name                 = "External"
   virtual_network_name = azurerm_virtual_network.main.name
   resource_group_name  = azurerm_resource_group.main.name
-  address_prefix       = var.subnets["subnet2"]
+  address_prefixes     = [var.subnets["subnet2"]]
 }
 
 # Create a Virtual Network for Spoke
@@ -37,7 +37,7 @@ resource "azurerm_subnet" "App1" {
   name                 = "App1"
   virtual_network_name = azurerm_virtual_network.spoke.name
   resource_group_name  = azurerm_resource_group.main.name
-  address_prefix       = var.app-subnets["subnet1"]
+  address_prefixes     = [var.app-subnets["subnet1"]]
 }
 
 # Create Network Peerings

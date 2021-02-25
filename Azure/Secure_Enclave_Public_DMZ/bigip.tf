@@ -360,7 +360,7 @@ data "template_file" "as3_json" {
 }
 
 data "template_file" "ts_json" {
-  template   = file("${path.module}/ts.json")
+  template = file("${path.module}/ts.json")
 
   vars = {
     region      = var.location
@@ -417,7 +417,7 @@ resource "azurerm_linux_virtual_machine" "f5vm02" {
   location                        = azurerm_resource_group.main.location
   resource_group_name             = azurerm_resource_group.main.name
   availability_set_id             = azurerm_availability_set.avset.id
-  network_interface_ids           = ["${azurerm_network_interface.vm02-mgmt-nic.id}", "${azurerm_network_interface.vm02-ext-nic.id}"]
+  network_interface_ids           = [azurerm_network_interface.vm02-mgmt-nic.id, azurerm_network_interface.vm02-ext-nic.id]
   size                            = var.instance_type
   admin_username                  = var.uname
   admin_password                  = var.upassword

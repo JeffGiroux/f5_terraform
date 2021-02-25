@@ -25,9 +25,8 @@ resource "azurerm_lb" "lb" {
 
 # Create backend pool
 resource "azurerm_lb_backend_address_pool" "backend_pool" {
-  name                = "BackendPool1"
-  resource_group_name = azurerm_resource_group.main.name
-  loadbalancer_id     = azurerm_lb.lb.id
+  name            = "BackendPool1"
+  loadbalancer_id = azurerm_lb.lb.id
 }
 
 # Create health probe
