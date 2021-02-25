@@ -33,11 +33,11 @@ Example...
 
 ## Version
 This template is tested and worked in the following version
-Terraform v0.12.26
-+ provider.azurerm v2.1
-+ provider.local v1.4
-+ provider.null v2.1
-+ provider.template v2.1
+Terraform v0.14.6
++ provider.azurerm v2.48
++ provider.local v2.1
++ provider.null v3.1
++ provider.template v2.2
 
 ## Prerequisites
 
@@ -77,8 +77,8 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
             "offer": "f5-big-ip-byol",
             "publisher": "f5-networks",
             "sku": "f5-big-ltm-2slot-byol",
-            "urn": "f5-networks:f5-big-ip-byol:f5-big-ltm-2slot-byol:15.1.002000",
-            "version": "15.1.002000"
+            "urn": "f5-networks:f5-big-ip-byol:f5-big-ltm-2slot-byol:15.1.201000",
+            "version": "15.1.201000"
           },
   ```
 2. In the "variables.tf", modify *image_name* and *product* with the SKU and offer from AZ CLI results
