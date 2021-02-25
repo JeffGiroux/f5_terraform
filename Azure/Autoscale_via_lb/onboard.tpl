@@ -182,6 +182,9 @@ EOF
 hostName=`echo $(curl -s -f -H Metadata:true "http://169.254.169.254/metadata/instance/compute?api-version=2019-06-01" | jq -r '.["name"]')`
 local_selfip=`echo $(curl -s -f -H Metadata:true "http://169.254.169.254/metadata/instance/network/interface?api-version=2019-06-01" | jq -r '.[1].ipv4[]' | grep private | awk '{print $2}' | awk -F \" '{print $2}') | awk '{print $1}'`
 
+# Replace _ underscore with - hyphen
+hostName=`echo "$${hostName//_/-}"`
+
 # Modify DO json file with retreived Azure metadata
 sed -i "s/-device-hostname-/$hostName/g" /config/do.json
 sed -i "s/-external-self-address-/$local_selfip/g" /config/do.json
