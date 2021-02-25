@@ -122,7 +122,7 @@ data "template_file" "as3_json" {
 }
 
 data "template_file" "ts_json" {
-  template   = file("${path.module}/ts.json")
+  template = file("${path.module}/ts.json")
 
   vars = {
     region      = var.location
