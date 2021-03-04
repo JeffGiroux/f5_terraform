@@ -203,7 +203,7 @@ tmsh+=(
 "tmsh create net route ext_rt network $${INT1NETWORK}/$${INT1MASK} gw $${INT1GATEWAY}"
 "tmsh create net route default gw $${INT1GATEWAY}"
 "tmsh create net vlan internal interfaces add { 1.2 } mtu 1460"
-"tmsh create net self self_internal address $${INT2ADDRESS}/32 vlan internal allow-service add { tcp:4353 udp:1026 }"
+"tmsh create net self self_internal address $${INT2ADDRESS}/32 vlan internal allow-service add { tcp:443 tcp:4353 udp:1026 }"
 "tmsh create net route int_gw_interface network $${INT2GATEWAY}/32 interface internal"
 "tmsh create net route int_rt network $${INT2NETWORK}/$${INT2MASK} gw $${INT2GATEWAY}"
 "tmsh modify sys global-settings remote-host add { metadata.google.internal { hostname metadata.google.internal addr 169.254.169.254 } }"
@@ -265,17 +265,17 @@ fi
 
 date
 
-# Submit AS3 Declaration
-wait_for_ready appsvcs
-file_loc="/config/cloud/as3.json"
-echo "Submitting AS3 declaration"
-response_code=$(/usr/bin/curl -sku admin:$passwd -w "%%{http_code}" -X POST -H "Content-Type: application/json" -H "Expect:" https://localhost:$${mgmtGuiPort}/mgmt/shared/appsvcs/declare -d @$file_loc -o /dev/null)
-if [[ $response_code == *200 || $response_code == *502 ]]; then
-  echo "Deployment of AS3 succeeded"
-else
-  echo "Failed to deploy AS3; continuing..."
-  echo "Response code: $${response_code}"
-fi
+# # Submit AS3 Declaration
+# wait_for_ready appsvcs
+# file_loc="/config/cloud/as3.json"
+# echo "Submitting AS3 declaration"
+# response_code=$(/usr/bin/curl -sku admin:$passwd -w "%%{http_code}" -X POST -H "Content-Type: application/json" -H "Expect:" https://localhost:$${mgmtGuiPort}/mgmt/shared/appsvcs/declare -d @$file_loc -o /dev/null)
+# if [[ $response_code == *200 || $response_code == *502 ]]; then
+#   echo "Deployment of AS3 succeeded"
+# else
+#   echo "Failed to deploy AS3; continuing..."
+#   echo "Response code: $${response_code}"
+# fi
 
 # # Submit TS Declaration
 # wait_for_ready telemetry
