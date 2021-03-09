@@ -1,5 +1,5 @@
 # Deploying F5 in Azure with Terraform
-The Azure folder contains various deployments. All deployments utilize the F5 Automation Toolchain components for Declarative Onboarding (DO for L1-L3) and Application Services (AS3 for L4-L7) in order to asist in onboarding the BIG-IP and configuration. Telemtry Streaming (TS for analytics/logging) is also installed and ready for use.
+The Azure folder contains various deployments. All deployments utilize the F5 Automation Toolchain components for Declarative Onboarding (DO for L1-L3) and Application Services (AS3 for L4-L7) in order to asist in onboarding the BIG-IP and configuration. Telemetry Streaming (TS for analytics/logging) is also installed and ready for use.
 
   - **[Infrastructure Only](Infrastructure-only)** <br> This Terraform plan uses the Azurerm provider to build the basic infrastructure with a VNET, subnets, firewall rules, routes, and storage buckets. Start here if you don't have an existing Azure network stack yet, and then move on to the other templates below. This will build one VNET with three (3) subnets: management, external, internal.
   - **[Standalone](Standalone)** <br> This Terraform plan uses the Azurerm provider to build the necessary Azure objects and a standalone BIG-IP device with 3-NICs. Traffic flows from client to F5 to backend app servers.
