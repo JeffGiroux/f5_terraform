@@ -1,0 +1,3 @@
+awsRegion     = "us-west-2"
+projectPrefix = "myDemo"
+resourceOwner = "myName"
