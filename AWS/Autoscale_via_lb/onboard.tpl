@@ -140,6 +140,7 @@ echo "Set TMM networks"
 tmsh+=(
 "tmsh modify sys global-settings gui-setup disabled"
 "tmsh modify sys global-settings mgmt-dhcp disabled"
+"tmsh modify sys db config.allow.rfc3927 value enable"
 "tmsh delete sys management-route all"
 "tmsh delete sys management-ip all"
 "tmsh create sys management-ip 10.100.100.100/24"
