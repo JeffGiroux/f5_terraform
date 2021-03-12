@@ -64,7 +64,7 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 1. In the "variables.tf", modify *f5_ami_search_name* value with a BYOL filter in the name. Example below...
   ```
           # BIGIP Image
-          variable "f5_ami_search_name" { default = "F5 BIGIP-15.1.2.1* BYOL-All 2Boot" }
+          variable "f5_ami_search_name" { default = "F5 BIGIP-15.1.2.1* BYOL-All* 2Boot*" }
   ```
 2. In the "variables.tf", modify the BIG-IQ license section to match your environment
 3. In the "do.json", add the "myLicense" block under the "Common" declaration ([full declaration example here](https://clouddocs.f5.com/products/extensions/f5-declarative-onboarding/latest/bigiq-examples.html#licensing-with-big-iq-regkey-pool-route-to-big-ip))
