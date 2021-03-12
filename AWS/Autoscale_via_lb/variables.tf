@@ -1,17 +1,14 @@
 # Variables
 
 # AWS Environment
-variable "awsRegion" {}
-variable "projectPrefix" {}
-variable "resourceOwner" {}
+variable "awsRegion" { default = "us-west-2" }
+variable "projectPrefix" { default = "mydemo" }
+variable "resourceOwner" { default = "myname" }
 
 # NETWORK
 variable "vpcId" {}
 variable "extSubnetAz1" {}
 variable "extSubnetAz2" {}
-variable "mgmtSubnetAz1" {}
-variable "mgmtSubnetAz2" {}
-
 
 # AWS LB, auto healing, and auto scaling
 variable "asg_min_size" { default = 1 }
@@ -25,15 +22,12 @@ variable "ec2_instance_type" { default = "m5.xlarge" }
 # BIGIP Setup
 variable "f5_username" { default = "admin" }
 variable "f5_password" {}
-variable "uSecret" {}
+variable "uSecret" { default = "my-secret" }
 variable "ec2_key_name" {}
 variable "allowedIps" {}
-variable "dns_server" { default = "8.8.8.8" }
 variable "ntp_server" { default = "169.254.169.123" }
 variable "timezone" { default = "UTC" }
 variable "DO_URL" { default = "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.19.0/f5-declarative-onboarding-1.19.0-2.noarch.rpm" }
-variable "AS3_URL" { default = "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.26.0/f5-appsvcs-3.26.0-5.noarch.rpm" }
-variable "TS_URL" { default = "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.18.0/f5-telemetry-1.18.0-2.noarch.rpm" }
 variable "onboard_log" { default = "/var/log/cloud/onboard.log" }
 
 # BIGIQ License Manager Setup

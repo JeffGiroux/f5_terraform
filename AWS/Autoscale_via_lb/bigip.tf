@@ -3,15 +3,14 @@
 # Setup Onboarding scripts
 locals {
   vm01_onboard = templatefile("${path.module}/onboard.tpl", {
-    f5_username  = var.f5_username
-    f5_password  = var.f5_password
-    uSecret      = var.uSecret
-    DO_URL       = var.DO_URL
-    onboard_log  = var.onboard_log
-    DO_Document  = local.vm01_do_json
+    f5_username = var.f5_username
+    f5_password = var.f5_password
+    uSecret     = var.uSecret
+    DO_URL      = var.DO_URL
+    onboard_log = var.onboard_log
+    DO_Document = local.vm01_do_json
   })
   vm01_do_json = templatefile("${path.module}/do.json", {
-    dns_server         = var.dns_server
     ntp_server         = var.ntp_server
     timezone           = var.timezone
     bigIqLicenseType   = var.bigIqLicenseType
