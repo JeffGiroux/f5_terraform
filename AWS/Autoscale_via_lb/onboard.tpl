@@ -142,9 +142,11 @@ tmsh+=(
 "tmsh modify sys global-settings mgmt-dhcp disabled"
 "tmsh delete sys management-route all"
 "tmsh delete sys management-ip all"
+"tmsh create sys management-ip 10.100.100.100/24"
 "tmsh create net vlan external interfaces add { 1.0 } mtu 1460"
 "tmsh create net self self_external address $${INT1_ADDRESS}/$${INT1_MASK} vlan external allow-service default"
 "tmsh create net route default gw $${INT1_GATEWAY}"
+"tmsh create net route aws_metadata network 169.254.169.254/32 gw $${INT1_GATEWAY}"
 "tmsh modify sys dns name-servers add { 10.0.0.2 }"
 "tmsh modify sys management-dhcp sys-mgmt-dhcp-config request-options delete { ntp-servers }"
 'tmsh save /sys config'
