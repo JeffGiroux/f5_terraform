@@ -1,0 +1,39 @@
+{
+    "schemaVersion": "1.0.0",
+    "class": "Device",
+    "async": true,
+    "label": "Onboard BIG-IP into an HA Pair",
+    "Common": {
+        "class": "Tenant",
+        "hostname": "$${local_host}",
+        "dbVars": {
+            "class": "DbVariables",
+            "ui.advisory.enabled": true,
+            "ui.advisory.color": "green",
+            "ui.advisory.text": "/Common/hostname",
+            "config.allow.rfc3927": "enable"
+        },
+        "myDns": {
+            "class": "DNS",
+            "nameServers": [
+                "10.0.0.2"
+            ],
+            "search": [
+                "us-west-2.compute.internal"
+            ]
+        },
+        "myNtp": {
+            "class": "NTP",
+            "servers": [
+                "${ntp_server}",
+                "1.pool.ntp.org",
+                "2.pool.ntp.org"
+            ],
+            "timezone": "${timezone}"
+        },
+        "myProvisioning": {
+            "class": "Provision",
+            "ltm": "nominal"
+        }
+    }
+}

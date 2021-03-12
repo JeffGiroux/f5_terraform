@@ -1,0 +1,17 @@
+# BIG-IP Environment
+uSecret      = "my-secret"
+allowedIps   = ["0.0.0.0/0"]
+vpcId        = "vpc-1234"
+extSubnetAz1 = "subnet-1234"
+extSubnetAz2 = "subnet-5678"
+mgmtSubnetAz1 = "subnet-4321"
+mgmtSubnetAz2 = "subnet-8754"
+ec2_key_name = "mykey123"
+
+# BIG-IQ Environment
+bigIqUsername = "admin"
+
+# AWS Environment
+awsRegion     = "us-west-2"
+projectPrefix = "mydemo"
+resourceOwner = "myname"
