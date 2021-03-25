@@ -17,17 +17,7 @@ The BIG-IP VEs have the [Local Traffic Manager (LTM)](https://f5.com/products/bi
 
 Terraform is beneficial as it allows composing resources a bit differently to account for dependencies into Immutable/Mutable elements. For example, mutable includes items you would typically frequently change/mutate, such as traditional configs on the BIG-IP. Once the template is deployed, there are certain resources (network infrastructure) that are fixed while others (BIG-IP VMs and configurations) can be changed.
 
-This template deploys each BIG-IP in an AWS ASG as a standalone device and NOT in a [BIG-IP Device Service Cluster (DSC)](https://www.youtube.com/watch?v=NEguvpkmteM). As a result, there is no traditional BIG-IP clustering in regards to config sync and/or network failover. Each device is standalone, each device retrieves its onboarding from custom-data, and each device is treated as [immutable](https://www.f5.com/company/blog/you-cant-do-immutable-infrastructure-without-a-per-app-architecture). If changes are required to the network/application config of the BIG-IP device, then you do this in user-data via changes to Terraform TF files. The AWS ASG will perform a rolling upgrade (aka replacement) of each BIG-IP device.
-
-Example...
-
--> Run once
-- Deploy the entire infrastructure with all the neccessary resources, then use Declarative Onboarding (DO) to configure the BIG-IP cluster, Application Services (AS3) to create a sample app proxy, then lastly use Service Discovery to automatically add the DVWA container app to the BIG-IP pool.
-
--> Run many X
-- [Redeploy BIG-IP for Replacement or Upgrade](#Redeploy-BIG-IP-for-replacement-or-upgrade)
-
-**Networking Stack Type:** This solution deploys into an *EXISTING* networking stack. You are required to have an existing VPC network and subnets. A NAT gateway is also required for outbound Internet traffic. Refer to the [Prerequisites](#prerequisites).
+This solution leverages more traditional Auto Scale configuration management practices where each instance is created with an identical configuration as defined in the Scale Set's "model". Scale Set sizes are no longer restricted to the small limitations of the cluster. The BIG-IP's configuration, now defined in a single convenient YAML or JSON [F5 BIG-IP Runtime Init](https://github.com/F5Networks/f5-bigip-runtime-init) configuration file, leverages [F5 Automation Tool Chain](https://www.f5.com/pdf/products/automation-toolchain-overview.pdf) declarations which are easier to author, validate and maintain as code. For instance, if you need to change the configuration on the BIG-IPs in the deployment, you update the instance model by passing a new config file (which references the updated Automation Toolchain declarations) via template's runtimeConfig input parameter. New instances will be deployed with the updated configurations.
 
 ## Version
 This template is tested and worked in the following versions:
@@ -36,12 +26,15 @@ This template is tested and worked in the following versions:
 | terraform | ~> 0.14 |
 | aws | ~> 3 |
 
+
 ## Prerequisites
 
 - This template requires programmatic API credentials to deploy the Terraform AWS provider and build out all the neccessary AWS objects
   - See the [Terraform "AWS Provider"](https://registry.terraform.io/providers/hashicorp/aws/latest/docs#authentication) for details
   - You will require at minimum `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`
   - ***Note***: Make sure to [practice least privilege](https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html)
+- This templates deploys into an *EXISTING* networking stack. You are required to have an existing VPC network and subnets. A NAT gateway is also required for outbound Internet traffic. Refer to the [Prerequisites](#prerequisites).
+
 
 ## Important Configuration Notes
 
@@ -54,7 +47,7 @@ This template is tested and worked in the following versions:
   - bigip.tf - resources for BIG-IP autoscaling group, launch template, security groups
   - main.tf - resources for provider, versions
   - nlb.tf - resources for AWS NLB
-  - onboard.tpl - onboarding script which is run by user-data. This script is responsible for downloading the neccessary F5 Automation Toolchain RPM files, installing them, and then executing the onboarding REST calls.
+  - f5_onboard.tmpl - onboarding script which is run by user-data. This script is responsible for downloading the neccessary F5 Automation Toolchain RPM files, installing them, and then executing the onboarding REST calls.
   - do.json - contains the L1-L3 BIG-IP configurations used by DO for items like VLANs, IPs, and routes
   - as3.json - contains the L4-L7 BIG-IP configurations used by AS3 for items like pool members, virtual server listeners, security policies, and more
   - ts.json - contains the BIG-IP configurations used by TS for items like telemetry streaming, CPU, memory, application statistics, and more
@@ -94,7 +87,6 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | projectPrefix | This value is inserted at the beginning of each AWS object (alpha-numeric, no special character) | `string` | myDemo | no |
 | f5_username | User name for the Virtual Machine | `string` | admin | no |
 | f5_password | Password for the Virtual Machine (remove later) | `string` | n/a | yes |
-| uSecret (not currently used) | Used during onboarding to query the AWS Secrets Manager  and retrieve the admin password (use the secret name, not the secret value/password) |`string` | my-secret | no |
 | ec2_key_name | SSH public key for admin authentation | `string` | n/a | yes |
 | allowedIps | Trusted source network for admin access | `list` | ["0.0.0.0/0"] | yes |
 | awsRegion | AWS Region for provider | `string` | us-west-2 | yes |
@@ -105,7 +97,6 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | ec2_instance_type | AWS instance type for the BIG-IP | `string` | m5.xlarge | no |
 | ntp_server | NTP server used by BIG-IP | `string` | 169.254.169.123 | no |
 | timezone | Timezone used by BIG-IP clock (ex: UTC, US/Pacific, US/Eastern, Europe/London or Asia/Singapore) | `string` | UTC | no |
-| DO_URL | This is the raw github URL for downloading the Declarative Onboarding RPM | `string` | https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.19.0/f5-declarative-onboarding-1.19.0-2.noarch.rpm | no |
 | onboard_log | This is where the onboarding script logs all the events | `string` | /var/log/cloud/onboard.log | no |
 | bigIqHost | This is the BIG-IQ License Manager host name or IP address | `string` | 200.200.200.200 | no |
 | bigIqUsername | BIG-IQ user name | `string` | admin | no |

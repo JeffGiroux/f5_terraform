@@ -2,13 +2,9 @@
 
 # Setup Onboarding scripts
 locals {
-  vm01_onboard = templatefile("${path.module}/onboard.tpl", {
+  f5_onboard = templatefile("${path.module}/f5_onboard.tmpl", {
     f5_username = var.f5_username
     f5_password = var.f5_password
-    uSecret     = var.uSecret
-    DO_URL      = var.DO_URL
-    onboard_log = var.onboard_log
-    DO_Document = local.vm01_do_json
   })
   vm01_do_json = templatefile("${path.module}/do.json", {
     ntp_server         = var.ntp_server
@@ -61,7 +57,7 @@ resource "aws_launch_template" "bigip-lt" {
   image_id      = data.aws_ami.f5_ami.id
   instance_type = var.ec2_instance_type
   key_name      = var.ec2_key_name
-  user_data     = base64encode(local.vm01_onboard)
+  user_data     = base64encode(local.f5_onboard)  
 
   network_interfaces {
     device_index          = 0
