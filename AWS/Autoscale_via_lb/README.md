@@ -13,10 +13,6 @@
 
 This solution uses a Terraform template to launch a 2-NIC deployment of a cloud-focused BIG-IP VE cluster (Active/Active) in Amazon AWS. It uses [AWS Autoscaling Groups (ASG)](https://docs.aws.amazon.com/autoscaling/ec2/userguide/AutoScalingGroup.html) to allow auto scaling and auto healing of the BIG-IP VE devices. Traffic flows from an AWS Network Load Balancer (NLB) to the BIG-IP VE which then processes the traffic to application servers. The BIG-IP VE instance is running with multiple interfaces: management, external. NIC0 is associated with the external network and used in ASGs. **NOTE: NIC-SWAP happens on mgmt interface**
 
-The BIG-IP VEs have the [Local Traffic Manager (LTM)](https://f5.com/products/big-ip/local-traffic-manager-ltm) module enabled to provide advanced traffic management functionality. In addition, the [Application Security Module (ASM)](https://www.f5.com/pdf/products/big-ip-application-security-manager-overview.pdf) can be enabled to provide F5's L4/L7 security features for web application firewall (WAF) and bot protection.
-
-Terraform is beneficial as it allows composing resources a bit differently to account for dependencies into Immutable/Mutable elements. For example, mutable includes items you would typically frequently change/mutate, such as traditional configs on the BIG-IP. Once the template is deployed, there are certain resources (network infrastructure) that are fixed while others (BIG-IP VMs and configurations) can be changed.
-
 This solution leverages more traditional Auto Scale configuration management practices where each instance is created with an identical configuration as defined in the Scale Set's "model". Scale Set sizes are no longer restricted to the small limitations of the cluster. The BIG-IP's configuration, now defined in a single convenient YAML or JSON [F5 BIG-IP Runtime Init](https://github.com/F5Networks/f5-bigip-runtime-init) configuration file, leverages [F5 Automation Tool Chain](https://www.f5.com/pdf/products/automation-toolchain-overview.pdf) declarations which are easier to author, validate and maintain as code. For instance, if you need to change the configuration on the BIG-IPs in the deployment, you update the instance model by passing a new config file (which references the updated Automation Toolchain declarations) via template's runtimeConfig input parameter. New instances will be deployed with the updated configurations.
 
 ## Version
@@ -33,7 +29,9 @@ This template is tested and worked in the following versions:
   - See the [Terraform "AWS Provider"](https://registry.terraform.io/providers/hashicorp/aws/latest/docs#authentication) for details
   - You will require at minimum `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`
   - ***Note***: Make sure to [practice least privilege](https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html)
-- This templates deploys into an *EXISTING* networking stack. You are required to have an existing VPC network and subnets. A NAT gateway is also required for outbound Internet traffic. Refer to the [Prerequisites](#prerequisites).
+- This templates deploys into an *EXISTING* networking stack. You are required to have an existing VPC network and subnets
+  - A NAT gateway is also required for outbound Internet traffic
+  - If you require a new network first, see the [Infrastructure Only folder](../Infrastructure-only) to get started
 
 
 ## Important Configuration Notes
@@ -41,7 +39,6 @@ This template is tested and worked in the following versions:
 - Variables are configured in variables.tf
 - Sensitive variables like AWS SSH keys are configured in terraform.tfvars
   - ***Note***: Other items like BIG-IP password are stored in AWS Secrets Manager. Refer to the [Prerequisites](#prerequisites).
-- This template uses Declarative Onboarding (DO) for the initial configuration. As part of the onboarding script, it will download the RPM automatically. See the [DO documentation](http://f5.com/DODocs) for details on how to use Declarative Onboarding on your BIG-IP VE(s).
 - Files
   - main.tf - resources for provider, versions
   - bigip.tf - resources for BIG-IP autoscaling group, launch template, security groups
