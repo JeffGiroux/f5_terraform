@@ -1,0 +1,4 @@
+resourceOwner = "fred"
+azureLocation = "westus2"
+keyName       = "~/.ssh/id_rsa.pub"
+projectPrefix = "multi-cloud"
