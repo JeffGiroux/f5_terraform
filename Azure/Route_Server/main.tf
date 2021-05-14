@@ -2,27 +2,34 @@ provider "azurerm" {
   features {}
 }
 
-############################ Locals for Vnets ############################
+############################ Locals ############################
 
 locals {
   vnets = {
     hub = {
       location       = var.azureLocation
       addressSpace   = ["10.255.0.0/16"]
-      subnetPrefixes = ["10.255.10.0/24", "10.255.20.0/24", "10.255.255.0/24"]
-      subnetNames    = ["external", "internal", "RouteServerSubnet"]
+      subnetPrefixes = ["10.255.1.0/24", "10.255.10.0/24", "10.255.20.0/24", "10.255.255.0/24"]
+      subnetNames    = ["mgmt", "external", "internal", "RouteServerSubnet"]
     }
     spoke1 = {
       location       = var.azureLocation
       addressSpace   = ["10.1.0.0/16"]
-      subnetPrefixes = ["10.1.10.0/24", "10.1.20.0/24", "10.1.1.0/24"]
-      subnetNames    = ["external", "internal", "mgmt"]
+      subnetPrefixes = ["10.1.1.0/24", "10.1.10.0/24", "10.1.20.0/24"]
+      subnetNames    = ["mgmt", "external", "internal"]
     }
     spoke2 = {
       location       = var.azureLocation
       addressSpace   = ["10.2.0.0/16"]
-      subnetPrefixes = ["10.2.10.0/24", "10.2.20.0/24", "10.2.1.0/24"]
-      subnetNames    = ["external", "internal", "mgmt"]
+      subnetPrefixes = ["10.2.1.0/24", "10.2.10.0/24", "10.2.20.0/24"]
+      subnetNames    = ["mgmt", "external", "internal"]
+    }
+  }
+
+  spokeHubPeerings = {
+    spoke1 = {
+    }
+    spoke2 = {
     }
   }
 }
@@ -41,6 +48,80 @@ resource "azurerm_resource_group" "rg" {
   }
 }
 
+############################ Route Tables ############################
+
+# Create Route Tables
+resource "azurerm_route_table" "rt" {
+  for_each                      = local.vnets
+  name                          = format("%s-rt-%s-%s", var.projectPrefix, each.key, random_id.buildSuffix.hex)
+  location                      = azurerm_resource_group.rg[each.key].location
+  resource_group_name           = azurerm_resource_group.rg[each.key].name
+  disable_bgp_route_propagation = false
+
+  tags = {
+    Name      = format("%s-rt-%s-%s", var.resourceOwner, each.key, random_id.buildSuffix.hex)
+    Terraform = "true"
+  }
+}
+
+############################ Network Security Groups ############################
+
+# Create Mgmt NSG
+module "nsg-mgmt" {
+  for_each              = local.vnets
+  source                = "Azure/network-security-group/azurerm"
+  resource_group_name   = azurerm_resource_group.rg[each.key].name
+  location              = azurerm_resource_group.rg[each.key].location
+  security_group_name   = format("%s-mgmt-nsg-%s-%s", var.projectPrefix, each.key, random_id.buildSuffix.hex)
+  source_address_prefix = [var.adminSrcAddr]
+
+  predefined_rules = [
+    {
+      name     = "HTTP"
+      priority = "100"
+    },
+    {
+      name     = "HTTPS"
+      priority = "110"
+    },
+    {
+      name     = "SSH"
+      priority = "120"
+    }
+  ]
+
+  tags = {
+    Name      = format("%s-mgmt-nsg-%s-%s", var.resourceOwner, each.key, random_id.buildSuffix.hex)
+    Terraform = "true"
+  }
+}
+
+# Create External NSG
+module "nsg-external" {
+  for_each              = local.vnets
+  source                = "Azure/network-security-group/azurerm"
+  resource_group_name   = azurerm_resource_group.rg[each.key].name
+  location              = azurerm_resource_group.rg[each.key].location
+  security_group_name   = format("%s-external-nsg-%s-%s", var.projectPrefix, each.key, random_id.buildSuffix.hex)
+  source_address_prefix = ["*"]
+
+  predefined_rules = [
+    {
+      name     = "HTTP"
+      priority = "100"
+    },
+    {
+      name     = "HTTPS"
+      priority = "110"
+    }
+  ]
+
+  tags = {
+    Name      = format("%s-external-nsg-%s-%s", var.resourceOwner, each.key, random_id.buildSuffix.hex)
+    Terraform = "true"
+  }
+}
+
 ############################ VNets ############################
 
 # Create VNets
@@ -53,6 +134,11 @@ module "network" {
   subnet_prefixes     = each.value["subnetPrefixes"]
   subnet_names        = each.value["subnetNames"]
 
+  nsg_ids = {
+    external = module.nsg-external[each.key].network_security_group_id
+    mgmt     = module.nsg-mgmt[each.key].network_security_group_id
+  }
+
   route_tables_ids = {
     external = azurerm_route_table.rt[each.key].id
     internal = azurerm_route_table.rt[each.key].id
@@ -64,45 +150,29 @@ module "network" {
   }
 }
 
-# Retrieve Route Server Subnet Data
-data "azurerm_subnet" "routeServerSubnet" {
+# Retrieve Hub Subnet Data
+data "azurerm_subnet" "routeServerSubnetHub" {
   name                 = "RouteServerSubnet"
   virtual_network_name = module.network["hub"].vnet_name
   resource_group_name  = azurerm_resource_group.rg["hub"].name
   depends_on           = [module.network["hub"].vnet_subnets]
 }
 
-############################ Route Server and BGP Peering ############################
-
-resource "azurerm_virtual_hub" "routeServer" {
-  name                = format("%s-routeServer-%s", var.projectPrefix, random_id.buildSuffix.hex)
-  resource_group_name = azurerm_resource_group.rg["hub"].name
-  location            = azurerm_resource_group.rg["hub"].location
-  sku                 = "Standard"
-  depends_on          = [module.network["hub"].vnet_subnets]
-
-  tags = {
-    Name      = format("%s-routeServer-%s", var.resourceOwner, random_id.buildSuffix.hex)
-    Terraform = "true"
-  }
+data "azurerm_subnet" "externalSubnetHub" {
+  name                 = "external"
+  virtual_network_name = module.network["hub"].vnet_name
+  resource_group_name  = azurerm_resource_group.rg["hub"].name
+  depends_on           = [module.network["hub"].vnet_subnets]
 }
 
-resource "azurerm_virtual_hub_ip" "routeServerIp" {
-  name           = format("%s-routeServerIp-%s", var.projectPrefix, random_id.buildSuffix.hex)
-  virtual_hub_id = azurerm_virtual_hub.routeServer.id
-  subnet_id      = data.azurerm_subnet.routeServerSubnet.id
+data "azurerm_subnet" "mgmtSubnetHub" {
+  name                 = "mgmt"
+  virtual_network_name = module.network["hub"].vnet_name
+  resource_group_name  = azurerm_resource_group.rg["hub"].name
+  depends_on           = [module.network["hub"].vnet_subnets]
 }
 
 ############################ VNet Peering ############################
-
-locals {
-  spokeHubPeerings = {
-    spoke1 = {
-    }
-    spoke2 = {
-    }
-  }
-}
 
 # Create hub to spoke peerings
 resource "azurerm_virtual_network_peering" "hubToSpoke" {
@@ -126,18 +196,23 @@ resource "azurerm_virtual_network_peering" "spokeToHub" {
   #use_remote_gateways       = true
 }
 
-############################ Route Tables ############################
+############################ Route Server and BGP Peering ############################
 
-# Create Route Tables
-resource "azurerm_route_table" "rt" {
-  for_each                      = local.vnets
-  name                          = format("%s-rt-%s-%s", var.projectPrefix, each.key, random_id.buildSuffix.hex)
-  location                      = azurerm_resource_group.rg[each.key].location
-  resource_group_name           = azurerm_resource_group.rg[each.key].name
-  disable_bgp_route_propagation = false
+resource "azurerm_virtual_hub" "routeServer" {
+  name                = format("%s-routeServer-%s", var.projectPrefix, random_id.buildSuffix.hex)
+  resource_group_name = azurerm_resource_group.rg["hub"].name
+  location            = azurerm_resource_group.rg["hub"].location
+  sku                 = "Standard"
+  depends_on          = [module.network["hub"].vnet_subnets]
 
   tags = {
-    Name      = format("%s-rt-%s-%s", var.resourceOwner, each.key, random_id.buildSuffix.hex)
+    Name      = format("%s-routeServer-%s", var.resourceOwner, random_id.buildSuffix.hex)
     Terraform = "true"
   }
+}
+
+resource "azurerm_virtual_hub_ip" "routeServerIp" {
+  name           = format("%s-routeServerIp-%s", var.projectPrefix, random_id.buildSuffix.hex)
+  virtual_hub_id = azurerm_virtual_hub.routeServer.id
+  subnet_id      = data.azurerm_subnet.routeServerSubnetHub.id
 }
