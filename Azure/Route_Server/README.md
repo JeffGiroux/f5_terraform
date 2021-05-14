@@ -4,7 +4,6 @@ Azure Route Server and BIG-IP using BGP and eCMP for traffic distribution
 ## Diagram
 
 ![Azure Route Server and BIG-IP](azure-route-server-overview.png)
-*example only, IPs might be different in your environment
 
 ## Requirements
 
