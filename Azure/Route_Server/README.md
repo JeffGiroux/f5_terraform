@@ -31,7 +31,7 @@ az account set -s <subscriptionId>
 - Clone the repo and open the solution's directory
 ```bash
 git clone https://github.com/JeffGiroux/f5_terraform.git
-cd f5_terraform/Azure/Route_Server_BGP/
+cd f5_terraform/Azure/Route_Server/
 ```
 
 - Create the tfvars file and update it with your settings
