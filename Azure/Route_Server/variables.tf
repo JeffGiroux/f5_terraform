@@ -21,4 +21,9 @@ variable "keyName" {
   type        = string
   description = "instance key pair name"
 }
+variable "adminSrcAddr" {
+  type    = string
+  default = "0.0.0.0/0"
+}
+
 
