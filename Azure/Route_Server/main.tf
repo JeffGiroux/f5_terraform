@@ -72,7 +72,7 @@ module "nsg-mgmt" {
   source                = "Azure/network-security-group/azurerm"
   resource_group_name   = azurerm_resource_group.rg[each.key].name
   location              = azurerm_resource_group.rg[each.key].location
-  security_group_name   = format("%s-mgmt-nsg-%s-%s", var.projectPrefix, each.key, random_id.buildSuffix.hex)
+  security_group_name   = format("%s-nsg-mgmt-%s-%s", var.projectPrefix, each.key, random_id.buildSuffix.hex)
   source_address_prefix = [var.adminSrcAddr]
 
   predefined_rules = [
@@ -91,7 +91,7 @@ module "nsg-mgmt" {
   ]
 
   tags = {
-    Name      = format("%s-mgmt-nsg-%s-%s", var.resourceOwner, each.key, random_id.buildSuffix.hex)
+    Name      = format("%s-nsg-mgmt-%s-%s", var.resourceOwner, each.key, random_id.buildSuffix.hex)
     Terraform = "true"
   }
 }
@@ -102,7 +102,7 @@ module "nsg-external" {
   source                = "Azure/network-security-group/azurerm"
   resource_group_name   = azurerm_resource_group.rg[each.key].name
   location              = azurerm_resource_group.rg[each.key].location
-  security_group_name   = format("%s-external-nsg-%s-%s", var.projectPrefix, each.key, random_id.buildSuffix.hex)
+  security_group_name   = format("%s-nsg-external-%s-%s", var.projectPrefix, each.key, random_id.buildSuffix.hex)
   source_address_prefix = ["*"]
 
   predefined_rules = [
@@ -117,7 +117,21 @@ module "nsg-external" {
   ]
 
   tags = {
-    Name      = format("%s-external-nsg-%s-%s", var.resourceOwner, each.key, random_id.buildSuffix.hex)
+    Name      = format("%s-nsg-external-%s-%s", var.resourceOwner, each.key, random_id.buildSuffix.hex)
+    Terraform = "true"
+  }
+}
+
+# Create Internal NSG
+module "nsg-internal" {
+  for_each            = local.vnets
+  source              = "Azure/network-security-group/azurerm"
+  resource_group_name = azurerm_resource_group.rg[each.key].name
+  location            = azurerm_resource_group.rg[each.key].location
+  security_group_name = format("%s-nsg-internal-%s-%s", var.projectPrefix, each.key, random_id.buildSuffix.hex)
+
+  tags = {
+    Name      = format("%s-nsg-internal-%s-%s", var.resourceOwner, each.key, random_id.buildSuffix.hex)
     Terraform = "true"
   }
 }
@@ -151,8 +165,8 @@ module "network" {
 }
 
 # Retrieve Hub Subnet Data
-data "azurerm_subnet" "routeServerSubnetHub" {
-  name                 = "RouteServerSubnet"
+data "azurerm_subnet" "mgmtSubnetHub" {
+  name                 = "mgmt"
   virtual_network_name = module.network["hub"].vnet_name
   resource_group_name  = azurerm_resource_group.rg["hub"].name
   depends_on           = [module.network["hub"].vnet_subnets]
@@ -165,8 +179,15 @@ data "azurerm_subnet" "externalSubnetHub" {
   depends_on           = [module.network["hub"].vnet_subnets]
 }
 
-data "azurerm_subnet" "mgmtSubnetHub" {
-  name                 = "mgmt"
+data "azurerm_subnet" "internalSubnetHub" {
+  name                 = "internal"
+  virtual_network_name = module.network["hub"].vnet_name
+  resource_group_name  = azurerm_resource_group.rg["hub"].name
+  depends_on           = [module.network["hub"].vnet_subnets]
+}
+
+data "azurerm_subnet" "routeServerSubnetHub" {
+  name                 = "RouteServerSubnet"
   virtual_network_name = module.network["hub"].vnet_name
   resource_group_name  = azurerm_resource_group.rg["hub"].name
   depends_on           = [module.network["hub"].vnet_subnets]
