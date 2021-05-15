@@ -11,6 +11,7 @@ module "bigip" {
   internal_securitygroup_ids = [module.nsg-internal["hub"].network_security_group_id]
   availabilityZones          = var.availabilityZones
   f5_ssh_publickey           = var.keyName
+  f5_username                = var.f5UserName
 }
 
 resource "null_resource" "clusterDO" {

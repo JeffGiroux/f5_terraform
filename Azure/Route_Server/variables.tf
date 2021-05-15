@@ -38,5 +38,7 @@ variable "instanceCountBigIp" {
   description = "Number of BIG-IP instances to deploy"
   default     = 1
 }
-
-
+variable "f5UserName" {
+  description = "The admin username of the F5 BIG-IP that will be deployed"
+  default     = "azureuser"
+}
