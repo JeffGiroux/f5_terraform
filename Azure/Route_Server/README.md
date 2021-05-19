@@ -49,7 +49,9 @@ vi admin.auto.tfvars
 
 ## TEST your setup:
 
-View the created objects in Azure Portal
+View the created objects in Azure Portal.
+
+View BPG peering on the Azure Route Server object in the portal - https://aka.ms/routeserver
 
 
 ## Cleanup
