@@ -203,7 +203,7 @@ resource "azurerm_virtual_network_peering" "hubToSpoke" {
   virtual_network_name      = module.network["hub"].vnet_name
   remote_virtual_network_id = module.network[each.key].vnet_id
   allow_forwarded_traffic   = true
-  #allow_gateway_transit     = true
+  allow_gateway_transit     = true
 }
 
 # Create spoke to hub peerings
@@ -214,7 +214,7 @@ resource "azurerm_virtual_network_peering" "spokeToHub" {
   virtual_network_name      = module.network[each.key].vnet_name
   remote_virtual_network_id = module.network["hub"].vnet_id
   allow_forwarded_traffic   = true
-  #use_remote_gateways       = true
+  use_remote_gateways       = true
 }
 
 ############################ Route Server and BGP Peering ############################
