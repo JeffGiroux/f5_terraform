@@ -269,8 +269,8 @@ module "client" {
 ############################ VM for App ############################
 
 # App Onboarding script
-locals {
-  appOnboard = templatefile("${path.module}/scripts/init-app.sh")
+data "local_file" "appOnboard" {
+  filename = "${path.module}/scripts/init-app.sh"
 }
 
 module "app" {
@@ -282,7 +282,7 @@ module "app" {
   vm_os_sku           = "20_04-lts"
   vnet_subnet_id      = module.network["spoke2"].vnet_subnets[2]
   ssh_key             = var.keyName
-  custom_data         = base64encode(locals.appOnboard.rendered)
+  custom_data         = data.local_file.appOnboard.content_base64
 
   tags = {
     Name      = format("%s-app-%s", var.resourceOwner, random_id.buildSuffix.hex)
