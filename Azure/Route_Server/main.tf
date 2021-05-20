@@ -237,3 +237,11 @@ resource "azurerm_virtual_hub_ip" "routeServerIp" {
   virtual_hub_id = azurerm_virtual_hub.routeServer.id
   subnet_id      = data.azurerm_subnet.routeServerSubnetHub.id
 }
+
+resource "azurerm_virtual_hub_bgp_connection" "bigip" {
+  name           = "bigip1"
+  virtual_hub_id = azurerm_virtual_hub.routeServer.id
+  peer_asn       = 65530
+  peer_ip        = "10.255.10.4"
+  depends_on     = [azurerm_virtual_hub_ip.routeServerIp]
+}
