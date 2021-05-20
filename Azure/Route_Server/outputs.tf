@@ -32,6 +32,10 @@ output "clientPrivateIP" {
   description = "The private ip address allocated for the client/jumphost in Spoke 1"
   value       = module.client.network_interface_private_ip
 }
+output "appPublicIP" {
+  description = "The public ip address allocated for the app in Spoke 2"
+  value       = module.app.public_ip_address
+}
 output "appPrivateIP" {
   description = "The private ip address allocated for the webapp in Spoke 2"
   value       = module.app.network_interface_private_ip
