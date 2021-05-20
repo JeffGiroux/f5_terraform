@@ -12,6 +12,7 @@ module "bigip" {
   availabilityZones          = var.availabilityZones
   f5_ssh_publickey           = var.keyName
   f5_username                = var.f5UserName
+  f5_version                 = var.f5Version
   script_name                = "f5_onboard_bgp"
 }
 

@@ -42,3 +42,7 @@ variable "f5UserName" {
   description = "The admin username of the F5 BIG-IP that will be deployed"
   default     = "azureuser"
 }
+variable "f5Version" {
+  description = "The BIG-IP version"
+  default     = "15.1.201000"
+}
