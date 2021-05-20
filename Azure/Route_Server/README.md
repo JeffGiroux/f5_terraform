@@ -53,6 +53,37 @@ View the created objects in Azure Portal.
 
 View BPG peering on the Azure Route Server object in the portal - https://aka.ms/routeserver
 
+Validate BGP peering on BIG-IP using tmsh or imish.
+```bash
+# TMSH
+tmsh list net routing
+
+# TMSH Output
+net routing bgp 65530 {
+    address-family {
+        ipv4 {
+            aggregate-address {
+                10.3.0.0/16 {
+                    summary-only enabled
+                }
+and so on...
+
+# IMISH
+imish
+show ip bgp summary 
+
+# IMISH Output
+BGP router identifier 10.255.20.4, local AS number 65530
+BGP table version is 2
+1 BGP AS-PATH entries
+0 BGP community entries
+
+Neighbor        V    AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State/PfxRcd
+10.255.255.4    4 65515      16      13        2    0    0 00:05:51        1
+10.255.255.5    4 65515      16      14        2    0    0 00:05:39        1
+
+Total number of neighbors 2
+```
 
 ## Cleanup
 Use the following command to destroy all of the resources
