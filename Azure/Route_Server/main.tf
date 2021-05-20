@@ -215,6 +215,7 @@ resource "azurerm_virtual_network_peering" "spokeToHub" {
   remote_virtual_network_id = module.network["hub"].vnet_id
   allow_forwarded_traffic   = true
   use_remote_gateways       = true
+  depends_on                = [azurerm_virtual_hub.routeServer]
 }
 
 ############################ Route Server and BGP Peering ############################
