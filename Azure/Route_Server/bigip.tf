@@ -1,7 +1,7 @@
 module "bigip" {
   count                      = var.instanceCountBigIp
   source                     = "github.com/JeffGiroux/terraform-azure-bigip-module?ref=3nic"
-  prefix                     = format("%s-bigip-%s-%s", var.projectPrefix, count.index, random_id.buildSuffix.hex)
+  prefix                     = var.projectPrefix
   resource_group_name        = azurerm_resource_group.rg["hub"].name
   mgmt_subnet_ids            = [{ "subnet_id" = data.azurerm_subnet.mgmtSubnetHub.id, "public_ip" = true, "private_ip_primary" = "" }]
   mgmt_securitygroup_ids     = [module.nsg-mgmt["hub"].network_security_group_id]
@@ -12,6 +12,7 @@ module "bigip" {
   availabilityZones          = var.availabilityZones
   f5_ssh_publickey           = var.keyName
   f5_username                = var.f5UserName
+  script_name                = "f5_onboard_bgp"
 }
 
 resource "null_resource" "clusterDO" {
