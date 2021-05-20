@@ -258,6 +258,7 @@ module "client" {
   vm_os_sku           = "20_04-lts"
   vnet_subnet_id      = module.network["spoke1"].vnet_subnets[0]
   ssh_key             = var.keyName
+  remote_port         = "22"
 
   tags = {
     Name      = format("%s-client-%s", var.resourceOwner, random_id.buildSuffix.hex)
