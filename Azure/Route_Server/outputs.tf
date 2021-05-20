@@ -24,3 +24,8 @@ output "bigipPassword" {
   EOT
   value       = module.bigip.*.bigip_password
 }
+output "clientPublicIP" {
+  description = "The public ip address allocated for the client/jumphost in Spoke 1"
+  value       = module.client.public_ip_address
+}
+
