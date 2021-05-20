@@ -49,13 +49,15 @@ vi admin.auto.tfvars
 
 ## TEST your setup:
 
-View the created objects in Azure Portal. Choose a VM instance or NIC from a spoke VNet and view "Effective Routes". You will see BIG-IP advertised routes via BGP across the VNet peering.
+- View the created objects in Azure Portal. Choose a VM instance or NIC from a spoke VNet and view "Effective Routes". You will see BIG-IP advertised routes via BGP across the VNet peering.
 
 ![Azure Effective Routes](images/azure-effective-routes.png)
 
-View BPG peering on the Azure Route Server object in the portal - https://aka.ms/routeserver
+- View BPG peering on the Azure Route Server object in the portal - https://aka.ms/routeserver
 
-Validate BGP peering on BIG-IP using tmsh or imish.
+![Azure BGP Peering](images/azure-bgp-peering.png)
+
+- Validate BGP peering on BIG-IP using tmsh or imish.
 ```bash
 # TMSH
 tmsh list net routing
