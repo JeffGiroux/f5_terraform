@@ -252,8 +252,11 @@ resource "azurerm_virtual_hub_bgp_connection" "bigip" {
 module "client" {
   source              = "Azure/compute/azurerm"
   resource_group_name = azurerm_resource_group.rg["spoke1"].name
-  vm_os_simple        = "UbuntuServer"
-  vnet_subnet_id      = module.network["spoke1"].vnet_subnets[1]
+  vm_hostname         = "client"
+  vm_os_publisher     = "Canonical"
+  vm_os_offer         = "0001-com-ubuntu-server-focal"
+  vm_os_sku           = "20_04-lts"
+  vnet_subnet_id      = module.network["spoke1"].vnet_subnets[0]
   ssh_key             = var.keyName
 
   tags = {
