@@ -247,7 +247,7 @@ resource "azurerm_virtual_hub_bgp_connection" "bigip" {
   depends_on     = [azurerm_virtual_hub_ip.routeServerIp]
 }
 
-############################ VMs for Client and App ############################
+############################ VM for Client ############################
 
 module "client" {
   source              = "Azure/compute/azurerm"
@@ -262,6 +262,30 @@ module "client" {
 
   tags = {
     Name      = format("%s-client-%s", var.resourceOwner, random_id.buildSuffix.hex)
+    Terraform = "true"
+  }
+}
+
+############################ VM for App ############################
+
+# App Onboarding script
+locals {
+  appOnboard = templatefile("${path.module}/scripts/init-app.sh")
+}
+
+module "app" {
+  source              = "Azure/compute/azurerm"
+  resource_group_name = azurerm_resource_group.rg["spoke2"].name
+  vm_hostname         = "app"
+  vm_os_publisher     = "Canonical"
+  vm_os_offer         = "0001-com-ubuntu-server-focal"
+  vm_os_sku           = "20_04-lts"
+  vnet_subnet_id      = module.network["spoke2"].vnet_subnets[2]
+  ssh_key             = var.keyName
+  custom_data         = base64encode(locals.appOnboard.rendered)
+
+  tags = {
+    Name      = format("%s-app-%s", var.resourceOwner, random_id.buildSuffix.hex)
     Terraform = "true"
   }
 }
