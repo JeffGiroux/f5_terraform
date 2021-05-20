@@ -246,3 +246,18 @@ resource "azurerm_virtual_hub_bgp_connection" "bigip" {
   peer_ip        = "10.255.10.4"
   depends_on     = [azurerm_virtual_hub_ip.routeServerIp]
 }
+
+############################ VMs for Client and App ############################
+
+module "client" {
+  source              = "Azure/compute/azurerm"
+  resource_group_name = azurerm_resource_group.rg["spoke1"].name
+  vm_os_simple        = "UbuntuServer"
+  vnet_subnet_id      = module.network["spoke1"].vnet_subnets[1]
+  ssh_key             = var.keyName
+
+  tags = {
+    Name      = format("%s-client-%s", var.resourceOwner, random_id.buildSuffix.hex)
+    Terraform = "true"
+  }
+}
