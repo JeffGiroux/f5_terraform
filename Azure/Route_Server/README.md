@@ -187,6 +187,11 @@ terraform taint module.bigip[0].azurerm_virtual_machine_extension.vmext
 ./setup.sh
 ```
 
+If you want to manually re-run BIG-IP Runtime init and force declarations to re-run too, then login to the BIG-IP, enter 'bash' mode and run this command.
+```bash
+f5-bigip-runtime-init --config-file /config/cloud/runtime-init-conf.yaml
+```
+
 ## Cleanup
 Use the following command to destroy all of the resources
 
