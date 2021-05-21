@@ -44,6 +44,6 @@ variable "f5UserName" {
 }
 variable "f5Version" {
   description = "The BIG-IP version"
-  default     = "latest"
-  #default     = "15.1.201000"
+  #default     = "latest"
+  default = "15.1.201000"
 }
