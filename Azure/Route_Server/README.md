@@ -174,6 +174,10 @@ Total number of prefixes 6
 ## Troubleshooting
 If you don't see routes in the spoke VNets, then try deleting the VNet peering and re-run Terraform to have it create the peer again. If you happen to run into this issue, open an issue directly with Azure support to provide feedback.
 
+You can view BIG-IP onboard logs in /var/log/cloud. Review logs for failure message.
+
+You can view BIG-IP onbard config files in /config/cloud. Review the declarative onboarding JSON file as well as the runtime init YAML file for accuracy. Did the variables render correctly?
+
 ## Cleanup
 Use the following command to destroy all of the resources
 
