@@ -4,7 +4,7 @@ Azure Route Server and BIG-IP using BGP and eCMP for traffic distribution
 ## TO DO - WORK IN PROGRESS
 1. Wait for Azure Route Server GA...currently in preview
 2. Finish BIG-IP setup with test app
-3. Remove test network prefix virtuals (10.100, 10.101, 10.102)
+3. Remove test network virtuals (10.100, 10.101, 10.102)...testing only
 4. More README, more how-to steps
 
 ## Diagram
@@ -53,7 +53,7 @@ vi admin.auto.tfvars
 ./setup.sh
 ```
 
-## TEST your setup
+## Test your setup
 
 - View the created objects in Azure Portal. Choose a VM instance or NIC from a spoke VNet and view "Effective Routes". You will see BIG-IP advertised routes via BGP across the VNet peering.
 
