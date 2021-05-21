@@ -178,6 +178,15 @@ You can view BIG-IP onboard logs in /var/log/cloud. Review logs for failure mess
 
 You can view BIG-IP onbard config files in /config/cloud. Review the declarative onboarding JSON file as well as the runtime init YAML file for accuracy. Did the variables render correctly?
 
+If BIG-IP imish commands do not provide results to "show ip bgp" or "show run" but you do see "tmsh list net routing", then something happen in the preview tmsh BGP/routing feature. You should simply delete and recreate the device.
+```bash
+# taint BIG-IP resource
+terraform taint module.bigip[0].azurerm_virtual_machine.f5vm01
+terraform taint module.bigip[0].azurerm_virtual_machine_extension.vmext
+# re-run terraform
+./setup.sh
+```
+
 ## Cleanup
 Use the following command to destroy all of the resources
 
