@@ -204,6 +204,7 @@ resource "azurerm_virtual_network_peering" "hubToSpoke" {
   remote_virtual_network_id = module.network[each.key].vnet_id
   allow_forwarded_traffic   = true
   allow_gateway_transit     = true
+  depends_on                = [azurerm_virtual_hub_bgp_connection.bigip]
 }
 
 # Create spoke to hub peerings
