@@ -2,10 +2,10 @@
 Azure Route Server and BIG-IP using BGP and eCMP for traffic distribution
 
 ## TO DO - WORK IN PROGRESS
-1. More README, more how-to steps
+1. Wait for Azure Route Server GA...currently in preview
 2. Finish BIG-IP setup with test app
-3. Remove test network prefix virtuals later 
-4. Wait for Azure Route Server GA...currently in preview
+3. Remove test network prefix virtuals (10.100, 10.101, 10.102)
+4. More README, more how-to steps
 
 ## Diagram
 
@@ -94,6 +94,9 @@ Neighbor        V    AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State/PfxRcd
 
 Total number of neighbors 2
 ```
+
+## Troubleshooting
+If you don't see routes in the spoke VNets, then try deleting the VNet peering and re-run Terraform to have it create the peer again. If you happen to run into this issue, open an issue directly with Azure support to provide feedback.
 
 ## Cleanup
 Use the following command to destroy all of the resources
