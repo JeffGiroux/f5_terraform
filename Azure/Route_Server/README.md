@@ -53,7 +53,7 @@ vi admin.auto.tfvars
 ./setup.sh
 ```
 
-## TEST your setup:
+## TEST your setup
 
 - View the created objects in Azure Portal. Choose a VM instance or NIC from a spoke VNet and view "Effective Routes". You will see BIG-IP advertised routes via BGP across the VNet peering.
 
@@ -138,7 +138,6 @@ end
 
 - Validate BGP on BIG-IP using imish
 ```bash
-##
 f5vm01.example.com[0]>show ip bgp summary
 BGP router identifier 10.255.20.4, local AS number 65530
 BGP table version is 6
@@ -153,15 +152,6 @@ Total number of neighbors 2
 
 ##
 f5vm01.example.com[0]>show ip bgp
-BGP router identifier 10.255.20.4, local AS number 65530
-BGP table version is 2
-2 BGP AS-PATH entries
-0 BGP community entries
-
-Neighbor        V    AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State/PfxRcd
-10.255.255.4    4 65515      19      17        2    0    0 00:07:22        3
-10.255.255.5    4 65515      19      18        2    0    0 00:07:22        3
-
 BGP table version is 6, local router ID is 10.255.20.4
 Status codes: s suppressed, d damped, h history, * valid, > best, i - internal, l - labeled
               S Stale
