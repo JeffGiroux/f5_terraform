@@ -1,6 +1,12 @@
 # Description
 Azure Route Server and BIG-IP using BGP and eCMP for traffic distribution
 
+## TO DO - WORK IN PROGRESS
+1. More README, more how-to steps
+2. Finish BIG-IP setup with test app
+3. Remove test network prefix virtuals later 
+4. Wait for Azure Route Server GA...currently in preview
+
 ## Diagram
 
 ![Azure Route Server and BIG-IP](images/azure-route-server-overview.png)
