@@ -176,7 +176,7 @@ If you don't see routes in the spoke VNets, then try deleting the VNet peering a
 
 You can view BIG-IP onboard logs in /var/log/cloud. Review logs for failure message.
 
-You can view BIG-IP onbard config files in /config/cloud. Review the declarative onboarding JSON file as well as the runtime init YAML file for accuracy. Did the variables render correctly?
+You can view BIG-IP onboard config files in /config/cloud. Review the declarative onboarding JSON file as well as the runtime init YAML file for accuracy. Did the variables render correctly?
 
 If BIG-IP imish commands do not provide results to "show ip bgp" or "show run" but you do see "tmsh list net routing", then something happen in the preview tmsh BGP/routing feature. You should simply delete and recreate the device.
 ```bash
