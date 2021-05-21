@@ -63,11 +63,8 @@ vi admin.auto.tfvars
 
 ![Azure BGP Peering](images/azure-bgp-peering.png)
 
-- Validate BGP peering on BIG-IP using tmsh or imish.
+- Validate BGP peering on BIG-IP using tmsh
 ```bash
-# TMSH
-
-##
 (tmos)# show net routing bgp
 ------------------------------------------
 Net::BGP Instance (route-domain: 0)
@@ -93,10 +90,54 @@ Net::BGP Instance (route-domain: 0)
   |  Notification               0             2
   |  Queued                     0             0
   | Route Refresh               0             0
-...and so on
+```
 
-# IMISH
+- View running config on BIG-IP using imish
+```bash
+(tmos)# imish
+f5vm01.example.com[0]#show running-config 
+!
+service password-encryption
+!
+bgp extended-asn-cap 
+!
+router bgp 65530
+ bgp graceful-restart restart-time 120
+ aggregate-address 10.100.0.0/16 summary-only
+ aggregate-address 10.101.0.0/16 summary-only
+ aggregate-address 10.102.0.0/16 summary-only
+ redistribute kernel
+ neighbor Neighbor peer-group
+ neighbor Neighbor remote-as 65515
+ neighbor Neighbor ebgp-multihop 2
+ no neighbor Neighbor capability route-refresh
+ neighbor Neighbor soft-reconfiguration inbound
+ neighbor Neighbor prefix-list /Common/myPrefixList1 out
+ neighbor 10.255.255.4 peer-group Neighbor
+ neighbor 10.255.255.5 peer-group Neighbor
+ !
+ address-family ipv6
+ neighbor Neighbor activate
+ no neighbor 10.255.255.4 activate
+ no neighbor 10.255.255.4 capability graceful-restart
+ no neighbor 10.255.255.5 activate
+ no neighbor 10.255.255.5 capability graceful-restart
+ exit-address-family
+!
+ip route 0.0.0.0/0 10.255.10.1
+!
+ip prefix-list /Common/myPrefixList1 seq 10 permit 10.0.0.0/8 ge 16
+!
+line con 0
+ login
+line vty 0 39
+ login
+!
+end
+```
 
+- Validate BGP on BIG-IP using imish
+```bash
 ##
 f5vm01.example.com[0]>show ip bgp summary
 BGP router identifier 10.255.20.4, local AS number 65530
