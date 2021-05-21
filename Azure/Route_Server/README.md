@@ -66,33 +66,78 @@ vi admin.auto.tfvars
 - Validate BGP peering on BIG-IP using tmsh or imish.
 ```bash
 # TMSH
-tmsh list net routing
 
-# TMSH Output
-net routing bgp 65530 {
-    address-family {
-        ipv4 {
-            aggregate-address {
-                10.3.0.0/16 {
-                    summary-only enabled
-                }
-and so on...
+##
+(tmos)# show net routing bgp
+------------------------------------------
+Net::BGP Instance (route-domain: 0)
+------------------------------------------
+  Name                               myBGP
+  Local AS                           65530
+
+  ----------------------------------------------------------------------------
+  | Net::BGP Neighbor - 10.255.255.5 via 10.255.10.4
+  ----------------------------------------------------------------------------
+  | Remote AS                   0           
+  | State                       established   0:06:24
+  | Notification                Cease/Administratively Shutdown.
+  | Address Family              IPv4 Unicast  IPv6 Unicast
+  |  Prefix                   
+  |   Accepted                  3              
+  |   Announced                 6              
+  |  Table Version            
+  |   Local                     6              
+  |   Neighbor                  6              
+  | Message/Notification/Queue  Sent          Received
+  |  Message                    27            26
+  |  Notification               0             2
+  |  Queued                     0             0
+  | Route Refresh               0             0
+...and so on
 
 # IMISH
-imish
-show ip bgp summary 
 
-# IMISH Output
+##
+f5vm01.example.com[0]>show ip bgp summary
 BGP router identifier 10.255.20.4, local AS number 65530
-BGP table version is 2
-1 BGP AS-PATH entries
+BGP table version is 6
+2 BGP AS-PATH entries
 0 BGP community entries
 
 Neighbor        V    AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State/PfxRcd
-10.255.255.4    4 65515      16      13        2    0    0 00:05:51        1
-10.255.255.5    4 65515      16      14        2    0    0 00:05:39        1
+10.255.255.4    4 65515      20      17        6    0    0 00:02:38        3
+10.255.255.5    4 65515      19      20        6    0    0 00:02:38        3
 
 Total number of neighbors 2
+
+##
+f5vm01.example.com[0]>show ip bgp
+BGP router identifier 10.255.20.4, local AS number 65530
+BGP table version is 2
+2 BGP AS-PATH entries
+0 BGP community entries
+
+Neighbor        V    AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State/PfxRcd
+10.255.255.4    4 65515      19      17        2    0    0 00:07:22        3
+10.255.255.5    4 65515      19      18        2    0    0 00:07:22        3
+
+BGP table version is 6, local router ID is 10.255.20.4
+Status codes: s suppressed, d damped, h history, * valid, > best, i - internal, l - labeled
+              S Stale
+Origin codes: i - IGP, e - EGP, ? - incomplete
+
+   Network          Next Hop            Metric     LocPrf     Weight Path
+*  10.1.0.0/16      10.255.255.5             0                     0 65515 i
+*>                  10.255.255.4             0                     0 65515 i
+*  10.2.0.0/16      10.255.255.5             0                     0 65515 i
+*>                  10.255.255.4             0                     0 65515 i
+*> 10.100.0.0/16    0.0.0.0                                    32768 ?
+*> 10.101.0.0/16    0.0.0.0                                    32768 ?
+*> 10.102.0.0/16    0.0.0.0                                    32768 ?
+*  10.255.0.0/16    10.255.255.5             0                     0 65515 i
+*>                  10.255.255.4             0                     0 65515 i
+
+Total number of prefixes 6
 ```
 
 ## Troubleshooting
