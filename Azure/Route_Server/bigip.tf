@@ -1,6 +1,6 @@
 module "bigip" {
   count                      = var.instanceCountBigIp
-  source                     = "github.com/JeffGiroux/terraform-azure-bigip-module?ref=3nic"
+  source                     = "github.com/JeffGiroux/terraform-azure-bigip-module"
   prefix                     = var.projectPrefix
   resource_group_name        = azurerm_resource_group.rg["hub"].name
   mgmt_subnet_ids            = [{ "subnet_id" = data.azurerm_subnet.mgmtSubnetHub.id, "public_ip" = true, "private_ip_primary" = "" }]
