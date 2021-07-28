@@ -117,6 +117,19 @@ resource "google_compute_firewall" "app" {
   }
 }
 
+resource "google_compute_firewall" "one_nic" {
+  name          = "${var.prefix}-allow-mgmt-1nic"
+  network       = google_compute_network.vpc_ext.name
+  source_ranges = [var.adminSrcAddr]
+  allow {
+    protocol = "icmp"
+  }
+  allow {
+    protocol = "tcp"
+    ports    = ["22", "8443"]
+  }
+}
+
 resource "google_compute_firewall" "app-ilb-probe" {
   name          = "${var.prefix}-allow-app-ilb-probe"
   network       = google_compute_network.vpc_ext.name
