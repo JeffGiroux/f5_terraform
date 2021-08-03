@@ -41,7 +41,7 @@
         "template": "shared",
         "NLB_serviceAddress": {
           "class": "Service_Address",
-          "virtualAddress": "${publicVip}"
+          "virtualAddress": "0.0.0.0/0"
         }
       },
       "A1": {
