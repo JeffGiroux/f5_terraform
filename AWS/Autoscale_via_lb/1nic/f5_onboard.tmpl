@@ -68,6 +68,11 @@ extension_services:
             autoPhonehome: true
             class: System
             hostname: '{{{HOST_NAME}}}'
+    - extensionType: as3
+      type: url
+      value: https://raw.githubusercontent.com/JeffGiroux/f5_terraform/aws-autoscale-1nic/AWS/Autoscale_via_lb/1nic/as3.json
+
+
 post_onboard_enabled:
   - name: create_misc_routes
     type: inline
