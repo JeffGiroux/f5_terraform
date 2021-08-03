@@ -1,0 +1,131 @@
+#!/bin/bash
+# SUMMARY: This is an example for how to perform a NIC Swap for AWS using maximal runtime-init config
+mkdir -p  /var/log/cloud /config/cloud /var/lib/cloud/icontrollx_installs /var/config/rest/downloads
+LOG_FILE=/var/log/cloud/startup-script-pre-nic-swap.log
+[[ ! -f $LOG_FILE ]] && touch $LOG_FILE || { echo "Run Only Once. Exiting"; exit; }
+npipe=/tmp/$$.tmp
+trap "rm -f $npipe" EXIT
+mknod $npipe p
+tee <$npipe -a $LOG_FILE /dev/ttyS0 &
+exec 1>&-
+exec 1>$npipe
+exec 2>&1
+cat << 'EOF' > /config/first-run.sh
+#!/bin/bash
+if [ ! -f /config/first_run_flag ]; then
+    touch /config/first_run_flag
+    chmod +w /config/startup
+    chmod +x /config/startup-script.sh
+    echo "/config/startup-script.sh" >> /config/startup
+    /usr/bin/setdb provision.managementeth eth1
+    /usr/bin/setdb provision.extramb 500
+    /usr/bin/setdb restjavad.useextramb true
+    reboot
+fi
+EOF
+cat << 'EOF' > /config/cloud/runtime-init-conf.yaml
+---
+runtime_parameters:
+  - name: HOST_NAME
+    type: metadata
+    metadataProvider:
+      environment: aws
+      type: compute
+      field: hostname
+  - name: REGION
+    type: url
+    value: http://169.254.169.254/latest/dynamic/instance-identity/document
+    query: region
+extension_packages: 
+  install_operations:
+    - extensionType: do
+      extensionVersion: 1.19.0
+      extensionUrl: https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.19.0/f5-declarative-onboarding-1.19.0-2.noarch.rpm
+    - extensionType: as3
+      extensionVersion: 3.26.0
+      extensionUrl: https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.26.0/f5-appsvcs-3.26.0-5.noarch.rpm
+    - extensionType: ts
+      extensionVersion: 1.18.0
+      extensionUrl: https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.18.0/f5-telemetry-1.18.0-2.noarch.rpm
+extension_services: 
+  service_operations:
+    - extensionType: do
+      type: inline
+      value:
+        schemaVersion: 1.0.0
+        class: Device
+        async: true
+        label: Standalone 3NIC BIG-IP declaration for Declarative Onboarding with PAYG license
+        Common:
+          class: Tenant
+          dbVars:
+            class: DbVariables
+            restjavad.useextramb: true
+            provision.extramb: 500
+            config.allow.rfc3927: enable
+            ui.advisory.enabled: true
+            ui.advisory.color: blue
+            ui.advisory.text: "BIG-IP Autoscale"
+          myNtp:
+            class: NTP
+            servers:
+              - 0.pool.ntp.org
+            timezone: UTC
+          myDns:
+            class: DNS
+            nameServers:
+              - 10.0.0.2
+              - 8.8.8.8
+          mySystem:
+            autoPhonehome: true
+            class: System
+            hostname: '{{{HOST_NAME}}}'
+post_onboard_enabled:
+  - name: create_misc_routes
+    type: inline
+    commands:
+    - tmsh save sys config
+EOF
+
+# Run startup-script post nic-swap
+cat << 'EOF' > /config/startup-script.sh
+#!/bin/bash
+LOG_FILE=/var/log/cloud/startup-script-post-swap-nic.log
+[[ ! -f $LOG_FILE ]] && touch $LOG_FILE || { echo "Run Only Once. Exiting"; exit; }
+npipe=/tmp/$$.tmp
+trap "rm -f $npipe" EXIT
+mknod $npipe p
+tee <$npipe -a $LOG_FILE /dev/ttyS0 &
+exec 1>&-
+exec 1>$npipe
+exec 2>&1
+# Need use info from DHCP for TMM instead of MGMT
+IP=$(egrep fixed-address /var/lib/dhclient/dhclient.leases | head -1 | grep -oE '[^ ]+$' | tr -d ';' )
+MASK=$(egrep subnet-mask /var/lib/dhclient/dhclient.leases | head -1 | grep -oE '[^ ]+$' | tr -d ';' )
+GW=$(egrep routers /var/lib/dhclient/dhclient.leases | head -1 | grep -oE '[^ ]+$' | tr -d ';' )
+PREFIX=$(ipcalc -p $IP $MASK | sed -n 's/^PREFIX=\(.*\)/\1/p' )
+DNS_SERVERS=$(egrep domain-name-servers /var/lib/dhclient/dhclient.leases | head -1 | grep -oE '[^ ]+$' | tr -d ';' )
+source /usr/lib/bigstart/bigip-ready-functions
+wait_bigip_ready
+# Wait until a little more until dhcp/chmand is finished re-configuring MGMT IP w/ "chmand[4267]: 012a0003:3: Mgmt Operation:0 Dest:0.0.0.0"
+sleep 15
+tmsh modify sys global-settings mgmt-dhcp disabled
+tmsh modify sys db config.allow.rfc3927 value enable
+tmsh delete sys management-route all
+tmsh delete sys management-ip all
+tmsh create net vlan external interfaces add { 1.0 } mtu 1460
+tmsh create net self self_external address $IP/$PREFIX vlan external allow-service default
+tmsh create net route default network default gw $GW mtu 1460
+tmsh create net route aws_metadata network 169.254.169.254/32 gw $GW
+tmsh modify sys dns name-servers add { $DNS_SERVERS }
+tmsh save /sys config
+# Begin as usual.... 
+for i in {1..30}; do
+   curl -fv --retry 1 --connect-timeout 5 -L https://github.com/F5Networks/f5-bigip-runtime-init/releases/download/1.2.0/f5-bigip-runtime-init-1.2.0-1.gz.run -o "/var/config/rest/downloads/f5-bigip-runtime-init.gz.run" && break || sleep 10
+done
+# Install
+bash /var/config/rest/downloads/f5-bigip-runtime-init.gz.run -- '--cloud aws'
+/usr/local/bin/f5-bigip-runtime-init --config-file /config/cloud/runtime-init-conf.yaml
+EOF
+chmod 755 /config/first-run.sh
+nohup /config/first-run.sh &
