@@ -11,7 +11,6 @@ exec 1>$npipe
 exec 2>&1
 /usr/bin/setdb provision.extramb 500
 /usr/bin/setdb restjavad.useextramb true
-fi
 cat << 'EOF' > /config/cloud/runtime-init-conf.yaml
 ---
 runtime_parameters:
@@ -90,7 +89,6 @@ source /usr/lib/bigstart/bigip-ready-functions
 wait_bigip_ready
 # Wait until a little more until dhcp/chmand is finished re-configuring MGMT IP w/ "chmand[4267]: 012a0003:3: Mgmt Operation:0 Dest:0.0.0.0"
 sleep 15
-tmsh modify sys global-settings mgmt-dhcp disabled
 tmsh modify sys db config.allow.rfc3927 value enable
 tmsh save /sys config
 # Begin as usual.... 

@@ -63,7 +63,7 @@ resource "aws_launch_template" "bigip-lt" {
     device_index          = 0
     description           = "eth0"
     delete_on_termination = true
-    security_groups       = [module.external-security-group.this_security_group_id]
+    security_groups       = [module.external-security-group.security_group_id]
   }
 
   tag_specifications {
