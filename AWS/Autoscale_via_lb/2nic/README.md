@@ -1,5 +1,12 @@
 # Deploying BIG-IP VEs in AWS - Auto Scale (Active/Active): 2-NIC
 
+## Notes
+ - VERY EXPERIMENTAL!!
+ - AWS autoscale group requires multi-nic VM to have NICs in same subnet
+ - BIG-IP not supported when running multiple NICs in same subnet
+ - This folder does some hack work to move mgmt IP to self IP
+ - Upon first reboot, BIG-IP will lose license (bug ID# 1013065) due to not reaching AWS API server
+
 ## Contents
 
 - [Introduction](#introduction)
