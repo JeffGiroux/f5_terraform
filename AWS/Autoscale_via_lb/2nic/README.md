@@ -6,6 +6,7 @@
  - BIG-IP not supported when running multiple NICs in same subnet
  - This folder does some hack work to move mgmt IP to self IP
  - Upon first reboot, BIG-IP will lose license (bug ID# 1013065) due to not reaching AWS API server
+ - This deployment attemps to bypass limitations of single NIC BIG-IP devices. Reference supported platform table and speeds (https://clouddocs.f5.com/cloud/public/v1/matrix.html#amazon-web-services)
 
 ## Contents
 
