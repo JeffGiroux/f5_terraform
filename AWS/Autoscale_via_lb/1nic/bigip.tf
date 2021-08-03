@@ -28,7 +28,7 @@ module "external-security-group" {
   vpc_id      = var.vpcId
 
   ingress_cidr_blocks = var.allowedIps
-  ingress_rules       = ["http-80-tcp", "https-443-tcp", "https-8443-tcp", "ssh-tcp"]
+  ingress_rules       = ["http-80-tcp", "http-8080-tcp", "https-443-tcp", "https-8443-tcp", "ssh-tcp"]
 
   # Allow ec2 instances outbound Internet connectivity
   egress_cidr_blocks = ["0.0.0.0/0"]
