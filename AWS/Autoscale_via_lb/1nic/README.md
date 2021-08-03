@@ -4,6 +4,8 @@
 - testing
 - update readme
 - move to AWS secret manager
+- create AWS NLB
+- fix AS3 on BIG-IP, otherwise NLB health checks fail
 
 
 ## Contents
