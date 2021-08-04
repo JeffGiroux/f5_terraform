@@ -55,16 +55,6 @@ extension_services:
             ui.advisory.enabled: true
             ui.advisory.color: blue
             ui.advisory.text: "BIG-IP Autoscale"
-          myNtp:
-            class: NTP
-            servers:
-              - 0.pool.ntp.org
-            timezone: UTC
-          myDns:
-            class: DNS
-            nameServers:
-              - 10.0.0.2
-              - 8.8.8.8
           mySystem:
             autoPhonehome: true
             class: System
@@ -98,20 +88,7 @@ extension_services:
                   - servicePort: 80
                     addressDiscovery: fqdn
                     autoPopulate: true
-                    hostname: httpbin.org
-            NLB_Probe_Ext:
-              class: Application
-              fr-probe-external:
-                class: Service_HTTP
-                remark: Health check listener for external NLB
-                virtualPort: 8080
-                virtualAddresses:
-                  - 0.0.0.0/0
-                iRules:
-                  - monitor_respond_200
-              monitor_respond_200:
-                class: iRule
-                iRule: "when HTTP_REQUEST {\n   HTTP::respond 200 System Responding \n}\n"
+                    hostname: example.com
 post_onboard_enabled:
   - name: create_misc_routes
     type: inline
