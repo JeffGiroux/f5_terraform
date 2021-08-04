@@ -67,7 +67,7 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
             licenseType: ${bigIqLicenseType}
             bigIqHost: ${bigIqHost}
             bigIqUsername: ${bigIqUsername}
-            bigIqPassword: ${bigIqPassword}
+            bigIqPassword: '{{{BIGIQ_PASSWORD}}}'
             licensePool: ${bigIqLicensePool}
             skuKeyword1: ${bigIqSkuKeyword1}
             skuKeyword2: ${bigIqSkuKeyword2}

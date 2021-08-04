@@ -25,6 +25,20 @@ runtime_parameters:
     type: url
     value: http://169.254.169.254/latest/dynamic/instance-identity/document
     query: region
+  - name: BIGIP_PASSWORD
+    type: secret
+    secretProvider:
+      environment: aws
+      secretId: ${f5_password}
+      type: SecretsManager
+      version: AWSCURRENT
+  - name: BIGIQ_PASSWORD
+    type: secret
+    secretProvider:
+      environment: aws
+      secretId: ${bigIqPassword}
+      type: SecretsManager
+      version: AWSCURRENT
 extension_packages: 
   install_operations:
     - extensionType: do
