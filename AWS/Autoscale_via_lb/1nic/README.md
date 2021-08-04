@@ -1,4 +1,4 @@
-# Deploying BIG-IP VEs in AWS - Auto Scale (Active/Active): 2-NIC
+# Deploying BIG-IP VEs in AWS - Auto Scale (Active/Active): 1-NIC
 
 ## To Do
 - EXPIREMENTAL ONLY
