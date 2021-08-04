@@ -59,6 +59,14 @@ extension_services:
             autoPhonehome: true
             class: System
             hostname: '{{{HOST_NAME}}}'
+          admin:
+            class: User
+            partitionAccess:
+              all-partitions:
+                role: admin
+            password: ${f5_password}
+            shell: bash
+            userType: regular
     - extensionType: as3
       type: inline
       value:
