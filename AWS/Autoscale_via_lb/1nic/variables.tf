@@ -21,7 +21,7 @@ variable "ec2_instance_type" { default = "m5.xlarge" }
 
 # BIGIP Setup
 variable "f5_username" { default = "admin" }
-variable "f5_password" {}
+variable "f5_password" { default = "Default12345!" }
 variable "ec2_key_name" {}
 variable "allowedIps" {}
 variable "onboard_log" { default = "/var/log/cloud/onboard.log" }
@@ -29,7 +29,7 @@ variable "onboard_log" { default = "/var/log/cloud/onboard.log" }
 # BIGIQ License Manager Setup
 variable "bigIqHost" { default = "200.200.200.200" }
 variable "bigIqUsername" { default = "admin" }
-variable "bigIqPassword" {}
+variable "bigIqPassword" { default = "Default12345!" }
 variable "bigIqLicenseType" { default = "licensePool" }
 variable "bigIqLicensePool" { default = "myPool" }
 variable "bigIqSkuKeyword1" { default = "key1" }
