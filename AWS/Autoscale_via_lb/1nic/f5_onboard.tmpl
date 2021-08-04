@@ -1,0 +1,164 @@
+#!/bin/bash
+mkdir -p  /var/log/cloud /config/cloud /var/lib/cloud/icontrollx_installs /var/config/rest/downloads
+LOG_FILE=/var/log/cloud/startup-script.log
+[[ ! -f $LOG_FILE ]] && touch $LOG_FILE || { echo "Run Only Once. Exiting"; exit; }
+npipe=/tmp/$$.tmp
+trap "rm -f $npipe" EXIT
+mknod $npipe p
+tee <$npipe -a $LOG_FILE /dev/ttyS0 &
+exec 1>&-
+exec 1>$npipe
+exec 2>&1
+/usr/bin/setdb provision.extramb 500
+/usr/bin/setdb restjavad.useextramb true
+# BIG-IP Runtime Init YAML declaration
+cat << 'EOF' > /config/cloud/runtime-init-conf.yaml
+---
+runtime_parameters:
+  - name: HOST_NAME
+    type: metadata
+    metadataProvider:
+      environment: aws
+      type: compute
+      field: hostname
+  - name: REGION
+    type: url
+    value: http://169.254.169.254/latest/dynamic/instance-identity/document
+    query: region
+  - name: USER_NAME
+    type: static
+    value: ${f5_username}
+  - name: ADMIN_PASS
+    type: static
+    value: ${f5_password}
+  - name: SSH_KEYS
+    type: static
+    value: ${ssh_keypair}
+extension_packages: 
+  install_operations:
+    - extensionType: do
+      extensionVersion: 1.22.0
+      extensionUrl: https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.22.0/f5-declarative-onboarding-1.22.0-3.noarch.rpm
+    - extensionType: as3
+      extensionVersion: 3.29.0
+      extensionUrl: https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.29.0/f5-appsvcs-3.29.0-3.noarch.rpm
+    - extensionType: ts
+      extensionVersion: 1.20.0
+      extensionUrl: https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.20.1/f5-telemetry-1.20.1-1.noarch.rpm
+extension_services: 
+  service_operations:
+    - extensionType: do
+      type: inline
+      value:
+        schemaVersion: 1.0.0
+        class: Device
+        async: true
+        label: Autoscale 1NIC BIG-IP declaration for Declarative Onboarding with PAYG license
+        Common:
+          class: Tenant
+          dbVars:
+            class: DbVariables
+            restjavad.useextramb: true
+            provision.extramb: 500
+            config.allow.rfc3927: enable
+            ui.advisory.enabled: true
+            ui.advisory.color: blue
+            ui.advisory.text: "BIG-IP Autoscale"
+          mySystem:
+            autoPhonehome: true
+            class: System
+            hostname: '{{{HOST_NAME}}}'
+          '{{{ USER_NAME }}}':
+            class: User
+            partitionAccess:
+              all-partitions:
+                role: admin
+            password: '{{{ ADMIN_PASS }}}'
+            shell: bash
+            userType: regular
+            keys:
+              - '{{{ SSH_KEYS }}}'
+    - extensionType: as3
+      type: inline
+      value:
+        class: AS3
+        action: deploy
+        persist: true
+        declaration:
+          class: ADC
+          schemaVersion: 3.0.0
+          label: Sample 1
+          remark: An HTTP sample application
+          Sample_01:
+            class: Tenant
+            A1:
+              class: Application
+              template: http
+              serviceMain:
+                class: Service_HTTP
+                virtualAddresses:
+                  - 0.0.0.0/0
+                pool: web_pool
+              web_pool:
+                class: Pool
+                monitors:
+                  - tcp
+                members:
+                  - servicePort: 80
+                    addressDiscovery: fqdn
+                    autoPopulate: true
+                    hostname: httpbin.org
+    - extensionType: ts
+      type: inline
+      value:
+        class: Telemetry
+        My_System:
+          class: Telemetry_System
+          systemPoller:
+            interval: 60
+        My_Listener:
+          class: Telemetry_Listener
+          port: 6514
+        My_Consumer:
+          class: Telemetry_Consumer
+          type: AWS_CloudWatch
+          region: '{{{REGION}}}'
+          logGroup: f5telemetry
+          logStream: default              
+post_onboard_enabled:
+  - name: create_misc_routes
+    type: inline
+    commands:
+    - tmsh save sys config
+EOF
+
+# Retrieve self IP and update yaml declaration
+SELF_IP=$(egrep fixed-address /var/lib/dhclient/dhclient.leases | head -1 | grep -oE '[^ ]+$' | tr -d ';' )
+sed -i "s/\$SELF_IP/$SELF_IP/g" /config/cloud/runtime-init-conf.yaml
+
+# startup-script
+cat << 'EOF' > /config/startup-script.sh
+#!/bin/bash
+npipe=/tmp/$$.tmp
+trap "rm -f $npipe" EXIT
+mknod $npipe p
+tee <$npipe -a $LOG_FILE /dev/ttyS0 &
+exec 1>&-
+exec 1>$npipe
+exec 2>&1
+source /usr/lib/bigstart/bigip-ready-functions
+wait_bigip_ready
+# Wait until a little more until dhcp/chmand is finished re-configuring MGMT IP w/ "chmand[4267]: 012a0003:3: Mgmt Operation:0 Dest:0.0.0.0"
+sleep 15
+tmsh modify sys db config.allow.rfc3927 value enable
+tmsh save /sys config
+# Begin as usual.... 
+for i in {1..30}; do
+   curl -fv --retry 1 --connect-timeout 5 -L https://github.com/F5Networks/f5-bigip-runtime-init/releases/download/1.2.0/f5-bigip-runtime-init-1.2.0-1.gz.run -o "/var/config/rest/downloads/f5-bigip-runtime-init.gz.run" && break || sleep 10
+done
+# Install
+bash /var/config/rest/downloads/f5-bigip-runtime-init.gz.run -- '--cloud aws'
+/usr/local/bin/f5-bigip-runtime-init --config-file /config/cloud/runtime-init-conf.yaml
+EOF
+chmod 755 /config/startup-script.sh
+nohup /config/startup-script.sh & >> $LOG_FILE
