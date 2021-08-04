@@ -24,13 +24,12 @@ variable "f5_username" { default = "admin" }
 variable "f5_password" {}
 variable "ec2_key_name" {}
 variable "allowedIps" {}
-variable "ntp_server" { default = "169.254.169.123" }
-variable "timezone" { default = "UTC" }
 variable "onboard_log" { default = "/var/log/cloud/onboard.log" }
 
 # BIGIQ License Manager Setup
 variable "bigIqHost" { default = "200.200.200.200" }
 variable "bigIqUsername" { default = "admin" }
+variable "bigIqPassword" {}
 variable "bigIqLicenseType" { default = "licensePool" }
 variable "bigIqLicensePool" { default = "myPool" }
 variable "bigIqSkuKeyword1" { default = "key1" }

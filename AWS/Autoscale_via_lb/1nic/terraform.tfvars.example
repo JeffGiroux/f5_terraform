@@ -4,8 +4,6 @@ vpcId        = "vpc-1234"
 extSubnetAz1 = "subnet-1234"
 extSubnetAz2 = "subnet-5678"
 ec2_key_name = "mykey123"
-f5_username  = "admin"
-f5_password  = "Default12345!"
 
 # AWS Environment
 awsRegion     = "us-west-2"
