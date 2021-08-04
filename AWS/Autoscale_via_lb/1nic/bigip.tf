@@ -28,7 +28,7 @@ module "external-security-group" {
   vpc_id      = var.vpcId
 
   ingress_cidr_blocks = var.allowedIps
-  ingress_rules       = ["http-80-tcp", "http-8080-tcp", "https-443-tcp", "https-8443-tcp", "ssh-tcp"]
+  ingress_rules       = ["http-80-tcp", "https-443-tcp", "https-8443-tcp", "ssh-tcp"]
 
   # Allow ec2 instances outbound Internet connectivity
   egress_cidr_blocks = ["0.0.0.0/0"]
@@ -57,13 +57,14 @@ resource "aws_launch_template" "bigip-lt" {
   image_id      = data.aws_ami.f5_ami.id
   instance_type = var.ec2_instance_type
   key_name      = var.ec2_key_name
-  user_data     = base64encode(local.f5_onboard)  
+  user_data     = base64encode(local.f5_onboard)
 
   network_interfaces {
-    device_index          = 0
-    description           = "eth0"
-    delete_on_termination = true
-    security_groups       = [module.external-security-group.security_group_id]
+    device_index                = 0
+    description                 = "eth0"
+    delete_on_termination       = true
+    security_groups             = [module.external-security-group.security_group_id]
+    associate_public_ip_address = true
   }
 
   tag_specifications {
@@ -83,7 +84,7 @@ resource "aws_autoscaling_group" "bigip-asg" {
   min_size            = var.asg_min_size
   health_check_type   = "EC2"
   vpc_zone_identifier = [var.extSubnetAz1, var.extSubnetAz2]
-  #target_group_arns   = module.nlb.target_group_arns
+  target_group_arns   = module.nlb.target_group_arns
 
   launch_template {
     id      = aws_launch_template.bigip-lt.id
