@@ -67,7 +67,7 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
             licenseType: ${bigIqLicenseType}
             bigIqHost: ${bigIqHost}
             bigIqUsername: ${bigIqUsername}
-            bigIqPassword: '{{{BIGIQ_PASSWORD}}}'
+            bigIqPassword: ${bigIqPassword}
             licensePool: ${bigIqLicensePool}
             skuKeyword1: ${bigIqSkuKeyword1}
             skuKeyword2: ${bigIqSkuKeyword2}
@@ -86,6 +86,7 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | projectPrefix | This value is inserted at the beginning of each AWS object (alpha-numeric, no special character) | `string` | myDemo | no |
 | f5_username | User name for the BIG-IP (Note: currenlty not used. Defaults to 'admin' based on AMI | `string` | admin | no |
 | f5_password | BIG-IP Password | `string` | Default12345! | no |
+| f5_ssh_publickey | SSH public key (same key you store in 'ec2_key_name', format should be ssh-rsa like "ssh-rsa AAAA....") | `string` | n/a | no |
 | ec2_key_name | SSH public key for admin authentation | `string` | n/a | yes |
 | allowedIps | Trusted source network for admin access | `list` | ["0.0.0.0/0"] | yes |
 | awsRegion | AWS Region for provider | `string` | us-west-2 | yes |
@@ -125,11 +126,14 @@ To run this Terraform template, perform the following steps:
   2. Modify terraform.tfvars with the required information
   ```
       # BIG-IP Environment
-      allowedIps   = ["0.0.0.0/0"]
-      vpcId        = "vpc-1234"
-      extSubnetAz1 = "subnet-1234"
-      extSubnetAz2 = "subnet-5678"
-      ec2_key_name = "mykey123"
+      allowedIps        = ["0.0.0.0/0"]
+      vpcId             = "vpc-1234"
+      extSubnetAz1      = "subnet-1234"
+      extSubnetAz2      = "subnet-5678"
+      ec2_key_name      = "mykey123"
+      f5_ssh_publickey  = "ssh-rsa AAABC123....."
+      f5_username       = "admin"
+      f5_password       = "Default12345!"
 
       # AWS Environment
       awsRegion     = "us-west-2"

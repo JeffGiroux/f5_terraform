@@ -22,6 +22,7 @@ variable "ec2_instance_type" { default = "m5.xlarge" }
 # BIGIP Setup
 variable "f5_username" { default = "admin" }
 variable "f5_password" { default = "Default12345!" }
+variable "f5_ssh_publickey" {}
 variable "ec2_key_name" {}
 variable "allowedIps" {}
 variable "onboard_log" { default = "/var/log/cloud/onboard.log" }

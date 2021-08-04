@@ -5,6 +5,7 @@ locals {
   f5_onboard = templatefile("${path.module}/f5_onboard.tmpl", {
     f5_username        = var.f5_username
     f5_password        = var.f5_password
+    ssh_keypair        = var.f5_ssh_publickey
     bigIqLicenseType   = var.bigIqLicenseType
     bigIqHost          = var.bigIqHost
     bigIqPassword      = var.bigIqPassword

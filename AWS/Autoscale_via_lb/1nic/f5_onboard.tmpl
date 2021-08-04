@@ -25,20 +25,15 @@ runtime_parameters:
     type: url
     value: http://169.254.169.254/latest/dynamic/instance-identity/document
     query: region
-  - name: BIGIP_PASSWORD
-    type: secret
-    secretProvider:
-      environment: aws
-      secretId: ${f5_password}
-      type: SecretsManager
-      version: AWSCURRENT
-  - name: BIGIQ_PASSWORD
-    type: secret
-    secretProvider:
-      environment: aws
-      secretId: ${bigIqPassword}
-      type: SecretsManager
-      version: AWSCURRENT
+  - name: USER_NAME
+    type: static
+    value: ${f5_username}
+  - name: ADMIN_PASS
+    type: static
+    value: ${f5_password}
+  - name: SSH_KEYS
+    type: static
+    value: ${ssh_keypair}
 extension_packages: 
   install_operations:
     - extensionType: do
@@ -73,14 +68,16 @@ extension_services:
             autoPhonehome: true
             class: System
             hostname: '{{{HOST_NAME}}}'
-          admin:
+          '{{{ USER_NAME }}}':
             class: User
             partitionAccess:
               all-partitions:
                 role: admin
-            password: ${f5_password}
+            password: '{{{ ADMIN_PASS }}}'
             shell: bash
             userType: regular
+            keys:
+              - '{{{ SSH_KEYS }}}'
     - extensionType: as3
       type: inline
       value:
