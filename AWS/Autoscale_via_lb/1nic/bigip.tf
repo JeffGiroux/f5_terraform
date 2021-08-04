@@ -49,12 +49,17 @@ data "aws_ami" "f5_ami" {
   }
 }
 
+resource "aws_key_pair" "bigip" {
+  key_name   = format("%s-key-%s", var.projectPrefix, random_id.buildSuffix.hex)
+  public_key = var.f5_ssh_publickey
+}
+
 # Create BIG-IP launch template
 resource "aws_launch_template" "bigip-lt" {
   name          = format("%s-bigip-lt-%s", var.projectPrefix, random_id.buildSuffix.hex)
   image_id      = data.aws_ami.f5_ami.id
   instance_type = var.ec2_instance_type
-  key_name      = var.ec2_key_name
+  key_name      = aws_key_pair.bigip.key_name
   user_data     = base64encode(local.f5_onboard)
 
   network_interfaces {
