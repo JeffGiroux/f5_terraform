@@ -45,7 +45,7 @@ This template is tested and worked in the following versions:
 ## Important Configuration Notes
 
 - Variables are configured in variables.tf
-- Sensitive variables like AWS SSH keys are configured in terraform.tfvars
+- Sensitive variables like AWS SSH keys are configured in terraform.tfvars or AWS Secrets Manager
 - Files
   - main.tf - resources for provider, versions
   - bigip.tf - resources for BIG-IP autoscaling group, launch template, security groups
@@ -60,14 +60,14 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
           variable "f5_ami_search_name" { default = "F5 BIGIP-15.1.2.1* BYOL-All* 2Boot*" }
   ```
 2. In the "variables.tf", modify the BIG-IQ license section to match your environment
-3. In the "f5_onboard.tmpl", add the "myLicense" block under the "Common" declaration ([full declaration example here in JSON (must use YAML)](https://clouddocs.f5.com/products/extensions/f5-declarative-onboarding/latest/bigiq-examples.html#licensing-with-big-iq-regkey-pool-route-to-big-ip))
+3. In the "f5_onboard.tmpl", add the "myLicense" block under the "Common" declaration ([example here](https://github.com/F5Networks/f5-aws-cloudformation-v2/blob/main/examples/autoscale/bigip-configurations/runtime-init-conf-bigiq.yaml))
   ```
           myLicense:
             class: License
             licenseType: ${bigIqLicenseType}
             bigIqHost: ${bigIqHost}
             bigIqUsername: ${bigIqUsername}
-            bigIqPassword: ${bigIqPassword}
+            bigIqPassword: '{{{BIGIQ_PASSWORD}}}'
             licensePool: ${bigIqLicensePool}
             skuKeyword1: ${bigIqSkuKeyword1}
             skuKeyword2: ${bigIqSkuKeyword2}
@@ -85,7 +85,7 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | --------- | ----------- | ---- | ------- | -------- |
 | projectPrefix | This value is inserted at the beginning of each AWS object (alpha-numeric, no special character) | `string` | myDemo | no |
 | f5_username | User name for the BIG-IP (Note: currenlty not used. Defaults to 'admin' based on AMI | `string` | admin | no |
-| f5_password | Password for the BIG-IP (Note: currently not used. SSH key auth is used) | `string` | n/a | no |
+| f5_password | AWS Secrets Manager secret for BIG-IP Password | `string` | n/a | no |
 | ec2_key_name | SSH public key for admin authentation | `string` | n/a | yes |
 | allowedIps | Trusted source network for admin access | `list` | ["0.0.0.0/0"] | yes |
 | awsRegion | AWS Region for provider | `string` | us-west-2 | yes |
@@ -99,7 +99,7 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | onboard_log | This is where the onboarding script logs all the events | `string` | /var/log/cloud/onboard.log | no |
 | bigIqHost | This is the BIG-IQ License Manager host name or IP address | `string` | 200.200.200.200 | no |
 | bigIqUsername | BIG-IQ user name | `string` | admin | no |
-| bigIqPassword | BIG_IQ password | `string` | n/a | no |
+| bigIqPassword | AWS Secrets Manager secret for BIG-IQ Password | `string` | n/a | no |
 | bigIqLicenseType | BIG-IQ license type | `string` | licensePool | no |
 | bigIqLicensePool | BIG-IQ license pool name | `string` | myPool | no |
 | bigIqSkuKeyword1 | BIG-IQ license SKU keyword 1 | `string` | key1 | no |
@@ -115,6 +115,8 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | Name | Description |
 | ---- | ----------- |
 | asg_name | AWS autoscaling group name of BIG-IP devices |
+| public_vip | AWS NLB DNS name |
+| public_vip_url | http URL link for AWS NLB DNS name |
 
 ## Installation Example
 

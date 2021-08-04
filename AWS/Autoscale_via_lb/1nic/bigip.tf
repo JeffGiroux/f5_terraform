@@ -3,10 +3,11 @@
 # Setup Onboarding scripts
 locals {
   f5_onboard = templatefile("${path.module}/f5_onboard.tmpl", {
-    f5_username        = f5_username
-    f5_password        = f5_password
+    f5_username        = var.f5_username
+    f5_password        = var.f5_password
     bigIqLicenseType   = var.bigIqLicenseType
     bigIqHost          = var.bigIqHost
+    bigIqPassword      = var.bigIqPassword
     bigIqUsername      = var.bigIqUsername
     bigIqLicensePool   = var.bigIqLicensePool
     bigIqSkuKeyword1   = var.bigIqSkuKeyword1
