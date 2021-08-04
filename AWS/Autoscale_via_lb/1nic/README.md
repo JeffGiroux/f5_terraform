@@ -1,11 +1,16 @@
 # Deploying BIG-IP VEs in AWS - Auto Scale (Active/Active): 2-NIC
 
 ## To Do
-- testing
-- update readme
-- move to AWS secret manager
-- create AWS NLB
-- fix AS3 on BIG-IP, otherwise NLB health checks fail
+- EXPIREMENTAL ONLY
+- Community support only. Not F5 supported.
+- Move to AWS secret manager. Currently passwords are stored in clear text in the runtime init YAML file local to the BIG-IP box.
+- Add lifecycle hooks in ASG for auto healing
+- Add custom metrics for scale in/out
+- Much much much more to do. Not production ready.
+
+## Issues
+- Find an issue? Fork, clone, create branch, fix and PR. I'll review and merge into the main branch. Or submit a GitHub issue with all necessary details and logs.
+
 
 
 ## Contents
