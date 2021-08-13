@@ -11,6 +11,10 @@ variable "rest_ts_uri" { default = "/mgmt/shared/telemetry/declare" }
 variable "rest_vm_ts_file" { default = "vm_ts_data.json" }
 
 # Azure Environment
+variable "sp_subscription_id" { default = "" }
+variable "sp_client_id" { default = "" }
+variable "sp_client_secret" { default = "" }
+variable "sp_tenant_id" { default = "" }
 variable "prefix" {}
 variable "location" {}
 variable "storage_name" {}

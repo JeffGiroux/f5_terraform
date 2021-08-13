@@ -184,7 +184,11 @@ data "template_file" "as3_json" {
   template = file("${path.module}/as3.json")
 
   vars = {
-    rg_name         = data.azurerm_resource_group.main.name
+    rg_name         = azurerm_resource_group.main.name
+    subscription_id = var.sp_subscription_id
+    tenant_id       = var.sp_tenant_id
+    client_id       = var.sp_client_id
+    client_secret   = var.sp_client_secret
     backendvm_ip    = var.backend01ext
     publicvip       = var.f5publicvip
     privatevip      = var.f5privatevip

@@ -151,6 +151,10 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | rest_AS3_method | Yes | Available options are GET, POST, and DELETE |
 | rest_vm01_do_file | Yes | Terraform will generate the vm01 DO json file, where you can manually run it again for debugging |
 | rest_vm_as3_file | Yes | Terraform will generate the AS3 json file, where you can manually run it again for debugging |
+| sp_subscription_id | Yes | This is the service principal subscription ID |
+| sp_client_id | Yes | This is the service principal application/client ID |
+| sp_client_secret | Yes | This is the service principal secret |
+| sp_tenant_id | Yes | This is the service principal tenant ID |
 | uname | Yes | User name for the Virtual Machine |
 | upassword | Yes | Password for the Virtual Machine |
 | location | Yes | Location of the deployment |
