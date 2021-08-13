@@ -34,8 +34,8 @@ Example...
 
 ## Version
 This template is tested and worked in the following version
-Terraform v0.14.6
-+ provider.azurerm v2.48
+Terraform v0.14.10
++ provider.azurerm v2.72
 + provider.local v2.1
 + provider.null v3.1
 + provider.template v2.2
@@ -151,10 +151,6 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | rest_AS3_method | Yes | Available options are GET, POST, and DELETE |
 | rest_vm01_do_file | Yes | Terraform will generate the vm01 DO json file, where you can manually run it again for debugging |
 | rest_vm_as3_file | Yes | Terraform will generate the AS3 json file, where you can manually run it again for debugging |
-| sp_subscription_id | Yes | This is the service principal subscription ID |
-| sp_client_id | Yes | This is the service principal application/client ID |
-| sp_client_secret | Yes | This is the service principal secret |
-| sp_tenant_id | Yes | This is the service principal tenant ID |
 | uname | Yes | User name for the Virtual Machine |
 | upassword | Yes | Password for the Virtual Machine |
 | location | Yes | Location of the deployment |
@@ -198,11 +194,8 @@ To run this Terraform template, perform the following steps:
       intSubnet  = "internal"
 
       # Azure Environment
-      sp_subscription_id = "xxxxx"
-      sp_client_id       = "xxxxx"
-      sp_client_secret   = "xxxxx"
-      sp_tenant_id       = "xxxxx"
       location           = "westus2"
+      storage_name       = "mystorage"
 
       # Prefix for objects being created
       prefix = "mylab123"
@@ -256,7 +249,7 @@ This example illustrates how to replace or upgrade the BIG-IP VE.
   2. Revoke the problematic BIG-IP VE's license (if BYOL)
   3. Run command
 ```
-terraform destroy -target azurerm_virtual_machine.f5vm01
+terraform destroy -target azurerm_linux_virtual_machine.f5vm01
 ```
   3. Run command
 ```
@@ -290,30 +283,47 @@ This example illustrates how to re-configure the BIG-IP instances with TS. If yo
 ```
 terraform taint template_file.vm_ts_file
 terraform taint null_resource.f5vm01_TS
-terraform taint null_resource.f5vm02_TS
 terraform apply
 ```
 
 ## Service Principal Authentication
-This solution requires access to the Azure API to determine how the BIG-IP VEs should be configured. The following provides information/links on the options for configuring a service principal within Azure if this is the first time it is needed in a subscription. The end result should be a client(application) ID, tenant ID and service principal.
+This solution might require access to the Azure API to query pool member key:value. If F5 AS3 is used with pool member dynamic service discovery, then you will need an SP. The current demo repo as-is does NOT need an SP. The following provides information/links on the options for configuring a service principal within Azure.
 
 As another reference...head over to F5 CloudDocs to see an example in one of the awesome lab guides. Pay attention to the [Setting Up a Service Principal Account](https://clouddocs.f5.com/training/community/big-iq-cloud-edition/html/class2/module5/lab1.html#setting-up-a-service-principal-account) section and then head back over here!
 
-### Option #1 Azure Portal
+1. Login to az cli and set default subscription:
 
-Follow the steps outlined in the [Azure Portal documentation](https://azure.microsoft.com/en-us/documentation/articles/resource-group-create-service-principal-portal/) to generate the service principal.
+```bash
+# Login
+az login
 
-### Option #2 Azure CLI
+# Show subscriptions
+az account show
 
-This method can be used with either the [Azure CLI v2.0 (Python)](https://github.com/Azure/azure-cli) or the [Azure Cross-Platform CLI (npm module)](https://github.com/Azure/azure-xplat-cli).
-
-_Using the Python Azure CLI v2.0 - requires just one step_
-```shell
-$ az ad sp create-for-rbac
+# Set default
+az account set -s <subscriptionId>
 ```
 
-_Using the Node.js cross-platform CLI - requires additional steps for setting up_
-https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-authenticate-service-principal-cli
+2. Create service principal account. Copy the JSON output starting with "{" ending with "}".
 
-### Option #3 Azure PowerShell
-Follow the steps outlined in the [Azure Powershell documentation](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-authenticate-service-principal) to generate the service principal.
+***Note:*** Keep this safe. This credential enables read/write access to your Azure Subscription.
+```
+  $ az ad sp create-for-rbac -n "http://[unique-name]-demo-cc" --role contributor
+  {
+    "appId": "xxx-xxxx",
+    "displayName": "[unique-name]-demo-cc",
+    "name": "http://[unique-name]-demo-cc",
+    "password": "[password]",
+    "tenant": "yyy-yyy"
+  }
+```
+
+3. Retrieve Azure subscription ID
+```
+  $ az account show  --query [name,id,isDefault]
+  [
+    "f5-AZR_xxxx", <-- name
+    "xxx-xxx-xxx", <-- subscription id
+    true           <-- is this the default subscription 
+  ]
+```

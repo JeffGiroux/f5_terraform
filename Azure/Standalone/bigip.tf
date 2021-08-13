@@ -3,9 +3,9 @@
 # Create Public IPs
 resource "azurerm_public_ip" "vm01mgmtpip" {
   name                = "${var.prefix}-vm01-mgmt-pip"
-  location            = azurerm_resource_group.main.location
+  location            = data.azurerm_resource_group.main.location
   sku                 = "Standard"
-  resource_group_name = azurerm_resource_group.main.name
+  resource_group_name = data.azurerm_resource_group.main.name
   allocation_method   = "Static"
 
   tags = {
@@ -20,9 +20,9 @@ resource "azurerm_public_ip" "vm01mgmtpip" {
 
 resource "azurerm_public_ip" "vm01selfpip" {
   name                = "${var.prefix}-vm01-self-pip"
-  location            = azurerm_resource_group.main.location
+  location            = data.azurerm_resource_group.main.location
   sku                 = "Standard"
-  resource_group_name = azurerm_resource_group.main.name
+  resource_group_name = data.azurerm_resource_group.main.name
   allocation_method   = "Static"
 
   tags = {
@@ -37,9 +37,9 @@ resource "azurerm_public_ip" "vm01selfpip" {
 
 resource "azurerm_public_ip" "pubvippip" {
   name                = "${var.prefix}-pubvip-pip"
-  location            = azurerm_resource_group.main.location
+  location            = data.azurerm_resource_group.main.location
   sku                 = "Standard"
-  resource_group_name = azurerm_resource_group.main.name
+  resource_group_name = data.azurerm_resource_group.main.name
   allocation_method   = "Static"
 
   tags = {
@@ -55,8 +55,8 @@ resource "azurerm_public_ip" "pubvippip" {
 # Create NIC for Management 
 resource "azurerm_network_interface" "vm01-mgmt-nic" {
   name                = "${var.prefix}-mgmt0"
-  location            = azurerm_resource_group.main.location
-  resource_group_name = azurerm_resource_group.main.name
+  location            = data.azurerm_resource_group.main.location
+  resource_group_name = data.azurerm_resource_group.main.name
 
   ip_configuration {
     name                          = "primary"
@@ -79,8 +79,8 @@ resource "azurerm_network_interface" "vm01-mgmt-nic" {
 # Create NIC for External
 resource "azurerm_network_interface" "vm01-ext-nic" {
   name                 = "${var.prefix}-ext0"
-  location             = azurerm_resource_group.main.location
-  resource_group_name  = azurerm_resource_group.main.name
+  location             = data.azurerm_resource_group.main.location
+  resource_group_name  = data.azurerm_resource_group.main.name
   enable_ip_forwarding = true
 
   ip_configuration {
@@ -120,8 +120,8 @@ resource "azurerm_network_interface" "vm01-ext-nic" {
 # Create NIC for Internal
 resource "azurerm_network_interface" "vm01-int-nic" {
   name                 = "${var.prefix}-int0"
-  location             = azurerm_resource_group.main.location
-  resource_group_name  = azurerm_resource_group.main.name
+  location             = data.azurerm_resource_group.main.location
+  resource_group_name  = data.azurerm_resource_group.main.name
   enable_ip_forwarding = true
 
   ip_configuration {
@@ -184,11 +184,7 @@ data "template_file" "as3_json" {
   template = file("${path.module}/as3.json")
 
   vars = {
-    rg_name         = azurerm_resource_group.main.name
-    subscription_id = var.sp_subscription_id
-    tenant_id       = var.sp_tenant_id
-    client_id       = var.sp_client_id
-    client_secret   = var.sp_client_secret
+    rg_name         = data.azurerm_resource_group.main.name
     backendvm_ip    = var.backend01ext
     publicvip       = var.f5publicvip
     privatevip      = var.f5privatevip
@@ -208,8 +204,8 @@ data "template_file" "ts_json" {
 # Create F5 BIG-IP VMs
 resource "azurerm_linux_virtual_machine" "f5vm01" {
   name                            = "${var.prefix}-f5vm01"
-  location                        = azurerm_resource_group.main.location
-  resource_group_name             = azurerm_resource_group.main.name
+  location                        = data.azurerm_resource_group.main.location
+  resource_group_name             = data.azurerm_resource_group.main.name
   network_interface_ids           = [azurerm_network_interface.vm01-mgmt-nic.id, azurerm_network_interface.vm01-ext-nic.id, azurerm_network_interface.vm01-int-nic.id]
   size                            = var.instance_type
   admin_username                  = var.uname

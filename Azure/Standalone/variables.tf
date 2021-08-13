@@ -11,10 +11,6 @@ variable "rest_ts_uri" { default = "/mgmt/shared/telemetry/declare" }
 variable "rest_vm_ts_file" { default = "vm_ts_data.json" }
 
 # Azure Environment
-variable "sp_subscription_id" {}
-variable "sp_client_id" {}
-variable "sp_client_secret" {}
-variable "sp_tenant_id" {}
 variable "prefix" {}
 variable "location" {}
 variable "storage_name" {}
@@ -47,9 +43,9 @@ variable "host1_name" { default = "f5vm01" }
 variable "dns_server" { default = "8.8.8.8" }
 variable "ntp_server" { default = "0.us.pool.ntp.org" }
 variable "timezone" { default = "UTC" }
-variable "DO_URL" { default = "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.19.0/f5-declarative-onboarding-1.19.0-2.noarch.rpm" }
-variable "AS3_URL" { default = "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.26.0/f5-appsvcs-3.26.0-5.noarch.rpm" }
-variable "TS_URL" { default = "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.18.0/f5-telemetry-1.18.0-2.noarch.rpm" }
+variable "DO_URL" { default = "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.23.0/f5-declarative-onboarding-1.23.0-4.noarch.rpm" }
+variable "AS3_URL" { default = "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.30.0/f5-appsvcs-3.30.0-5.noarch.rpm" }
+variable "TS_URL" { default = "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.22.0/f5-telemetry-1.22.0-1.noarch.rpm" }
 variable "libs_dir" { default = "/config/cloud/azure/node_modules" }
 variable "onboard_log" { default = "/var/log/startup-script.log" }
 
