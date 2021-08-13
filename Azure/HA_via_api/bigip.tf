@@ -3,8 +3,8 @@
 # Create Route Table
 resource "azurerm_route_table" "udr" {
   name                          = "udr"
-  location                      = azurerm_resource_group.main.location
-  resource_group_name           = azurerm_resource_group.main.name
+  location                      = data.azurerm_resource_group.main.location
+  resource_group_name           = data.azurerm_resource_group.main.name
   disable_bgp_route_propagation = false
 
   route {
@@ -23,10 +23,10 @@ resource "azurerm_route_table" "udr" {
 # Create Public IPs
 resource "azurerm_public_ip" "vm01mgmtpip" {
   name                = "${var.prefix}-vm01-mgmt-pip"
-  location            = azurerm_resource_group.main.location
+  location            = data.azurerm_resource_group.main.location
   sku                 = "Standard"
-  zones               = [1]
-  resource_group_name = azurerm_resource_group.main.name
+  availability_zone   = 1
+  resource_group_name = data.azurerm_resource_group.main.name
   allocation_method   = "Static"
 
   tags = {
@@ -41,10 +41,10 @@ resource "azurerm_public_ip" "vm01mgmtpip" {
 
 resource "azurerm_public_ip" "vm01selfpip" {
   name                = "${var.prefix}-vm01-self-pip"
-  location            = azurerm_resource_group.main.location
+  location            = data.azurerm_resource_group.main.location
   sku                 = "Standard"
-  zones               = [1]
-  resource_group_name = azurerm_resource_group.main.name
+  availability_zone   = 1
+  resource_group_name = data.azurerm_resource_group.main.name
   allocation_method   = "Static"
 
   tags = {
@@ -59,10 +59,10 @@ resource "azurerm_public_ip" "vm01selfpip" {
 
 resource "azurerm_public_ip" "vm02mgmtpip" {
   name                = "${var.prefix}-vm02-mgmt-pip"
-  location            = azurerm_resource_group.main.location
+  location            = data.azurerm_resource_group.main.location
   sku                 = "Standard"
-  zones               = [2]
-  resource_group_name = azurerm_resource_group.main.name
+  availability_zone   = 2
+  resource_group_name = data.azurerm_resource_group.main.name
   allocation_method   = "Static"
 
   tags = {
@@ -77,10 +77,10 @@ resource "azurerm_public_ip" "vm02mgmtpip" {
 
 resource "azurerm_public_ip" "vm02selfpip" {
   name                = "${var.prefix}-vm02-self-pip"
-  location            = azurerm_resource_group.main.location
+  location            = data.azurerm_resource_group.main.location
   sku                 = "Standard"
-  zones               = [2]
-  resource_group_name = azurerm_resource_group.main.name
+  availability_zone   = 2
+  resource_group_name = data.azurerm_resource_group.main.name
   allocation_method   = "Static"
 
   tags = {
@@ -95,10 +95,10 @@ resource "azurerm_public_ip" "vm02selfpip" {
 
 resource "azurerm_public_ip" "pubvippip" {
   name                = "${var.prefix}-pubvip-pip"
-  location            = azurerm_resource_group.main.location
+  location            = data.azurerm_resource_group.main.location
   sku                 = "Standard"
-  zones               = [1]
-  resource_group_name = azurerm_resource_group.main.name
+  availability_zone   = 1
+  resource_group_name = data.azurerm_resource_group.main.name
   allocation_method   = "Static"
 
   tags = {
@@ -111,90 +111,22 @@ resource "azurerm_public_ip" "pubvippip" {
   }
 }
 
-# Create a Network Security Group and rules
-resource "azurerm_network_security_group" "main" {
-  name                = "${var.prefix}-nsg"
-  location            = azurerm_resource_group.main.location
-  resource_group_name = azurerm_resource_group.main.name
-
-  security_rule {
-    name                       = "allow_SSH"
-    description                = "Allow SSH access"
-    priority                   = 100
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "22"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-
-  security_rule {
-    name                       = "allow_HTTP"
-    description                = "Allow HTTP access"
-    priority                   = 110
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "80"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-
-  security_rule {
-    name                       = "allow_HTTPS"
-    description                = "Allow HTTPS access"
-    priority                   = 120
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "443"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-
-  security_rule {
-    name                       = "allow_APP_HTTPS"
-    description                = "Allow HTTPS access"
-    priority                   = 130
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "8443"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-
-  tags = {
-    Name        = "${var.environment}-bigip-sg"
-    environment = var.environment
-    owner       = var.owner
-    group       = var.group
-    costcenter  = var.costcenter
-    application = var.application
-  }
-}
-
 # Create NIC for Management 
 resource "azurerm_network_interface" "vm01-mgmt-nic" {
-  name                = "${var.prefix}-mgmt0"
-  location            = azurerm_resource_group.main.location
-  resource_group_name = azurerm_resource_group.main.name
+  name                = "${var.prefix}-vm01-mgmt"
+  location            = data.azurerm_resource_group.main.location
+  resource_group_name = data.azurerm_resource_group.main.name
 
   ip_configuration {
     name                          = "primary"
-    subnet_id                     = azurerm_subnet.Mgmt.id
+    subnet_id                     = data.azurerm_subnet.mgmt.id
     private_ip_address_allocation = "Static"
     private_ip_address            = var.f5vm01mgmt
     public_ip_address_id          = azurerm_public_ip.vm01mgmtpip.id
   }
 
   tags = {
-    Name        = "${var.environment}-vm01-mgmt-int"
+    Name        = "${var.environment}-vm01-mgmt"
     environment = var.environment
     owner       = var.owner
     group       = var.group
@@ -204,20 +136,20 @@ resource "azurerm_network_interface" "vm01-mgmt-nic" {
 }
 
 resource "azurerm_network_interface" "vm02-mgmt-nic" {
-  name                = "${var.prefix}-mgmt1"
-  location            = azurerm_resource_group.main.location
-  resource_group_name = azurerm_resource_group.main.name
+  name                = "${var.prefix}-vm02-mgmt"
+  location            = data.azurerm_resource_group.main.location
+  resource_group_name = data.azurerm_resource_group.main.name
 
   ip_configuration {
     name                          = "primary"
-    subnet_id                     = azurerm_subnet.Mgmt.id
+    subnet_id                     = data.azurerm_subnet.mgmt.id
     private_ip_address_allocation = "Static"
     private_ip_address            = var.f5vm02mgmt
     public_ip_address_id          = azurerm_public_ip.vm02mgmtpip.id
   }
 
   tags = {
-    Name        = "${var.environment}-vm02-mgmt-int"
+    Name        = "${var.environment}-vm02-mgmt"
     environment = var.environment
     owner       = var.owner
     group       = var.group
@@ -228,14 +160,14 @@ resource "azurerm_network_interface" "vm02-mgmt-nic" {
 
 # Create NIC for External
 resource "azurerm_network_interface" "vm01-ext-nic" {
-  name                 = "${var.prefix}-ext0"
-  location             = azurerm_resource_group.main.location
-  resource_group_name  = azurerm_resource_group.main.name
+  name                 = "${var.prefix}-vm01-ext"
+  location             = data.azurerm_resource_group.main.location
+  resource_group_name  = data.azurerm_resource_group.main.name
   enable_ip_forwarding = true
 
   ip_configuration {
     name                          = "primary"
-    subnet_id                     = azurerm_subnet.External.id
+    subnet_id                     = data.azurerm_subnet.external.id
     private_ip_address_allocation = "Static"
     private_ip_address            = var.f5vm01ext
     primary                       = true
@@ -243,7 +175,7 @@ resource "azurerm_network_interface" "vm01-ext-nic" {
   }
 
   tags = {
-    Name                      = "${var.environment}-vm01-ext-int"
+    Name                      = "${var.environment}-vm01-ext"
     environment               = var.environment
     owner                     = var.owner
     group                     = var.group
@@ -255,14 +187,14 @@ resource "azurerm_network_interface" "vm01-ext-nic" {
 }
 
 resource "azurerm_network_interface" "vm02-ext-nic" {
-  name                 = "${var.prefix}-ext1"
-  location             = azurerm_resource_group.main.location
-  resource_group_name  = azurerm_resource_group.main.name
+  name                 = "${var.prefix}-vm02-ext"
+  location             = data.azurerm_resource_group.main.location
+  resource_group_name  = data.azurerm_resource_group.main.name
   enable_ip_forwarding = true
 
   ip_configuration {
     name                          = "primary"
-    subnet_id                     = azurerm_subnet.External.id
+    subnet_id                     = data.azurerm_subnet.external.id
     private_ip_address_allocation = "Static"
     private_ip_address            = var.f5vm02ext
     primary                       = true
@@ -271,21 +203,21 @@ resource "azurerm_network_interface" "vm02-ext-nic" {
 
   ip_configuration {
     name                          = "secondary1"
-    subnet_id                     = azurerm_subnet.External.id
+    subnet_id                     = data.azurerm_subnet.external.id
     private_ip_address_allocation = "Static"
     private_ip_address            = var.f5privatevip
   }
 
   ip_configuration {
     name                          = "secondary2"
-    subnet_id                     = azurerm_subnet.External.id
+    subnet_id                     = data.azurerm_subnet.external.id
     private_ip_address_allocation = "Static"
     private_ip_address            = var.f5publicvip
     public_ip_address_id          = azurerm_public_ip.pubvippip.id
   }
 
   tags = {
-    Name                      = "${var.environment}-vm02-ext-int"
+    Name                      = "${var.environment}-vm02-ext"
     environment               = var.environment
     owner                     = var.owner
     group                     = var.group
@@ -296,26 +228,65 @@ resource "azurerm_network_interface" "vm02-ext-nic" {
   }
 }
 
-# Associate network security groups with NICs
-resource "azurerm_network_interface_security_group_association" "vm01-mgmt-nsg" {
-  network_interface_id      = azurerm_network_interface.vm01-mgmt-nic.id
-  network_security_group_id = azurerm_network_security_group.main.id
+# Create NIC for Internal
+resource "azurerm_network_interface" "vm01-int-nic" {
+  name                 = "${var.prefix}-vm01-int"
+  location             = data.azurerm_resource_group.main.location
+  resource_group_name  = data.azurerm_resource_group.main.name
+  enable_ip_forwarding = true
+
+  ip_configuration {
+    name                          = "primary"
+    subnet_id                     = data.azurerm_subnet.internal.id
+    private_ip_address_allocation = "Dynamic"
+    primary                       = true
+  }
+
+  ip_configuration {
+    name                          = "secondary"
+    subnet_id                     = data.azurerm_subnet.internal.id
+    private_ip_address_allocation = "Dynamic"
+  }
+
+  tags = {
+    Name        = "${var.environment}-vm01-int"
+    environment = var.environment
+    owner       = var.owner
+    group       = var.group
+    costcenter  = var.costcenter
+    application = var.application
+  }
 }
 
-resource "azurerm_network_interface_security_group_association" "vm02-mgmt-nsg" {
-  network_interface_id      = azurerm_network_interface.vm02-mgmt-nic.id
-  network_security_group_id = azurerm_network_security_group.main.id
+resource "azurerm_network_interface" "vm02-int-nic" {
+  name                 = "${var.prefix}-vm02-int"
+  location             = data.azurerm_resource_group.main.location
+  resource_group_name  = data.azurerm_resource_group.main.name
+  enable_ip_forwarding = true
+
+  ip_configuration {
+    name                          = "primary"
+    subnet_id                     = data.azurerm_subnet.internal.id
+    private_ip_address_allocation = "Dynamic"
+    primary                       = true
+  }
+
+  ip_configuration {
+    name                          = "secondary"
+    subnet_id                     = data.azurerm_subnet.internal.id
+    private_ip_address_allocation = "Dynamic"
+  }
+
+  tags = {
+    Name        = "${var.environment}-vm02-int"
+    environment = var.environment
+    owner       = var.owner
+    group       = var.group
+    costcenter  = var.costcenter
+    application = var.application
+  }
 }
 
-resource "azurerm_network_interface_security_group_association" "vm01-ext-nsg" {
-  network_interface_id      = azurerm_network_interface.vm01-ext-nic.id
-  network_security_group_id = azurerm_network_security_group.main.id
-}
-
-resource "azurerm_network_interface_security_group_association" "vm02-ext-nsg" {
-  network_interface_id      = azurerm_network_interface.vm02-ext-nic.id
-  network_security_group_id = azurerm_network_security_group.main.id
-}
 
 # Setup Onboarding scripts
 data "template_file" "vm_onboard" {
@@ -376,7 +347,7 @@ data "template_file" "as3_json" {
   template = file("${path.module}/as3.json")
 
   vars = {
-    rg_name         = azurerm_resource_group.main.name
+    rg_name         = data.azurerm_resource_group.main.name
     subscription_id = var.sp_subscription_id
     tenant_id       = var.sp_tenant_id
     client_id       = var.sp_client_id
@@ -411,10 +382,10 @@ data "template_file" "failover_json" {
 # Create F5 BIG-IP VMs
 resource "azurerm_linux_virtual_machine" "f5vm01" {
   name                            = "${var.prefix}-f5vm01"
-  location                        = azurerm_resource_group.main.location
-  resource_group_name             = azurerm_resource_group.main.name
+  location                        = data.azurerm_resource_group.main.location
+  resource_group_name             = data.azurerm_resource_group.main.name
   zone                            = 1
-  network_interface_ids           = [azurerm_network_interface.vm01-mgmt-nic.id, azurerm_network_interface.vm01-ext-nic.id]
+  network_interface_ids           = [azurerm_network_interface.vm01-mgmt-nic.id, azurerm_network_interface.vm01-ext-nic.id, azurerm_network_interface.vm01-int-nic.id]
   size                            = var.instance_type
   admin_username                  = var.uname
   admin_password                  = var.upassword
@@ -442,7 +413,7 @@ resource "azurerm_linux_virtual_machine" "f5vm01" {
   }
 
   boot_diagnostics {
-    storage_account_uri = azurerm_storage_account.mystorage.primary_blob_endpoint
+    storage_account_uri = data.azurerm_storage_account.main.primary_blob_endpoint
   }
 
   identity {
@@ -461,10 +432,10 @@ resource "azurerm_linux_virtual_machine" "f5vm01" {
 
 resource "azurerm_linux_virtual_machine" "f5vm02" {
   name                            = "${var.prefix}-f5vm02"
-  location                        = azurerm_resource_group.main.location
-  resource_group_name             = azurerm_resource_group.main.name
+  location                        = data.azurerm_resource_group.main.location
+  resource_group_name             = data.azurerm_resource_group.main.name
   zone                            = 2
-  network_interface_ids           = [azurerm_network_interface.vm02-mgmt-nic.id, azurerm_network_interface.vm02-ext-nic.id]
+  network_interface_ids           = [azurerm_network_interface.vm02-mgmt-nic.id, azurerm_network_interface.vm02-ext-nic.id, azurerm_network_interface.vm02-int-nic.id]
   size                            = var.instance_type
   admin_username                  = var.uname
   admin_password                  = var.upassword
@@ -492,7 +463,7 @@ resource "azurerm_linux_virtual_machine" "f5vm02" {
   }
 
   boot_diagnostics {
-    storage_account_uri = azurerm_storage_account.mystorage.primary_blob_endpoint
+    storage_account_uri = data.azurerm_storage_account.main.primary_blob_endpoint
   }
 
   identity {
@@ -511,13 +482,13 @@ resource "azurerm_linux_virtual_machine" "f5vm02" {
 
 # Configure VMs to use a system-assigned managed identity
 resource "azurerm_role_assignment" "f5vm01ra" {
-  scope                = azurerm_resource_group.main.id
+  scope                = data.azurerm_resource_group.main.id
   role_definition_name = "Contributor"
   principal_id         = lookup(azurerm_linux_virtual_machine.f5vm01.identity[0], "principal_id")
 }
 
 resource "azurerm_role_assignment" "f5vm02ra" {
-  scope                = azurerm_resource_group.main.id
+  scope                = data.azurerm_resource_group.main.id
   role_definition_name = "Contributor"
   principal_id         = lookup(azurerm_linux_virtual_machine.f5vm02.identity[0], "principal_id")
 }
