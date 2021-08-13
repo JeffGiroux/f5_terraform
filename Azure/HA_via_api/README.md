@@ -33,36 +33,54 @@ Example...
 
 ## Version
 This template is tested and worked in the following version
-Terraform v0.14.6
-+ provider.azurerm v2.48
+Terraform v0.14.10
++ provider.azurerm v2.72
 + provider.local v2.1
 + provider.null v3.1
 + provider.template v2.2
 
 ## Prerequisites
 
-- **Important**: When you configure the admin password for the BIG-IP VE in the template, you cannot use the character **#**.  Additionally, there are a number of other special characters that you should avoid using for F5 product user accounts.  See [K2873](https://support.f5.com/csp/article/K2873) for details.
-- This template requires a service principal for backend pool service discovery. **Important**: you MUST have "OWNER" priviledge on the SP in order to assign role to the resources in your subscription. See the [Service Principal Setup section](#service-principal-authentication) for details, including required permissions.
+- ***Important***: When you configure the admin password for the BIG-IP VE in the template, you cannot use the character **#**.  Additionally, there are a number of other special characters that you should avoid using for F5 product user accounts.  See [K2873](https://support.f5.com/csp/article/K2873) for details.
+- This template requires one or more service accounts for the BIG-IP instance to perform various tasks:
+  - Azure Key Vault secrets - requires (TBD...not tested yet)
+    - Performed by VM instance during onboarding to retrieve passwords and private keys
+  - Backend pool service discovery - requires "Reader"
+    - Performed by F5 Application Services AS3
 - The HA BIG-IP VMs use Azure RBAC role for the failover instead of using Service Prinicipal.
 - These BIG-IP VMs are deployed across different Availability Zones. Please ensure the region you've chosen can support AZ.
 - This deployment will be using the Terraform Azurerm provider to build out all the neccessary Azure objects. Therefore, Azure CLI is required. For installation, please follow this [Microsoft link](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-apt?view=azure-cli-latest)
 - If this is the first time to deploy the F5 image, the subscription used in this deployment needs to be enabled to programatically deploy. For more information, please refer to [Configure Programatic Deployment](https://azure.microsoft.com/en-us/blog/working-with-marketplace-images-on-azure-resource-manager/)
+- This template requires a service account to deploy with the Terraform Azure provider and build out all the neccessary Azure objects
+  - See the [Terraform Azure Provider "Authenticating Using a Service Principal"](https://www.terraform.io/docs/providers/azurerm/guides/service_principal_client_secret.html) for details. Also, review the [available Azure built-in roles](https://docs.microsoft.com/en-gb/azure/role-based-access-control/built-in-roles) too.
+  - Permissions will depend on the objects you are creating
+  - My service account for Terraform deployments in Azure uses the following roles:
+    - Contributor
+  - ***Note***: Make sure to [practice least privilege](https://docs.microsoft.com/en-us/azure/security/fundamentals/identity-management-best-practices#lower-exposure-of-privileged-accounts)
+- This template deploys into an existing network
+  - You must have a VNET with three (3) subnets: management, external, internal
+  - Firewall rules are required to pass traffic to the application
+    - BIG-IP will require tcp/22 and tcp/443 on the mgmt network
+    - Application access will require tcp/80 and tcp/443 on the external network
+  - If you require a new network first, see the [Infrastructure Only folder](../Infrastructure-only) to get started.
+
 
 ## Important Configuration Notes
 
 - Variables are configured in variables.tf
 - Sensitive variables like Azure Subscription and Service Principal are configured in terraform.tfvars
-  - Note: Passwords and secrets will be moved to Azure Key Vault in the future
-- This template uses Declarative Onboarding (DO), Application Services 3 (AS3), and Cloud Failover Extension packages for the initial configuration. As part of the onboarding script, it will download the RPMs automatically. See the [AS3 documentation](https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/) and [DO documentation](https://clouddocs.f5.com/products/extensions/f5-declarative-onboarding/latest/) for details on how to use AS3 and Declarative Onboarding on your BIG-IP VE(s). The [Telemetry Streaming](https://clouddocs.f5.com/products/extensions/f5-telemetry-streaming/latest/) extension is also downloaded and can be configured to point to Azure Log Analytics. The [Cloud Failover Extension](https://clouddocs.f5.com/products/extensions/f5-cloud-failover/latest/) documentation is also available.
+  - ***Note***: Passwords and secrets will be moved to Azure Key Vault in the future
+  - (TBD) The BIG-IP instance will query Azure Metadata API to retrieve the service account's token for authentication
+  - (TBD) The BIG-IP instance will then use the secret name and the service account's token to query Azure Metadata API and dynamically retrieve the password for device onboarding
+- This template uses Declarative Onboarding (DO), Application Services 3 (AS3), and Cloud Failover Extension packages for the initial configuration. As part of the onboarding script, it will download the RPMs automatically. See the [AS3 documentation](http://f5.com/AS3Docs) and [DO documentation](http://f5.com/DODocs) for details on how to use AS3 and Declarative Onboarding on your BIG-IP VE(s). The [Telemetry Streaming](http://f5.com/TSDocs) extension is also downloaded and can be configured to point to Azure Log Analytics. The [Cloud Failover Extension](http://f5.com/CFEDocs) documentation is also available.
 - Files
-  - appserver.tf - resources for backend web server running DVWA
-  - bigip.tf - resources for BIG-IP, NICs, public IPs, network security group
+  - bigip.tf - resources for BIG-IP, NICs, public IPs
   - main.tf - resources for provider, versions, resource group
-  - network.tf - resources for VNET and subnets
+  - network.tf - data for existing subnets
   - onboard.tpl - onboarding script which is run by commandToExecute (user data). It will be copied to /var/lib/waagent/CustomData upon bootup. This script is responsible for downloading the neccessary F5 Automation Toolchain RPM files, installing them, and then executing the onboarding REST calls.
-  - do.json - contains the L1-L3 BIG-IP configurations used by DO for items like VLANs, IPs, and routes.
-  - as3.json - contains the L4-L7 BIG-IP configurations used by AS3 for items like pool members, virtual server listeners, security policies, and more.
-  - ts.json - contains the BIG-IP configurations used by TS for items like telemetry streaming, CPU, memory, application statistics, and more.
+  - do.json - contains the L1-L3 BIG-IP configurations used by DO for items like VLANs, IPs, and routes
+  - as3.json - contains the L4-L7 BIG-IP configurations used by AS3 for items like pool members, virtual server listeners, security policies, and more
+  - ts.json - contains the BIG-IP configurations used by TS for items like telemetry streaming, CPU, memory, application statistics, and more
   - failover.json - contains the BIG-IP configurations used by CFE for failover of cloud objects (IPs, routes)
 
 ## BYOL Licensing
@@ -102,6 +120,30 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
         },
   ```
 
+## BIG-IQ License Manager
+This template uses PayGo BIG-IP image for the deployment (as default). If you would like to use BYOL/ELA/Subscription licenses from [BIG-IQ License Manager (LM)](https://devcentral.f5.com/s/articles/managing-big-ip-licensing-with-big-iq-31944), then these following steps are needed:
+1. Find BYOL image. Reference [BYOL Licensing](#byol-licensing) step #1.
+2. Replace BIG-IP *image_name* and *product* in "variables.tf". Reference [BYOL Licensing](#byol-licensing) step #2.
+3. In the "variables.tf", modify the BIG-IQ license section to match your environment
+4. In the "do.json", add the "myLicense" block under the "Common" declaration ([full declaration example here](https://clouddocs.f5.com/products/extensions/f5-declarative-onboarding/latest/bigiq-examples.html#licensing-with-big-iq-regkey-pool-route-to-big-ip))
+  ```
+        "myLicense": {
+            "class": "License",
+            "licenseType": "${bigIqLicenseType}",
+            "bigIqHost": "${bigIqHost}",
+            "bigIqUsername": "${bigIqUsername}",
+            "bigIqPassword": "$${bigIqPassword}",
+            "licensePool": "${bigIqLicensePool}",
+            "skuKeyword1": "${bigIqSkuKeyword1}",
+            "skuKeyword2": "${bigIqSkuKeyword2}",
+            "unitOfMeasure": "${bigIqUnitOfMeasure}",
+            "reachable": false,
+            "hypervisor": "${bigIqHypervisor}",
+            "overwrite": true
+        },
+  ```
+  ***Note***: The [onboard.tpl](./onboard.tpl) startup script will use the same 'usecret' payload value (aka password) for BIG-IP password AND the BIG-IQ password. In the onboard.tpl file, this happens in the 'passwd' variable. You can use a separate password for BIG-IQ by creating a new Google Secret Manager secret for the BIG-IQ password, then add a new variable for the secret in [variables.tf](./variables.tf), modify [bigip.tf](./bigip.tf) to include the secret in the local templatefile section similar to 'usecret', then update [onboard.tpl](./onboard.tpl) to query Secret Manager for the BIG-IQ secret name. Reference code example *usecret='${usecret}'*.
+
 ## Template Parameters
 
 | Parameter | Required | Description |
@@ -123,9 +165,11 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | uname | Yes | User name for the Virtual Machine |
 | upassword | Yes | Password for the Virtual Machine |
 | location | Yes | Location of the deployment |
-| cidr | Yes | IP Address range of the Virtual Network |
-| subnet1 | Yes | Subnet IP range of the management network |
-| subnet2 | Yes | Subnet IP range of the external network |
+| vnet_rg | Yes | Resource group name for existing VNET |
+| vnet_name | Yes | Name of existing VNET |
+| mgmtSubnet | Yes | Name of management subnet |
+| extSubnet | Yes | Name of external subnet |
+| intSubnet | Yes | Name of internal subnet |
 | managed_route1 | Yes | A UDR route can used for testing managed-route failover. Enter address prefix like x.x.x.x/x. |
 | f5vm01mgmt | Yes | IP address for 1st BIG-IP's management interface |
 | f5vm02mgmt | Yes | IP address for 2nd BIG-IP's management interface |
@@ -160,15 +204,17 @@ To run this Terraform template, perform the following steps:
   2. Modify terraform.tfvars with the required information
   ```
       # BIG-IP Environment
-      uname     = "azureuser"
-      upassword = "Default12345!"
+      uname      = "azureuser"
+      upassword  = "Default12345!"
+      vnet_rg    = "myVnetRg"
+      vnet_name  = "myVnet123"
+      mgmtSubnet = "mgmt"
+      extSubnet  = "external"
+      intSubnet  = "internal"
 
       # Azure Environment
-      sp_subscription_id = "xxxxx"
-      sp_client_id       = "xxxxx"
-      sp_client_secret   = "xxxxx"
-      sp_tenant_id       = "xxxxx"
       location           = "westus2"
+      storage_name       = "mystorage"
 
       # Prefix for objects being created
       prefix = "mylab123"
@@ -204,8 +250,6 @@ For more information on F5 solutions for Azure, including manual configuration p
 
 In order to pass traffic from your clients to the servers through the BIG-IP system, you must create a virtual server on the BIG-IP VE. In this template, the AS3 declaration creates 2 VIPs: one for public internet facing, and one for private internal usage. It is preconfigured as an example.
 
-In this template, the Azure public IP address is associated with an Azure Load Balancer that forwards traffic to a backend pool that includes the secondary private IP address of the External NIC on each BIG-IP.
-
 ***Note:*** These next steps illustrate the manual way in the GUI to create a virtual server
 1. Open the BIG-IP VE Configuration utility
 2. Click **Local Traffic > Virtual Servers**
@@ -224,7 +268,7 @@ This example illustrates how to replace or upgrade the BIG-IP VE.
   2. Revoke the problematic BIG-IP VE's license (if BYOL)
   3. Run command
 ```
-terraform destroy -target azurerm_virtual_machine.f5vm02
+terraform destroy -target azurerm_linux_virtual_machine.f5vm01
 ```
   3. Run command
 ```
@@ -277,29 +321,43 @@ terraform apply
 ```
 
 ## Service Principal Authentication
-This solution requires access to the Azure API to determine how the BIG-IP VEs should be configured. The following provides information/links on the options for configuring a service principal within Azure if this is the first time it is needed in a subscription.
+This solution might require access to the Azure API to query pool member key:value. If F5 AS3 is used with pool member dynamic service discovery, then you will need an SP. The current demo repo as-is does NOT need an SP. The following provides information/links on the options for configuring a service principal within Azure.
 
-_Ensure that however the creation of the service principal occurs to verify it only has minimum required access based on the solutions need(read vs read/write) prior to this template being deployed and used by the solution within the resource group selected(new or existing)._
+As another reference...head over to F5 CloudDocs to see an example in one of the awesome lab guides. Pay attention to the [Setting Up a Service Principal Account](https://clouddocs.f5.com/training/community/big-iq-cloud-edition/html/class2/module5/lab1.html#setting-up-a-service-principal-account) section and then head back over here!
 
-The end result should be possession of a client(application) ID, tenant ID and service principal secret that can login to the same subscription this template will be deployed into. Ensuring this is fully functioning prior to deploying this ARM template will save on some troubleshooting post-deployment if the service principal is in fact not fully configured.
+1. Login to az cli and set default subscription:
 
-As another ference...ead over to F5 CloudDocs to see an example in one of the awesome lab guides. Pay attention to the [Setting Up a Service Principal Account](https://clouddocs.f5.com/training/community/big-iq-cloud-edition/html/class2/module5/lab1.html#setting-up-a-service-principal-account) section and then head back over here!
+```bash
+# Login
+az login
 
-### Option #1 Azure Portal
+# Show subscriptions
+az account show
 
-Follow the steps outlined in the [Azure Portal documentation](https://azure.microsoft.com/en-us/documentation/articles/resource-group-create-service-principal-portal/) to generate the service principal.
-
-### Option #2 Azure CLI
-
-This method can be used with either the [Azure CLI v2.0 (Python)](https://github.com/Azure/azure-cli) or the [Azure Cross-Platform CLI (npm module)](https://github.com/Azure/azure-xplat-cli).
-
-_Using the Python Azure CLI v2.0 - requires just one step_
-```shell
-$ az ad sp create-for-rbac
+# Set default
+az account set -s <subscriptionId>
 ```
 
-_Using the Node.js cross-platform CLI - requires additional steps for setting up_
-https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-authenticate-service-principal-cli
+2. Create service principal account. Copy the JSON output starting with "{" ending with "}".
 
-### Option #3 Azure PowerShell
-Follow the steps outlined in the [Azure Powershell documentation](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-authenticate-service-principal) to generate the service principal.
+***Note:*** Keep this safe. This credential enables read/write access to your Azure Subscription.
+```
+  $ az ad sp create-for-rbac -n "http://[unique-name]-demo-cc" --role contributor
+  {
+    "appId": "xxx-xxxx",
+    "displayName": "[unique-name]-demo-cc",
+    "name": "http://[unique-name]-demo-cc",
+    "password": "[password]",
+    "tenant": "yyy-yyy"
+  }
+```
+
+3. Retrieve Azure subscription ID
+```
+  $ az account show  --query [name,id,isDefault]
+  [
+    "f5-AZR_xxxx", <-- name
+    "xxx-xxx-xxx", <-- subscription id
+    true           <-- is this the default subscription 
+  ]
+```
