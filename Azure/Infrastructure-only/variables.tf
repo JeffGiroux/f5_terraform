@@ -1,10 +1,6 @@
 # Variables
 
 # Azure Environment
-variable "sp_subscription_id" {}
-variable "sp_client_id" {}
-variable "sp_client_secret" {}
-variable "sp_tenant_id" {}
 variable "prefix" { default = "mydemo123" }
 variable "location" { default = "westus2" }
 variable "adminSrcAddr" { default = "0.0.0.0/0" }

@@ -15,8 +15,8 @@ Terraform is beneficial as it allows composing resources a bit differently to ac
 
 ## Version
 This template is tested and worked in the following version
-Terraform v0.14.6
-+ provider.azurerm v2.48
+Terraform v0.14.10
++ provider.azurerm v2.72
 
 ## Prerequisites
 
@@ -42,10 +42,6 @@ Terraform v0.14.6
 | --- | --- | --- |
 | prefix | Yes | This value is inserted at the beginning of each Azure object (alpha-numeric, no special character) |
 | adminSrcAddr | Yes | Trusted source network for admin access |
-| sp_subscription_id | Yes | This is the service principal subscription ID |
-| sp_client_id | Yes | This is the service principal application/client ID |
-| sp_client_secret | Yes | This is the service principal secret |
-| sp_tenant_id | Yes | This is the service principal tenant ID |
 | vnet_cidr | Yes | IP address CIDR range for VNET |
 | mgmt_address_prefix | Yes | IP address prefix for management subnet |
 | ext_address_prefix | Yes | IP address prefix for external subnet |
@@ -58,10 +54,6 @@ To run this Terraform template, perform the following steps:
   2. Modify terraform.tfvars with the required information
   ```
       # Azure Environment
-      sp_subscription_id = "xxxxx"
-      sp_client_id       = "xxxxx"
-      sp_client_secret   = "xxxxx"
-      sp_tenant_id       = "xxxxx"
       location           = "westus2"
       adminSrcAddr       = "0.0.0.0/0"
 
