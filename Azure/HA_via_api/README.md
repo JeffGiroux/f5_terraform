@@ -1,5 +1,9 @@
 # Deploying BIG-IP VEs in Azure - High Availability (Active/Standby): 3-NIC
 
+## To Do
+1. Currently BROKEN
+2. Converting onboard to runtime-init
+
 ## Contents
 
 - [Introduction](#introduction)
