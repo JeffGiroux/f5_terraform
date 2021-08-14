@@ -85,7 +85,7 @@ runtime_parameters:
   - name: HOST1
     type: static
     value: ${host1}
-  - name: HOST1
+  - name: HOST2
     type: static
     value: ${host2}
 pre_onboard_enabled:
@@ -168,7 +168,7 @@ extension_services:
                 tagged: false
           external-localself:
             class: SelfIp
-            address: '{{{ LOCAL_SELF_EXT }}}/24'
+            address: '{{{ LOCAL_SELFIP_EXT }}}/24'
             vlan: external
             allowService: default
             trafficGroup: traffic-group-local-only
@@ -181,8 +181,8 @@ extension_services:
                 tagged: false
           internal-localself:
             class: SelfIp
-            address: '{{{ LOCAL_SELF_INT }}}/24'
-            vlan: external
+            address: '{{{ LOCAL_SELFIP_INT }}}/24'
+            vlan: internal
             allowService: default
             trafficGroup: traffic-group-local-only
           default:
