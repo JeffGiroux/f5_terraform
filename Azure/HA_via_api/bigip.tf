@@ -347,6 +347,9 @@ locals {
     f5_cloud_failover_label = var.f5_cloud_failover_label
     local_selfip            = var.f5vm02ext
     remote_selfip           = var.f5vm01ext
+    dns_server              = var.dns_server
+    ntp_server              = var.ntp_server
+    timezone                = var.timezone
     mgmt_gw                 = var.mgmt_gw
     gateway                 = var.ext_gw
     regKey                  = var.license2

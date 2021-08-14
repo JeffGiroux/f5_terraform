@@ -61,6 +61,15 @@ runtime_parameters:
   - name: REMOTE_SELFIP
     type: static
     value: ${remote_selfip}
+  - name: DNS_SERVER
+    type: static
+    value: ${dns_server}
+  - name: NTP_SERVER
+    type: static
+    value: ${ntp_server}
+  - name: TIMEZONE
+    type: static
+    value: ${timezone}
 pre_onboard_enabled:
   - name: provision_rest
     type: inline
@@ -100,11 +109,11 @@ extension_services:
             config.allow.rfc3927: enable
             ui.advisory.enabled: true
             ui.advisory.color: blue
-            ui.advisory.text: '{{{HOST_NAME}}}.example.com'
+            ui.advisory.text: '{{{ HOST_NAME }}}.example.com'
           mySystem:
             autoPhonehome: true
             class: System
-            hostname: '{{{HOST_NAME}}}.example.com'
+            hostname: '{{{ HOST_NAME }}}.example.com'
           '{{{ USER_NAME }}}':
             class: User
             partitionAccess:
@@ -115,6 +124,20 @@ extension_services:
             userType: regular
             keys:
               - '{{{ SSH_KEYS }}}'
+          myDns:
+            class: DNS
+            nameServers:
+              - '{{{ DNS_SERVER }}}'
+              - 2001:4860:4860::8844
+            search:
+              - f5.com
+          myNtp:
+            class: NTP
+            servers:
+              - '{{{ NTP_SERVER }}}
+              - 1.pool.ntp.org
+              - 2.pool.ntp.org
+            timezone: '{{{ TIMEZONE }}}'
     - extensionType: as3
       type: inline
       value:
@@ -152,22 +175,22 @@ extension_services:
         environment: azure
         externalStorage:
           scopingTags:
-            f5_cloud_failover_label: '{{{FAILOVER_LABEL}}}'
+            f5_cloud_failover_label: '{{{ FAILOVER_LABEL }}}'
         failoverAddresses:
           enabled: true
           scopingTags:
-            f5_cloud_failover_label: '{{{FAILOVER_LABEL}}}'
+            f5_cloud_failover_label: '{{{ FAILOVER_LABEL }}}'
         failoverRoutes:
           enabled: true
           scopingTags:
-            f5_cloud_failover_label: '{{{FAILOVER_LABEL}}}'
+            f5_cloud_failover_label: '{{{ FAILOVER_LABEL }}}'
           scopingAddressRanges:
-            - range: '{{{MANAGED_ROUTE}}}'
+            - range: '{{{ MANAGED_ROUTE }}}'
           defaultNextHopAddresses:
             discoveryType: static
             items:
-              - '{{{LOCAL_SELFIP}}}'
-              - '{{{REMOTE_SELFIP}}}'
+              - '{{{ LOCAL_SELFIP }}}'
+              - '{{{ REMOTE_SELFIP }}}'
     - extensionType: ts
       type: inline
       value:
@@ -182,9 +205,9 @@ extension_services:
         My_Consumer:
           class: Telemetry_Consumer
           type: Azure_Log_Analytics
-          workspaceId: '{{{LAW_ID}}}'
+          workspaceId: '{{{ LAW_ID }}}'
           passphrase:
-            cipherText: '{{{LAW_PRIMKEY}}}'
+            cipherText: '{{{ LAW_PRIMKEY }}}'
           useManagedIdentity: false
           region: '{{{REGION}}}'              
 post_onboard_enabled:
