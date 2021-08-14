@@ -159,8 +159,10 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | f5vm02mgmt | IP address for 2nd BIG-IP's management interface | `string` | 10.90.1.5 | yes |
 | f5vm01ext | IP address for 1st BIG-IP's external interface | `string` | 10.90.2.4 | yes |
 | f5vm02ext | IP address for 2nd BIG-IP's external interface | `string` | 10.90.2.5 | yes |
-| f5privatevip | Secondary Private IP address for BIG-IP virtual server (internal) | `string` | 10.90.2.11 | yes |
-| f5publicvip | Secondary Private IP address for BIG-IP virtual server (external) | `string` | 10.90.2.12 | yes |
+| f5vm01int | IP address for 1st BIG-IP's internal interface | `string` | 10.90.3.4 | yes |
+| f5vm02int | IP address for 2nd BIG-IP's internal interface | `string` | 10.90.3.5 | yes |
+| f5privatevip | Secondary Private IP address for BIG-IP virtual server (internal) | `string` | 10.90.3.11 | yes |
+| f5publicvip | Secondary Private IP address for BIG-IP virtual server (external) | `string` | 10.90.2.11 | yes |
 | instance_type | Azure instance to be used for the BIG-IP VE | `string` | Standard_DS4_v2 | no |
 | product | Azure BIG-IP VE Offer | `string` | f5-big-ip-best | no |
 | bigip_version | BIG-IP Version | `string` | 15.1.201000 | no |

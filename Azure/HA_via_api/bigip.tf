@@ -202,14 +202,7 @@ resource "azurerm_network_interface" "vm02-ext-nic" {
   }
 
   ip_configuration {
-    name                          = "secondary1"
-    subnet_id                     = data.azurerm_subnet.external.id
-    private_ip_address_allocation = "Static"
-    private_ip_address            = var.f5privatevip
-  }
-
-  ip_configuration {
-    name                          = "secondary2"
+    name                          = "secondary"
     subnet_id                     = data.azurerm_subnet.external.id
     private_ip_address_allocation = "Static"
     private_ip_address            = var.f5publicvip
@@ -238,14 +231,9 @@ resource "azurerm_network_interface" "vm01-int-nic" {
   ip_configuration {
     name                          = "primary"
     subnet_id                     = data.azurerm_subnet.internal.id
-    private_ip_address_allocation = "Dynamic"
+    private_ip_address_allocation = "Static"
+    private_ip_address            = var.f5vm01int
     primary                       = true
-  }
-
-  ip_configuration {
-    name                          = "secondary"
-    subnet_id                     = data.azurerm_subnet.internal.id
-    private_ip_address_allocation = "Dynamic"
   }
 
   tags = {
@@ -267,14 +255,16 @@ resource "azurerm_network_interface" "vm02-int-nic" {
   ip_configuration {
     name                          = "primary"
     subnet_id                     = data.azurerm_subnet.internal.id
-    private_ip_address_allocation = "Dynamic"
+    private_ip_address_allocation = "Static"
+    private_ip_address            = var.f5vm02int
     primary                       = true
   }
 
   ip_configuration {
     name                          = "secondary"
     subnet_id                     = data.azurerm_subnet.internal.id
-    private_ip_address_allocation = "Dynamic"
+    private_ip_address_allocation = "Static"
+    private_ip_address            = var.f5privatevip
   }
 
   tags = {
@@ -308,8 +298,13 @@ locals {
     law_id                  = azurerm_log_analytics_workspace.law.workspace_id
     law_primkey             = azurerm_log_analytics_workspace.law.primary_shared_key
     f5_cloud_failover_label = var.f5_cloud_failover_label
-    local_selfip            = var.f5vm01ext
-    remote_selfip           = var.f5vm02ext
+    local_selfip_ext        = var.f5vm01ext
+    remote_selfip_ext       = var.f5vm02ext
+    local_selfip_int        = var.f5vm01int
+    remote_selfip_int       = var.f5vm02int
+    dns_server              = var.dns_server
+    ntp_server              = var.ntp_server
+    timezone                = var.timezone
     mgmt_gw                 = var.mgmt_gw
     gateway                 = var.ext_gw
     regKey                  = var.license1
@@ -345,8 +340,10 @@ locals {
     law_id                  = azurerm_log_analytics_workspace.law.workspace_id
     law_primkey             = azurerm_log_analytics_workspace.law.primary_shared_key
     f5_cloud_failover_label = var.f5_cloud_failover_label
-    local_selfip            = var.f5vm02ext
-    remote_selfip           = var.f5vm01ext
+    local_selfip_ext        = var.f5vm02ext
+    remote_selfip_ext       = var.f5vm01ext
+    local_selfip_int        = var.f5vm02int
+    remote_selfip_int       = var.f5vm01int
     dns_server              = var.dns_server
     ntp_server              = var.ntp_server
     timezone                = var.timezone
@@ -367,81 +364,6 @@ locals {
     bigIqUnitOfMeasure      = var.bigIqUnitOfMeasure
     bigIqHypervisor         = var.bigIqHypervisor
   })
-}
-
-
-data "template_file" "vm01_do_json" {
-  template = file("${path.module}/do.json")
-
-  vars = {
-    regKey         = var.license1
-    host1          = var.host1_name
-    host2          = var.host2_name
-    local_host     = var.host1_name
-    local_selfip   = var.f5vm01ext
-    remote_selfip  = var.f5vm02ext
-    gateway        = var.ext_gw
-    dns_server     = var.dns_server
-    ntp_server     = var.ntp_server
-    timezone       = var.timezone
-    admin_user     = var.uname
-    admin_password = var.upassword
-  }
-}
-
-data "template_file" "vm02_do_json" {
-  template = file("${path.module}/do.json")
-
-  vars = {
-    regKey         = var.license2
-    host1          = var.host1_name
-    host2          = var.host2_name
-    local_host     = var.host2_name
-    local_selfip   = var.f5vm02ext
-    remote_selfip  = var.f5vm01ext
-    gateway        = var.ext_gw
-    dns_server     = var.dns_server
-    ntp_server     = var.ntp_server
-    timezone       = var.timezone
-    admin_user     = var.uname
-    admin_password = var.upassword
-  }
-}
-
-data "template_file" "as3_json" {
-  template = file("${path.module}/as3.json")
-
-  vars = {
-    rg_name         = data.azurerm_resource_group.main.name
-    subscription_id = var.sp_subscription_id
-    tenant_id       = var.sp_tenant_id
-    client_id       = var.sp_client_id
-    client_secret   = var.sp_client_secret
-    backendvm_ip    = var.backend01ext
-    publicvip       = var.f5publicvip
-    privatevip      = var.f5privatevip
-  }
-}
-
-data "template_file" "ts_json" {
-  template = file("${path.module}/ts.json")
-
-  vars = {
-    region      = var.location
-    law_id      = azurerm_log_analytics_workspace.law.workspace_id
-    law_primkey = azurerm_log_analytics_workspace.law.primary_shared_key
-  }
-}
-
-data "template_file" "failover_json" {
-  template = file("${path.module}/failover.json")
-
-  vars = {
-    f5_cloud_failover_label = var.f5_cloud_failover_label
-    managed_route           = var.managed_route
-    local_selfip            = var.f5vm02ext
-    remote_selfip           = var.f5vm01ext
-  }
 }
 
 # Create F5 BIG-IP VMs

@@ -55,12 +55,18 @@ runtime_parameters:
   - name: MANAGED_ROUTE
     type: static
     value: ${managed_route}
-  - name: LOCAL_SELFIP
+  - name: LOCAL_SELFIP_EXT
     type: static
-    value: ${local_selfip}
-  - name: REMOTE_SELFIP
+    value: ${local_selfip_ext}
+  - name: REMOTE_SELFIP_EXT
     type: static
-    value: ${remote_selfip}
+    value: ${remote_selfip_ext}
+  - name: LOCAL_SELFIP_INT
+    type: static
+    value: ${local_selfip_int}
+  - name: REMOTE_SELFIP_INT
+    type: static
+    value: ${remote_selfip_int}
   - name: DNS_SERVER
     type: static
     value: ${dns_server}
@@ -70,6 +76,18 @@ runtime_parameters:
   - name: TIMEZONE
     type: static
     value: ${timezone}
+  - name: GATEWAY
+    type: static
+    value: ${gateway}
+  - name: MGMT_GW
+    type: static
+    value: ${mgmt_gw}
+  - name: HOST1
+    type: static
+    value: ${host1}
+  - name: HOST1
+    type: static
+    value: ${host2}
 pre_onboard_enabled:
   - name: provision_rest
     type: inline
@@ -138,6 +156,65 @@ extension_services:
               - 1.pool.ntp.org
               - 2.pool.ntp.org
             timezone: '{{{ TIMEZONE }}}'
+          myProvisioning:
+            class: Provision
+            ltm: nominal
+          external:
+            class: VLAN
+            tag: 4094
+            mtu: 1500
+            interfaces:
+              - name: 1.1
+                tagged: false
+          external-localself:
+            class: SelfIp
+            address: '{{{ LOCAL_SELF_EXT }}}/24'
+            vlan: external
+            allowService: default
+            trafficGroup: traffic-group-local-only
+          internal:
+            class: VLAN
+            tag: 4093
+            mtu: 1500
+            interfaces:
+              - name: 1.2
+                tagged: false
+          internal-localself:
+            class: SelfIp
+            address: '{{{ LOCAL_SELF_INT }}}/24'
+            vlan: external
+            allowService: default
+            trafficGroup: traffic-group-local-only
+          default:
+            class: Route
+            gw: '{{{ GATEWAY }}}'
+            network: default
+            mtu: 1500
+          configsync:
+            class: ConfigSync
+            configsyncIp: /Common/internal-localself/address
+          failoverAddress:
+            class: FailoverUnicast
+            address: /Common/internal-localself/address
+          failoverGroup:
+            class: DeviceGroup
+            type: sync-failover
+            members:
+              - '{{{ HOST1 }}}.example.com'
+              - '{{{ HOST2 }}}.example.com'
+            owner: /Common/failoverGroup/members/0
+            autoSync: true
+            saveOnAutoSync: false
+            networkFailover: true
+            fullLoadOnSync: false
+            asmSync: false
+          trust:
+            class: DeviceTrust
+            localUsername: '{{{ USER_NAME }}}'
+            localPassword: '{{{ ADMIN_PASS }}}'
+            remoteHost: '{{{ REMOTE_SELFIP_INT }}}'
+            remoteUsername: '{{{ USER_NAME }}}'
+            remotePassword: '{{{ ADMIN_PASS }}}'
     - extensionType: as3
       type: inline
       value:
@@ -189,8 +266,8 @@ extension_services:
           defaultNextHopAddresses:
             discoveryType: static
             items:
-              - '{{{ LOCAL_SELFIP }}}'
-              - '{{{ REMOTE_SELFIP }}}'
+              - '{{{ LOCAL_SELFIP_EXT }}}'
+              - '{{{ REMOTE_SELFIP_EXT }}}'
     - extensionType: ts
       type: inline
       value:
@@ -214,6 +291,7 @@ post_onboard_enabled:
   - name: create_misc_routes
     type: inline
     commands:
+    - tmsh create sys management-route azure_metadata network 169.254.169.254/32 gateway '{{{ MGMT_GW }}}'
     - tmsh save sys config
 EOF
 
