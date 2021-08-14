@@ -79,9 +79,6 @@ runtime_parameters:
   - name: GATEWAY
     type: static
     value: ${gateway}
-  - name: MGMT_GW
-    type: static
-    value: ${mgmt_gw}
   - name: HOST1
     type: static
     value: ${host1}
@@ -291,7 +288,6 @@ post_onboard_enabled:
   - name: create_misc_routes
     type: inline
     commands:
-    - tmsh create sys management-route azure_metadata network 169.254.169.254/32 gateway '{{{ MGMT_GW }}}'
     - tmsh save sys config
 EOF
 
