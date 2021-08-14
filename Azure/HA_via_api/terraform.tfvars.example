@@ -1,6 +1,7 @@
 # BIG-IP Environment
 uname      = "azureuser"
 upassword  = "Default12345!"
+ssh_key    = "ssh-rsa REDACTED me@my.email"
 vnet_rg    = "myVnetRg"
 vnet_name  = "myVnet123"
 mgmtSubnet = "mgmt"

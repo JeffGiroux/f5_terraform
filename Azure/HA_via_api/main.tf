@@ -15,7 +15,7 @@ provider "azurerm" {
 
 # Retrieve Resource Group
 data "azurerm_resource_group" "main" {
-  name     = var.vnet_rg
+  name = var.vnet_rg
 }
 
 # Create Log Analytic Workspace

@@ -9,7 +9,7 @@ resource "azurerm_route_table" "udr" {
 
   route {
     name                   = "route1"
-    address_prefix         = var.managed_route1
+    address_prefix         = var.managed_route
     next_hop_type          = "VirtualAppliance"
     next_hop_in_ip_address = azurerm_network_interface.vm02-ext-nic.private_ip_address
   }
@@ -289,21 +289,83 @@ resource "azurerm_network_interface" "vm02-int-nic" {
 
 
 # Setup Onboarding scripts
-data "template_file" "vm_onboard" {
-  template = file("${path.module}/onboard.tpl")
-
-  vars = {
-    admin_user     = var.uname
-    admin_password = var.upassword
-    DO_URL         = var.DO_URL
-    AS3_URL        = var.AS3_URL
-    TS_URL         = var.TS_URL
-    CF_URL         = var.CF_URL
-    libs_dir       = var.libs_dir
-    onboard_log    = var.onboard_log
-    mgmt_gw        = var.mgmt_gw
-  }
+locals {
+  f5_onboard1 = templatefile("${path.module}/f5_onboard.tmpl", {
+    INIT_URL                = var.INIT_URL
+    DO_URL                  = var.DO_URL
+    AS3_URL                 = var.AS3_URL
+    TS_URL                  = var.TS_URL
+    CFE_URL                 = var.CFE_URL
+    FAST_URL                = var.FAST_URL
+    DO_VER                  = split("/", var.DO_URL)[7]
+    AS3_VER                 = split("/", var.AS3_URL)[7]
+    TS_VER                  = split("/", var.TS_URL)[7]
+    CFE_VER                 = split("/", var.CFE_URL)[7]
+    FAST_VER                = split("/", var.FAST_URL)[7]
+    f5_username             = var.uname
+    f5_password             = var.upassword
+    ssh_keypair             = var.ssh_key
+    law_id                  = azurerm_log_analytics_workspace.law.workspace_id
+    law_primkey             = azurerm_log_analytics_workspace.law.primary_shared_key
+    f5_cloud_failover_label = var.f5_cloud_failover_label
+    local_selfip            = var.f5vm01ext
+    remote_selfip           = var.f5vm02ext
+    mgmt_gw                 = var.mgmt_gw
+    gateway                 = var.ext_gw
+    regKey                  = var.license1
+    local_host              = var.host1_name
+    host1                   = var.host1_name
+    host2                   = var.host2_name
+    managed_route           = var.managed_route
+    bigIqLicenseType        = var.bigIqLicenseType
+    bigIqHost               = var.bigIqHost
+    bigIqPassword           = var.bigIqPassword
+    bigIqUsername           = var.bigIqUsername
+    bigIqLicensePool        = var.bigIqLicensePool
+    bigIqSkuKeyword1        = var.bigIqSkuKeyword1
+    bigIqSkuKeyword2        = var.bigIqSkuKeyword2
+    bigIqUnitOfMeasure      = var.bigIqUnitOfMeasure
+    bigIqHypervisor         = var.bigIqHypervisor
+  })
+  f5_onboard2 = templatefile("${path.module}/f5_onboard.tmpl", {
+    INIT_URL                = var.INIT_URL
+    DO_URL                  = var.DO_URL
+    AS3_URL                 = var.AS3_URL
+    TS_URL                  = var.TS_URL
+    CFE_URL                 = var.CFE_URL
+    FAST_URL                = var.FAST_URL
+    DO_VER                  = split("/", var.DO_URL)[7]
+    AS3_VER                 = split("/", var.AS3_URL)[7]
+    TS_VER                  = split("/", var.TS_URL)[7]
+    CFE_VER                 = split("/", var.CFE_URL)[7]
+    FAST_VER                = split("/", var.FAST_URL)[7]
+    f5_username             = var.uname
+    f5_password             = var.upassword
+    ssh_keypair             = var.ssh_key
+    law_id                  = azurerm_log_analytics_workspace.law.workspace_id
+    law_primkey             = azurerm_log_analytics_workspace.law.primary_shared_key
+    f5_cloud_failover_label = var.f5_cloud_failover_label
+    local_selfip            = var.f5vm02ext
+    remote_selfip           = var.f5vm01ext
+    mgmt_gw                 = var.mgmt_gw
+    gateway                 = var.ext_gw
+    regKey                  = var.license2
+    local_host              = var.host2_name
+    host1                   = var.host1_name
+    host2                   = var.host2_name
+    managed_route           = var.managed_route
+    bigIqLicenseType        = var.bigIqLicenseType
+    bigIqHost               = var.bigIqHost
+    bigIqPassword           = var.bigIqPassword
+    bigIqUsername           = var.bigIqUsername
+    bigIqLicensePool        = var.bigIqLicensePool
+    bigIqSkuKeyword1        = var.bigIqSkuKeyword1
+    bigIqSkuKeyword2        = var.bigIqSkuKeyword2
+    bigIqUnitOfMeasure      = var.bigIqUnitOfMeasure
+    bigIqHypervisor         = var.bigIqHypervisor
+  })
 }
+
 
 data "template_file" "vm01_do_json" {
   template = file("${path.module}/do.json")
@@ -373,7 +435,7 @@ data "template_file" "failover_json" {
 
   vars = {
     f5_cloud_failover_label = var.f5_cloud_failover_label
-    managed_route1          = var.managed_route1
+    managed_route           = var.managed_route
     local_selfip            = var.f5vm02ext
     remote_selfip           = var.f5vm01ext
   }
@@ -391,7 +453,12 @@ resource "azurerm_linux_virtual_machine" "f5vm01" {
   admin_password                  = var.upassword
   disable_password_authentication = false
   computer_name                   = "${var.prefix}vm01"
-  custom_data                     = base64encode(data.template_file.vm_onboard.rendered)
+  custom_data                     = base64encode(local.f5_onboard1)
+
+  admin_ssh_key {
+    username   = var.uname
+    public_key = var.ssh_key
+  }
 
   os_disk {
     name                 = "${var.prefix}vm01-osdisk"
@@ -441,7 +508,7 @@ resource "azurerm_linux_virtual_machine" "f5vm02" {
   admin_password                  = var.upassword
   disable_password_authentication = false
   computer_name                   = "${var.prefix}vm02"
-  custom_data                     = base64encode(data.template_file.vm_onboard.rendered)
+  custom_data                     = base64encode(local.f5_onboard2)
 
   os_disk {
     name                 = "${var.prefix}vm02-osdisk"
@@ -537,112 +604,5 @@ resource "azurerm_virtual_machine_extension" "f5vm02-run-startup-cmd" {
     group       = var.group
     costcenter  = var.costcenter
     application = var.application
-  }
-}
-
-# Run REST API for configuration
-resource "local_file" "vm01_do_file" {
-  content  = data.template_file.vm01_do_json.rendered
-  filename = "${path.module}/${var.rest_vm01_do_file}"
-}
-
-resource "local_file" "vm02_do_file" {
-  content  = data.template_file.vm02_do_json.rendered
-  filename = "${path.module}/${var.rest_vm02_do_file}"
-}
-
-resource "local_file" "vm_as3_file" {
-  content  = data.template_file.as3_json.rendered
-  filename = "${path.module}/${var.rest_vm_as3_file}"
-}
-
-resource "local_file" "vm_ts_file" {
-  content  = data.template_file.ts_json.rendered
-  filename = "${path.module}/${var.rest_vm_ts_file}"
-}
-
-resource "local_file" "vm_failover_file" {
-  content  = data.template_file.failover_json.rendered
-  filename = "${path.module}/${var.rest_vm_failover_file}"
-}
-
-resource "null_resource" "f5vm01_DO" {
-  depends_on = [azurerm_virtual_machine_extension.f5vm01-run-startup-cmd]
-  # Running DO REST API
-  provisioner "local-exec" {
-    command = <<-EOF
-      #!/bin/bash
-      curl -k -X ${var.rest_do_method} https://${azurerm_public_ip.vm01mgmtpip.ip_address}${var.rest_do_uri} -u ${var.uname}:${var.upassword} -d @${var.rest_vm01_do_file}
-      x=1; while [ $x -le 30 ]; do STATUS=$(curl -s -k -X GET https://${azurerm_public_ip.vm01mgmtpip.ip_address}/mgmt/shared/declarative-onboarding/task -u ${var.uname}:${var.upassword}); if ( echo $STATUS | grep "OK" ); then break; fi; sleep 10; x=$(( $x + 1 )); done
-      sleep 10
-    EOF
-  }
-}
-
-resource "null_resource" "f5vm02_DO" {
-  depends_on = [azurerm_virtual_machine_extension.f5vm02-run-startup-cmd]
-  # Running DO REST API
-  provisioner "local-exec" {
-    command = <<-EOF
-      #!/bin/bash
-      curl -k -X ${var.rest_do_method} https://${azurerm_public_ip.vm02mgmtpip.ip_address}${var.rest_do_uri} -u ${var.uname}:${var.upassword} -d @${var.rest_vm02_do_file}
-      x=1; while [ $x -le 30 ]; do STATUS=$(curl -s -k -X GET https://${azurerm_public_ip.vm02mgmtpip.ip_address}/mgmt/shared/declarative-onboarding/task -u ${var.uname}:${var.upassword}); if ( echo $STATUS | grep "OK" ); then break; fi; sleep 10; x=$(( $x + 1 )); done
-      sleep 10
-    EOF
-  }
-}
-
-resource "null_resource" "f5vm01_TS" {
-  depends_on = [null_resource.f5vm01_DO]
-  # Running TS REST API
-  provisioner "local-exec" {
-    command = <<-EOF
-      #!/bin/bash
-      curl -H 'Content-Type: application/json' -k -X POST https://${azurerm_public_ip.vm01mgmtpip.ip_address}${var.rest_ts_uri} -u ${var.uname}:${var.upassword} -d @${var.rest_vm_ts_file}
-    EOF
-  }
-}
-
-resource "null_resource" "f5vm02_TS" {
-  depends_on = [null_resource.f5vm02_DO]
-  # Running TS REST API
-  provisioner "local-exec" {
-    command = <<-EOF
-      #!/bin/bash
-      curl -H 'Content-Type: application/json' -k -X POST https://${azurerm_public_ip.vm02mgmtpip.ip_address}${var.rest_ts_uri} -u ${var.uname}:${var.upassword} -d @${var.rest_vm_ts_file}
-    EOF
-  }
-}
-
-resource "null_resource" "f5vm01_CF" {
-  depends_on = [null_resource.f5vm01_TS]
-  # Running CF REST API
-  provisioner "local-exec" {
-    command = <<-EOF
-      #!/bin/bash
-      curl -k -X POST https://${azurerm_public_ip.vm01mgmtpip.ip_address}${var.rest_CF_uri} -u ${var.uname}:${var.upassword} -d @${var.rest_vm_failover_file}
-    EOF
-  }
-}
-
-resource "null_resource" "f5vm02_CF" {
-  depends_on = [null_resource.f5vm02_TS]
-  # Running CF REST API
-  provisioner "local-exec" {
-    command = <<-EOF
-      #!/bin/bash
-      curl -k -X POST https://${azurerm_public_ip.vm02mgmtpip.ip_address}${var.rest_CF_uri} -u ${var.uname}:${var.upassword} -d @${var.rest_vm_failover_file}
-    EOF
-  }
-}
-
-resource "null_resource" "f5vm_AS3" {
-  depends_on = [null_resource.f5vm01_CF, null_resource.f5vm02_CF]
-  # Running AS3 REST API
-  provisioner "local-exec" {
-    command = <<-EOF
-      #!/bin/bash
-      curl -k -X ${var.rest_as3_method} https://${azurerm_public_ip.vm01mgmtpip.ip_address}${var.rest_as3_uri} -u ${var.uname}:${var.upassword} -d @${var.rest_vm_as3_file}
-    EOF
   }
 }

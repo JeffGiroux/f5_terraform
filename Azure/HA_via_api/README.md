@@ -21,18 +21,6 @@ The BIG-IP VEs have the [Local Traffic Manager (LTM)](https://f5.com/products/bi
 
 Terraform is beneficial as it allows composing resources a bit differently to account for dependencies into Immutable/Mutable elements. For example, mutable includes items you would typically frequently change/mutate, such as traditional configs on the BIG-IP. Once the template is deployed, there are certain resources (network infrastructure) that are fixed while others (BIG-IP VMs and configurations) can be changed.
 
-Example...
-
--> Run once
-- Deploy the entire infrastructure with all the neccessary resources, then use Declarative Onboarding (DO) to configure the BIG-IP cluster, Application Services (AS3) to create a sample app proxy, then lastly use Service Discovery to automatically add the DVWA container app to the BIG-IP pool.
-
--> Run many X
-- [Redeploy BIG-IP for Replacement or Upgrade](#Redeploy-BIG-IP-for-replacement-or-upgrade)
-- [Reconfigure BIG-IP L1-L3 Configurations (DO)](#Rerun-Declarative-Onboarding-on-the-BIG-IP-VE)
-- [Reconfigure BIG-IP L4-L7 Configurations (AS3)](#Rerun-Application-Services-AS3-on-the-BIG-IP-VE)
-- [Reconfigure BIG-IP Telemetry Streaming (TS)](#Rerun-Telemetry-Streaming-on-the-BIG-IP-VE)
-- [Reconfigure BIG-IP Cloud Failover Extension (CFE)](#Rerun-Cloud-Failover-Extension-on-the-BIG-IP-VE)
-
 **Networking Stack Type:** This solution deploys into a new networking stack, which is created along with the solution.
 
 ## Version
@@ -150,56 +138,60 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 
 ## Template Parameters
 
-| Parameter | Required | Description |
-| --- | --- | --- |
-| prefix | Yes | This value is inserted at the beginning of each Azure object (alpha-numeric, no special character) |
-| rest_do_uri | Yes | URI of the Declarative Onboarding REST call |
-| rest_as3_uri | Yes | URI of the AS3 REST call |
-| rest_do_method | Yes | Available options are GET, POST, and DELETE |
-| rest_AS3_method | Yes | Available options are GET, POST, and DELETE |
-| rest_vm01_do_file | Yes | Terraform will generate the vm01 DO json file, where you can manually run it again for debugging |
-| rest_vm02_do_file | Yes | Terraform will generate the vm02 DO json file, where you can manually run it again for debugging |
-| rest_vm_as3_file | Yes | Terraform will generate the AS3 json file, where you can manually run it again for debugging |
-| rest_cf_uri | Yes | URI of the Cloud Failover REST call |
-| rest_vm_cf_file | Yes | Terraform will generate the Cloud Failover json file |
-| sp_subscription_id | Yes | This is the service principal subscription ID |
-| sp_client_id | Yes | This is the service principal application/client ID |
-| sp_client_secret | Yes | This is the service principal secret |
-| sp_tenant_id | Yes | This is the service principal tenant ID |
-| uname | Yes | User name for the Virtual Machine |
-| upassword | Yes | Password for the Virtual Machine |
-| location | Yes | Location of the deployment |
-| vnet_rg | Yes | Resource group name for existing VNET |
-| vnet_name | Yes | Name of existing VNET |
-| mgmtSubnet | Yes | Name of management subnet |
-| extSubnet | Yes | Name of external subnet |
-| intSubnet | Yes | Name of internal subnet |
-| managed_route1 | Yes | A UDR route can used for testing managed-route failover. Enter address prefix like x.x.x.x/x. |
-| f5vm01mgmt | Yes | IP address for 1st BIG-IP's management interface |
-| f5vm02mgmt | Yes | IP address for 2nd BIG-IP's management interface |
-| f5vm01ext | Yes | IP address for 1st BIG-IP's external interface |
-| f5vm02ext | Yes | IP address for 2nd BIG-IP's external interface |
-| f5privatevip | Yes | Secondary Private IP address for BIG-IP virtual server (internal) |
-| f5publicvip | Yes | Secondary Private IP address for BIG-IP virtual server (external) |
-| instance_type | Yes | Azure instance to be used for the BIG-IP VE |
-| product | Yes | Azure BIG-IP VE Offer |
-| bigip_version | Yes | BIG-IP Version |
-| image_name | Yes | F5 SKU (image) to deploy. Note: The disk size of the VM will be determined based on the option you select.  **Important**: If intending to provision multiple modules, ensure the appropriate value is selected, such as ****AllTwoBootLocations or AllOneBootLocation****. |
-| license1 | No | The license token for the F5 BIG-IP VE (BYOL) |
-| license2 | No | The license token for the F5 BIG-IP VE (BYOL) |
-| host1_name | Yes | Hostname for the 1st BIG-IP |
-| host2_name | Yes | Hostname for the 2nd BIG-IP |
-| ntp_server | Yes | Leave the default NTP server the BIG-IP uses, or replace the default NTP server with the one you want to use |
-| timezone | Yes | If you would like to change the time zone the BIG-IP uses, enter the time zone you want to use. This is based on the tz database found in /usr/share/zoneinfo (see the full list [here](https://github.com/F5Networks/f5-azure-arm-templates/blob/master/azure-timezone-list.md)). Example values: UTC, US/Pacific, US/Eastern, Europe/London or Asia/Singapore. |
-| dns_server | Yes | Leave the default DNS server the BIG-IP uses, or replace the default DNS server with the one you want to use | 
-| DO_URL | Yes | This is the raw github URL for downloading the Declarative Onboarding RPM |
-| AS3_URL | Yes | This is the raw github URL for downloading the AS3 RPM |
-| TS_URL | Yes | This is the raw github URL for downloading the Telemetry RPM |
-| CF_URL | Yes | This is the raw github URL for downloading the Cloud-Failover RPM |
-| libs_dir | Yes | This is where all the temporary libs and RPM will be store in BIG-IP |
-| onboard_log | Yes | This is where the onboarding script logs all the events |
-| f5_cloud_failover_label | Yes | This is a tag used for failover. |
-| f5_cloud_failover_nic_map | Yes | This is a tag used for failover NIC. |
+| Parameter | Description | Type | Default | Required |
+| --------- | ----------- | ---- | ------- | -------- |
+| prefix | This value is inserted at the beginning of each Azure object (alpha-numeric, no special character) | `string` | demo | no |
+| sp_subscription_id | This is the service principal subscription ID | `string` | null | no |
+| sp_client_id | This is the service principal application/client ID | `string` | null | no |
+| sp_client_secret | This is the service principal secret | `string` | null | no |
+| sp_tenant_id | This is the service principal tenant ID | `string` | null | no |
+| uname | User name for the Virtual Machine | `string` | azureuser | no |
+| upassword | Password for the Virtual Machine | `string` | Default12345! | no |
+| ssh_key | Public key used for authentication in ssh-rsa format | `string` | null | yes |
+| location | Azure Location of the deployment | `string` | westus2 | no |
+| vnet_rg | Resource group name for existing VNET | `string` | null | yes |
+| vnet_name | Name of existing VNET | `string` | null | yes |
+| mgmtSubnet | Name of management subnet | `string` | null | yes |
+| extSubnet | Name of external subnet | `string` | null | yes |
+| intSubnet | Name of internal subnet | `string` | null | yes |
+| managed_route | A UDR route can used for testing managed-route failover. Enter address prefix like x.x.x.x/x. | `string` | 0.0.0.0/0 | no |
+| f5vm01mgmt | IP address for 1st BIG-IP's management interface | `string` | 10.90.1.4 | yes |
+| f5vm02mgmt | IP address for 2nd BIG-IP's management interface | `string` | 10.90.1.5 | yes |
+| f5vm01ext | IP address for 1st BIG-IP's external interface | `string` | 10.90.2.4 | yes |
+| f5vm02ext | IP address for 2nd BIG-IP's external interface | `string` | 10.90.2.5 | yes |
+| f5privatevip | Secondary Private IP address for BIG-IP virtual server (internal) | `string` | 10.90.2.11 | yes |
+| f5publicvip | Secondary Private IP address for BIG-IP virtual server (external) | `string` | 10.90.2.12 | yes |
+| instance_type | Azure instance to be used for the BIG-IP VE | `string` | Standard_DS4_v2 | no |
+| product | Azure BIG-IP VE Offer | `string` | f5-big-ip-best | no |
+| bigip_version | BIG-IP Version | `string` | 15.1.201000 | no |
+| image_name | F5 SKU (image) to deploy. Note: The disk size of the VM will be determined based on the option you select.  **Important**: If intending to provision multiple modules, ensure the appropriate value is selected, such as ****AllTwoBootLocations or AllOneBootLocation****. | `string` | f5-bigip-virtual-edition-1g-best-hourly | no |
+| license1 | The license token for the F5 BIG-IP VE (BYOL) | `string` | null | no |
+| license2 | The license token for the F5 BIG-IP VE (BYOL) | `string` | null | no |
+| host1_name | Hostname for the 1st BIG-IP | `string` | f5vm01 | no |
+| host2_name | Hostname for the 2nd BIG-IP | `string` | f5vm02 | no |
+| ntp_server | Leave the default NTP server the BIG-IP uses, or replace the default NTP server with the one you want to use | `string` | 0.us.pool.ntp.org | no |
+| timezone | If you would like to change the time zone the BIG-IP uses, enter the time zone you want to use. This is based on the tz database found in /usr/share/zoneinfo (see the full list [here](https://github.com/F5Networks/f5-azure-arm-templates/blob/master/azure-timezone-list.md)). Example values: UTC, US/Pacific, US/Eastern, Europe/London or Asia/Singapore. | `string` | UTC | no |
+| dns_server | Leave the default DNS server the BIG-IP uses, or replace the default DNS server with the one you want to use | `string` | 8.8.8.8 | no |
+| INIT_URL | URL to download the BIG-IP runtime init | `string` | https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.2.1/dist/f5-bigip-runtime-init-1.2.1-1.gz.run | no |
+| DO_URL | URL to download the BIG-IP Declarative Onboarding module | `string` | https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.23.0/f5-declarative-onboarding-1.23.0-4.noarch.rpm | no |
+| AS3_URL | URL to download the BIG-IP Application Service Extension 3 (AS3) module | `string` | https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.30.0/f5-appsvcs-3.30.0-5.noarch.rpm | no |
+| TS_URL | URL to download the BIG-IP Telemetry Streaming module | `string` | https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.22.0/f5-telemetry-1.22.0-1.noarch.rpm | no |
+| FAST_URL | URL to download the BIG-IP FAST module | `string` | https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.11.0/f5-appsvcs-templates-1.11.0-1.noarch.rpm | no |
+| CFE_URL | URL to download the BIG-IP Cloud Failover Extension module | `string` | https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.9.0/f5-cloud-failover-1.9.0-0.noarch.rpm | no |
+| libs_dir | Directory on the BIG-IP to download the A&O Toolchain into | `string` | /config/cloud/azure/node_modules | no |
+| onboard_log | Directory on the BIG-IP to store the cloud-init logs | `string` | /var/log/startup-script.log | no |
+| f5_cloud_failover_label | This is a tag used for failover. | `string` | mydeployment | yes |
+| f5_cloud_failover_nic_map | This is a tag used for failover NIC. | `string` | external | yes |
+| bigIqHost | This is the BIG-IQ License Manager host name or IP address | `string` | 200.200.200.200 | no |
+| bigIqUsername | BIG-IQ user name | `string` | admin | no |
+| bigIqPassword | BIG-IQ Password | `string` | Default12345! | no |
+| bigIqLicenseType | BIG-IQ license type | `string` | licensePool | no |
+| bigIqLicensePool | BIG-IQ license pool name | `string` | myPool | no |
+| bigIqSkuKeyword1 | BIG-IQ license SKU keyword 1 | `string` | key1 | no |
+| bigIqSkuKeyword2 | BIG-IQ license SKU keyword 1 | `string` | key2 | no |
+| bigIqUnitOfMeasure | BIG-IQ license unit of measure | `string` | hourly | no |
+| bigIqHypervisor | BIG-IQ hypervisor | `string` | azure | no |
+
 
 ## Installation Example
 
@@ -210,6 +202,7 @@ To run this Terraform template, perform the following steps:
       # BIG-IP Environment
       uname      = "azureuser"
       upassword  = "Default12345!"
+      ssh_key    = "ssh-rsa REDACTED me@my.email"
       vnet_rg    = "myVnetRg"
       vnet_name  = "myVnet123"
       mgmtSubnet = "mgmt"
@@ -266,63 +259,6 @@ In order to pass traffic from your clients to the servers through the BIG-IP sys
 8. Click the **Finished** button
 9. Repeat as necessary for other applications
 
-## Redeploy BIG-IP for Replacement or Upgrade
-This example illustrates how to replace or upgrade the BIG-IP VE.
-  1. Change the *bigip_version* variable to the desired release 
-  2. Revoke the problematic BIG-IP VE's license (if BYOL)
-  3. Run command
-```
-terraform destroy -target azurerm_linux_virtual_machine.f5vm01
-```
-  3. Run command
-```
-terraform apply
-```
-  4. Repeat steps 1-3 on the other BIG-IP VE in order to establish Device Trust.
-
-
-## Rerun Declarative Onboarding on the BIG-IP VE
-This example illustrates how to re-configure the BIG-IP instances with DO. If you need to make changes to the L1-L3 settings of the BIG-IP device or run HA setup again, you can follow these steps.
-  1. Update do.json as needed
-  2. Taint resources and apply
-```
-terraform taint template_file.vm01_do_json
-terraform taint template_file.vm02_do_json
-terraform taint null_resource.f5vm01_DO
-terraform taint null_resource.f5vm02_DO
-terraform apply
-```
-
-## Rerun Application Services AS3 on the BIG-IP VE
-This example illustrates how to run your own custom AS3 (aka application). You can have a catalog of AS3 apps/templates and repeat these steps as many times as desired.
-  1. Update as3.json as needed
-  2. Taint resources and apply
-```
-terraform taint template_file.as3_json
-terraform taint null_resource.f5vm_AS3
-terraform apply
-```
-
-## Rerun Telemetry Streaming on the BIG-IP VE
-This example illustrates how to re-configure the BIG-IP instances with TS. If you need to make changes to the push consumers (ex. Azure Log Analytics, Splunk, etc) or other telemetry configs of the BIG-IP device, you can follow these steps.
-  1. Update ts.json as needed
-  2. Taint resources and apply
-```
-terraform taint template_file.vm_ts_file
-terraform taint null_resource.f5vm01_TS
-terraform taint null_resource.f5vm02_TS
-terraform apply
-```
-
-## Rerun Cloud Failover Extension on the BIG-IP VE
-This example illustrates how to re-configure the BIG-IP instances with Cloud Failover Extention. If you need to make changes to the BIG-IP declaration specifying failover objects (NICs, storage, routes, tags), you can follow these steps.
-  1. Update failover.json as needed
-  2. Taint resources and apply
-```
-terraform taint null_resource.f5vm01_CF
-terraform taint null_resource.f5vm02_CF
-terraform apply
-```
 
 ## Service Principal Authentication
 This solution might require access to the Azure API to query pool member key:value. If F5 AS3 is used with pool member dynamic service discovery, then you will need an SP. The current demo repo as-is does NOT need an SP. The following provides information/links on the options for configuring a service principal within Azure.

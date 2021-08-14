@@ -1,0 +1,204 @@
+#!/bin/bash -x
+
+# NOTE: Startup Script is run once / initialization only (Cloud-Init behavior vs. typical re-entrant for Azure Custom Script Extension )
+# For 15.1+ and above, Cloud-Init will run the script directly and can remove Azure Custom Script Extension 
+
+
+mkdir -p  /var/log/cloud /config/cloud /var/config/rest/downloads
+
+
+LOG_FILE=/var/log/cloud/startup-script.log
+[[ ! -f $LOG_FILE ]] && touch $LOG_FILE || { echo "Run Only Once. Exiting"; exit; }
+npipe=/tmp/$$.tmp
+trap "rm -f $npipe" EXIT
+mknod $npipe p
+tee <$npipe -a $LOG_FILE /dev/ttyS0 &
+exec 1>&-
+exec 1>$npipe
+exec 2>&1
+  
+
+### write_files:
+# Download or Render BIG-IP Runtime Init Config 
+
+cat << 'EOF' > /config/cloud/runtime-init-conf.yaml
+---
+runtime_parameters:
+  - name: HOST_NAME
+    type: metadata
+    metadataProvider:
+      environment: azure
+      type: compute
+      field: name
+  - name: REGION
+    type: url
+    value: http://169.254.169.254/latest/dynamic/instance-identity/document
+    query: region
+  - name: USER_NAME
+    type: static
+    value: ${f5_username}
+  - name: ADMIN_PASS
+    type: static
+    value: ${f5_password}
+  - name: SSH_KEYS
+    type: static
+    value: ${ssh_keypair}
+  - name: LAW_ID
+    type: static
+    value: ${law_id}
+  - name: LAW_PRIMKEY
+    type: static
+    value: ${law_primkey}
+  - name: FAILOVER_LABEL
+    type: static
+    value: ${f5_cloud_failover_label}
+  - name: MANAGED_ROUTE
+    type: static
+    value: ${managed_route}
+  - name: LOCAL_SELFIP
+    type: static
+    value: ${local_selfip}
+  - name: REMOTE_SELFIP
+    type: static
+    value: ${remote_selfip}
+pre_onboard_enabled:
+  - name: provision_rest
+    type: inline
+    commands:
+      - /usr/bin/setdb provision.extramb 500
+      - /usr/bin/setdb restjavad.useextramb true
+      - /usr/bin/setdb setup.run false
+extension_packages:
+  install_operations:
+    - extensionType: do
+      extensionVersion: ${DO_VER}
+      extensionUrl: ${DO_URL}
+    - extensionType: as3
+      extensionVersion: ${AS3_VER}
+      extensionUrl: ${AS3_URL}
+    - extensionType: ts
+      extensionVersion: ${TS_VER}
+      extensionUrl: ${TS_URL}
+    - extensionType: cf
+      extensionVersion: ${CFE_VER}
+      extensionUrl: ${CFE_URL}
+extension_services:
+  service_operations:
+    - extensionType: do
+      type: inline
+      value:
+        schemaVersion: 1.0.0
+        class: Device
+        async: true
+        label: Onboard BIG-IP into an HA Pair
+        Common:
+          class: Tenant
+          dbVars:
+            class: DbVariables
+            restjavad.useextramb: true
+            provision.extramb: 500
+            config.allow.rfc3927: enable
+            ui.advisory.enabled: true
+            ui.advisory.color: blue
+            ui.advisory.text: '{{{HOST_NAME}}}.example.com'
+          mySystem:
+            autoPhonehome: true
+            class: System
+            hostname: '{{{HOST_NAME}}}.example.com'
+          '{{{ USER_NAME }}}':
+            class: User
+            partitionAccess:
+              all-partitions:
+                role: admin
+            password: '{{{ ADMIN_PASS }}}'
+            shell: bash
+            userType: regular
+            keys:
+              - '{{{ SSH_KEYS }}}'
+    - extensionType: as3
+      type: inline
+      value:
+        class: AS3
+        action: deploy
+        persist: true
+        declaration:
+          class: ADC
+          schemaVersion: 3.0.0
+          label: Sample 1
+          remark: An HTTP sample application
+          Sample_01:
+            class: Tenant
+            A1:
+              class: Application
+              template: http
+              serviceMain:
+                class: Service_HTTP
+                virtualAddresses:
+                  - 0.0.0.0/0
+                pool: web_pool
+              web_pool:
+                class: Pool
+                monitors:
+                  - tcp
+                members:
+                  - servicePort: 80
+                    addressDiscovery: fqdn
+                    autoPopulate: true
+                    hostname: httpbin.org
+    - extensionType: cf
+      type: inline
+      value:
+        class: Cloud_Failover
+        environment: azure
+        externalStorage:
+          scopingTags:
+            f5_cloud_failover_label: '{{{FAILOVER_LABEL}}}'
+        failoverAddresses:
+          enabled: true
+          scopingTags:
+            f5_cloud_failover_label: '{{{FAILOVER_LABEL}}}'
+        failoverRoutes:
+          enabled: true
+          scopingTags:
+            f5_cloud_failover_label: '{{{FAILOVER_LABEL}}}'
+          scopingAddressRanges:
+            - range: '{{{MANAGED_ROUTE}}}'
+          defaultNextHopAddresses:
+            discoveryType: static
+            items:
+              - '{{{LOCAL_SELFIP}}}'
+              - '{{{REMOTE_SELFIP}}}'
+    - extensionType: ts
+      type: inline
+      value:
+        class: Telemetry
+        My_System:
+          class: Telemetry_System
+          systemPoller:
+            interval: 60
+        My_Listener:
+          class: Telemetry_Listener
+          port: 6514
+        My_Consumer:
+          class: Telemetry_Consumer
+          type: Azure_Log_Analytics
+          workspaceId: '{{{LAW_ID}}}'
+          passphrase:
+            cipherText: '{{{LAW_PRIMKEY}}}'
+          useManagedIdentity: false
+          region: '{{{REGION}}}'              
+post_onboard_enabled:
+  - name: create_misc_routes
+    type: inline
+    commands:
+    - tmsh save sys config
+EOF
+
+# Download
+for i in {1..30}; do
+    curl -fv --retry 1 --connect-timeout 5 -L ${INIT_URL} -o "/var/config/rest/downloads/f5-bigip-runtime.gz.run" && break || sleep 10
+done
+# Install
+bash /var/config/rest/downloads/f5-bigip-runtime.gz.run -- '--cloud azure'
+# Run
+f5-bigip-runtime-init --config-file /config/cloud/runtime-init-conf.yaml

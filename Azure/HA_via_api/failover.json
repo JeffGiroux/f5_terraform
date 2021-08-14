@@ -19,7 +19,7 @@
       },
       "scopingAddressRanges": [
           {
-              "range": "${managed_route1}"
+              "range": "${managed_route}"
           }
       ],
       "defaultNextHopAddresses": {
