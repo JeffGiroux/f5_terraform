@@ -305,12 +305,10 @@ locals {
     dns_server              = var.dns_server
     ntp_server              = var.ntp_server
     timezone                = var.timezone
-    mgmt_gw                 = var.mgmt_gw
     gateway                 = var.ext_gw
     regKey                  = var.license1
-    local_host              = var.host1_name
-    host1                   = var.host1_name
-    host2                   = var.host2_name
+    host1                   = "${var.prefix}-${var.host1_name}"
+    host2                   = "${var.prefix}-${var.host2_name}"
     managed_route           = var.managed_route
     bigIqLicenseType        = var.bigIqLicenseType
     bigIqHost               = var.bigIqHost
@@ -347,12 +345,10 @@ locals {
     dns_server              = var.dns_server
     ntp_server              = var.ntp_server
     timezone                = var.timezone
-    mgmt_gw                 = var.mgmt_gw
     gateway                 = var.ext_gw
     regKey                  = var.license2
-    local_host              = var.host2_name
-    host1                   = var.host1_name
-    host2                   = var.host2_name
+    host1                   = "${var.prefix}-${var.host1_name}"
+    host2                   = "${var.prefix}-${var.host2_name}"
     managed_route           = var.managed_route
     bigIqLicenseType        = var.bigIqLicenseType
     bigIqHost               = var.bigIqHost
@@ -368,7 +364,7 @@ locals {
 
 # Create F5 BIG-IP VMs
 resource "azurerm_linux_virtual_machine" "f5vm01" {
-  name                            = "${var.prefix}-f5vm01"
+  name                            = "${var.prefix}-${var.host1_name}"
   location                        = data.azurerm_resource_group.main.location
   resource_group_name             = data.azurerm_resource_group.main.name
   zone                            = 1
@@ -423,7 +419,7 @@ resource "azurerm_linux_virtual_machine" "f5vm01" {
 }
 
 resource "azurerm_linux_virtual_machine" "f5vm02" {
-  name                            = "${var.prefix}-f5vm02"
+  name                            = "${var.prefix}-${var.host2_name}"
   location                        = data.azurerm_resource_group.main.location
   resource_group_name             = data.azurerm_resource_group.main.name
   zone                            = 2
