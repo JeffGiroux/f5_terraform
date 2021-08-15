@@ -293,6 +293,7 @@ post_onboard_enabled:
   - name: create_misc_routes
     type: inline
     commands:
+    - tmsh create sys management-route azure_metadata network 169.254.169.254/32 gateway ${mgmt_gw}
     - tmsh save sys config
 EOF
 
