@@ -34,6 +34,11 @@ runtime_parameters:
     type: url
     value: http://169.254.169.254/latest/dynamic/instance-identity/document
     query: region
+    headers:
+      - name: Content-Type
+        value: json
+      - name: User-Agent
+        value: bigip-ve
   - name: USER_NAME
     type: static
     value: ${f5_username}
