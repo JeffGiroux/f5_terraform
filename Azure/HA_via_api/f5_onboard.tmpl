@@ -32,13 +32,10 @@ runtime_parameters:
       field: name
   - name: REGION
     type: url
-    value: http://169.254.169.254/latest/dynamic/instance-identity/document
-    query: region
+    value: http://169.254.169.254/metadata/instance/compute/location?api-version=2021-05-01&format=text
     headers:
-      - name: Content-Type
-        value: json
-      - name: User-Agent
-        value: bigip-ve
+      - name: Metadata
+        value: true
   - name: USER_NAME
     type: static
     value: ${f5_username}
