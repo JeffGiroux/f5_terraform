@@ -17,6 +17,14 @@ provider "azurerm" {
 resource "azurerm_resource_group" "main" {
   name     = "${var.prefix}_rg"
   location = var.location
+  tags = {
+    Name        = "${var.environment}-rg"
+    environment = var.environment
+    owner       = var.owner
+    group       = var.group
+    costcenter  = var.costcenter
+    application = var.application
+  }
 }
 
 # Create the Storage Account
