@@ -22,7 +22,6 @@ variable "f5vm01int" { default = "10.90.3.4" }
 variable "f5vm02mgmt" { default = "10.90.1.5" }
 variable "f5vm02ext" { default = "10.90.2.5" }
 variable "f5vm02int" { default = "10.90.3.5" }
-variable "f5privatevip" { default = "10.90.3.11" }
 variable "f5publicvip" { default = "10.90.2.11" }
 variable "mgmt_gw" { default = "10.90.1.1" }
 variable "ext_gw" { default = "10.90.2.1" }

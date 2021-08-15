@@ -260,13 +260,6 @@ resource "azurerm_network_interface" "vm02-int-nic" {
     primary                       = true
   }
 
-  ip_configuration {
-    name                          = "secondary"
-    subnet_id                     = data.azurerm_subnet.internal.id
-    private_ip_address_allocation = "Static"
-    private_ip_address            = var.f5privatevip
-  }
-
   tags = {
     Name        = "${var.environment}-vm02-int"
     environment = var.environment
@@ -302,6 +295,7 @@ locals {
     remote_selfip_ext       = var.f5vm02ext
     local_selfip_int        = var.f5vm01int
     remote_selfip_int       = var.f5vm02int
+    public_vip              = var.f5publicvip
     dns_server              = var.dns_server
     ntp_server              = var.ntp_server
     timezone                = var.timezone
@@ -341,7 +335,8 @@ locals {
     local_selfip_ext        = var.f5vm02ext
     remote_selfip_ext       = var.f5vm01ext
     local_selfip_int        = var.f5vm02int
-    remote_selfip_int       = var.f5vm01int
+    remote_selfip_int       = var.f5vm02int
+    public_vip              = var.f5publicvip
     dns_server              = var.dns_server
     ntp_server              = var.ntp_server
     timezone                = var.timezone
@@ -373,7 +368,6 @@ resource "azurerm_linux_virtual_machine" "f5vm01" {
   admin_username                  = var.uname
   admin_password                  = var.upassword
   disable_password_authentication = false
-  computer_name                   = "${var.prefix}vm01"
   custom_data                     = base64encode(local.f5_onboard1)
 
   admin_ssh_key {
@@ -428,7 +422,6 @@ resource "azurerm_linux_virtual_machine" "f5vm02" {
   admin_username                  = var.uname
   admin_password                  = var.upassword
   disable_password_authentication = false
-  computer_name                   = "${var.prefix}vm02"
   custom_data                     = base64encode(local.f5_onboard2)
 
   os_disk {
