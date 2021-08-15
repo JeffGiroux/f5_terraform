@@ -3,8 +3,8 @@
 # Create Route Table
 resource "azurerm_route_table" "udr" {
   name                          = "udr"
-  location                      = data.azurerm_resource_group.main.location
-  resource_group_name           = data.azurerm_resource_group.main.name
+  location                      = azurerm_resource_group.main.location
+  resource_group_name           = azurerm_resource_group.main.name
   disable_bgp_route_propagation = false
 
   route {
@@ -23,10 +23,10 @@ resource "azurerm_route_table" "udr" {
 # Create Public IPs
 resource "azurerm_public_ip" "vm01mgmtpip" {
   name                = "${var.prefix}-vm01-mgmt-pip"
-  location            = data.azurerm_resource_group.main.location
+  location            = azurerm_resource_group.main.location
   sku                 = "Standard"
   availability_zone   = 1
-  resource_group_name = data.azurerm_resource_group.main.name
+  resource_group_name = azurerm_resource_group.main.name
   allocation_method   = "Static"
 
   tags = {
@@ -41,10 +41,10 @@ resource "azurerm_public_ip" "vm01mgmtpip" {
 
 resource "azurerm_public_ip" "vm01selfpip" {
   name                = "${var.prefix}-vm01-self-pip"
-  location            = data.azurerm_resource_group.main.location
+  location            = azurerm_resource_group.main.location
   sku                 = "Standard"
   availability_zone   = 1
-  resource_group_name = data.azurerm_resource_group.main.name
+  resource_group_name = azurerm_resource_group.main.name
   allocation_method   = "Static"
 
   tags = {
@@ -59,10 +59,10 @@ resource "azurerm_public_ip" "vm01selfpip" {
 
 resource "azurerm_public_ip" "vm02mgmtpip" {
   name                = "${var.prefix}-vm02-mgmt-pip"
-  location            = data.azurerm_resource_group.main.location
+  location            = azurerm_resource_group.main.location
   sku                 = "Standard"
   availability_zone   = 2
-  resource_group_name = data.azurerm_resource_group.main.name
+  resource_group_name = azurerm_resource_group.main.name
   allocation_method   = "Static"
 
   tags = {
@@ -77,10 +77,10 @@ resource "azurerm_public_ip" "vm02mgmtpip" {
 
 resource "azurerm_public_ip" "vm02selfpip" {
   name                = "${var.prefix}-vm02-self-pip"
-  location            = data.azurerm_resource_group.main.location
+  location            = azurerm_resource_group.main.location
   sku                 = "Standard"
   availability_zone   = 2
-  resource_group_name = data.azurerm_resource_group.main.name
+  resource_group_name = azurerm_resource_group.main.name
   allocation_method   = "Static"
 
   tags = {
@@ -95,10 +95,10 @@ resource "azurerm_public_ip" "vm02selfpip" {
 
 resource "azurerm_public_ip" "pubvippip" {
   name                = "${var.prefix}-pubvip-pip"
-  location            = data.azurerm_resource_group.main.location
+  location            = azurerm_resource_group.main.location
   sku                 = "Standard"
   availability_zone   = 1
-  resource_group_name = data.azurerm_resource_group.main.name
+  resource_group_name = azurerm_resource_group.main.name
   allocation_method   = "Static"
 
   tags = {
@@ -114,8 +114,8 @@ resource "azurerm_public_ip" "pubvippip" {
 # Create NIC for Management 
 resource "azurerm_network_interface" "vm01-mgmt-nic" {
   name                = "${var.prefix}-vm01-mgmt"
-  location            = data.azurerm_resource_group.main.location
-  resource_group_name = data.azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
 
   ip_configuration {
     name                          = "primary"
@@ -137,8 +137,8 @@ resource "azurerm_network_interface" "vm01-mgmt-nic" {
 
 resource "azurerm_network_interface" "vm02-mgmt-nic" {
   name                = "${var.prefix}-vm02-mgmt"
-  location            = data.azurerm_resource_group.main.location
-  resource_group_name = data.azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
 
   ip_configuration {
     name                          = "primary"
@@ -161,8 +161,8 @@ resource "azurerm_network_interface" "vm02-mgmt-nic" {
 # Create NIC for External
 resource "azurerm_network_interface" "vm01-ext-nic" {
   name                 = "${var.prefix}-vm01-ext"
-  location             = data.azurerm_resource_group.main.location
-  resource_group_name  = data.azurerm_resource_group.main.name
+  location             = azurerm_resource_group.main.location
+  resource_group_name  = azurerm_resource_group.main.name
   enable_ip_forwarding = true
 
   ip_configuration {
@@ -188,8 +188,8 @@ resource "azurerm_network_interface" "vm01-ext-nic" {
 
 resource "azurerm_network_interface" "vm02-ext-nic" {
   name                 = "${var.prefix}-vm02-ext"
-  location             = data.azurerm_resource_group.main.location
-  resource_group_name  = data.azurerm_resource_group.main.name
+  location             = azurerm_resource_group.main.location
+  resource_group_name  = azurerm_resource_group.main.name
   enable_ip_forwarding = true
 
   ip_configuration {
@@ -224,8 +224,8 @@ resource "azurerm_network_interface" "vm02-ext-nic" {
 # Create NIC for Internal
 resource "azurerm_network_interface" "vm01-int-nic" {
   name                 = "${var.prefix}-vm01-int"
-  location             = data.azurerm_resource_group.main.location
-  resource_group_name  = data.azurerm_resource_group.main.name
+  location             = azurerm_resource_group.main.location
+  resource_group_name  = azurerm_resource_group.main.name
   enable_ip_forwarding = true
 
   ip_configuration {
@@ -248,8 +248,8 @@ resource "azurerm_network_interface" "vm01-int-nic" {
 
 resource "azurerm_network_interface" "vm02-int-nic" {
   name                 = "${var.prefix}-vm02-int"
-  location             = data.azurerm_resource_group.main.location
-  resource_group_name  = data.azurerm_resource_group.main.name
+  location             = azurerm_resource_group.main.location
+  resource_group_name  = azurerm_resource_group.main.name
   enable_ip_forwarding = true
 
   ip_configuration {
@@ -360,8 +360,8 @@ locals {
 # Create F5 BIG-IP VMs
 resource "azurerm_linux_virtual_machine" "f5vm01" {
   name                            = "${var.prefix}-${var.host1_name}"
-  location                        = data.azurerm_resource_group.main.location
-  resource_group_name             = data.azurerm_resource_group.main.name
+  location                        = azurerm_resource_group.main.location
+  resource_group_name             = azurerm_resource_group.main.name
   zone                            = 1
   network_interface_ids           = [azurerm_network_interface.vm01-mgmt-nic.id, azurerm_network_interface.vm01-ext-nic.id, azurerm_network_interface.vm01-int-nic.id]
   size                            = var.instance_type
@@ -414,8 +414,8 @@ resource "azurerm_linux_virtual_machine" "f5vm01" {
 
 resource "azurerm_linux_virtual_machine" "f5vm02" {
   name                            = "${var.prefix}-${var.host2_name}"
-  location                        = data.azurerm_resource_group.main.location
-  resource_group_name             = data.azurerm_resource_group.main.name
+  location                        = azurerm_resource_group.main.location
+  resource_group_name             = azurerm_resource_group.main.name
   zone                            = 2
   network_interface_ids           = [azurerm_network_interface.vm02-mgmt-nic.id, azurerm_network_interface.vm02-ext-nic.id, azurerm_network_interface.vm02-int-nic.id]
   size                            = var.instance_type
@@ -463,13 +463,13 @@ resource "azurerm_linux_virtual_machine" "f5vm02" {
 
 # Configure VMs to use a system-assigned managed identity
 resource "azurerm_role_assignment" "f5vm01ra" {
-  scope                = data.azurerm_resource_group.main.id
+  scope                = azurerm_resource_group.main.id
   role_definition_name = "Contributor"
   principal_id         = lookup(azurerm_linux_virtual_machine.f5vm01.identity[0], "principal_id")
 }
 
 resource "azurerm_role_assignment" "f5vm02ra" {
-  scope                = data.azurerm_resource_group.main.id
+  scope                = azurerm_resource_group.main.id
   role_definition_name = "Contributor"
   principal_id         = lookup(azurerm_linux_virtual_machine.f5vm02.identity[0], "principal_id")
 }

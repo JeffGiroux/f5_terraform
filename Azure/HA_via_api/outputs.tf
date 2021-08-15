@@ -1,7 +1,6 @@
 # Outputs
 
-output "mgmt_subnet_gw" { value = var.mgmt_gw }
-output "ext_subnet_gw" { value = var.ext_gw }
+output "bigip_resource_group" { value = azurerm_resource_group.main.name }
 output "Public_VIP_pip" { value = azurerm_public_ip.pubvippip.ip_address }
 
 output "f5vm01_id" { value = azurerm_linux_virtual_machine.f5vm01.id }
