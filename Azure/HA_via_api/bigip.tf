@@ -465,13 +465,13 @@ resource "azurerm_linux_virtual_machine" "f5vm02" {
 
 # Configure VMs to use a system-assigned managed identity
 resource "azurerm_role_assignment" "f5vm01ra" {
-  scope                = azurerm_resource_group.main.id
+  scope                = data.azurerm_subscription.main.id
   role_definition_name = "Contributor"
   principal_id         = lookup(azurerm_linux_virtual_machine.f5vm01.identity[0], "principal_id")
 }
 
 resource "azurerm_role_assignment" "f5vm02ra" {
-  scope                = azurerm_resource_group.main.id
+  scope                = data.azurerm_subscription.main.id
   role_definition_name = "Contributor"
   principal_id         = lookup(azurerm_linux_virtual_machine.f5vm02.identity[0], "principal_id")
 }

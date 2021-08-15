@@ -13,6 +13,10 @@ provider "azurerm" {
   features {}
 }
 
+# Retreive subscription
+data "azurerm_subscription" "main" {
+}
+
 # Create a Resource Group for BIG-IP
 resource "azurerm_resource_group" "main" {
   name     = "${var.prefix}_bigip_rg"
