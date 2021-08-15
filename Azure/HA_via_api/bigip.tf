@@ -335,7 +335,7 @@ locals {
     local_selfip_ext        = var.f5vm02ext
     remote_selfip_ext       = var.f5vm01ext
     local_selfip_int        = var.f5vm02int
-    remote_selfip_int       = var.f5vm02int
+    remote_selfip_int       = var.f5vm01int
     public_vip              = var.f5publicvip
     dns_server              = var.dns_server
     ntp_server              = var.ntp_server
