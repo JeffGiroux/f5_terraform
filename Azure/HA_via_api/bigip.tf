@@ -338,6 +338,11 @@ resource "azurerm_linux_virtual_machine" "f5vm02" {
   disable_password_authentication = false
   custom_data                     = base64encode(local.f5_onboard2)
 
+  admin_ssh_key {
+    username   = var.uname
+    public_key = var.ssh_key
+  }
+
   os_disk {
     name                 = "${var.prefix}vm02-osdisk"
     caching              = "ReadWrite"
