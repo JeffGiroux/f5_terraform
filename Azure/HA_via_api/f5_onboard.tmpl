@@ -60,15 +60,12 @@ runtime_parameters:
   - name: LOCAL_SELFIP_EXT
     type: static
     value: ${local_selfip_ext}
-  - name: REMOTE_SELFIP_EXT
-    type: static
-    value: ${remote_selfip_ext}
   - name: LOCAL_SELFIP_INT
     type: static
     value: ${local_selfip_int}
-  - name: REMOTE_SELFIP_INT
+  - name: REMOTE_HOST
     type: static
-    value: ${remote_selfip_int}
+    value: ${remote_host}
   - name: DNS_SERVER
     type: static
     value: ${dns_server}
@@ -118,7 +115,7 @@ extension_services:
       value:
         schemaVersion: 1.0.0
         class: Device
-        async: true
+        async: false
         label: Onboard BIG-IP into an HA Pair
         Common:
           class: Tenant
@@ -214,7 +211,7 @@ extension_services:
             class: DeviceTrust
             localUsername: '{{{ USER_NAME }}}'
             localPassword: '{{{ ADMIN_PASS }}}'
-            remoteHost: '{{{ REMOTE_SELFIP_INT }}}'
+            remoteHost: '{{{ REMOTE_HOST }}}'
             remoteUsername: '{{{ USER_NAME }}}'
             remotePassword: '{{{ ADMIN_PASS }}}'
     - extensionType: as3
@@ -269,7 +266,7 @@ extension_services:
             discoveryType: static
             items:
               - '{{{ LOCAL_SELFIP_EXT }}}'
-              - '{{{ REMOTE_SELFIP_EXT }}}'
+              - ${remote_selfip_ext}
     - extensionType: ts
       type: inline
       value:
@@ -293,15 +290,24 @@ post_onboard_enabled:
   - name: create_misc_routes
     type: inline
     commands:
-    - tmsh create sys management-route azure_metadata network 169.254.169.254/32 gateway ${mgmt_gw}
     - tmsh save sys config
 EOF
 
-# Download
+# Download BIG-IP Runtime Init
 for i in {1..30}; do
     curl -fv --retry 1 --connect-timeout 5 -L ${INIT_URL} -o "/var/config/rest/downloads/f5-bigip-runtime.gz.run" && break || sleep 10
 done
-# Install
+
+# Install BIG-IP Runtime Init
 bash /var/config/rest/downloads/f5-bigip-runtime.gz.run -- '--cloud azure'
-# Run
+
+# Create Route for Azure's Instance Metadata Service
+# https://clouddocs.f5.com/products/extensions/f5-cloud-failover/latest/userguide/azure.html#set-up-access-to-azure-s-instance-metadata-service
+source /usr/lib/bigstart/bigip-ready-functions
+wait_bigip_ready
+tmsh modify sys db config.allow.rfc3927 value enable
+tmsh create sys management-route azure_metadata network 169.254.169.254/32 gateway '${mgmt_gw}'
+tmsh save sys config
+
+# Run BIG-IP Runtime Init and Process YAML
 f5-bigip-runtime-init --config-file /config/cloud/runtime-init-conf.yaml
