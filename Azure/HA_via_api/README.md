@@ -67,13 +67,9 @@ Terraform v0.14.10
 - This template uses Declarative Onboarding (DO), Application Services 3 (AS3), and Cloud Failover Extension packages for the initial configuration. As part of the onboarding script, it will download the RPMs automatically. See the [AS3 documentation](http://f5.com/AS3Docs) and [DO documentation](http://f5.com/DODocs) for details on how to use AS3 and Declarative Onboarding on your BIG-IP VE(s). The [Telemetry Streaming](http://f5.com/TSDocs) extension is also downloaded and can be configured to point to Azure Log Analytics. The [Cloud Failover Extension](http://f5.com/CFEDocs) documentation is also available.
 - Files
   - bigip.tf - resources for BIG-IP, NICs, public IPs
-  - main.tf - resources for provider, versions, resource group
+  - main.tf - resources for provider, versions, resource group, storage bucket
   - network.tf - data for existing subnets
-  - onboard.tpl - onboarding script which is run by commandToExecute (user data). It will be copied to /var/lib/waagent/CustomData upon bootup. This script is responsible for downloading the neccessary F5 Automation Toolchain RPM files, installing them, and then executing the onboarding REST calls.
-  - do.json - contains the L1-L3 BIG-IP configurations used by DO for items like VLANs, IPs, and routes
-  - as3.json - contains the L4-L7 BIG-IP configurations used by AS3 for items like pool members, virtual server listeners, security policies, and more
-  - ts.json - contains the BIG-IP configurations used by TS for items like telemetry streaming, CPU, memory, application statistics, and more
-  - failover.json - contains the BIG-IP configurations used by CFE for failover of cloud objects (IPs, routes)
+  - f5_onboard.tpl - onboarding script which is run by commandToExecute (user data). It will be copied to /var/lib/waagent/CustomData upon bootup. This script is responsible for downloading the neccessary F5 Automation Toolchain RPM files, installing them, and then executing the onboarding REST calls via the [BIG-IP Runtime Init tool](https://github.com/F5Networks/f5-bigip-runtime-init).
 
 ## BYOL Licensing
 This template uses PayGo BIG-IP image for the deployment (as default). If you would like to use BYOL licenses, then these following steps are needed:
@@ -163,7 +159,6 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | f5vm02int | IP address for 2nd BIG-IP's internal interface | `string` | 10.90.3.5 | yes |
 | f5publicvip | Secondary Private IP address for BIG-IP virtual server (external) | `string` | 10.90.2.11 | yes |
 | instance_type | Azure instance to be used for the BIG-IP VE | `string` | Standard_DS4_v2 | no |
-| product | Azure BIG-IP VE Offer | `string` | f5-big-ip-best | no |
 | bigip_version | BIG-IP Version | `string` | 15.1.201000 | no |
 | image_name | F5 SKU (image) to deploy. Note: The disk size of the VM will be determined based on the option you select.  **Important**: If intending to provision multiple modules, ensure the appropriate value is selected, such as ****AllTwoBootLocations or AllOneBootLocation****. | `string` | f5-bigip-virtual-edition-1g-best-hourly | no |
 | license1 | The license token for the F5 BIG-IP VE (BYOL) | `string` | null | no |
@@ -183,6 +178,7 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | onboard_log | Directory on the BIG-IP to store the cloud-init logs | `string` | /var/log/startup-script.log | no |
 | f5_cloud_failover_label | This is a tag used for failover. | `string` | mydeployment | yes |
 | f5_cloud_failover_nic_map | This is a tag used for failover NIC. | `string` | external | yes |
+| owner | This is a tag used for object creation. Example "lastname" | `string` | null | yes |
 | bigIqHost | This is the BIG-IQ License Manager host name or IP address | `string` | 200.200.200.200 | no |
 | bigIqUsername | BIG-IQ user name | `string` | admin | no |
 | bigIqPassword | BIG-IQ Password | `string` | Default12345! | no |
@@ -211,10 +207,9 @@ To run this Terraform template, perform the following steps:
       intSubnet  = "internal"
 
       # Azure Environment
-      location           = "westus2"
-
-      # Prefix for objects being created
-      prefix = "mylab123"
+      location = "westus2"
+      prefix   = "mylab123"
+      owner    = "myLastName"
   ```
   3. Initialize the directory
   ```
