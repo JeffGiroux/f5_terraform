@@ -1,25 +1,5 @@
 # BIG-IP Cluster
 
-# Create Route Table
-resource "azurerm_route_table" "udr" {
-  name                          = "udr"
-  location                      = azurerm_resource_group.main.location
-  resource_group_name           = azurerm_resource_group.main.name
-  disable_bgp_route_propagation = false
-
-  route {
-    name                   = "route1"
-    address_prefix         = var.managed_route
-    next_hop_type          = "VirtualAppliance"
-    next_hop_in_ip_address = azurerm_network_interface.vm02-ext-nic.private_ip_address
-  }
-
-  tags = {
-    f5_cloud_failover_label = var.f5_cloud_failover_label
-    f5_self_ips             = "${azurerm_network_interface.vm01-ext-nic.private_ip_address},${azurerm_network_interface.vm02-ext-nic.private_ip_address}"
-  }
-}
-
 # Create Public IPs
 resource "azurerm_public_ip" "vm01mgmtpip" {
   name                = "${var.prefix}-vm01-mgmt-pip"
@@ -396,10 +376,6 @@ resource "azurerm_linux_virtual_machine" "f5vm01" {
     product   = var.product
   }
 
-  boot_diagnostics {
-    storage_account_uri = data.azurerm_storage_account.main.primary_blob_endpoint
-  }
-
   identity {
     type = "SystemAssigned"
   }
@@ -445,10 +421,6 @@ resource "azurerm_linux_virtual_machine" "f5vm02" {
     product   = var.product
   }
 
-  boot_diagnostics {
-    storage_account_uri = data.azurerm_storage_account.main.primary_blob_endpoint
-  }
-
   identity {
     type = "SystemAssigned"
   }
@@ -465,13 +437,13 @@ resource "azurerm_linux_virtual_machine" "f5vm02" {
 
 # Configure VMs to use a system-assigned managed identity
 resource "azurerm_role_assignment" "f5vm01ra" {
-  scope                = data.azurerm_subscription.main.id
+  scope                = azurerm_resource_group.main.id
   role_definition_name = "Contributor"
   principal_id         = lookup(azurerm_linux_virtual_machine.f5vm01.identity[0], "principal_id")
 }
 
 resource "azurerm_role_assignment" "f5vm02ra" {
-  scope                = data.azurerm_subscription.main.id
+  scope                = azurerm_resource_group.main.id
   role_definition_name = "Contributor"
   principal_id         = lookup(azurerm_linux_virtual_machine.f5vm02.identity[0], "principal_id")
 }
@@ -520,5 +492,25 @@ resource "azurerm_virtual_machine_extension" "f5vm02-run-startup-cmd" {
     group       = var.group
     costcenter  = var.costcenter
     application = var.application
+  }
+}
+
+# Create Route Table
+resource "azurerm_route_table" "udr" {
+  name                          = "udr"
+  location                      = azurerm_resource_group.main.location
+  resource_group_name           = azurerm_resource_group.main.name
+  disable_bgp_route_propagation = false
+
+  route {
+    name                   = "route1"
+    address_prefix         = var.managed_route
+    next_hop_type          = "VirtualAppliance"
+    next_hop_in_ip_address = azurerm_network_interface.vm02-ext-nic.private_ip_address
+  }
+
+  tags = {
+    f5_cloud_failover_label = var.f5_cloud_failover_label
+    f5_self_ips             = "${azurerm_network_interface.vm01-ext-nic.private_ip_address},${azurerm_network_interface.vm02-ext-nic.private_ip_address}"
   }
 }

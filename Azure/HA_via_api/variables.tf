@@ -7,7 +7,6 @@ variable "sp_client_secret" { default = "" }
 variable "sp_tenant_id" { default = "" }
 variable "prefix" { default = "demo" }
 variable "location" { default = "westus2" }
-variable "storage_name" {}
 
 # NETWORK
 variable "vnet_rg" {}
