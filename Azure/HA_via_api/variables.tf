@@ -14,7 +14,7 @@ variable "vnet_name" {}
 variable "mgmtSubnet" {}
 variable "extSubnet" {}
 variable "intSubnet" {}
-variable "managed_route" { default = "0.0.0.0/0" }
+variable "cfe_managed_route" { default = "0.0.0.0/0" }
 variable "f5vm01mgmt" { default = "10.90.1.4" }
 variable "f5vm01ext" { default = "10.90.2.4" }
 variable "f5vm01int" { default = "10.90.3.4" }

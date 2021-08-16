@@ -150,7 +150,7 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | mgmtSubnet | Name of management subnet | `string` | null | yes |
 | extSubnet | Name of external subnet | `string` | null | yes |
 | intSubnet | Name of internal subnet | `string` | null | yes |
-| managed_route | A UDR route can used for testing managed-route failover. Enter address prefix like x.x.x.x/x. | `string` | 0.0.0.0/0 | no |
+| cfe_managed_route | A UDR route can used for testing managed-route failover. Enter address prefix like x.x.x.x/x. | `string` | 0.0.0.0/0 | no |
 | f5vm01mgmt | IP address for 1st BIG-IP's management interface | `string` | 10.90.1.4 | yes |
 | f5vm02mgmt | IP address for 2nd BIG-IP's management interface | `string` | 10.90.1.5 | yes |
 | f5vm01ext | IP address for 1st BIG-IP's external interface | `string` | 10.90.2.4 | yes |
