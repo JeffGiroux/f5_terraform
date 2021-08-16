@@ -56,21 +56,15 @@ runtime_parameters:
     value: ${f5_cloud_failover_label}
   - name: MANAGED_ROUTE
     type: static
-    value: ${managed_route}
-  - name: SELF_IP_EXTERNAL
+    value: ${cfe_managed_route}
+  - name: GATEWAY_EXTERNAL
     type: metadata
     metadataProvider:
       environment: azure
       type: network
       field: ipv4
       index: 1
-  - name: SELF_IP_INTERNAL
-    type: metadata
-    metadataProvider:
-      environment: azure
-      type: network
-      field: ipv4
-      index: 2
+      ipcalc: first
   - name: REMOTE_HOST
     type: static
     value: ${remote_host}
@@ -83,18 +77,12 @@ runtime_parameters:
   - name: TIMEZONE
     type: static
     value: ${timezone}
-  - name: GATEWAY
-    type: static
-    value: ${gateway}
   - name: HOST1
     type: static
     value: ${host1}
   - name: HOST2
     type: static
     value: ${host2}
-  - name: PUBLIC_VIP
-    type: static
-    value: ${public_vip}
 pre_onboard_enabled:
   - name: provision_rest
     type: inline
@@ -175,7 +163,7 @@ extension_services:
                 tagged: false
           external-localself:
             class: SelfIp
-            address: '{{{ SELF_IP_EXTERNAL }}}/24'
+            address: '$SELF_IP_EXTERNAL/24'
             vlan: external
             allowService: default
             trafficGroup: traffic-group-local-only
@@ -188,13 +176,13 @@ extension_services:
                 tagged: false
           internal-localself:
             class: SelfIp
-            address: '{{{ SELF_IP_INTERNAL }}}/24'
+            address: '$SELF_IP_INTERNAL/24'
             vlan: internal
             allowService: default
             trafficGroup: traffic-group-local-only
           default:
             class: Route
-            gw: '{{{ GATEWAY }}}'
+            gw: '{{{ GATEWAY_EXTERNAL }}}'
             network: default
             mtu: 1500
           configsync:
@@ -241,7 +229,7 @@ extension_services:
               serviceMain:
                 class: Service_HTTP
                 virtualAddresses:
-                  - '{{{ PUBLIC_VIP }}}'
+                  - '$PUBLIC_VIP'
                 pool: web_pool
               web_pool:
                 class: Pool
@@ -273,8 +261,8 @@ extension_services:
           defaultNextHopAddresses:
             discoveryType: static
             items:
-              - '{{{ SELF_IP_INTERNAL }}}'
-              - ${remote_selfip_ext}
+              - '$SELF_IP_EXTERNAL'
+              - '${remote_selfip_ext}'
     - extensionType: ts
       type: inline
       value:
@@ -313,9 +301,19 @@ bash /var/config/rest/downloads/f5-bigip-runtime.gz.run -- '--cloud azure'
 # https://clouddocs.f5.com/products/extensions/f5-cloud-failover/latest/userguide/azure.html#set-up-access-to-azure-s-instance-metadata-service
 source /usr/lib/bigstart/bigip-ready-functions
 wait_bigip_ready
+GATEWAY_MGMT=$(egrep routers /var/lib/dhclient/dhclient.leases | head -1 | grep -oE '[^ ]+$' | tr -d ';' )
 tmsh modify sys db config.allow.rfc3927 value enable
-tmsh create sys management-route azure_metadata network 169.254.169.254/32 gateway '${mgmt_gw}'
+tmsh create sys management-route azure_metadata network 169.254.169.254/32 gateway $GATEWAY_MGMT
 tmsh save sys config
+
+# Retrieve Network Metadata from Azure
+NETWORK_BASE_URL="http://169.254.169.254/metadata/instance/network"
+PUBLIC_VIP=$(curl -s -f --retry 10 -H Metadata:true "$${NETWORK_BASE_URL}/interface/2/ipv4/ipAddress/1/privateIpAddress?api-version=2021-05-01&format=text")
+SELF_IP_EXTERNAL=$(curl -s -f --retry 10 -H Metadata:true "$${NETWORK_BASE_URL}/interface/2/ipv4/ipAddress/0/privateIpAddress?api-version=2021-05-01&format=text")
+SELF_IP_INTERNAL=$(curl -s -f --retry 10 -H Metadata:true "$${NETWORK_BASE_URL}/interface/1/ipv4/ipAddress/0/privateIpAddress?api-version=2021-05-01&format=text")
+sed -i "s/\$PUBLIC_VIP/$PUBLIC_VIP/g" /config/cloud/runtime-init-conf.yaml
+sed -i "s/\$SELF_IP_EXTERNAL/$SELF_IP_EXTERNAL/g" /config/cloud/runtime-init-conf.yaml
+sed -i "s/\$SELF_IP_INTERNAL/$SELF_IP_INTERNAL/g" /config/cloud/runtime-init-conf.yaml
 
 # Run BIG-IP Runtime Init and Process YAML
 f5-bigip-runtime-init --config-file /config/cloud/runtime-init-conf.yaml

@@ -195,6 +195,10 @@ resource "azurerm_network_interface" "vm02-int-nic" {
 # Setup Onboarding scripts
 locals {
   f5_onboard1 = templatefile("${path.module}/f5_onboard.tmpl", {
+    regKey                  = var.license1
+    f5_username             = var.uname
+    f5_password             = var.upassword
+    ssh_keypair             = var.ssh_key
     INIT_URL                = var.INIT_URL
     DO_URL                  = var.DO_URL
     AS3_URL                 = var.AS3_URL
@@ -206,24 +210,18 @@ locals {
     TS_VER                  = split("/", var.TS_URL)[7]
     CFE_VER                 = split("/", var.CFE_URL)[7]
     FAST_VER                = split("/", var.FAST_URL)[7]
-    f5_username             = var.uname
-    f5_password             = var.upassword
-    ssh_keypair             = var.ssh_key
-    law_id                  = azurerm_log_analytics_workspace.law.workspace_id
-    law_primkey             = azurerm_log_analytics_workspace.law.primary_shared_key
-    f5_cloud_failover_label = var.f5_cloud_failover_label
     remote_selfip_ext       = ""
-    mgmt_gw                 = var.mgmt_gw
     public_vip              = var.f5publicvip
     dns_server              = var.dns_server
     ntp_server              = var.ntp_server
     timezone                = var.timezone
-    gateway                 = var.ext_gw
-    regKey                  = var.license1
     host1                   = "${var.prefix}-${var.host1_name}"
     host2                   = "${var.prefix}-${var.host2_name}"
     remote_host             = "${var.prefix}-${var.host2_name}"
-    managed_route           = var.managed_route
+    f5_cloud_failover_label = var.f5_cloud_failover_label
+    cfe_managed_route       = var.cfe_managed_route
+    law_id                  = azurerm_log_analytics_workspace.law.workspace_id
+    law_primkey             = azurerm_log_analytics_workspace.law.primary_shared_key
     bigIqLicenseType        = var.bigIqLicenseType
     bigIqHost               = var.bigIqHost
     bigIqPassword           = var.bigIqPassword
@@ -235,6 +233,10 @@ locals {
     bigIqHypervisor         = var.bigIqHypervisor
   })
   f5_onboard2 = templatefile("${path.module}/f5_onboard.tmpl", {
+    regKey                  = var.license2
+    f5_username             = var.uname
+    f5_password             = var.upassword
+    ssh_keypair             = var.ssh_key
     INIT_URL                = var.INIT_URL
     DO_URL                  = var.DO_URL
     AS3_URL                 = var.AS3_URL
@@ -246,24 +248,18 @@ locals {
     TS_VER                  = split("/", var.TS_URL)[7]
     CFE_VER                 = split("/", var.CFE_URL)[7]
     FAST_VER                = split("/", var.FAST_URL)[7]
-    f5_username             = var.uname
-    f5_password             = var.upassword
-    ssh_keypair             = var.ssh_key
-    law_id                  = azurerm_log_analytics_workspace.law.workspace_id
-    law_primkey             = azurerm_log_analytics_workspace.law.primary_shared_key
-    f5_cloud_failover_label = var.f5_cloud_failover_label
     remote_selfip_ext       = azurerm_network_interface.vm01-ext-nic.private_ip_address
-    mgmt_gw                 = var.mgmt_gw
     public_vip              = var.f5publicvip
     dns_server              = var.dns_server
     ntp_server              = var.ntp_server
     timezone                = var.timezone
-    gateway                 = var.ext_gw
-    regKey                  = var.license2
     host1                   = "${var.prefix}-${var.host1_name}"
     host2                   = "${var.prefix}-${var.host2_name}"
     remote_host             = azurerm_network_interface.vm01-int-nic.private_ip_address
-    managed_route           = var.managed_route
+    f5_cloud_failover_label = var.f5_cloud_failover_label
+    cfe_managed_route       = var.cfe_managed_route
+    law_id                  = azurerm_log_analytics_workspace.law.workspace_id
+    law_primkey             = azurerm_log_analytics_workspace.law.primary_shared_key
     bigIqLicenseType        = var.bigIqLicenseType
     bigIqHost               = var.bigIqHost
     bigIqPassword           = var.bigIqPassword
@@ -426,7 +422,7 @@ resource "azurerm_route_table" "udr" {
 
   route {
     name                   = "route1"
-    address_prefix         = var.managed_route
+    address_prefix         = var.cfe_managed_route
     next_hop_type          = "VirtualAppliance"
     next_hop_in_ip_address = azurerm_network_interface.vm02-ext-nic.private_ip_address
   }
