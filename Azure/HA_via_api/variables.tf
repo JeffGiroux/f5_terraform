@@ -45,6 +45,7 @@ variable "host2_name" { default = "f5vm02" }
 variable "dns_server" { default = "8.8.8.8" }
 variable "ntp_server" { default = "0.us.pool.ntp.org" }
 variable "timezone" { default = "UTC" }
+
 variable "DO_URL" {
   description = "URL to download the BIG-IP Declarative Onboarding module"
   type        = string
@@ -98,11 +99,6 @@ variable "bigIqUnitOfMeasure" { default = "hourly" }
 variable "bigIqHypervisor" { default = "azure" }
 
 # TAGS
-variable "purpose" { default = "public" }
-variable "environment" { default = "f5env" } #ex. dev/staging/prod
-variable "owner" { default = "f5owner" }
-variable "group" { default = "f5group" }
-variable "costcenter" { default = "f5costcenter" }
-variable "application" { default = "f5app" }
+variable "owner" {}
 variable "f5_cloud_failover_label" { default = "mydeployment" } #Cloud Failover Tag
 variable "f5_cloud_failover_nic_map" { default = "external" }   #NIC Tag

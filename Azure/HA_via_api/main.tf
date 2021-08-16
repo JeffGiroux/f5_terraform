@@ -13,21 +13,12 @@ provider "azurerm" {
   features {}
 }
 
-# Retreive subscription
-data "azurerm_subscription" "main" {
-}
-
 # Create a Resource Group for BIG-IP
 resource "azurerm_resource_group" "main" {
   name     = "${var.prefix}_bigip_rg"
   location = var.location
   tags = {
-    Name        = "${var.environment}-bigip_rg"
-    environment = var.environment
-    owner       = var.owner
-    group       = var.group
-    costcenter  = var.costcenter
-    application = var.application
+    owner = var.owner
   }
 }
 
@@ -39,12 +30,7 @@ resource "azurerm_log_analytics_workspace" "law" {
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
   tags = {
-    Name        = "${var.environment}-law"
-    environment = var.environment
-    owner       = var.owner
-    group       = var.group
-    costcenter  = var.costcenter
-    application = var.application
+    owner = var.owner
   }
 }
 
@@ -56,11 +42,7 @@ resource "azurerm_storage_account" "main" {
   account_tier             = "Standard"
   account_replication_type = "LRS"
   tags = {
-    environment             = var.environment
     owner                   = var.owner
-    group                   = var.group
-    costcenter              = var.costcenter
-    application             = var.application
     f5_cloud_failover_label = var.f5_cloud_failover_label
   }
 }

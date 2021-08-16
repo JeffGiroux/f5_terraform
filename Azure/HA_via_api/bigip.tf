@@ -1,6 +1,6 @@
 # BIG-IP Cluster
 
-# Create Public IPs
+# Create Public IPs - mgmt
 resource "azurerm_public_ip" "vm01mgmtpip" {
   name                = "${var.prefix}-vm01-mgmt-pip"
   location            = azurerm_resource_group.main.location
@@ -8,32 +8,8 @@ resource "azurerm_public_ip" "vm01mgmtpip" {
   availability_zone   = 1
   resource_group_name = azurerm_resource_group.main.name
   allocation_method   = "Static"
-
   tags = {
-    Name        = "${var.environment}-vm01-mgmt-public-ip"
-    environment = var.environment
-    owner       = var.owner
-    group       = var.group
-    costcenter  = var.costcenter
-    application = var.application
-  }
-}
-
-resource "azurerm_public_ip" "vm01selfpip" {
-  name                = "${var.prefix}-vm01-self-pip"
-  location            = azurerm_resource_group.main.location
-  sku                 = "Standard"
-  availability_zone   = 1
-  resource_group_name = azurerm_resource_group.main.name
-  allocation_method   = "Static"
-
-  tags = {
-    Name        = "${var.environment}-vm01-self-public-ip"
-    environment = var.environment
-    owner       = var.owner
-    group       = var.group
-    costcenter  = var.costcenter
-    application = var.application
+    owner = var.owner
   }
 }
 
@@ -44,14 +20,21 @@ resource "azurerm_public_ip" "vm02mgmtpip" {
   availability_zone   = 2
   resource_group_name = azurerm_resource_group.main.name
   allocation_method   = "Static"
-
   tags = {
-    Name        = "${var.environment}-vm02-mgmt-public-ip"
-    environment = var.environment
-    owner       = var.owner
-    group       = var.group
-    costcenter  = var.costcenter
-    application = var.application
+    owner = var.owner
+  }
+}
+
+# Create Public IPs - external
+resource "azurerm_public_ip" "vm01selfpip" {
+  name                = "${var.prefix}-vm01-self-pip"
+  location            = azurerm_resource_group.main.location
+  sku                 = "Standard"
+  availability_zone   = 1
+  resource_group_name = azurerm_resource_group.main.name
+  allocation_method   = "Static"
+  tags = {
+    owner = var.owner
   }
 }
 
@@ -62,17 +45,12 @@ resource "azurerm_public_ip" "vm02selfpip" {
   availability_zone   = 2
   resource_group_name = azurerm_resource_group.main.name
   allocation_method   = "Static"
-
   tags = {
-    Name        = "${var.environment}-vm02-self-public-ip"
-    environment = var.environment
-    owner       = var.owner
-    group       = var.group
-    costcenter  = var.costcenter
-    application = var.application
+    owner = var.owner
   }
 }
 
+# Create Public IPs - VIP
 resource "azurerm_public_ip" "pubvippip" {
   name                = "${var.prefix}-pubvip-pip"
   location            = azurerm_resource_group.main.location
@@ -80,14 +58,8 @@ resource "azurerm_public_ip" "pubvippip" {
   availability_zone   = 1
   resource_group_name = azurerm_resource_group.main.name
   allocation_method   = "Static"
-
   tags = {
-    Name        = "${var.environment}-pubvip-public-ip"
-    environment = var.environment
-    owner       = var.owner
-    group       = var.group
-    costcenter  = var.costcenter
-    application = var.application
+    owner = var.owner
   }
 }
 
@@ -106,12 +78,7 @@ resource "azurerm_network_interface" "vm01-mgmt-nic" {
   }
 
   tags = {
-    Name        = "${var.environment}-vm01-mgmt"
-    environment = var.environment
-    owner       = var.owner
-    group       = var.group
-    costcenter  = var.costcenter
-    application = var.application
+    owner = var.owner
   }
 }
 
@@ -129,12 +96,7 @@ resource "azurerm_network_interface" "vm02-mgmt-nic" {
   }
 
   tags = {
-    Name        = "${var.environment}-vm02-mgmt"
-    environment = var.environment
-    owner       = var.owner
-    group       = var.group
-    costcenter  = var.costcenter
-    application = var.application
+    owner = var.owner
   }
 }
 
@@ -155,12 +117,7 @@ resource "azurerm_network_interface" "vm01-ext-nic" {
   }
 
   tags = {
-    Name                      = "${var.environment}-vm01-ext"
-    environment               = var.environment
     owner                     = var.owner
-    group                     = var.group
-    costcenter                = var.costcenter
-    application               = var.application
     f5_cloud_failover_label   = var.f5_cloud_failover_label
     f5_cloud_failover_nic_map = var.f5_cloud_failover_nic_map
   }
@@ -190,12 +147,7 @@ resource "azurerm_network_interface" "vm02-ext-nic" {
   }
 
   tags = {
-    Name                      = "${var.environment}-vm02-ext"
-    environment               = var.environment
     owner                     = var.owner
-    group                     = var.group
-    costcenter                = var.costcenter
-    application               = var.application
     f5_cloud_failover_label   = var.f5_cloud_failover_label
     f5_cloud_failover_nic_map = var.f5_cloud_failover_nic_map
   }
@@ -217,12 +169,7 @@ resource "azurerm_network_interface" "vm01-int-nic" {
   }
 
   tags = {
-    Name        = "${var.environment}-vm01-int"
-    environment = var.environment
-    owner       = var.owner
-    group       = var.group
-    costcenter  = var.costcenter
-    application = var.application
+    owner = var.owner
   }
 }
 
@@ -241,15 +188,9 @@ resource "azurerm_network_interface" "vm02-int-nic" {
   }
 
   tags = {
-    Name        = "${var.environment}-vm02-int"
-    environment = var.environment
-    owner       = var.owner
-    group       = var.group
-    costcenter  = var.costcenter
-    application = var.application
+    owner = var.owner
   }
 }
-
 
 # Setup Onboarding scripts
 locals {
@@ -381,12 +322,7 @@ resource "azurerm_linux_virtual_machine" "f5vm01" {
   }
 
   tags = {
-    Name        = "${var.environment}-f5vm01"
-    environment = var.environment
-    owner       = var.owner
-    group       = var.group
-    costcenter  = var.costcenter
-    application = var.application
+    owner = var.owner
   }
 }
 
@@ -426,12 +362,7 @@ resource "azurerm_linux_virtual_machine" "f5vm02" {
   }
 
   tags = {
-    Name        = "${var.environment}-f5vm02"
-    environment = var.environment
-    owner       = var.owner
-    group       = var.group
-    costcenter  = var.costcenter
-    application = var.application
+    owner = var.owner
   }
 }
 
@@ -450,7 +381,7 @@ resource "azurerm_role_assignment" "f5vm02ra" {
 
 # Run Startup Script
 resource "azurerm_virtual_machine_extension" "f5vm01-run-startup-cmd" {
-  name                 = "${var.environment}-f5vm01-run-startup-cmd"
+  name                 = "${var.prefix}-f5vm01-run-startup-cmd"
   virtual_machine_id   = azurerm_linux_virtual_machine.f5vm01.id
   publisher            = "Microsoft.Azure.Extensions"
   type                 = "CustomScript"
@@ -463,17 +394,12 @@ resource "azurerm_virtual_machine_extension" "f5vm01-run-startup-cmd" {
   SETTINGS
 
   tags = {
-    Name        = "${var.environment}-f5vm01-startup-cmd"
-    environment = var.environment
-    owner       = var.owner
-    group       = var.group
-    costcenter  = var.costcenter
-    application = var.application
+    owner = var.owner
   }
 }
 
 resource "azurerm_virtual_machine_extension" "f5vm02-run-startup-cmd" {
-  name                 = "${var.environment}-f5vm02-run-startup-cmd"
+  name                 = "${var.prefix}-f5vm02-run-startup-cmd"
   virtual_machine_id   = azurerm_linux_virtual_machine.f5vm02.id
   publisher            = "Microsoft.Azure.Extensions"
   type                 = "CustomScript"
@@ -486,12 +412,7 @@ resource "azurerm_virtual_machine_extension" "f5vm02-run-startup-cmd" {
   SETTINGS
 
   tags = {
-    Name        = "${var.environment}-f5vm02-startup-cmd"
-    environment = var.environment
-    owner       = var.owner
-    group       = var.group
-    costcenter  = var.costcenter
-    application = var.application
+    owner = var.owner
   }
 }
 
@@ -510,6 +431,7 @@ resource "azurerm_route_table" "udr" {
   }
 
   tags = {
+    owner                   = var.owner
     f5_cloud_failover_label = var.f5_cloud_failover_label
     f5_self_ips             = "${azurerm_network_interface.vm01-ext-nic.private_ip_address},${azurerm_network_interface.vm02-ext-nic.private_ip_address}"
   }
