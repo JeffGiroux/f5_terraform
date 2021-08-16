@@ -212,9 +212,7 @@ locals {
     law_id                  = azurerm_log_analytics_workspace.law.workspace_id
     law_primkey             = azurerm_log_analytics_workspace.law.primary_shared_key
     f5_cloud_failover_label = var.f5_cloud_failover_label
-    local_selfip_ext        = var.f5vm01ext
     remote_selfip_ext       = ""
-    local_selfip_int        = var.f5vm01int
     mgmt_gw                 = var.mgmt_gw
     public_vip              = var.f5publicvip
     dns_server              = var.dns_server
@@ -254,9 +252,7 @@ locals {
     law_id                  = azurerm_log_analytics_workspace.law.workspace_id
     law_primkey             = azurerm_log_analytics_workspace.law.primary_shared_key
     f5_cloud_failover_label = var.f5_cloud_failover_label
-    local_selfip_ext        = var.f5vm02ext
     remote_selfip_ext       = azurerm_network_interface.vm01-ext-nic.private_ip_address
-    local_selfip_int        = var.f5vm02int
     mgmt_gw                 = var.mgmt_gw
     public_vip              = var.f5publicvip
     dns_server              = var.dns_server
