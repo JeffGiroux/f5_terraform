@@ -202,13 +202,15 @@ locals {
     TS_VER                  = split("/", var.TS_URL)[7]
     CFE_VER                 = split("/", var.CFE_URL)[7]
     FAST_VER                = split("/", var.FAST_URL)[7]
+    self_ip_external        = azurerm_network_interface.vm01-ext-nic.private_ip_address
+    self_ip_internal        = azurerm_network_interface.vm01-int-nic.private_ip_address
     remote_selfip_ext       = ""
     dns_server              = var.dns_server
     ntp_server              = var.ntp_server
     timezone                = var.timezone
     host1                   = "${var.prefix}-${var.host1_name}"
     host2                   = "${var.prefix}-${var.host2_name}"
-    remote_host             = "${var.prefix}-${var.host2_name}"
+    remote_host             = ""
     f5_cloud_failover_label = var.f5_cloud_failover_label
     cfe_managed_route       = var.cfe_managed_route
     law_id                  = azurerm_log_analytics_workspace.law.workspace_id
@@ -239,6 +241,8 @@ locals {
     TS_VER                  = split("/", var.TS_URL)[7]
     CFE_VER                 = split("/", var.CFE_URL)[7]
     FAST_VER                = split("/", var.FAST_URL)[7]
+    self_ip_external        = azurerm_network_interface.vm02-ext-nic.private_ip_address
+    self_ip_internal        = azurerm_network_interface.vm02-int-nic.private_ip_address
     remote_selfip_ext       = azurerm_network_interface.vm01-ext-nic.private_ip_address
     dns_server              = var.dns_server
     ntp_server              = var.ntp_server
