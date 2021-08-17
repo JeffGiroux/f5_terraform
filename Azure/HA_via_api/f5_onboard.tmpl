@@ -104,9 +104,6 @@ extension_packages:
     - extensionType: as3
       extensionVersion: ${AS3_VER}
       extensionUrl: ${AS3_URL}
-    - extensionType: ts
-      extensionVersion: ${TS_VER}
-      extensionUrl: ${TS_URL}
     - extensionType: cf
       extensionVersion: ${CFE_VER}
       extensionUrl: ${CFE_URL}
@@ -117,7 +114,7 @@ extension_services:
       value:
         schemaVersion: 1.0.0
         class: Device
-        async: false
+        async: true
         label: Onboard BIG-IP into an HA Pair
         Common:
           class: Tenant
@@ -269,25 +266,6 @@ extension_services:
             items:
               - '{{{ SELF_IP_EXTERNAL }}}'
               - '${remote_selfip_ext}'
-    - extensionType: ts
-      type: inline
-      value:
-        class: Telemetry
-        My_System:
-          class: Telemetry_System
-          systemPoller:
-            interval: 60
-        My_Listener:
-          class: Telemetry_Listener
-          port: 6514
-        My_Consumer:
-          class: Telemetry_Consumer
-          type: Azure_Log_Analytics
-          workspaceId: '{{{ LAW_ID }}}'
-          passphrase:
-            cipherText: '{{{ LAW_PRIMKEY }}}'
-          useManagedIdentity: false
-          region: '{{{ REGION }}}'
 post_onboard_enabled:
   - name: create_misc_routes
     type: inline
@@ -299,6 +277,9 @@ EOF
 for i in {1..30}; do
     curl -fv --retry 1 --connect-timeout 5 -L ${INIT_URL} -o "/var/config/rest/downloads/f5-bigip-runtime.gz.run" && break || sleep 10
 done
+
+# Remove comment to do silly debugging on BIG-IP Runtime init
+export F5_BIGIP_RUNTIME_INIT_LOG_LEVEL=silly 
 
 # Install BIG-IP Runtime Init
 bash /var/config/rest/downloads/f5-bigip-runtime.gz.run -- '--cloud azure'
@@ -312,7 +293,7 @@ tmsh modify sys db config.allow.rfc3927 value enable
 tmsh create sys management-route azure_metadata network 169.254.169.254/32 gateway $GATEWAY_MGMT
 tmsh save sys config
 
-# Retrieve secondary IP which will be for VIP assignment
+# Retrieve secondary IP which will be for VIP assignment in AS3 declaration
 base=${self_ip_external}
 f3=$(echo $base | cut -d. -f1-3)
 list=$(/usr/bin/curl -s -H Metadata:true "http://169.254.169.254/metadata/instance/network?api-version=2021-05-01" | jq -r .interface[].ipv4.ipAddress[].privateIpAddress)
