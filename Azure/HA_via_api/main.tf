@@ -46,3 +46,7 @@ resource "azurerm_storage_account" "main" {
     f5_cloud_failover_label = var.f5_cloud_failover_label
   }
 }
+
+# Retrieve Subscription Info
+data "azurerm_subscription" "main" {
+}
