@@ -314,7 +314,7 @@ SELF_IP_INTERNAL=$(curl -s -f --retry 10 -H Metadata:true "$${NETWORK_BASE_URL}/
 SELF_IP_EXTERNAL=$(curl -s -f --retry 10 -H Metadata:true "$${NETWORK_BASE_URL}/interface/1/ipv4/ipAddress/0/privateIpAddress?api-version=2021-05-01&format=text")
 PUBLIC_VIP=$(curl -s -f --retry 10 -H Metadata:true "$${NETWORK_BASE_URL}/interface/1/ipv4/ipAddress/1/privateIpAddress?api-version=2021-05-01&format=text")
 # if PUBLIC_VIP is empty, then set to 0.0.0.0/0 to avoid AS3 error
-[[ -z $PUBLIC_VIP ]] && PUBLIC_VIP="0.0.0.0/0"
+[[ -z $PUBLIC_VIP ]] && PUBLIC_VIP="0.0.0.0\/0"
 sed -i "s/\$PUBLIC_VIP/$PUBLIC_VIP/g" /config/cloud/runtime-init-conf.yaml
 sed -i "s/\$SELF_IP_EXTERNAL/$SELF_IP_EXTERNAL/g" /config/cloud/runtime-init-conf.yaml
 sed -i "s/\$SELF_IP_INTERNAL/$SELF_IP_INTERNAL/g" /config/cloud/runtime-init-conf.yaml
