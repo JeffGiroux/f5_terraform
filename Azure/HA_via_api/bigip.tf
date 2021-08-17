@@ -72,8 +72,7 @@ resource "azurerm_network_interface" "vm01-mgmt-nic" {
   ip_configuration {
     name                          = "primary"
     subnet_id                     = data.azurerm_subnet.mgmt.id
-    private_ip_address_allocation = "Static"
-    private_ip_address            = var.f5vm01mgmt
+    private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = azurerm_public_ip.vm01mgmtpip.id
   }
 
@@ -90,8 +89,7 @@ resource "azurerm_network_interface" "vm02-mgmt-nic" {
   ip_configuration {
     name                          = "primary"
     subnet_id                     = data.azurerm_subnet.mgmt.id
-    private_ip_address_allocation = "Static"
-    private_ip_address            = var.f5vm02mgmt
+    private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = azurerm_public_ip.vm02mgmtpip.id
   }
 
@@ -110,8 +108,7 @@ resource "azurerm_network_interface" "vm01-ext-nic" {
   ip_configuration {
     name                          = "primary"
     subnet_id                     = data.azurerm_subnet.external.id
-    private_ip_address_allocation = "Static"
-    private_ip_address            = var.f5vm01ext
+    private_ip_address_allocation = "Dynamic"
     primary                       = true
     public_ip_address_id          = azurerm_public_ip.vm01selfpip.id
   }
@@ -132,17 +129,14 @@ resource "azurerm_network_interface" "vm02-ext-nic" {
   ip_configuration {
     name                          = "primary"
     subnet_id                     = data.azurerm_subnet.external.id
-    private_ip_address_allocation = "Static"
-    private_ip_address            = var.f5vm02ext
+    private_ip_address_allocation = "Dynamic"
     primary                       = true
     public_ip_address_id          = azurerm_public_ip.vm02selfpip.id
   }
-
   ip_configuration {
     name                          = "secondary"
     subnet_id                     = data.azurerm_subnet.external.id
-    private_ip_address_allocation = "Static"
-    private_ip_address            = var.f5publicvip
+    private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = azurerm_public_ip.pubvippip.id
   }
 
@@ -163,8 +157,7 @@ resource "azurerm_network_interface" "vm01-int-nic" {
   ip_configuration {
     name                          = "primary"
     subnet_id                     = data.azurerm_subnet.internal.id
-    private_ip_address_allocation = "Static"
-    private_ip_address            = var.f5vm01int
+    private_ip_address_allocation = "Dynamic"
     primary                       = true
   }
 
@@ -182,8 +175,7 @@ resource "azurerm_network_interface" "vm02-int-nic" {
   ip_configuration {
     name                          = "primary"
     subnet_id                     = data.azurerm_subnet.internal.id
-    private_ip_address_allocation = "Static"
-    private_ip_address            = var.f5vm02int
+    private_ip_address_allocation = "Dynamic"
     primary                       = true
   }
 
@@ -211,7 +203,6 @@ locals {
     CFE_VER                 = split("/", var.CFE_URL)[7]
     FAST_VER                = split("/", var.FAST_URL)[7]
     remote_selfip_ext       = ""
-    public_vip              = var.f5publicvip
     dns_server              = var.dns_server
     ntp_server              = var.ntp_server
     timezone                = var.timezone
@@ -249,7 +240,6 @@ locals {
     CFE_VER                 = split("/", var.CFE_URL)[7]
     FAST_VER                = split("/", var.FAST_URL)[7]
     remote_selfip_ext       = azurerm_network_interface.vm01-ext-nic.private_ip_address
-    public_vip              = var.f5publicvip
     dns_server              = var.dns_server
     ntp_server              = var.ntp_server
     timezone                = var.timezone

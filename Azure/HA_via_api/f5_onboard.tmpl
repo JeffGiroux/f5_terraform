@@ -307,10 +307,14 @@ tmsh create sys management-route azure_metadata network 169.254.169.254/32 gatew
 tmsh save sys config
 
 # Retrieve Network Metadata from Azure
+# Metadata retrieval from runtime init retrieves IP/mask.
+# Only IP is needed in spots (no mask). Collecting here.
 NETWORK_BASE_URL="http://169.254.169.254/metadata/instance/network"
-PUBLIC_VIP=$(curl -s -f --retry 10 -H Metadata:true "$${NETWORK_BASE_URL}/interface/2/ipv4/ipAddress/1/privateIpAddress?api-version=2021-05-01&format=text")
-SELF_IP_EXTERNAL=$(curl -s -f --retry 10 -H Metadata:true "$${NETWORK_BASE_URL}/interface/2/ipv4/ipAddress/0/privateIpAddress?api-version=2021-05-01&format=text")
-SELF_IP_INTERNAL=$(curl -s -f --retry 10 -H Metadata:true "$${NETWORK_BASE_URL}/interface/1/ipv4/ipAddress/0/privateIpAddress?api-version=2021-05-01&format=text")
+SELF_IP_INTERNAL=$(curl -s -f --retry 10 -H Metadata:true "$${NETWORK_BASE_URL}/interface/2/ipv4/ipAddress/0/privateIpAddress?api-version=2021-05-01&format=text")
+SELF_IP_EXTERNAL=$(curl -s -f --retry 10 -H Metadata:true "$${NETWORK_BASE_URL}/interface/1/ipv4/ipAddress/0/privateIpAddress?api-version=2021-05-01&format=text")
+PUBLIC_VIP=$(curl -s -f --retry 10 -H Metadata:true "$${NETWORK_BASE_URL}/interface/1/ipv4/ipAddress/1/privateIpAddress?api-version=2021-05-01&format=text")
+# if PUBLIC_VIP is empty, then set to 0.0.0.0/0 to avoid AS3 error
+[[ -z $PUBLIC_VIP ]] && PUBLIC_VIP="0.0.0.0/0"
 sed -i "s/\$PUBLIC_VIP/$PUBLIC_VIP/g" /config/cloud/runtime-init-conf.yaml
 sed -i "s/\$SELF_IP_EXTERNAL/$SELF_IP_EXTERNAL/g" /config/cloud/runtime-init-conf.yaml
 sed -i "s/\$SELF_IP_INTERNAL/$SELF_IP_INTERNAL/g" /config/cloud/runtime-init-conf.yaml
