@@ -210,7 +210,7 @@ locals {
     timezone                = var.timezone
     host1                   = "${var.prefix}-${var.host1_name}"
     host2                   = "${var.prefix}-${var.host2_name}"
-    remote_host             = ""
+    remote_host             = "${var.prefix}-${var.host2_name}"
     f5_cloud_failover_label = var.f5_cloud_failover_label
     cfe_managed_route       = var.cfe_managed_route
     law_id                  = azurerm_log_analytics_workspace.law.workspace_id
