@@ -234,11 +234,11 @@ extension_services:
               - '{{{ SELF_IP_EXTERNAL }}}'
               - '${remote_selfip_ext}'
 post_onboard_enabled:
-  - name: trigger_failover_host2
+  - name: trigger_failover
     type: inline
     commands:
     - $(nohup bash /config/failover/tgactive &>/dev/null &)
-    - tmsh modify cm device-group Sync devices modify { '{{{ HOST2 }}}.example.com' { set-sync-leader } }
+    - tmsh modify cm device-group failoverGroup devices modify { '{{{ HOST2 }}}.example.com' { set-sync-leader } }
     - tmsh save sys config
 EOF
 
@@ -246,10 +246,6 @@ EOF
 for i in {1..30}; do
     curl -fv --retry 1 --connect-timeout 5 -L ${INIT_URL} -o "/var/config/rest/downloads/f5-bigip-runtime.gz.run" && break || sleep 10
 done
-
-# Remove comment to do silly debugging on BIG-IP Runtime init
-#export F5_BIGIP_RUNTIME_INIT_LOG_LEVEL=silly
-#export F5_BIGIP_RUNTIME_EXTENSION_INSTALL_DELAY_IN_MS=60000
 
 # Install BIG-IP Runtime Init
 bash /var/config/rest/downloads/f5-bigip-runtime.gz.run -- '--cloud azure'
