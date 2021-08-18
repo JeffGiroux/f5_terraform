@@ -112,6 +112,12 @@ resource "azurerm_network_interface" "vm01-ext-nic" {
     primary                       = true
     public_ip_address_id          = azurerm_public_ip.vm01selfpip.id
   }
+  ip_configuration {
+    name                          = "secondary"
+    subnet_id                     = data.azurerm_subnet.external.id
+    private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.pubvippip.id
+  }
 
   tags = {
     owner                     = var.owner
@@ -132,12 +138,6 @@ resource "azurerm_network_interface" "vm02-ext-nic" {
     private_ip_address_allocation = "Dynamic"
     primary                       = true
     public_ip_address_id          = azurerm_public_ip.vm02selfpip.id
-  }
-  ip_configuration {
-    name                          = "secondary"
-    subnet_id                     = data.azurerm_subnet.external.id
-    private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.pubvippip.id
   }
 
   tags = {
