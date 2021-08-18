@@ -54,8 +54,8 @@ To run this Terraform template, perform the following steps:
   2. Modify terraform.tfvars with the required information
   ```
       # Azure Environment
-      location           = "westus2"
-      adminSrcAddr       = "0.0.0.0/0"
+      location     = "westus2"
+      adminSrcAddr = "0.0.0.0/0"
 
       # Prefix for objects being created
       prefix = "mydemo123"

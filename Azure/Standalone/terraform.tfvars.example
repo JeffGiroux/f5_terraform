@@ -8,7 +8,7 @@ extSubnet  = "external"
 intSubnet  = "internal"
 
 # Azure Environment
-location           = "westus2"
+location = "westus2"
 
 # Prefix for objects being created
 prefix = "mydemo123"
