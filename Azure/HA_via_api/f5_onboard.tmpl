@@ -271,6 +271,7 @@ for address in $list; do
     tmsh create ltm virtual-address $address address $address
   fi
 done
+tmsh save sys config
 
 # Run BIG-IP Runtime Init and Process YAML
 f5-bigip-runtime-init --config-file /config/cloud/runtime-init-conf.yaml
