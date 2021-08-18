@@ -1,8 +1,8 @@
 # Deploying BIG-IP VEs in Azure - High Availability (Active/Standby): 3-NIC
 
 ## To Do
-1. Currently BROKEN
-2. Converting onboard to runtime-init
+1. ltm virtual-address is deployed for app side
+2. AS3 still not used and not installed
 
 ## Contents
 
