@@ -2,7 +2,7 @@
 
 # Create Public IPs - mgmt
 resource "azurerm_public_ip" "vm01mgmtpip" {
-  name                = "${var.prefix}-vm01-mgmt-pip"
+  name                = format("%s-vm01-mgmt-pip-%s", var.projectPrefix, random_id.buildSuffix.hex)
   location            = azurerm_resource_group.main.location
   sku                 = "Standard"
   availability_zone   = 1
@@ -14,7 +14,7 @@ resource "azurerm_public_ip" "vm01mgmtpip" {
 }
 
 resource "azurerm_public_ip" "vm02mgmtpip" {
-  name                = "${var.prefix}-vm02-mgmt-pip"
+  name                = format("%s-vm02-mgmt-pip-%s", var.projectPrefix, random_id.buildSuffix.hex)
   location            = azurerm_resource_group.main.location
   sku                 = "Standard"
   availability_zone   = 2
@@ -27,7 +27,7 @@ resource "azurerm_public_ip" "vm02mgmtpip" {
 
 # Create Public IPs - external
 resource "azurerm_public_ip" "vm01selfpip" {
-  name                = "${var.prefix}-vm01-self-pip"
+  name                = format("%s-vm01-self-pip-%s", var.projectPrefix, random_id.buildSuffix.hex)
   location            = azurerm_resource_group.main.location
   sku                 = "Standard"
   availability_zone   = 1
@@ -39,7 +39,7 @@ resource "azurerm_public_ip" "vm01selfpip" {
 }
 
 resource "azurerm_public_ip" "vm02selfpip" {
-  name                = "${var.prefix}-vm02-self-pip"
+  name                = format("%s-vm02-self-pip-%s", var.projectPrefix, random_id.buildSuffix.hex)
   location            = azurerm_resource_group.main.location
   sku                 = "Standard"
   availability_zone   = 2
@@ -52,7 +52,7 @@ resource "azurerm_public_ip" "vm02selfpip" {
 
 # Create Public IPs - VIP
 resource "azurerm_public_ip" "pubvippip" {
-  name                = "${var.prefix}-pubvip-pip"
+  name                = format("%s-pubvip-pip-%s", var.projectPrefix, random_id.buildSuffix.hex)
   location            = azurerm_resource_group.main.location
   sku                 = "Standard"
   availability_zone   = 1
@@ -65,7 +65,7 @@ resource "azurerm_public_ip" "pubvippip" {
 
 # Create NIC for Management 
 resource "azurerm_network_interface" "vm01-mgmt-nic" {
-  name                = "${var.prefix}-vm01-mgmt"
+  name                = format("%s-vm01-mgmt-%s", var.projectPrefix, random_id.buildSuffix.hex)
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
 
@@ -82,7 +82,7 @@ resource "azurerm_network_interface" "vm01-mgmt-nic" {
 }
 
 resource "azurerm_network_interface" "vm02-mgmt-nic" {
-  name                = "${var.prefix}-vm02-mgmt"
+  name                = format("%s-vm02-mgmt-%s", var.projectPrefix, random_id.buildSuffix.hex)
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
 
@@ -100,7 +100,7 @@ resource "azurerm_network_interface" "vm02-mgmt-nic" {
 
 # Create NIC for External
 resource "azurerm_network_interface" "vm01-ext-nic" {
-  name                 = "${var.prefix}-vm01-ext"
+  name                 = format("%s-vm01-ext-%s", var.projectPrefix, random_id.buildSuffix.hex)
   location             = azurerm_resource_group.main.location
   resource_group_name  = azurerm_resource_group.main.name
   enable_ip_forwarding = true
@@ -121,13 +121,13 @@ resource "azurerm_network_interface" "vm01-ext-nic" {
 
   tags = {
     owner                     = var.owner
-    f5_cloud_failover_label   = var.f5_cloud_failover_label
+    f5_cloud_failover_label   = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
     f5_cloud_failover_nic_map = var.f5_cloud_failover_nic_map
   }
 }
 
 resource "azurerm_network_interface" "vm02-ext-nic" {
-  name                 = "${var.prefix}-vm02-ext"
+  name                 = format("%s-vm02-ext-%s", var.projectPrefix, random_id.buildSuffix.hex)
   location             = azurerm_resource_group.main.location
   resource_group_name  = azurerm_resource_group.main.name
   enable_ip_forwarding = true
@@ -142,14 +142,14 @@ resource "azurerm_network_interface" "vm02-ext-nic" {
 
   tags = {
     owner                     = var.owner
-    f5_cloud_failover_label   = var.f5_cloud_failover_label
+    f5_cloud_failover_label   = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
     f5_cloud_failover_nic_map = var.f5_cloud_failover_nic_map
   }
 }
 
 # Create NIC for Internal
 resource "azurerm_network_interface" "vm01-int-nic" {
-  name                 = "${var.prefix}-vm01-int"
+  name                 = format("%s-vm01-int-%s", var.projectPrefix, random_id.buildSuffix.hex)
   location             = azurerm_resource_group.main.location
   resource_group_name  = azurerm_resource_group.main.name
   enable_ip_forwarding = true
@@ -167,7 +167,7 @@ resource "azurerm_network_interface" "vm01-int-nic" {
 }
 
 resource "azurerm_network_interface" "vm02-int-nic" {
-  name                 = "${var.prefix}-vm02-int"
+  name                 = format("%s-vm02-int-%s", var.projectPrefix, random_id.buildSuffix.hex)
   location             = azurerm_resource_group.main.location
   resource_group_name  = azurerm_resource_group.main.name
   enable_ip_forwarding = true
@@ -208,10 +208,10 @@ locals {
     dns_server              = var.dns_server
     ntp_server              = var.ntp_server
     timezone                = var.timezone
-    host1                   = "${var.prefix}-${var.host1_name}"
-    host2                   = "${var.prefix}-${var.host2_name}"
-    remote_host             = "${var.prefix}-${var.host2_name}"
-    f5_cloud_failover_label = var.f5_cloud_failover_label
+    host1                   = format("%s-f5vm01-%s", var.projectPrefix, random_id.buildSuffix.hex)
+    host2                   = format("%s-f5vm02-%s", var.projectPrefix, random_id.buildSuffix.hex)
+    remote_host             = format("%s-f5vm02-%s", var.projectPrefix, random_id.buildSuffix.hex)
+    f5_cloud_failover_label = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
     cfe_managed_route       = var.cfe_managed_route
     law_id                  = azurerm_log_analytics_workspace.law.workspace_id
     law_primkey             = azurerm_log_analytics_workspace.law.primary_shared_key
@@ -247,10 +247,10 @@ locals {
     dns_server              = var.dns_server
     ntp_server              = var.ntp_server
     timezone                = var.timezone
-    host1                   = "${var.prefix}-${var.host1_name}"
-    host2                   = "${var.prefix}-${var.host2_name}"
+    host1                   = format("%s-f5vm01-%s", var.projectPrefix, random_id.buildSuffix.hex)
+    host2                   = format("%s-f5vm02-%s", var.projectPrefix, random_id.buildSuffix.hex)
     remote_host             = azurerm_network_interface.vm01-int-nic.private_ip_address
-    f5_cloud_failover_label = var.f5_cloud_failover_label
+    f5_cloud_failover_label = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
     cfe_managed_route       = var.cfe_managed_route
     law_id                  = azurerm_log_analytics_workspace.law.workspace_id
     law_primkey             = azurerm_log_analytics_workspace.law.primary_shared_key
@@ -268,7 +268,7 @@ locals {
 
 # Create F5 BIG-IP VMs
 resource "azurerm_linux_virtual_machine" "f5vm01" {
-  name                            = "${var.prefix}-${var.host1_name}"
+  name                            = format("%s-f5vm01-%s", var.projectPrefix, random_id.buildSuffix.hex)
   location                        = azurerm_resource_group.main.location
   resource_group_name             = azurerm_resource_group.main.name
   zone                            = 1
@@ -285,7 +285,7 @@ resource "azurerm_linux_virtual_machine" "f5vm01" {
   }
 
   os_disk {
-    name                 = "${var.prefix}vm01-osdisk"
+    name                 = format("%s-vm01-osdisk-%s", var.projectPrefix, random_id.buildSuffix.hex)
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
   }
@@ -313,7 +313,7 @@ resource "azurerm_linux_virtual_machine" "f5vm01" {
 }
 
 resource "azurerm_linux_virtual_machine" "f5vm02" {
-  name                            = "${var.prefix}-${var.host2_name}"
+  name                            = format("%s-f5vm02-%s", var.projectPrefix, random_id.buildSuffix.hex)
   location                        = azurerm_resource_group.main.location
   resource_group_name             = azurerm_resource_group.main.name
   zone                            = 2
@@ -330,7 +330,7 @@ resource "azurerm_linux_virtual_machine" "f5vm02" {
   }
 
   os_disk {
-    name                 = "${var.prefix}vm02-osdisk"
+    name                 = format("%s-vm02-osdisk-%s", var.projectPrefix, random_id.buildSuffix.hex)
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
   }
@@ -371,8 +371,8 @@ resource "azurerm_role_assignment" "f5vm02ra" {
 }
 
 # Run Startup Script
-resource "azurerm_virtual_machine_extension" "f5vm01-run-startup-cmd" {
-  name                 = "${var.prefix}-f5vm01-run-startup-cmd"
+resource "azurerm_virtual_machine_extension" "f5vm01-startup" {
+  name                 = format("%s-f5vm01-startup-%s", var.projectPrefix, random_id.buildSuffix.hex)
   virtual_machine_id   = azurerm_linux_virtual_machine.f5vm01.id
   publisher            = "Microsoft.Azure.Extensions"
   type                 = "CustomScript"
@@ -389,8 +389,8 @@ resource "azurerm_virtual_machine_extension" "f5vm01-run-startup-cmd" {
   }
 }
 
-resource "azurerm_virtual_machine_extension" "f5vm02-run-startup-cmd" {
-  name                 = "${var.prefix}-f5vm02-run-startup-cmd"
+resource "azurerm_virtual_machine_extension" "f5vm02-startup" {
+  name                 = format("%s-f5vm02-startup-%s", var.projectPrefix, random_id.buildSuffix.hex)
   virtual_machine_id   = azurerm_linux_virtual_machine.f5vm02.id
   publisher            = "Microsoft.Azure.Extensions"
   type                 = "CustomScript"
@@ -409,7 +409,7 @@ resource "azurerm_virtual_machine_extension" "f5vm02-run-startup-cmd" {
 
 # Create Route Table
 resource "azurerm_route_table" "udr" {
-  name                          = "udr"
+  name                          = format("%s-udr-%s", var.projectPrefix, random_id.buildSuffix.hex)
   location                      = azurerm_resource_group.main.location
   resource_group_name           = azurerm_resource_group.main.name
   disable_bgp_route_propagation = false
@@ -423,7 +423,7 @@ resource "azurerm_route_table" "udr" {
 
   tags = {
     owner                   = var.owner
-    f5_cloud_failover_label = var.f5_cloud_failover_label
+    f5_cloud_failover_label = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
     f5_self_ips             = "${azurerm_network_interface.vm01-ext-nic.private_ip_address},${azurerm_network_interface.vm02-ext-nic.private_ip_address}"
   }
 }

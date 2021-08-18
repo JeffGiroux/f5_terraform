@@ -9,6 +9,6 @@ extSubnet  = "external"
 intSubnet  = "internal"
 
 # Azure Environment
-location = "westus2"
-prefix   = "mydemo123"
-owner    = "myLastName"
+location      = "westus2"
+projectPrefix = "mydemo123"
+owner         = "myLastName"

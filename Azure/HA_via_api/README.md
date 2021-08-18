@@ -136,7 +136,7 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 
 | Parameter | Description | Type | Default | Required |
 | --------- | ----------- | ---- | ------- | -------- |
-| prefix | This value is inserted at the beginning of each Azure object (alpha-numeric, no special character) | `string` | demo | no |
+| projectPrefix | This value is inserted at the beginning of each Azure object (alpha-numeric, no special character) | `string` | demo | no |
 | sp_subscription_id | This is the service principal subscription ID | `string` | null | no |
 | sp_client_id | This is the service principal application/client ID | `string` | null | no |
 | sp_client_secret | This is the service principal secret | `string` | null | no |
@@ -156,8 +156,6 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | image_name | F5 SKU (image) to deploy. Note: The disk size of the VM will be determined based on the option you select.  **Important**: If intending to provision multiple modules, ensure the appropriate value is selected, such as ****AllTwoBootLocations or AllOneBootLocation****. | `string` | f5-bigip-virtual-edition-1g-best-hourly | no |
 | license1 | The license token for the F5 BIG-IP VE (BYOL) | `string` | null | no |
 | license2 | The license token for the F5 BIG-IP VE (BYOL) | `string` | null | no |
-| host1_name | Hostname for the 1st BIG-IP | `string` | f5vm01 | no |
-| host2_name | Hostname for the 2nd BIG-IP | `string` | f5vm02 | no |
 | ntp_server | Leave the default NTP server the BIG-IP uses, or replace the default NTP server with the one you want to use | `string` | 0.us.pool.ntp.org | no |
 | timezone | If you would like to change the time zone the BIG-IP uses, enter the time zone you want to use. This is based on the tz database found in /usr/share/zoneinfo (see the full list [here](https://github.com/F5Networks/f5-azure-arm-templates/blob/master/azure-timezone-list.md)). Example values: UTC, US/Pacific, US/Eastern, Europe/London or Asia/Singapore. | `string` | UTC | no |
 | dns_server | Leave the default DNS server the BIG-IP uses, or replace the default DNS server with the one you want to use | `string` | 8.8.8.8 | no |
@@ -169,7 +167,6 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | CFE_URL | URL to download the BIG-IP Cloud Failover Extension module | `string` | https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.9.0/f5-cloud-failover-1.9.0-0.noarch.rpm | no |
 | libs_dir | Directory on the BIG-IP to download the A&O Toolchain into | `string` | /config/cloud/azure/node_modules | no |
 | onboard_log | Directory on the BIG-IP to store the cloud-init logs | `string` | /var/log/startup-script.log | no |
-| f5_cloud_failover_label | This is a tag used for failover. | `string` | mydeployment | yes |
 | f5_cloud_failover_nic_map | This is a tag used for failover NIC. | `string` | external | yes |
 | owner | This is a tag used for object creation. Example "lastname" | `string` | null | yes |
 | bigIqHost | This is the BIG-IQ License Manager host name or IP address | `string` | 200.200.200.200 | no |
@@ -200,9 +197,9 @@ To run this Terraform template, perform the following steps:
       intSubnet  = "internal"
 
       # Azure Environment
-      location = "westus2"
-      prefix   = "mylab123"
-      owner    = "myLastName"
+      location      = "westus2"
+      projectPrefix = "mylab123"
+      owner         = "myLastName"
   ```
   3. Initialize the directory
   ```

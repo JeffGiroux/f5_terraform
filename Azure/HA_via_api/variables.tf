@@ -5,7 +5,7 @@ variable "sp_subscription_id" { default = "" }
 variable "sp_client_id" { default = "" }
 variable "sp_client_secret" { default = "" }
 variable "sp_tenant_id" { default = "" }
-variable "prefix" { default = "demo" }
+variable "projectPrefix" { default = "demo" }
 variable "location" { default = "westus2" }
 
 # NETWORK
@@ -31,8 +31,6 @@ variable "ssh_key" {
 }
 variable "license1" { default = "" }
 variable "license2" { default = "" }
-variable "host1_name" { default = "f5vm01" }
-variable "host2_name" { default = "f5vm02" }
 variable "dns_server" { default = "8.8.8.8" }
 variable "ntp_server" { default = "0.us.pool.ntp.org" }
 variable "timezone" { default = "UTC" }
@@ -91,5 +89,4 @@ variable "bigIqHypervisor" { default = "azure" }
 
 # TAGS
 variable "owner" {}
-variable "f5_cloud_failover_label" { default = "mydeployment" } #Cloud Failover Tag
-variable "f5_cloud_failover_nic_map" { default = "external" }   #NIC Tag
+variable "f5_cloud_failover_nic_map" { default = "external" } #NIC Tag
