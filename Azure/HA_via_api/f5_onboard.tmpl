@@ -271,9 +271,14 @@ for address in $list; do
   address_base=$(echo $address | cut -d. -f1-3)
   if [[ $address_base == $f3 && $address != $base ]]; then
     tmsh create ltm virtual-address $address address $address
+    PUBLIC_VIP=$address
   fi
 done
 tmsh save sys config
+
+# Note: if PUBLIC_VIP is empty, then set to 0.0.0.0/0 to avoid AS3 error
+[[ -z $PUBLIC_VIP ]] && PUBLIC_VIP="0.0.0.0\/0"
+sed -i "s/\$PUBLIC_VIP/$PUBLIC_VIP/g" /config/cloud/runtime-init-conf.yaml
 
 # Run BIG-IP Runtime Init and Process YAML
 f5-bigip-runtime-init --config-file /config/cloud/runtime-init-conf.yaml
