@@ -33,7 +33,7 @@ Terraform v0.14.10
 - Sensitive variables like Azure SSH keys are configured in terraform.tfvars
   - ***Note***: Other items like BIG-IP password are stored in Azure Key Vault. Refer to the [Prerequisites](#prerequisites).
 - Files
-  - main.tf - resources for provider, versions, storage account
+  - main.tf - resources for provider, versions
   - network.tf - resources for VNET, subnets, security groups
 
 ## Template Parameters
