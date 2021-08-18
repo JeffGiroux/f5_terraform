@@ -237,10 +237,6 @@ resource "azurerm_linux_virtual_machine" "f5vm01" {
     product   = var.product
   }
 
-  boot_diagnostics {
-    storage_account_uri = data.azurerm_storage_account.main.primary_blob_endpoint
-  }
-
   tags = {
     Name        = "${var.environment}-f5vm01"
     environment = var.environment

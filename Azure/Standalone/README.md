@@ -199,7 +199,6 @@ To run this Terraform template, perform the following steps:
 
       # Azure Environment
       location           = "westus2"
-      storage_name       = "mystorage"
 
       # Prefix for objects being created
       prefix = "mylab123"

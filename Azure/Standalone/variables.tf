@@ -17,7 +17,6 @@ variable "sp_client_secret" { default = "" }
 variable "sp_tenant_id" { default = "" }
 variable "prefix" {}
 variable "location" {}
-variable "storage_name" {}
 
 # NETWORK
 variable "vnet_rg" {}
