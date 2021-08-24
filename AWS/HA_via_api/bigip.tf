@@ -72,8 +72,10 @@ resource "aws_network_interface" "vm01-ext-nic" {
   security_groups   = [var.extNsg]
   private_ips_count = 1
   tags = {
-    Name  = format("%s-vm01-ext-%s", var.projectPrefix, random_id.buildSuffix.hex)
-    Owner = var.resourceOwner
+    Name                      = format("%s-vm01-ext-%s", var.projectPrefix, random_id.buildSuffix.hex)
+    Owner                     = var.resourceOwner
+    f5_cloud_failover_label   = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
+    f5_cloud_failover_nic_map = "external"
   }
 }
 
@@ -82,8 +84,10 @@ resource "aws_network_interface" "vm02-ext-nic" {
   security_groups   = [var.extNsg]
   private_ips_count = 1
   tags = {
-    Name  = format("%s-vm02-ext-%s", var.projectPrefix, random_id.buildSuffix.hex)
-    Owner = var.resourceOwner
+    Name                      = format("%s-vm02-ext-%s", var.projectPrefix, random_id.buildSuffix.hex)
+    Owner                     = var.resourceOwner
+    f5_cloud_failover_label   = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
+    f5_cloud_failover_nic_map = "external"
   }
 }
 
@@ -92,8 +96,10 @@ resource "aws_network_interface" "vm01-int-nic" {
   subnet_id       = var.intSubnetAz1
   security_groups = [var.intNsg]
   tags = {
-    Name  = format("%s-vm01-int-%s", var.projectPrefix, random_id.buildSuffix.hex)
-    Owner = var.resourceOwner
+    Name                      = format("%s-vm01-int-%s", var.projectPrefix, random_id.buildSuffix.hex)
+    Owner                     = var.resourceOwner
+    f5_cloud_failover_label   = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
+    f5_cloud_failover_nic_map = "internal"
   }
 }
 
@@ -101,8 +107,10 @@ resource "aws_network_interface" "vm02-int-nic" {
   subnet_id       = var.intSubnetAz2
   security_groups = [var.intNsg]
   tags = {
-    Name  = format("%s-vm02-int-%s", var.projectPrefix, random_id.buildSuffix.hex)
-    Owner = var.resourceOwner
+    Name                      = format("%s-vm02-int-%s", var.projectPrefix, random_id.buildSuffix.hex)
+    Owner                     = var.resourceOwner
+    f5_cloud_failover_label   = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
+    f5_cloud_failover_nic_map = "internal"
   }
 }
 
