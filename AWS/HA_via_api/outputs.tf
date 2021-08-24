@@ -1,5 +1,6 @@
 # Outputs
 
+output "route_table" { value = aws_route_table.main.id }
 output "storage_bucket" { value = aws_s3_bucket.main.arn }
 output "public_vip_pip" { value = aws_eip.vip-pip.public_ip }
 

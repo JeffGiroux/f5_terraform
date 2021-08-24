@@ -334,7 +334,7 @@ resource "aws_instance" "f5vm02" {
 ############################ Route Table ############################
 
 # Create Route Table
-resource "aws_route_table" "rt" {
+resource "aws_route_table" "main" {
   vpc_id = var.vpcId
 
   route {
