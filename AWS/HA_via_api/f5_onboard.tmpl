@@ -1,0 +1,330 @@
+#!/bin/bash -x
+
+mkdir -p  /var/log/cloud /config/cloud /var/config/rest/downloads
+LOG_FILE=/var/log/cloud/startup-script.log
+[[ ! -f $LOG_FILE ]] && touch $LOG_FILE || { echo "Run Only Once. Exiting"; exit; }
+npipe=/tmp/$$.tmp
+trap "rm -f $npipe" EXIT
+mknod $npipe p
+tee <$npipe -a $LOG_FILE /dev/ttyS0 &
+exec 1>&-
+exec 1>$npipe
+exec 2>&1
+  
+
+### write_files:
+# Download or Render BIG-IP Runtime Init Config 
+
+cat << 'EOF' > /config/cloud/runtime-init-conf.yaml
+---
+runtime_parameters:
+  - name: HOST_NAME
+    type: metadata
+    metadataProvider:
+      environment: aws
+      type: compute
+      field: hostname
+  - name: REGION
+    type: url
+    value: http://169.254.169.254/latest/dynamic/instance-identity/document
+    query: region
+  - name: USER_NAME
+    type: static
+    value: ${f5_username}
+  - name: ADMIN_PASS
+    type: static
+    value: ${f5_password}
+  - name: SSH_KEYS
+    type: static
+    value: ${ssh_keypair}
+  - name: FAILOVER_LABEL
+    type: static
+    value: ${f5_cloud_failover_label}
+  - name: MANAGED_ROUTE
+    type: static
+    value: ${cfe_managed_route}
+  - name: VPC_CIDR_BLOCK
+    type: static
+    value: ${vpc_cidr_block}
+  - name: GATEWAY_EXTERNAL
+    type: metadata
+    metadataProvider:
+      environment: aws
+      type: network
+      field: local-ipv4s
+      index: 1
+      ipcalc: first
+  - name: GATEWAY_INTERNAL
+    type: metadata
+    metadataProvider:
+      environment: aws
+      type: network
+      field: local-ipv4s
+      index: 2
+      ipcalc: first
+  - name: SELF_IP_EXTERNAL
+    type: static
+    value: ${self_ip_external}
+  - name: SELF_IP_INTERNAL
+    type: static
+    value: ${self_ip_internal}
+  - name: REMOTE_SELFIP_EXT
+    type: static
+    value: ${remote_selfip_ext}
+  - name: VIP_AZ1
+    type: static
+    value: ${vip_az1}
+  - name: VIP_AZ2
+    type: static
+    value: ${vip_az2}
+  - name: REMOTE_HOST
+    type: static
+    value: ${remote_host}
+  - name: DNS_SERVER
+    type: static
+    value: ${dns_server}
+  - name: NTP_SERVER
+    type: static
+    value: ${ntp_server}
+  - name: TIMEZONE
+    type: static
+    value: ${timezone}
+  - name: HOST1
+    type: static
+    value: ${host1}
+  - name: HOST2
+    type: static
+    value: ${host2}
+pre_onboard_enabled:
+  - name: provision_rest
+    type: inline
+    commands:
+      - /usr/bin/setdb provision.extramb 1000
+      - /usr/bin/setdb restjavad.useextramb true
+      - /usr/bin/setdb setup.run false
+extension_packages:
+  install_operations:
+    - extensionType: do
+      extensionVersion: ${DO_VER}
+      extensionUrl: ${DO_URL}
+    - extensionType: as3
+      extensionVersion: ${AS3_VER}
+      extensionUrl: ${AS3_URL}
+    - extensionType: cf
+      extensionVersion: ${CFE_VER}
+      extensionUrl: ${CFE_URL}
+extension_services:
+  service_operations:
+    - extensionType: do
+      type: inline
+      value:
+        schemaVersion: 1.0.0
+        class: Device
+        async: true
+        label: Onboard BIG-IP into an HA Pair
+        Common:
+          class: Tenant
+          dbVars:
+            class: DbVariables
+            restjavad.useextramb: true
+            provision.extramb: 1000
+            config.allow.rfc3927: enable
+            ui.advisory.enabled: true
+            ui.advisory.color: blue
+            ui.advisory.text: '{{{ HOST_NAME }}}'
+          mySystem:
+            autoPhonehome: true
+            class: System
+            hostname: '{{{ HOST_NAME }}}'
+          '{{{ USER_NAME }}}':
+            class: User
+            partitionAccess:
+              all-partitions:
+                role: admin
+            password: '{{{ ADMIN_PASS }}}'
+            shell: bash
+            userType: regular
+            keys:
+              - '{{{ SSH_KEYS }}}'
+          myDns:
+            class: DNS
+            nameServers:
+              - '{{{ DNS_SERVER }}}'
+              - 2001:4860:4860::8844
+            search:
+              - f5.com
+          myNtp:
+            class: NTP
+            servers:
+              - '{{{ NTP_SERVER }}}'
+              - 1.pool.ntp.org
+              - 2.pool.ntp.org
+            timezone: '{{{ TIMEZONE }}}'
+          myProvisioning:
+            class: Provision
+            ltm: nominal
+          external:
+            class: VLAN
+            tag: 4094
+            mtu: 1500
+            interfaces:
+              - name: 1.1
+                tagged: false
+          external-localself:
+            class: SelfIp
+            address: '{{{ SELF_IP_EXTERNAL }}}/24'
+            vlan: external
+            allowService: default
+            trafficGroup: traffic-group-local-only
+          internal:
+            class: VLAN
+            tag: 4093
+            mtu: 1500
+            interfaces:
+              - name: 1.2
+                tagged: false
+          internal-localself:
+            class: SelfIp
+            address: '{{{ SELF_IP_INTERNAL }}}/24'
+            vlan: internal
+            allowService: default
+            trafficGroup: traffic-group-local-only
+          default_ext:
+            class: Route
+            gw: '{{{ GATEWAY_EXTERNAL }}}'
+            network: default
+            localOnly: true
+            mtu: 1500
+          default_int:
+            class: Route
+            gw: '{{{ GATEWAY_INTERNAL }}}'
+            network: '{{{ VPC_CIDR_BLOCK }}}'
+            localOnly: true
+            mtu: 1500
+          configsync:
+            class: ConfigSync
+            configsyncIp: /Common/internal-localself/address
+          failoverAddress:
+            class: FailoverUnicast
+            address: /Common/internal-localself/address
+          failoverGroup:
+            class: DeviceGroup
+            type: sync-failover
+            members:
+              - '{{{ HOST1 }}}'
+              - '{{{ HOST2 }}}'
+            owner: /Common/failoverGroup/members/0
+            autoSync: true
+            saveOnAutoSync: false
+            networkFailover: true
+            fullLoadOnSync: false
+            asmSync: false
+          trust:
+            class: DeviceTrust
+            localUsername: '{{{ USER_NAME }}}'
+            localPassword: '{{{ ADMIN_PASS }}}'
+            remoteHost: '{{{ REMOTE_HOST }}}'
+            remoteUsername: '{{{ USER_NAME }}}'
+            remotePassword: '{{{ ADMIN_PASS }}}'
+    - extensionType: as3
+      type: inline
+      value:
+        class: AS3
+        action: deploy
+        persist: true
+        declaration:
+          class: ADC
+          schemaVersion: 3.0.0
+          label: Sample 1
+          remark: A HTTP sample application
+          Tenant_1:
+            class: Tenant
+            Shared:
+              class: Application
+              template: shared
+              shared_pool:
+                class: Pool
+                remark: Service 1 shared pool
+                monitors:
+                  - tcp
+                members:
+                  - servicePort: 80
+                    addressDiscovery: fqdn
+                    autoPopulate: true
+                    hostname: httpbin.org
+            Service_1_AZ1:
+              class: Application
+              template: http
+              serviceMain:
+                class: Service_HTTP
+                remark: EIP 1 for Service 1 maps to this VIP
+                virtualAddresses:
+                  - use: service_1_Address_AZ1
+                pool: /Tenant_1/Shared/shared_pool
+              service_1_Address_AZ1:
+                class: Service_Address
+                virtualAddress: '{{{ VIP_AZ1 }}}'
+                arpEnabled: true
+                icmpEcho: enable
+                routeAdvertisement: enable
+                spanningEnabled: false
+                trafficGroup: none
+            Service_1_AZ2:
+              class: Application
+              template: http
+              serviceMain:
+                class: Service_HTTP
+                remark: EIP 1 for Service 1 maps to this VIP
+                virtualAddresses:
+                  - use: service_1_Address_AZ2
+                pool: /Tenant_1/Shared/shared_pool
+              service_1_Address_AZ2:
+                class: Service_Address
+                virtualAddress: '{{{ VIP_AZ2 }}}'
+                arpEnabled: true
+                icmpEcho: enable
+                routeAdvertisement: enable
+                spanningEnabled: false
+                trafficGroup: none
+    - extensionType: cf
+      type: inline
+      value:
+        class: Cloud_Failover
+        environment: aws
+        externalStorage:
+          scopingTags:
+            f5_cloud_failover_label: '{{{ FAILOVER_LABEL }}}'
+        failoverAddresses:
+          enabled: true
+          scopingTags:
+            f5_cloud_failover_label: '{{{ FAILOVER_LABEL }}}'
+        failoverRoutes:
+          enabled: true
+          scopingTags:
+            f5_cloud_failover_label: '{{{ FAILOVER_LABEL }}}'
+          scopingAddressRanges:
+            - range: '{{{ MANAGED_ROUTE }}}'
+          defaultNextHopAddresses:
+            discoveryType: static
+            items:
+              - '{{{ SELF_IP_EXTERNAL }}}'
+              - '{{{ REMOTE_SELFIP_EXT }}}'
+post_onboard_enabled:
+  - name: trigger_failover
+    type: inline
+    commands:
+    - $(nohup bash /config/failover/tgactive &>/dev/null &)
+    - $(nohup tmsh modify cm device-group failoverGroup devices modify { '{{{ HOST2 }}}' { set-sync-leader } } &>/dev/null &)
+    - tmsh save sys config
+EOF
+
+# Download BIG-IP Runtime Init
+for i in {1..30}; do
+    curl -fv --retry 1 --connect-timeout 5 -L ${INIT_URL} -o "/var/config/rest/downloads/f5-bigip-runtime.gz.run" && break || sleep 10
+done
+
+# Install BIG-IP Runtime Init
+bash /var/config/rest/downloads/f5-bigip-runtime.gz.run -- '--cloud aws'
+
+# Run BIG-IP Runtime Init and Process YAML
+f5-bigip-runtime-init --config-file /config/cloud/runtime-init-conf.yaml

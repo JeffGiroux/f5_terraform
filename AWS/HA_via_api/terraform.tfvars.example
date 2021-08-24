@@ -1,0 +1,20 @@
+# BIG-IP Environment
+allowedIps    = ["0.0.0.0/0"]
+vpcId         = "vpc-1234"
+mgmtSubnetAz1 = "subnet-1111"
+mgmtSubnetAz2 = "subnet-2222"
+extSubnetAz1  = "subnet-3333"
+extSubnetAz2  = "subnet-4444"
+intSubnetAz1  = "subnet-5555"
+intSubnetAz2  = "subnet-6666"
+mgmtNsg       = "sg-1111"
+extNsg        = "sg-3333"
+intNsg        = "sg-5555"
+ssh_key       = "ssh-rsa AAABC123....."
+f5_username   = "admin"
+f5_password   = "Default12345!"
+
+# AWS Environment
+awsRegion     = "us-west-2"
+projectPrefix = "mydemo"
+resourceOwner = "myname"
