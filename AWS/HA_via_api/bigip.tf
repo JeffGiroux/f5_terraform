@@ -186,8 +186,8 @@ locals {
     dns_server              = var.dns_server
     ntp_server              = var.ntp_server
     timezone                = var.timezone
-    host1                   = format("%s-f5vm01-%s", var.projectPrefix, random_id.buildSuffix.hex)
-    host2                   = format("%s-f5vm02-%s", var.projectPrefix, random_id.buildSuffix.hex)
+    host1                   = ""
+    host2                   = ""
     remote_host             = format("%s-f5vm02-%s", var.projectPrefix, random_id.buildSuffix.hex)
     f5_cloud_failover_label = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
     cfe_managed_route       = var.cfe_managed_route
@@ -223,8 +223,8 @@ locals {
     dns_server              = var.dns_server
     ntp_server              = var.ntp_server
     timezone                = var.timezone
-    host1                   = format("%s-f5vm01-%s", var.projectPrefix, random_id.buildSuffix.hex)
-    host2                   = format("%s-f5vm02-%s", var.projectPrefix, random_id.buildSuffix.hex)
+    host1                   = ""
+    host2                   = aws_instance.f5vm01.private_dns
     remote_host             = aws_network_interface.vm01-int-nic.private_ip
     f5_cloud_failover_label = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
     cfe_managed_route       = var.cfe_managed_route
@@ -242,10 +242,11 @@ locals {
 
 # Create F5 BIG-IP VMs
 resource "aws_instance" "f5vm01" {
-  ami           = data.aws_ami.f5_ami.id
-  instance_type = var.ec2_instance_type
-  key_name      = aws_key_pair.bigip.key_name
-  user_data     = base64encode(local.f5_onboard1)
+  ami                  = data.aws_ami.f5_ami.id
+  instance_type        = var.ec2_instance_type
+  key_name             = aws_key_pair.bigip.key_name
+  user_data            = base64encode(local.f5_onboard1)
+  iam_instance_profile = aws_iam_instance_profile.bigip_profile.name
 
   network_interface {
     network_interface_id = aws_network_interface.vm01-mgmt-nic.id
@@ -265,7 +266,7 @@ resource "aws_instance" "f5vm01" {
   }
 
   tags = {
-    Name  = "${var.projectPrefix}-f5vm01-${random_id.buildSuffix.hex}"
+    Name  = format("%s-f5vm01-%s", var.projectPrefix, random_id.buildSuffix.hex)
     Owner = var.resourceOwner
   }
 }
@@ -294,7 +295,7 @@ resource "aws_instance" "f5vm02" {
   }
 
   tags = {
-    Name  = "${var.projectPrefix}-f5vm02-${random_id.buildSuffix.hex}"
+    Name  = format("%s-f5vm02-%s", var.projectPrefix, random_id.buildSuffix.hex)
     Owner = var.resourceOwner
   }
 }

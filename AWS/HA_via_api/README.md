@@ -69,6 +69,7 @@ This template is tested and worked in the following versions:
 - Files
   - bigip.tf - resources for BIG-IP, NICs, public IPs
   - main.tf - resources for provider, versions
+  - iam.tf - resources for IAM roles
   - bigip.tf - resources for BIG-IP, security groups, storage buckets
   - f5_onboard.tmpl - onboarding script which is run by user-data. This script is responsible for downloading the neccessary F5 Automation Toolchain RPM files, installing them, and then executing the onboarding REST calls via the [BIG-IP Runtime Init tool](https://github.com/F5Networks/f5-bigip-runtime-init).
 
