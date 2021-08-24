@@ -70,22 +70,3 @@ resource "aws_iam_instance_profile" "bigip_profile" {
   name = format("%s-bigip-profile-%s", var.projectPrefix, random_id.buildSuffix.hex)
   role = aws_iam_role.bigip_role.name
 }
-
-data "aws_iam_policy_document" "bigip_policy" {
-  version = "2012-10-17"
-  statement {
-    actions = [
-      "secretsmanager:GetSecretValue"
-    ]
-
-    resources = [
-      data.aws_secretsmanager_secret.password.arn
-    ]
-  }
-}
-
-resource "aws_iam_role_policy" "bigip_policy" {
-  name   = format("%s-bigip-policy", var.prefix)
-  role   = aws_iam_role.bigip_role.id
-  policy = data.aws_iam_policy_document.bigip_policy.json
-}
