@@ -1,7 +1,9 @@
 # BIG-IP Cluster
 
-# Locals
+############################ Locals ############################
+
 locals {
+  # Retrieve all BIG-IP secondary IPs
   vm01_ext_ips = {
     0 = {
       ip = sort(aws_network_interface.vm01-ext-nic.private_ips)[0]
@@ -18,7 +20,7 @@ locals {
       ip = sort(aws_network_interface.vm02-ext-nic.private_ips)[1]
     }
   }
-  # Determine BIG-IP secondary IP to be used for VIP
+  # Determine BIG-IP secondary IPs to be used for VIP
   vm01_vip_ips = {
     app1 = {
       ip = aws_network_interface.vm01-ext-nic.private_ip != local.vm01_ext_ips.0.ip ? local.vm01_ext_ips.0.ip : local.vm01_ext_ips.1.ip
@@ -31,6 +33,8 @@ locals {
   }
 }
 
+############################ AMI ############################
+
 # Find BIG-IP AMI
 data "aws_ami" "f5_ami" {
   most_recent = true
@@ -41,11 +45,15 @@ data "aws_ami" "f5_ami" {
   }
 }
 
+############################ SSH Key pair ############################
+
 # Create SSH Key Pair
 resource "aws_key_pair" "bigip" {
   key_name   = format("%s-key-%s", var.projectPrefix, random_id.buildSuffix.hex)
   public_key = var.ssh_key
 }
+
+############################ NICs ############################
 
 # Create NIC for Management 
 resource "aws_network_interface" "vm01-mgmt-nic" {
@@ -71,6 +79,7 @@ resource "aws_network_interface" "vm01-ext-nic" {
   subnet_id         = var.extSubnetAz1
   security_groups   = [var.extNsg]
   private_ips_count = 1
+  source_dest_check = false
   tags = {
     Name                      = format("%s-vm01-ext-%s", var.projectPrefix, random_id.buildSuffix.hex)
     Owner                     = var.resourceOwner
@@ -83,6 +92,7 @@ resource "aws_network_interface" "vm02-ext-nic" {
   subnet_id         = var.extSubnetAz2
   security_groups   = [var.extNsg]
   private_ips_count = 1
+  source_dest_check = false
   tags = {
     Name                      = format("%s-vm02-ext-%s", var.projectPrefix, random_id.buildSuffix.hex)
     Owner                     = var.resourceOwner
@@ -93,8 +103,9 @@ resource "aws_network_interface" "vm02-ext-nic" {
 
 # Create NIC for Internal
 resource "aws_network_interface" "vm01-int-nic" {
-  subnet_id       = var.intSubnetAz1
-  security_groups = [var.intNsg]
+  subnet_id         = var.intSubnetAz1
+  security_groups   = [var.intNsg]
+  source_dest_check = false
   tags = {
     Name                      = format("%s-vm01-int-%s", var.projectPrefix, random_id.buildSuffix.hex)
     Owner                     = var.resourceOwner
@@ -104,8 +115,9 @@ resource "aws_network_interface" "vm01-int-nic" {
 }
 
 resource "aws_network_interface" "vm02-int-nic" {
-  subnet_id       = var.intSubnetAz2
-  security_groups = [var.intNsg]
+  subnet_id         = var.intSubnetAz2
+  security_groups   = [var.intNsg]
+  source_dest_check = false
   tags = {
     Name                      = format("%s-vm02-int-%s", var.projectPrefix, random_id.buildSuffix.hex)
     Owner                     = var.resourceOwner
@@ -113,6 +125,8 @@ resource "aws_network_interface" "vm02-int-nic" {
     f5_cloud_failover_nic_map = "internal"
   }
 }
+
+############################ EIPs ############################
 
 # Create Public IPs - mgmt
 resource "aws_eip" "vm01-mgmt-pip" {
@@ -171,6 +185,8 @@ resource "aws_eip" "vip-pip" {
   }
   depends_on = [aws_network_interface.vm01-ext-nic]
 }
+
+############################ Onboard Scripts ############################
 
 # Setup Onboarding scripts
 locals {
@@ -252,6 +268,8 @@ locals {
   })
 }
 
+############################ Compute ############################
+
 # Create F5 BIG-IP VMs
 resource "aws_instance" "f5vm01" {
   ami                  = data.aws_ami.f5_ami.id
@@ -312,6 +330,8 @@ resource "aws_instance" "f5vm02" {
     Owner = var.resourceOwner
   }
 }
+
+############################ Route Table ############################
 
 # Create Route Table
 resource "aws_route_table" "rt" {
