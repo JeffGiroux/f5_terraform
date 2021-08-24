@@ -1,11 +1,12 @@
-# Deploying BIG-IP VEs in AWS - High Availability (Active/Standby): 3-NIC
+# Deploying BIG-IP VEs in AWS Across-Net - High Availability (Active/Standby): 3-NIC
 
 ## To Do
 - EXPIREMENTAL ONLY
 - Community support only. Not F5 supported.
 - Move to AWS secret manager. Currently passwords are stored in clear text in the runtime init YAML file local to the BIG-IP box.
-- LTM virtual-address is deployed for app side
 - AS3 still not used and not installed
+- TS still not used and not installed
+- Route table created for CFE demonstration but not associated with subnets
 
 ## Issues
 - Find an issue? Fork, clone, create branch, fix and PR. I'll review and merge into the main branch. Or submit a GitHub issue with all necessary details and logs.
@@ -254,7 +255,7 @@ For more information on F5 solutions for AWS, including manual configuration pro
 
 ## Creating Virtual Servers on the BIG-IP VE
 
-In order to pass traffic from your clients to the servers through the BIG-IP system, you must create a virtual server on the BIG-IP VE. In this template, the AS3 declaration creates 2 VIPs: one for each BIG-IP secondary IP on external subnet which in turn maps to the AWS EIP public VIP.
+In order to pass traffic from your clients to the servers through the BIG-IP system, you must create a virtual server on each BIG-IP VE. See [AS3 in AWS Failover Across-Net](https://clouddocs.f5.com/products/extensions/f5-cloud-failover/latest/userguide/aws.html#example-virtual-service-declaration) for an example declaration using AS3.
 
 ***Note:*** These next steps illustrate the manual way in the GUI to create a virtual server
 1. Open the BIG-IP VE Configuration utility
