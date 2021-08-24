@@ -31,10 +31,9 @@ This template is tested and worked in the following versions:
 
 - Variables are configured in variables.tf
 - Sensitive variables like AWS SSH keys are configured in terraform.tfvars
-  - ***Note***: Other items like BIG-IP password are stored in AWS Secrets Manager. Refer to the [Prerequisites](#prerequisites).
 - Files
   - main.tf - resources for provider, versions
-  - network.tf - resources for VPC, subnets, route tables, and internet gateway
+  - network.tf - resources for VPC, subnets, route tables, internet gateway, security groups
 
 ## Inputs
 
@@ -48,10 +47,16 @@ This template is tested and worked in the following versions:
 
 | Name | Description |
 | ---- | ----------- |
-| subnets_public | public subnets in az1 and az2 |
-| subnets_private | private subnets in az1 and az2 |
-| subnets_mgmt | mgmt subnets in az1 and az2 |
-| vpc_id | vpc id |
+| security_group_external | ID of External security group |
+| security_group_internal | ID of Internal security group |
+| security_group_mgmt | ID of Management security group |
+| subnets_external_Az1 | ID of External subnet AZ1 |
+| subnets_external_Az2 | ID of External subnet AZ2 |
+| subnets_internal_Az1 | ID of Internal subnet AZ1 |
+| subnets_internal_Az2 | ID of Internal subnet AZ2 |
+| subnets_mgmt_Az1 | ID of Management subnet AZ1 |
+| subnets_mgmt_Az2 | ID of Management subnet AZ2 |
+| vpc_id | ID of VPC |
 
 ## Installation Example
 
