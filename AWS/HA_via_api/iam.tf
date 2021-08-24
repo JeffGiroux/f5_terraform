@@ -4,13 +4,17 @@ data "aws_iam_policy_document" "bigip_role" {
   version = "2012-10-17"
   statement {
     actions = [
-      "sts:AssumeRole"
+      "sts:AssumeRole",
     ]
     principals {
       type        = "Service"
       identifiers = ["ec2.amazonaws.com"]
     }
   }
+}
+
+data "aws_iam_policy_document" "bigip_policy" {
+  version = "2012-10-17"
   statement {
     actions = [
       "ec2:DescribeInstances",
@@ -43,7 +47,7 @@ data "aws_iam_policy_document" "bigip_role" {
       "s3:GetBucketLocation",
       "s3:GetBucketTagging"
     ]
-    resources = ["*"]
+    resources = [aws_s3_bucket.main.arn]
     effect    = "Allow"
   }
   statement {
@@ -52,7 +56,7 @@ data "aws_iam_policy_document" "bigip_role" {
       "s3:GetObject",
       "s3:DeleteObject"
     ]
-    resources = ["*"]
+    resources = ["${aws_s3_bucket.main.arn}/*"]
     effect    = "Allow"
   }
 }
@@ -60,6 +64,10 @@ data "aws_iam_policy_document" "bigip_role" {
 resource "aws_iam_role" "bigip_role" {
   name               = format("%s-bigip-role-%s", var.projectPrefix, random_id.buildSuffix.hex)
   assume_role_policy = data.aws_iam_policy_document.bigip_role.json
+  inline_policy {
+    name   = "bigip-policy"
+    policy = data.aws_iam_policy_document.bigip_policy.json
+  }
   tags = {
     Name  = format("%s-bigip-role-%s", var.projectPrefix, random_id.buildSuffix.hex)
     Owner = var.resourceOwner

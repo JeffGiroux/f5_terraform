@@ -272,10 +272,11 @@ resource "aws_instance" "f5vm01" {
 }
 
 resource "aws_instance" "f5vm02" {
-  ami           = data.aws_ami.f5_ami.id
-  instance_type = var.ec2_instance_type
-  key_name      = aws_key_pair.bigip.key_name
-  user_data     = base64encode(local.f5_onboard2)
+  ami                  = data.aws_ami.f5_ami.id
+  instance_type        = var.ec2_instance_type
+  key_name             = aws_key_pair.bigip.key_name
+  user_data            = base64encode(local.f5_onboard2)
+  iam_instance_profile = aws_iam_instance_profile.bigip_profile.name
 
   network_interface {
     network_interface_id = aws_network_interface.vm02-mgmt-nic.id
@@ -297,5 +298,22 @@ resource "aws_instance" "f5vm02" {
   tags = {
     Name  = format("%s-f5vm02-%s", var.projectPrefix, random_id.buildSuffix.hex)
     Owner = var.resourceOwner
+  }
+}
+
+# Create Route Table
+resource "aws_route_table" "rt" {
+  vpc_id = var.vpcId
+
+  route {
+    cidr_block           = var.cfe_managed_route
+    network_interface_id = aws_network_interface.vm01-ext-nic.id
+  }
+
+  tags = {
+    Name                    = format("%s-rt-%s", var.projectPrefix, random_id.buildSuffix.hex)
+    Owner                   = var.resourceOwner
+    f5_cloud_failover_label = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
+    f5_self_ips             = "${aws_network_interface.vm01-ext-nic.private_ip},${aws_network_interface.vm02-ext-nic.private_ip}"
   }
 }
