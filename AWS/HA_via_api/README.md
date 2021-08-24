@@ -64,13 +64,13 @@ This template is tested and worked in the following versions:
   - ***Note***: Passwords and secrets will be moved to AWS Secrets Manager in the future
   - (TBD) The BIG-IP instance will query AWS Metadata API to retrieve the service account's token for authentication
   - (TBD) The BIG-IP instance will then use the secret name and the service account's token to query AWS Metadata API and dynamically retrieve the password for device onboarding
-- This template uses Declarative Onboarding (DO), Application Services 3 (AS3), and Cloud Failover Extension packages for the initial configuration. As part of the onboarding script, it will download the RPMs automatically. See the [AS3 documentation](http://f5.com/AS3Docs) and [DO documentation](http://f5.com/DODocs) for details on how to use AS3 and Declarative Onboarding on your BIG-IP VE(s). The [Telemetry Streaming](http://f5.com/TSDocs) extension is also downloaded and can be configured to point to Azure Log Analytics. The [Cloud Failover Extension](http://f5.com/CFEDocs) documentation is also available.
+- This template uses Declarative Onboarding (DO), Application Services 3 (AS3), and Cloud Failover Extension packages for the initial configuration. As part of the onboarding script, it will download the RPMs automatically. See the [AS3 documentation](http://f5.com/AS3Docs) and [DO documentation](http://f5.com/DODocs) for details on how to use AS3 and Declarative Onboarding on your BIG-IP VE(s). The [Telemetry Streaming](http://f5.com/TSDocs) extension is also downloaded and can be configured to point to AWS Cloud Watch. The [Cloud Failover Extension](http://f5.com/CFEDocs) documentation is also available.
 
 - Files
   - bigip.tf - resources for BIG-IP, NICs, public IPs
-  - main.tf - resources for provider, versions
+  - main.tf - resources for provider, versions, storage buckets
   - iam.tf - resources for IAM roles
-  - bigip.tf - resources for BIG-IP, security groups, storage buckets
+  - bigip.tf - resources for BIG-IP, security groups, route table
   - f5_onboard.tmpl - onboarding script which is run by user-data. This script is responsible for downloading the neccessary F5 Automation Toolchain RPM files, installing them, and then executing the onboarding REST calls via the [BIG-IP Runtime Init tool](https://github.com/F5Networks/f5-bigip-runtime-init).
 
 ## BYOL Licensing
@@ -101,7 +101,7 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
   ```
 4. In the "f5_onboard.tmpl", add the "myLicense" block under the "Common" declaration
   ```
-        myLicense:
+          myLicense:
             class: License
             licenseType: regKey
             regKey: '${regKey}'
@@ -159,7 +159,7 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | license1 | The license token for the F5 BIG-IP VE (BYOL) | `string` | null | no |
 | license2 | The license token for the F5 BIG-IP VE (BYOL) | `string` | null | no |
 | ntp_server | Leave the default NTP server the BIG-IP uses, or replace the default NTP server with the one you want to use | `string` | 0.us.pool.ntp.org | no |
-| timezone | If you would like to change the time zone the BIG-IP uses, enter the time zone you want to use. This is based on the tz database found in /usr/share/zoneinfo (see the full list [here](https://github.com/F5Networks/f5-azure-arm-templates/blob/master/azure-timezone-list.md)). Example values: UTC, US/Pacific, US/Eastern, Europe/London or Asia/Singapore. | `string` | UTC | no |
+| timezone | Enter the Olson timezone string from /usr/share/zoneinfo. The default is 'UTC'. See the TZ column here (https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) for legal values. | `string` | UTC | no |
 | dns_server | Leave the default DNS server the BIG-IP uses, or replace the default DNS server with the one you want to use | `string` | 8.8.8.8 | no |
 | INIT_URL | URL to download the BIG-IP runtime init | `string` | https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.2.1/dist/f5-bigip-runtime-init-1.2.1-1.gz.run | no |
 | DO_URL | URL to download the BIG-IP Declarative Onboarding module | `string` | https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.23.0/f5-declarative-onboarding-1.23.0-4.noarch.rpm | no |
@@ -167,7 +167,7 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | TS_URL | URL to download the BIG-IP Telemetry Streaming module | `string` | https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.22.0/f5-telemetry-1.22.0-1.noarch.rpm | no |
 | FAST_URL | URL to download the BIG-IP FAST module | `string` | https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.11.0/f5-appsvcs-templates-1.11.0-1.noarch.rpm | no |
 | CFE_URL | URL to download the BIG-IP Cloud Failover Extension module | `string` | https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.9.0/f5-cloud-failover-1.9.0-0.noarch.rpm | no |
-| libs_dir | Directory on the BIG-IP to download the A&O Toolchain into | `string` | /config/cloud/azure/node_modules | no |
+| libs_dir | Directory on the BIG-IP to download the A&O Toolchain into | `string` | /config/cloud/aws/node_modules | no |
 | onboard_log | Directory on the BIG-IP to store the cloud-init logs | `string` | /var/log/startup-script.log | no |
 | f5_cloud_failover_nic_map | This is a tag used for failover NIC. | `string` | external | yes |
 | owner | This is a tag used for object creation. Example "lastname" | `string` | null | yes |
