@@ -1,10 +1,8 @@
 # Deploying BIG-IP VEs in AWS Across-Net - High Availability (Active/Standby): 3-NIC
 
 ## To Do
-- EXPIREMENTAL ONLY
 - Community support only. Not F5 supported.
 - Move to AWS secret manager. Currently passwords are stored in clear text in the runtime init YAML file local to the BIG-IP box.
-- AS3 still not used and not installed
 - TS still not used and not installed
 - Route table created for CFE demonstration but not associated with subnets
 
@@ -24,7 +22,7 @@
 
 ## Introduction
 
-This solution uses a Terraform template to launch a 3-NIC deployment of a cloud-focused BIG-IP VE cluster (Active/Standby) in AWS. Traffic flows to the BIG-IP VE which then processes the traffic to application servers. The BIG-IP VE instance is running with multiple interfaces: management, external, internal. NIC1 is associated with the external network while NIC2 is associated with the internal network.
+This solution uses a Terraform template to launch a 3-NIC deployment of a cloud-focused BIG-IP VE cluster (Active/Standby) in AWS across two AWS Availability Zones. Traffic flows to the BIG-IP VE which then processes the traffic to application servers. The BIG-IP VE instance is running with multiple interfaces: management, external, internal. NIC1 is associated with the external network while NIC2 is associated with the internal network.
 
 The BIG-IP VEs have the [Local Traffic Manager (LTM)](https://f5.com/products/big-ip/local-traffic-manager-ltm) module enabled to provide advanced traffic management functionality. In addition, the [Application Security Module (ASM)](https://www.f5.com/pdf/products/big-ip-application-security-manager-overview.pdf) can be enabled to provide F5's L4/L7 security features for web application firewall (WAF) and bot protection.
 
@@ -53,7 +51,7 @@ This template is tested and worked in the following versions:
   - See the [Terraform "AWS Provider"](https://registry.terraform.io/providers/hashicorp/aws/latest/docs#authentication) for details
   - You will require at minimum `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`
   - ***Note***: Make sure to [practice least privilege](https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html)
-- This templates deploys into an *EXISTING* networking stack. You are required to have an existing VPC network and subnets
+- This templates deploys into an *EXISTING* networking stack. You are required to have an existing VPC network, subnets, and security groups.
   - A NAT gateway or public IP is also required for outbound Internet traffic
   - If you require a new network first, see the [Infrastructure Only folder](../Infrastructure-only) to get started
 
@@ -255,7 +253,7 @@ For more information on F5 solutions for AWS, including manual configuration pro
 
 ## Creating Virtual Servers on the BIG-IP VE
 
-In order to pass traffic from your clients to the servers through the BIG-IP system, you must create a virtual server on each BIG-IP VE. See [AS3 in AWS Failover Across-Net](https://clouddocs.f5.com/products/extensions/f5-cloud-failover/latest/userguide/aws.html#example-virtual-service-declaration) for an example declaration using AS3.
+In order to pass traffic from your clients to the servers through the BIG-IP system, you must create a virtual server on each BIG-IP VE. This demo creates a demo virtual server using AS3. See [AS3 in AWS Failover Across-Net](https://clouddocs.f5.com/products/extensions/f5-cloud-failover/latest/userguide/aws.html#example-virtual-service-declaration) for an example declaration using AS3.
 
 ***Note:*** These next steps illustrate the manual way in the GUI to create a virtual server
 1. Open the BIG-IP VE Configuration utility
