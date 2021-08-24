@@ -210,6 +210,8 @@ locals {
     self_ip_external        = aws_network_interface.vm01-ext-nic.private_ip
     self_ip_internal        = aws_network_interface.vm01-int-nic.private_ip
     remote_selfip_ext       = aws_network_interface.vm02-ext-nic.private_ip
+    vip_az1                 = local.vm01_vip_ips.app1.ip
+    vip_az2                 = local.vm02_vip_ips.app1.ip
     dns_server              = var.dns_server
     ntp_server              = var.ntp_server
     timezone                = var.timezone
@@ -248,6 +250,8 @@ locals {
     self_ip_external        = aws_network_interface.vm02-ext-nic.private_ip
     self_ip_internal        = aws_network_interface.vm02-int-nic.private_ip
     remote_selfip_ext       = aws_network_interface.vm01-ext-nic.private_ip
+    vip_az1                 = local.vm01_vip_ips.app1.ip
+    vip_az2                 = local.vm02_vip_ips.app1.ip
     dns_server              = var.dns_server
     ntp_server              = var.ntp_server
     timezone                = var.timezone
