@@ -30,4 +30,8 @@ resource "aws_s3_bucket" "main" {
   }
 }
 
+# Retrieve AWS VPC info
+data "aws_vpc" "main" {
+  id = var.vpcId
+}
 

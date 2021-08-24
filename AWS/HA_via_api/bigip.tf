@@ -180,6 +180,7 @@ locals {
     TS_VER                  = split("/", var.TS_URL)[7]
     CFE_VER                 = split("/", var.CFE_URL)[7]
     FAST_VER                = split("/", var.FAST_URL)[7]
+    vpc_cidr_block          = data.aws_vpc.main.cidr_block
     self_ip_external        = aws_network_interface.vm01-ext-nic.private_ip
     self_ip_internal        = aws_network_interface.vm01-int-nic.private_ip
     remote_selfip_ext       = aws_network_interface.vm02-ext-nic.private_ip
@@ -217,6 +218,7 @@ locals {
     TS_VER                  = split("/", var.TS_URL)[7]
     CFE_VER                 = split("/", var.CFE_URL)[7]
     FAST_VER                = split("/", var.FAST_URL)[7]
+    vpc_cidr_block          = data.aws_vpc.main.cidr_block
     self_ip_external        = aws_network_interface.vm02-ext-nic.private_ip
     self_ip_internal        = aws_network_interface.vm02-int-nic.private_ip
     remote_selfip_ext       = aws_network_interface.vm01-ext-nic.private_ip

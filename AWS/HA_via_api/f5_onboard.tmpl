@@ -43,6 +43,9 @@ runtime_parameters:
   - name: MANAGED_ROUTE
     type: static
     value: ${cfe_managed_route}
+  - name: VPC_CIDR_BLOCK
+    type: static
+    value: ${vpc_cidr_block}
   - name: GATEWAY_EXTERNAL
     type: metadata
     metadataProvider:
@@ -50,6 +53,14 @@ runtime_parameters:
       type: network
       field: local-ipv4s
       index: 1
+      ipcalc: first
+  - name: GATEWAY_INTERNAL
+    type: metadata
+    metadataProvider:
+      environment: aws
+      type: network
+      field: local-ipv4s
+      index: 2
       ipcalc: first
   - name: SELF_IP_EXTERNAL
     type: static
@@ -169,10 +180,16 @@ extension_services:
             vlan: internal
             allowService: default
             trafficGroup: traffic-group-local-only
-          default:
+          default_ext:
             class: Route
             gw: '{{{ GATEWAY_EXTERNAL }}}'
             network: default
+            localOnly: true
+            mtu: 1500
+          default_int:
+            class: Route
+            gw: '{{{ GATEWAY_INTERNAL }}}'
+            network: '{{{ VPC_CIDR_BLOCK }}}'
             localOnly: true
             mtu: 1500
           configsync:
