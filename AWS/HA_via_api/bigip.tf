@@ -164,8 +164,10 @@ resource "aws_eip" "vip-pip" {
   network_interface         = aws_network_interface.vm01-ext-nic.id
   associate_with_private_ip = local.vm01_vip_ips.app1.ip
   tags = {
-    Name  = format("%s-vip-pip-%s", var.projectPrefix, random_id.buildSuffix.hex)
-    Owner = var.resourceOwner
+    Name                    = format("%s-vip-pip-%s", var.projectPrefix, random_id.buildSuffix.hex)
+    Owner                   = var.resourceOwner
+    f5_cloud_failover_label = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
+    f5_cloud_failover_vips  = "${local.vm01_vip_ips.app1.ip},${local.vm02_vip_ips.app1.ip}"
   }
   depends_on = [aws_network_interface.vm01-ext-nic]
 }
