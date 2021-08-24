@@ -57,6 +57,9 @@ runtime_parameters:
   - name: SELF_IP_INTERNAL
     type: static
     value: ${self_ip_internal}
+  - name: REMOTE_SELFIP_EXT
+    type: static
+    value: ${remote_selfip_ext}
   - name: REMOTE_HOST
     type: static
     value: ${remote_host}
@@ -182,7 +185,7 @@ extension_services:
             class: DeviceGroup
             type: sync-failover
             members:
-              - '{{{ HOST_NAME }}}'
+              - '{{{ HOST1 }}}'
               - '{{{ HOST2 }}}'
             owner: /Common/failoverGroup/members/0
             autoSync: true
@@ -219,13 +222,13 @@ extension_services:
             discoveryType: static
             items:
               - '{{{ SELF_IP_EXTERNAL }}}'
-              - '${remote_selfip_ext}'
+              - '{{{ REMOTE_SELFIP_EXT }}}'
 post_onboard_enabled:
   - name: trigger_failover
     type: inline
     commands:
     - $(nohup bash /config/failover/tgactive &>/dev/null &)
-    - $(nohup tmsh modify cm device-group failoverGroup devices modify { '{{{ HOST1 }}}' { set-sync-leader } } &>/dev/null &)
+    - $(nohup tmsh modify cm device-group failoverGroup devices modify { '{{{ HOST2 }}}' { set-sync-leader } } &>/dev/null &)
     - tmsh save sys config
 EOF
 
@@ -236,17 +239,6 @@ done
 
 # Install BIG-IP Runtime Init
 bash /var/config/rest/downloads/f5-bigip-runtime.gz.run -- '--cloud aws'
-
-## Create LOCAL_ONLY admin partion and Default Route for AWS AZ default route
-# source /usr/lib/bigstart/bigip-ready-functions
-# wait_bigip_ready
-# GATEWAY_MAC=`ifconfig eth1 | egrep ether | awk '{print tolower($2)}'`
-# GATEWAY_CIDR_BLOCK=`/usr/bin/curl -s -f --retry 20 http://169.254.169.254/latest/meta-data/network/interfaces/macs/$${GATEWAY_MAC}/subnet-ipv4-cidr-block`
-# GATEWAY_NET=$${GATEWAY_CIDR_BLOCK%/*}
-# GATEWAY=`echo $${GATEWAY_NET} | awk -F. '{ print $1"."$2"."$3"."$4+1 }'`
-# tmsh create auth partition LOCAL_ONLY
-# tmsh create net route /LOCAL_ONLY/default-route network 0.0.0.0 gw $${GATEWAY}
-# tmsh save sys config
 
 # Run BIG-IP Runtime Init and Process YAML
 f5-bigip-runtime-init --config-file /config/cloud/runtime-init-conf.yaml
