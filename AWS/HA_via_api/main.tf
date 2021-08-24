@@ -20,7 +20,8 @@ resource "random_id" "buildSuffix" {
 
 # Create the Storage Account
 resource "aws_s3_bucket" "main" {
-  acl = "private"
+  acl           = "private"
+  force_destroy = true
   tags = {
     Name                    = format("%sstorage%s", var.projectPrefix, random_id.buildSuffix.hex)
     Owner                   = var.resourceOwner
