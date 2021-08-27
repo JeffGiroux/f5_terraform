@@ -1,20 +1,52 @@
 # Variables
 
-# Google Environment
-variable gcp_project_id {}
-variable gcp_region {}
-variable gcp_zone {}
-variable prefix {}
-variable adminSrcAddr {}
-variable cidr_range_mgmt { default = "10.1.1.0/24" }
-variable cidr_range_ext { default = "10.1.10.0/24" }
-variable cidr_range_int { default = "10.1.20.0/24" }
-
-# Tags
-variable purpose { default = "public" }
-variable environment { default = "f5env" } #ex. dev/staging/prod
-variable owner { default = "f5owner" }
-variable group { default = "f5group" }
-variable costcenter { default = "f5costcenter" }
-variable application { default = "f5app" }
-variable f5_cloud_failover_label { default = "mydeployment" } #Cloud Failover Tag
+variable "gcp_project_id" {
+  type        = string
+  default     = null
+  description = "GCP Project ID for provider"
+}
+variable "gcp_region" {
+  type        = string
+  default     = "us-west1"
+  description = "GCP Region for provider"
+}
+variable "gcp_zone" {
+  type        = string
+  default     = "us-west1-b"
+  description = "GCP Zone for provider"
+}
+variable "prefix" {
+  type        = string
+  default     = "demo"
+  description = "This value is inserted at the beginning of each Google object (alpha-numeric, no special character)"
+}
+variable "adminSrcAddr" {
+  type        = string
+  default     = "0.0.0.0/0"
+  description = "Trusted source network for admin access"
+}
+variable "cidr_range_mgmt" {
+  type        = string
+  default     = "10.1.1.0/24"
+  description = "IP CIDR range for management VPC network"
+}
+variable "cidr_range_ext" {
+  type        = string
+  default     = "10.1.10.0/24"
+  description = "IP CIDR range for external VPC network"
+}
+variable "cidr_range_int" {
+  type        = string
+  default     = "10.1.20.0/24"
+  description = "IP CIDR range for internal VPC network"
+}
+variable "owner" {
+  type        = string
+  default     = null
+  description = "This is a tag used for object creation. Example is last name."
+}
+variable "f5_cloud_failover_label" {
+  type        = string
+  default     = "mydeployment"
+  description = "This is a tag used for F5 Cloud Failover Extension to identity which cloud objects to move during a failover event."
+}
