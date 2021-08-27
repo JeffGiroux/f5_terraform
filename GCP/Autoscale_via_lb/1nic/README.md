@@ -242,8 +242,6 @@ To run this Terraform template, perform the following steps:
       gcp_region     = "us-west1"
       gcp_zone       = "us-west1-b"
       svc_acct       = "xxxxx@xxxxx.iam.gserviceaccount.com"
-      privateKeyId   = "abcdcba123321"
-      ksecret        = "svc-acct-secret"
   ```
   3. Initialize the directory
   ```
