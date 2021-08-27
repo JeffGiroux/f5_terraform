@@ -3,3 +3,5 @@ fileignoreconfig:
   checksum: 7a2f07e2f4d69028cbaeca01ca3faeff7cb8a3efe8e65fa945ef15b26eaf3be8
 - filename: GCP/HA_via_lb/README.md
   checksum: 54596a5d3b1797663fe99c9a0081cf4e004163fd5987358b91d5e9ddb95a533a
+- filename: GCP/HA_via_api/README.md
+  checksum: c526d9a7dac05e0d35ac270bfcb75d2fbf6b0aabc4e0936083fc1820d2318d57
