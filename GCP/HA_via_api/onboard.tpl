@@ -342,8 +342,8 @@ AS3_URL='${AS3_URL}'
 AS3_FN=$(basename "$AS3_URL")
 TS_URL='${TS_URL}'
 TS_FN=$(basename "$TS_URL")
-CF_URL='${CF_URL}'
-CF_FN=$(basename "$CF_URL")
+CFE_URL='${CFE_URL}'
+CFE_FN=$(basename "$CFE_URL")
 rpmFilePath="/var/config/rest/downloads"
 
 ###################
@@ -456,7 +456,7 @@ echo "Downloading toolchain RPMs"
 curl -L -s -f --retry 20 -o $rpmFilePath/$TS_FN $TS_URL
 curl -L -s -f --retry 20 -o $rpmFilePath/$DO_FN $DO_URL
 curl -L -s -f --retry 20 -o $rpmFilePath/$AS3_FN $AS3_URL
-curl -L -s -f --retry 20 -o $rpmFilePath/$CF_FN $CF_URL
+curl -L -s -f --retry 20 -o $rpmFilePath/$CFE_FN $CFE_URL
 sleep 10
 
 echo "Installing TS Pkg"
@@ -474,8 +474,8 @@ DATA="{\"operation\":\"INSTALL\",\"packageFilePath\":\"$rpmFilePath/$AS3_FN\"}"
 curl -s -u $CREDS -X POST http://localhost:8100/mgmt/shared/iapp/package-management-tasks -d $DATA
 sleep 10
 echo
-echo "Installing CF Pkg"
-DATA="{\"operation\":\"INSTALL\",\"packageFilePath\":\"$rpmFilePath/$CF_FN\"}"
+echo "Installing CFE Pkg"
+DATA="{\"operation\":\"INSTALL\",\"packageFilePath\":\"$rpmFilePath/$CFE_FN\"}"
 curl -s -u $CREDS -X POST http://localhost:8100/mgmt/shared/iapp/package-management-tasks -d $DATA
 sleep 10
 echo
