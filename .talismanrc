@@ -1,3 +1,5 @@
 fileignoreconfig:
 - filename: GCP/Standalone/README.md
   checksum: 7a2f07e2f4d69028cbaeca01ca3faeff7cb8a3efe8e65fa945ef15b26eaf3be8
+- filename: GCP/HA_via_lb/README.md
+  checksum: 54596a5d3b1797663fe99c9a0081cf4e004163fd5987358b91d5e9ddb95a533a
