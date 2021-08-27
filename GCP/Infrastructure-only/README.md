@@ -15,8 +15,8 @@ Terraform is beneficial as it allows composing resources a bit differently to ac
 
 ## Version
 This template is tested and worked in the following version
-Terraform v0.14.6
-+ provider.google v3.56
+Terraform v0.14.10
++ provider.google v3.81
 
 ## Prerequisites
 

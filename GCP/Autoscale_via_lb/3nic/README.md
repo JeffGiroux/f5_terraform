@@ -31,8 +31,8 @@ Example...
 
 ## Version
 This template is tested and worked in the following version
-Terraform v0.14.6
-+ provider.google v3.56
+Terraform v0.14.10
++ provider.google v3.81
 
 ## Prerequisites
 
@@ -104,14 +104,14 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
           f5-bigip-13-1-3-2-0-0-4-byol-all-modules-2slot-20191105200157
           ...and some more
           f5-bigip-14-1-2-3-0-0-5-byol-ltm-1boot-loc-191218142225
-          f5-bigip-14-1-2-3-0-0-5-payg-best-1gbps-191218142340
-          f5-bigip-15-1-0-2-0-0-9-payg-best-25mbps-200321032524
+          f5-bigip-15-1-2-1-0-0-10-payg-best-1gbps-210115161130
+          f5-bigip-15-1-2-1-0-0-10-byol-ltm-2boot-loc-210115160742
           ...and more...
   ```
 2. In the "variables.tf", modify *image_name* with the image name from gcloud CLI results
   ```
           # BIGIP Image
-          variable image_name { default = "projects/f5-7626-networks-public/global/images/f5-bigip-14-1-2-3-0-0-5-byol-ltm-2boot-loc-191218142235" }
+          variable image_name { default = "projects/f5-7626-networks-public/global/images/f5-bigip-15-1-2-1-0-0-10-byol-ltm-2boot-loc-210115160742" }
   ```
 3. In the "variables.tf", modify the BIG-IQ license section to match your environment
 4. In the "do.json", add the "myLicense" block under the "Common" declaration ([full declaration example here](https://clouddocs.f5.com/products/extensions/f5-declarative-onboarding/latest/bigiq-examples.html#licensing-with-big-iq-regkey-pool-route-to-big-ip))
