@@ -1,0 +1,24 @@
+---
+default_language_version:
+  python: python3.8
+repos:
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.45.0
+    hooks:
+      - id: terraform_fmt
+      - id: terraform_docs
+        args: ['--args=--sort-by-required']
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.2.0
+    hooks:
+      - id: check-merge-conflict
+      - id: end-of-file-fixer
+      - id: sort-simple-yaml
+      - id: trailing-whitespace
+      - id: detect-private-key
+        # excludes
+        #exclude: 'path/file'
+  - repo: https://github.com/thoughtworks/talisman
+    rev: v1.9.0
+    hooks:
+      - id: talisman-commit

@@ -33,7 +33,7 @@ locals {
     DO_URL         = var.DO_URL
     AS3_URL        = var.AS3_URL
     TS_URL         = var.TS_URL
-    CF_URL         = var.CF_URL
+    CFE_URL        = var.CFE_URL
     onboard_log    = var.onboard_log
     DO_Document    = local.vm01_do_json
     AS3_Document   = ""
@@ -48,7 +48,7 @@ locals {
     DO_URL         = var.DO_URL
     AS3_URL        = var.AS3_URL
     TS_URL         = var.TS_URL
-    CF_URL         = var.CF_URL
+    CFE_URL        = var.CFE_URL
     onboard_log    = var.onboard_log
     DO_Document    = local.vm02_do_json
     AS3_Document   = local.as3_json
