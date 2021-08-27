@@ -5,3 +5,5 @@ fileignoreconfig:
   checksum: 54596a5d3b1797663fe99c9a0081cf4e004163fd5987358b91d5e9ddb95a533a
 - filename: GCP/HA_via_api/README.md
   checksum: c526d9a7dac05e0d35ac270bfcb75d2fbf6b0aabc4e0936083fc1820d2318d57
+- filename: GCP/Autoscale_via_lb/1nic/README.md
+  checksum: a21478ef4050249abb98b7bd71f7f8b25647f736fbe0e900e959c5025731bbb1
