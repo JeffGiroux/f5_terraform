@@ -9,3 +9,5 @@ fileignoreconfig:
   checksum: a21478ef4050249abb98b7bd71f7f8b25647f736fbe0e900e959c5025731bbb1
 - filename: GCP/Autoscale_via_lb/3nic/README.md
   checksum: 12c945cad966cd291232ad7dd83456c93375198ec41de39e6a0352c1f5e0f8f5
+- filename: Azure/Standalone/README.md
+  checksum: 48ce844973a607f616e09b660b91d1d58bf03a9fcbe48a41c3d52b21263a3ea0
