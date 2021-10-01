@@ -29,13 +29,6 @@ The BIG-IP VEs have the [Local Traffic Manager (LTM)](https://f5.com/products/bi
 
 The BIG-IP's configuration, now defined in a single convenient YAML or JSON [F5 BIG-IP Runtime Init](https://github.com/F5Networks/f5-bigip-runtime-init) configuration file, leverages [F5 Automation Tool Chain](https://www.f5.com/pdf/products/automation-toolchain-overview.pdf) declarations which are easier to author, validate and maintain as code. For instance, if you need to change the configuration on the BIG-IPs in the deployment, you update the instance model by passing a new config file (which references the updated Automation Toolchain declarations) via template's runtimeConfig input parameter. New instances will be deployed with the updated configurations.
 
-## Version
-This template is tested and worked in the following versions:
-| Name | Version |
-| ---- | ------- |
-| terraform | ~> 0.14 |
-| aws | ~> 3 |
-
 
 ## Prerequisites
 
@@ -84,9 +77,9 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 
           #Output similar to this...
           [
-              "ami-0704e9e0efd3a9950", 
+              "ami-0704e9e0efd3a9950",
               "F5 BIGIP-15.1.2.1-0.0.10 BYOL-LTM 2Boot Loc-210115154531-6d69f6a1-37da-4a16-846c-aeb7cc0402aa-ami-03ebd220106268e94.4"
-          ], 
+          ],
   ```
 2. In the "variables.tf", modify *f5_ami_search_name* with a value from previous output
   ```
@@ -132,71 +125,121 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
             overwrite: true
   ```
 
-## Template Parameters
+<!-- markdownlint-disable no-inline-html -->
+<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 0.14 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 3 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 3.60.0 |
+| <a name="provider_random"></a> [random](#provider\_random) | 3.1.0 |
+
+## Modules
+
+No modules.
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [aws_eip.vip-pip](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eip) | resource |
+| [aws_eip.vm01-ext-pip](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eip) | resource |
+| [aws_eip.vm01-mgmt-pip](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eip) | resource |
+| [aws_eip.vm02-ext-pip](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eip) | resource |
+| [aws_eip.vm02-mgmt-pip](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eip) | resource |
+| [aws_iam_instance_profile.bigip_profile](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_instance_profile) | resource |
+| [aws_iam_role.bigip_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
+| [aws_instance.f5vm01](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance) | resource |
+| [aws_instance.f5vm02](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance) | resource |
+| [aws_key_pair.bigip](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/key_pair) | resource |
+| [aws_network_interface.vm01-ext-nic](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/network_interface) | resource |
+| [aws_network_interface.vm01-int-nic](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/network_interface) | resource |
+| [aws_network_interface.vm01-mgmt-nic](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/network_interface) | resource |
+| [aws_network_interface.vm02-ext-nic](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/network_interface) | resource |
+| [aws_network_interface.vm02-int-nic](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/network_interface) | resource |
+| [aws_network_interface.vm02-mgmt-nic](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/network_interface) | resource |
+| [aws_route_table.main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table) | resource |
+| [aws_s3_bucket.main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket) | resource |
+| [random_id.buildSuffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
+| [aws_ami.f5_ami](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami) | data source |
+| [aws_iam_policy_document.bigip_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.bigip_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_vpc.main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/vpc) | data source |
 
 ## Inputs
 
-| Parameter | Description | Type | Default | Required |
-| --------- | ----------- | ---- | ------- | -------- |
-| projectPrefix | This value is inserted at the beginning of each AWS object (alpha-numeric, no special character) | `string` | myDemo | no |
-| f5_username | User name for the BIG-IP (Note: currenlty not used. Defaults to 'admin' based on AMI | `string` | admin | no |
-| f5_password | BIG-IP Password | `string` | Default12345! | no |
-| ssh_key | SSH public key -- format should ssh-rsa like "ssh-rsa AAAA....") | `string` | n/a | no |
-| allowedIps | Trusted source network for admin access | `list` | ["0.0.0.0/0"] | yes |
-| awsRegion | AWS Region for provider | `string` | us-west-2 | yes |
-| vpcId | The AWS network VPC ID | `string` | n/a | yes |
-| mgmtSubnetAz1 | ID of Management subnet AZ1 | `string` | n/a | yes |
-| mgmtSubnetAz2 | ID of Management subnet AZ2 | `string` | n/a | yes |
-| extSubnetAz1 | ID of External subnet AZ1 | `string` | n/a | yes |
-| extSubnetAz2 | ID of External subnet AZ2 | `string` | n/a | yes |
-| intSubnetAz1 | ID of Internal subnet AZ1 | `string` | n/a | yes |
-| intSubnetAz2 | ID of Internal subnet AZ2 | `string` | n/a | yes |
-| mgmtNsg | ID of management security group | `string` | null | yes |
-| extNsg | ID of external security group | `string` | null | yes |
-| intNsg | ID of internal security group | `string` | null | yes |
-| f5_ami_search_name | AWS AMI search filter to find correct BIG-IP VE for region | `string` | F5 BIGIP-15.1.2.1* PAYG-Best 200Mbps* | no |
-| ec2_instance_type | AWS instance type for the BIG-IP | `string` | m5.xlarge | no |
-| license1 | The license token for the F5 BIG-IP VE (BYOL) | `string` | null | no |
-| license2 | The license token for the F5 BIG-IP VE (BYOL) | `string` | null | no |
-| ntp_server | Leave the default NTP server the BIG-IP uses, or replace the default NTP server with the one you want to use | `string` | 0.us.pool.ntp.org | no |
-| timezone | Enter the Olson timezone string from /usr/share/zoneinfo. The default is 'UTC'. See the TZ column here (https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) for legal values. | `string` | UTC | no |
-| dns_server | Leave the default DNS server the BIG-IP uses, or replace the default DNS server with the one you want to use | `string` | 8.8.8.8 | no |
-| INIT_URL | URL to download the BIG-IP runtime init | `string` | https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.2.1/dist/f5-bigip-runtime-init-1.2.1-1.gz.run | no |
-| DO_URL | URL to download the BIG-IP Declarative Onboarding module | `string` | https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.23.0/f5-declarative-onboarding-1.23.0-4.noarch.rpm | no |
-| AS3_URL | URL to download the BIG-IP Application Service Extension 3 (AS3) module | `string` | https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.30.0/f5-appsvcs-3.30.0-5.noarch.rpm | no |
-| TS_URL | URL to download the BIG-IP Telemetry Streaming module | `string` | https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.22.0/f5-telemetry-1.22.0-1.noarch.rpm | no |
-| FAST_URL | URL to download the BIG-IP FAST module | `string` | https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.11.0/f5-appsvcs-templates-1.11.0-1.noarch.rpm | no |
-| CFE_URL | URL to download the BIG-IP Cloud Failover Extension module | `string` | https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.9.0/f5-cloud-failover-1.9.0-0.noarch.rpm | no |
-| libs_dir | Directory on the BIG-IP to download the A&O Toolchain into | `string` | /config/cloud/aws/node_modules | no |
-| onboard_log | Directory on the BIG-IP to store the cloud-init logs | `string` | /var/log/startup-script.log | no |
-| f5_cloud_failover_nic_map | This is a tag used for failover NIC. | `string` | external | yes |
-| owner | This is a tag used for object creation. Example "lastname" | `string` | null | yes |
-| bigIqHost | This is the BIG-IQ License Manager host name or IP address | `string` | 200.200.200.200 | no |
-| bigIqUsername | BIG-IQ user name | `string` | admin | no |
-| bigIqPassword | BIG-IQ Password | `string` | Default12345! | no |
-| bigIqLicenseType | BIG-IQ license type | `string` | licensePool | no |
-| bigIqLicensePool | BIG-IQ license pool name | `string` | myPool | no |
-| bigIqSkuKeyword1 | BIG-IQ license SKU keyword 1 | `string` | key1 | no |
-| bigIqSkuKeyword2 | BIG-IQ license SKU keyword 1 | `string` | key2 | no |
-| bigIqUnitOfMeasure | BIG-IQ license unit of measure | `string` | hourly | no |
-| bigIqHypervisor | BIG-IQ hypervisor | `string` | aws | no |
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_ssh_key"></a> [ssh\_key](#input\_ssh\_key) | public key used for authentication in ssh-rsa format | `string` | n/a | yes |
+| <a name="input_AS3_URL"></a> [AS3\_URL](#input\_AS3\_URL) | URL to download the BIG-IP Application Service Extension 3 (AS3) module | `string` | `"https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.30.0/f5-appsvcs-3.30.0-5.noarch.rpm"` | no |
+| <a name="input_CFE_URL"></a> [CFE\_URL](#input\_CFE\_URL) | URL to download the BIG-IP Cloud Failover Extension module | `string` | `"https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.9.0/f5-cloud-failover-1.9.0-0.noarch.rpm"` | no |
+| <a name="input_DO_URL"></a> [DO\_URL](#input\_DO\_URL) | URL to download the BIG-IP Declarative Onboarding module | `string` | `"https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.23.0/f5-declarative-onboarding-1.23.0-4.noarch.rpm"` | no |
+| <a name="input_FAST_URL"></a> [FAST\_URL](#input\_FAST\_URL) | URL to download the BIG-IP FAST module | `string` | `"https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.11.0/f5-appsvcs-templates-1.11.0-1.noarch.rpm"` | no |
+| <a name="input_INIT_URL"></a> [INIT\_URL](#input\_INIT\_URL) | URL to download the BIG-IP runtime init | `string` | `"https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.2.1/dist/f5-bigip-runtime-init-1.2.1-1.gz.run"` | no |
+| <a name="input_TS_URL"></a> [TS\_URL](#input\_TS\_URL) | URL to download the BIG-IP Telemetry Streaming module | `string` | `"https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.22.0/f5-telemetry-1.22.0-1.noarch.rpm"` | no |
+| <a name="input_allowedIps"></a> [allowedIps](#input\_allowedIps) | Trusted source network for admin access | `list(any)` | <pre>[<br>  "0.0.0.0/0"<br>]</pre> | no |
+| <a name="input_awsRegion"></a> [awsRegion](#input\_awsRegion) | aws region | `string` | `"us-west-2"` | no |
+| <a name="input_bigIqHost"></a> [bigIqHost](#input\_bigIqHost) | This is the BIG-IQ License Manager host name or IP address | `string` | `""` | no |
+| <a name="input_bigIqHypervisor"></a> [bigIqHypervisor](#input\_bigIqHypervisor) | BIG-IQ hypervisor | `string` | `"gce"` | no |
+| <a name="input_bigIqLicensePool"></a> [bigIqLicensePool](#input\_bigIqLicensePool) | BIG-IQ license pool name | `string` | `""` | no |
+| <a name="input_bigIqLicenseType"></a> [bigIqLicenseType](#input\_bigIqLicenseType) | BIG-IQ license type | `string` | `"licensePool"` | no |
+| <a name="input_bigIqPassword"></a> [bigIqPassword](#input\_bigIqPassword) | Admin Password for BIG-IQ | `string` | `"Default12345!"` | no |
+| <a name="input_bigIqSkuKeyword1"></a> [bigIqSkuKeyword1](#input\_bigIqSkuKeyword1) | BIG-IQ license SKU keyword 1 | `string` | `"key1"` | no |
+| <a name="input_bigIqSkuKeyword2"></a> [bigIqSkuKeyword2](#input\_bigIqSkuKeyword2) | BIG-IQ license SKU keyword 2 | `string` | `"key2"` | no |
+| <a name="input_bigIqUnitOfMeasure"></a> [bigIqUnitOfMeasure](#input\_bigIqUnitOfMeasure) | BIG-IQ license unit of measure | `string` | `"hourly"` | no |
+| <a name="input_bigIqUsername"></a> [bigIqUsername](#input\_bigIqUsername) | Admin name for BIG-IQ | `string` | `"azureuser"` | no |
+| <a name="input_cfe_managed_route"></a> [cfe\_managed\_route](#input\_cfe\_managed\_route) | A route can used for testing managed-route failover. Enter address prefix like x.x.x.x/x | `string` | `"0.0.0.0/0"` | no |
+| <a name="input_dns_server"></a> [dns\_server](#input\_dns\_server) | Leave the default DNS server the BIG-IP uses, or replace the default DNS server with the one you want to use | `string` | `"8.8.8.8"` | no |
+| <a name="input_ec2_instance_type"></a> [ec2\_instance\_type](#input\_ec2\_instance\_type) | AWS instance type for the BIG-IP | `string` | `"m5.xlarge"` | no |
+| <a name="input_extNsg"></a> [extNsg](#input\_extNsg) | ID of external security group | `string` | `null` | no |
+| <a name="input_extSubnetAz1"></a> [extSubnetAz1](#input\_extSubnetAz1) | ID of External subnet AZ1 | `string` | `null` | no |
+| <a name="input_extSubnetAz2"></a> [extSubnetAz2](#input\_extSubnetAz2) | ID of External subnet AZ2 | `string` | `null` | no |
+| <a name="input_f5_ami_search_name"></a> [f5\_ami\_search\_name](#input\_f5\_ami\_search\_name) | AWS AMI search filter to find correct BIG-IP VE for region | `string` | `"F5 BIGIP-15.1.2.1* PAYG-Best 200Mbps*"` | no |
+| <a name="input_f5_password"></a> [f5\_password](#input\_f5\_password) | BIG-IP Password | `string` | `"Default12345!"` | no |
+| <a name="input_f5_username"></a> [f5\_username](#input\_f5\_username) | User name for the BIG-IP (Note: currenlty not used. Defaults to 'admin' based on AMI | `string` | `"admin"` | no |
+| <a name="input_intNsg"></a> [intNsg](#input\_intNsg) | ID of internal security group | `string` | `null` | no |
+| <a name="input_intSubnetAz1"></a> [intSubnetAz1](#input\_intSubnetAz1) | ID of Internal subnet AZ1 | `string` | `null` | no |
+| <a name="input_intSubnetAz2"></a> [intSubnetAz2](#input\_intSubnetAz2) | ID of Internal subnet AZ2 | `string` | `null` | no |
+| <a name="input_libs_dir"></a> [libs\_dir](#input\_libs\_dir) | Directory on the BIG-IP to download the A&O Toolchain into | `string` | `"/config/cloud/aws/node_modules"` | no |
+| <a name="input_license1"></a> [license1](#input\_license1) | The license token for the 1st F5 BIG-IP VE (BYOL) | `string` | `""` | no |
+| <a name="input_license2"></a> [license2](#input\_license2) | The license token for the 2nd F5 BIG-IP VE (BYOL) | `string` | `""` | no |
+| <a name="input_mgmtNsg"></a> [mgmtNsg](#input\_mgmtNsg) | ID of management security group | `string` | `null` | no |
+| <a name="input_mgmtSubnetAz1"></a> [mgmtSubnetAz1](#input\_mgmtSubnetAz1) | ID of Management subnet AZ1 | `string` | `null` | no |
+| <a name="input_mgmtSubnetAz2"></a> [mgmtSubnetAz2](#input\_mgmtSubnetAz2) | ID of Management subnet AZ2 | `string` | `null` | no |
+| <a name="input_ntp_server"></a> [ntp\_server](#input\_ntp\_server) | Leave the default NTP server the BIG-IP uses, or replace the default NTP server with the one you want to use | `string` | `"0.us.pool.ntp.org"` | no |
+| <a name="input_onboard_log"></a> [onboard\_log](#input\_onboard\_log) | Directory on the BIG-IP to store the cloud-init logs | `string` | `"/var/log/startup-script.log"` | no |
+| <a name="input_owner"></a> [owner](#input\_owner) | This is a tag used for object creation. Example is last name. | `string` | `null` | no |
+| <a name="input_projectPrefix"></a> [projectPrefix](#input\_projectPrefix) | prefix for resources | `string` | `"myDemo"` | no |
+| <a name="input_resourceOwner"></a> [resourceOwner](#input\_resourceOwner) | owner of the deployment, for tagging purposes | `string` | `"myName"` | no |
+| <a name="input_timezone"></a> [timezone](#input\_timezone) | If you would like to change the time zone the BIG-IP uses, enter the time zone you want to use. This is based on the tz database found in /usr/share/zoneinfo (see the full list [here](https://github.com/F5Networks/f5-azure-arm-templates/blob/master/azure-timezone-list.md)). Example values: UTC, US/Pacific, US/Eastern, Europe/London or Asia/Singapore. | `string` | `"UTC"` | no |
+| <a name="input_vpcId"></a> [vpcId](#input\_vpcId) | The AWS network VPC ID | `string` | `null` | no |
 
 ## Outputs
 
 | Name | Description |
-| ---- | ----------- |
-| storage_bucket | AWS storage bucket ARN |
-| public_vip_pip | Public IP for the BIG-IP listener (VIP) |
-| f5vm01_mgmt_private_ip | f5vm01 management private IP address |
-| f5vm01_mgmt_public_ip | f5vm01 management public IP address |
-| f5vm01_ext_private_ip | f5vm01 external primary IP address (self IP) |
-| f5vm01_ext_secondary_ip | f5vm01 external secondary IP address (VIP) |
-| f5vm01_int_private_ip | f5vm01 internal primary IP address |
-| f5vm02_mgmt_private_ip | f5vm02 management private IP address |
-| f5vm02_mgmt_public_ip | f5vm02 management public IP address |
-| f5vm02_ext_private_ip | f5vm02 external primary IP address (self IP) |
-| f5vm02_ext_secondary_ip | f5vm02 external secondary IP address (VIP) |
-| f5vm02_int_private_ip | f5vm02 internal primary IP address |
+|------|-------------|
+| <a name="output_f5vm01_ext_private_ip"></a> [f5vm01\_ext\_private\_ip](#output\_f5vm01\_ext\_private\_ip) | f5vm01 external primary IP address (self IP) |
+| <a name="output_f5vm01_ext_secondary_ip"></a> [f5vm01\_ext\_secondary\_ip](#output\_f5vm01\_ext\_secondary\_ip) | f5vm01 external secondary IP address (VIP) |
+| <a name="output_f5vm01_int_private_ip"></a> [f5vm01\_int\_private\_ip](#output\_f5vm01\_int\_private\_ip) | f5vm01 internal primary IP address |
+| <a name="output_f5vm01_mgmt_private_ip"></a> [f5vm01\_mgmt\_private\_ip](#output\_f5vm01\_mgmt\_private\_ip) | f5vm01 management private IP address |
+| <a name="output_f5vm01_mgmt_public_ip"></a> [f5vm01\_mgmt\_public\_ip](#output\_f5vm01\_mgmt\_public\_ip) | f5vm01 management public IP address |
+| <a name="output_f5vm02_ext_private_ip"></a> [f5vm02\_ext\_private\_ip](#output\_f5vm02\_ext\_private\_ip) | f5vm02 external primary IP address (self IP) |
+| <a name="output_f5vm02_ext_secondary_ip"></a> [f5vm02\_ext\_secondary\_ip](#output\_f5vm02\_ext\_secondary\_ip) | f5vm02 external secondary IP address (VIP) |
+| <a name="output_f5vm02_int_private_ip"></a> [f5vm02\_int\_private\_ip](#output\_f5vm02\_int\_private\_ip) | f5vm02 internal primary IP address |
+| <a name="output_f5vm02_mgmt_private_ip"></a> [f5vm02\_mgmt\_private\_ip](#output\_f5vm02\_mgmt\_private\_ip) | f5vm02 management private IP address |
+| <a name="output_f5vm02_mgmt_public_ip"></a> [f5vm02\_mgmt\_public\_ip](#output\_f5vm02\_mgmt\_public\_ip) | f5vm02 management public IP address |
+| <a name="output_public_vip_pip"></a> [public\_vip\_pip](#output\_public\_vip\_pip) | Public IP for the BIG-IP listener (VIP) |
+| <a name="output_route_table"></a> [route\_table](#output\_route\_table) | Route table ID |
+| <a name="output_storage_bucket"></a> [storage\_bucket](#output\_storage\_bucket) | AWS storage bucket ARN |
+<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- markdownlint-enable no-inline-html -->
 
 ## Installation Example
 
@@ -271,7 +314,7 @@ In order to pass traffic from your clients to the servers through the BIG-IP sys
 ## Troubleshooting
 
 ### F5 Automation Toolchain Components
-F5 BIG-IP Runtime Init uses the F5 Automation Toolchain for configuration of BIG-IP instances.  Any errors thrown from these components will be surfaced in the bigIpRuntimeInit.log (or a custom log location as specified below).  
+F5 BIG-IP Runtime Init uses the F5 Automation Toolchain for configuration of BIG-IP instances.  Any errors thrown from these components will be surfaced in the bigIpRuntimeInit.log (or a custom log location as specified below).
 
 Help with troubleshooting individual Automation Toolchain components can be found at F5's [Public Cloud Docs](http://clouddocs.f5.com/cloud/public/v1/):
 - DO: https://clouddocs.f5.com/products/extensions/f5-declarative-onboarding/latest/troubleshooting.html

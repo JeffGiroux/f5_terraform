@@ -55,7 +55,7 @@ resource "aws_key_pair" "bigip" {
 
 ############################ NICs ############################
 
-# Create NIC for Management 
+# Create NIC for Management
 resource "aws_network_interface" "vm01-mgmt-nic" {
   subnet_id       = var.mgmtSubnetAz1
   security_groups = [var.mgmtNsg]
