@@ -13,11 +13,6 @@ This solution uses a Terraform template to launch a new networking stack. It wil
 
 Terraform is beneficial as it allows composing resources a bit differently to account for dependencies into Immutable/Mutable elements. For example, mutable includes items you would typically frequently change/mutate, such as traditional configs on the BIG-IP. Once the template is deployed, there are certain resources (network infrastructure) that are fixed while others (BIG-IP VMs and configurations) can be changed.
 
-## Version
-This template is tested and worked in the following version
-Terraform v0.14.10
-+ provider.azurerm v2.72
-
 ## Prerequisites
 
 - This template requires a service account to deploy with the Terraform Azure provider and build out all the neccessary Azure objects
@@ -46,6 +41,65 @@ Terraform v0.14.10
 | mgmt_address_prefix | Yes | IP address prefix for management subnet |
 | ext_address_prefix | Yes | IP address prefix for external subnet |
 | int_address_prefix | Yes | IP address prefix for internal subnet |
+
+<!-- markdownlint-disable no-inline-html -->
+<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 0.14 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~> 2 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 2.78.0 |
+
+## Modules
+
+No modules.
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [azurerm_network_security_group.external](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_group) | resource |
+| [azurerm_network_security_group.mgmt](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_group) | resource |
+| [azurerm_resource_group.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) | resource |
+| [azurerm_subnet.external](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
+| [azurerm_subnet.internal](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
+| [azurerm_subnet.mgmt](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
+| [azurerm_subnet_network_security_group_association.external](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_network_security_group_association) | resource |
+| [azurerm_subnet_network_security_group_association.mgmt](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_network_security_group_association) | resource |
+| [azurerm_virtual_network.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) | resource |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_adminSrcAddr"></a> [adminSrcAddr](#input\_adminSrcAddr) | Allowed Admin source IP prefix | `string` | `"0.0.0.0/0"` | no |
+| <a name="input_ext_address_prefix"></a> [ext\_address\_prefix](#input\_ext\_address\_prefix) | External subnet address prefix | `string` | `"10.90.2.0/24"` | no |
+| <a name="input_f5_cloud_failover_label"></a> [f5\_cloud\_failover\_label](#input\_f5\_cloud\_failover\_label) | This is a tag used for F5 Cloud Failover Extension to identity which cloud objects to move during a failover event. | `string` | `"mydeployment"` | no |
+| <a name="input_int_address_prefix"></a> [int\_address\_prefix](#input\_int\_address\_prefix) | Internal subnet address prefix | `string` | `"10.90.3.0/24"` | no |
+| <a name="input_location"></a> [location](#input\_location) | Azure Location of the deployment | `string` | `null` | no |
+| <a name="input_mgmt_address_prefix"></a> [mgmt\_address\_prefix](#input\_mgmt\_address\_prefix) | Management subnet address prefix | `string` | `"10.90.1.0/24"` | no |
+| <a name="input_owner"></a> [owner](#input\_owner) | This is a tag used for object creation. Example is last name. | `string` | `null` | no |
+| <a name="input_prefix"></a> [prefix](#input\_prefix) | This value is inserted at the beginning of each Azure object (alpha-numeric, no special character) | `string` | `"demo"` | no |
+| <a name="input_vnet_cidr"></a> [vnet\_cidr](#input\_vnet\_cidr) | CIDR IP Address range of the Virtual Network | `string` | `"10.90.0.0/16"` | no |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_external_subnet"></a> [external\_subnet](#output\_external\_subnet) | External subnet address prefix |
+| <a name="output_internal_subnet"></a> [internal\_subnet](#output\_internal\_subnet) | Internal subnet address prefix |
+| <a name="output_mgmt_subnet"></a> [mgmt\_subnet](#output\_mgmt\_subnet) | Management subnet address prefix |
+| <a name="output_resource_group"></a> [resource\_group](#output\_resource\_group) | Resource group name |
+| <a name="output_vnet"></a> [vnet](#output\_vnet) | VNet name |
+<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- markdownlint-enable no-inline-html -->
 
 ## Installation Example
 
@@ -76,4 +130,3 @@ To run this Terraform template, perform the following steps:
   ```
       terraform destroy
   ```
-  

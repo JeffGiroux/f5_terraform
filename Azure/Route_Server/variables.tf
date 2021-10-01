@@ -11,8 +11,6 @@ variable "resourceOwner" {
   type        = string
   description = "name of the person or customer running the solution"
 }
-
-#Azure info
 variable "azureLocation" {
   type        = string
   description = "location where Azure resources are deployed (abbreviated Azure Region name)"
@@ -31,8 +29,6 @@ variable "availabilityZones" {
   description = "If you want the VM placed in an Azure Availability Zone, and the Azure region you are deploying to supports it, specify the numbers of the existing Availability Zone you want to use."
   default     = [1]
 }
-
-#BIG-IP info
 variable "instanceCountBigIp" {
   type        = number
   description = "Number of BIG-IP instances to deploy"
@@ -44,6 +40,5 @@ variable "f5UserName" {
 }
 variable "f5Version" {
   description = "The BIG-IP version"
-  #default     = "latest"
-  default = "15.1.201000"
+  default     = "15.1.201000"
 }

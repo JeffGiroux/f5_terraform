@@ -7,14 +7,8 @@ resource "azurerm_public_ip" "vm01mgmtpip" {
   sku                 = "Standard"
   resource_group_name = data.azurerm_resource_group.main.name
   allocation_method   = "Static"
-
   tags = {
-    Name        = "${var.environment}-vm01-mgmt-public-ip"
-    environment = var.environment
-    owner       = var.owner
-    group       = var.group
-    costcenter  = var.costcenter
-    application = var.application
+    owner = var.owner
   }
 }
 
@@ -24,14 +18,8 @@ resource "azurerm_public_ip" "vm01selfpip" {
   sku                 = "Standard"
   resource_group_name = data.azurerm_resource_group.main.name
   allocation_method   = "Static"
-
   tags = {
-    Name        = "${var.environment}-vm01-self-public-ip"
-    environment = var.environment
-    owner       = var.owner
-    group       = var.group
-    costcenter  = var.costcenter
-    application = var.application
+    owner = var.owner
   }
 }
 
@@ -41,18 +29,12 @@ resource "azurerm_public_ip" "pubvippip" {
   sku                 = "Standard"
   resource_group_name = data.azurerm_resource_group.main.name
   allocation_method   = "Static"
-
   tags = {
-    Name        = "${var.environment}-pubvip-public-ip"
-    environment = var.environment
-    owner       = var.owner
-    group       = var.group
-    costcenter  = var.costcenter
-    application = var.application
+    owner = var.owner
   }
 }
 
-# Create NIC for Management 
+# Create NIC for Management
 resource "azurerm_network_interface" "vm01-mgmt-nic" {
   name                = "${var.prefix}-mgmt0"
   location            = data.azurerm_resource_group.main.location
@@ -67,12 +49,7 @@ resource "azurerm_network_interface" "vm01-mgmt-nic" {
   }
 
   tags = {
-    Name        = "${var.environment}-vm01-mgmt"
-    environment = var.environment
-    owner       = var.owner
-    group       = var.group
-    costcenter  = var.costcenter
-    application = var.application
+    owner = var.owner
   }
 }
 
@@ -108,12 +85,7 @@ resource "azurerm_network_interface" "vm01-ext-nic" {
   }
 
   tags = {
-    Name        = "${var.environment}-vm01-ext"
-    environment = var.environment
-    owner       = var.owner
-    group       = var.group
-    costcenter  = var.costcenter
-    application = var.application
+    owner = var.owner
   }
 }
 
@@ -138,12 +110,7 @@ resource "azurerm_network_interface" "vm01-int-nic" {
   }
 
   tags = {
-    Name        = "${var.environment}-vm01-int"
-    environment = var.environment
-    owner       = var.owner
-    group       = var.group
-    costcenter  = var.costcenter
-    application = var.application
+    owner = var.owner
   }
 }
 
@@ -184,7 +151,6 @@ data "template_file" "as3_json" {
   template = file("${path.module}/as3.json")
 
   vars = {
-    rg_name         = azurerm_resource_group.main.name
     subscription_id = var.sp_subscription_id
     tenant_id       = var.sp_tenant_id
     client_id       = var.sp_client_id
@@ -238,18 +204,13 @@ resource "azurerm_linux_virtual_machine" "f5vm01" {
   }
 
   tags = {
-    Name        = "${var.environment}-f5vm01"
-    environment = var.environment
-    owner       = var.owner
-    group       = var.group
-    costcenter  = var.costcenter
-    application = var.application
+    owner = var.owner
   }
 }
 
 # Run Startup Script
 resource "azurerm_virtual_machine_extension" "f5vm01-run-startup-cmd" {
-  name                 = "${var.environment}-f5vm01-run-startup-cmd"
+  name                 = "${var.prefix}-f5vm01-run-startup-cmd"
   virtual_machine_id   = azurerm_linux_virtual_machine.f5vm01.id
   publisher            = "Microsoft.Azure.Extensions"
   type                 = "CustomScript"
@@ -262,12 +223,7 @@ resource "azurerm_virtual_machine_extension" "f5vm01-run-startup-cmd" {
   SETTINGS
 
   tags = {
-    Name        = "${var.environment}-f5vm01-startup-cmd"
-    environment = var.environment
-    owner       = var.owner
-    group       = var.group
-    costcenter  = var.costcenter
-    application = var.application
+    owner = var.owner
   }
 }
 

@@ -188,7 +188,7 @@ variable "bigIqHost" {
 variable "bigIqUsername" {
   type        = string
   default     = "admin"
-  description = "This is where the onboarding script logs all the events"
+  description = "Admin name for BIG-IQ"
 }
 variable "bigIqLicenseType" {
   type        = string

@@ -10,6 +10,7 @@
 - [Prerequisites](#prerequisites)
 - [Important Configuration Notes](#important-configuration-notes)
 - [BYOL Licensing](#byol-licensing)
+- [BIG-IQ License Manager](#big-iq-license-manager)
 - [Installation Example](#installation-example)
 - [Configuration Example](#configuration-example)
 
@@ -23,13 +24,6 @@ Terraform is beneficial as it allows composing resources a bit differently to ac
 
 **Networking Stack Type:** This solution deploys into a new networking stack, which is created along with the solution.
 
-## Version
-This template is tested and worked in the following version
-Terraform v0.14.10
-+ provider.azurerm v2.72
-+ provider.local v2.1
-+ provider.null v3.1
-+ provider.template v2.2
 
 ## Prerequisites
 
@@ -132,53 +126,122 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
   ```
   ***Note***: The [onboard.tpl](./onboard.tpl) startup script will use the same 'usecret' payload value (aka password) for BIG-IP password AND the BIG-IQ password. In the onboard.tpl file, this happens in the 'passwd' variable. You can use a separate password for BIG-IQ by creating a new Google Secret Manager secret for the BIG-IQ password, then add a new variable for the secret in [variables.tf](./variables.tf), modify [bigip.tf](./bigip.tf) to include the secret in the local templatefile section similar to 'usecret', then update [onboard.tpl](./onboard.tpl) to query Secret Manager for the BIG-IQ secret name. Reference code example *usecret='${usecret}'*.
 
-## Template Parameters
+<!-- markdownlint-disable no-inline-html -->
+<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+## Requirements
 
-| Parameter | Description | Type | Default | Required |
-| --------- | ----------- | ---- | ------- | -------- |
-| projectPrefix | This value is inserted at the beginning of each Azure object (alpha-numeric, no special character) | `string` | demo | no |
-| sp_subscription_id | This is the service principal subscription ID | `string` | null | no |
-| sp_client_id | This is the service principal application/client ID | `string` | null | no |
-| sp_client_secret | This is the service principal secret | `string` | null | no |
-| sp_tenant_id | This is the service principal tenant ID | `string` | null | no |
-| uname | User name for the Virtual Machine | `string` | azureuser | no |
-| upassword | Password for the Virtual Machine | `string` | Default12345! | no |
-| ssh_key | Public key used for authentication in ssh-rsa format | `string` | null | yes |
-| location | Azure Location of the deployment | `string` | westus2 | no |
-| vnet_rg | Resource group name for existing VNET | `string` | null | yes |
-| vnet_name | Name of existing VNET | `string` | null | yes |
-| mgmtSubnet | Name of management subnet | `string` | null | yes |
-| extSubnet | Name of external subnet | `string` | null | yes |
-| intSubnet | Name of internal subnet | `string` | null | yes |
-| cfe_managed_route | A UDR route can used for testing managed-route failover. Enter address prefix like x.x.x.x/x. | `string` | 0.0.0.0/0 | no |
-| instance_type | Azure instance to be used for the BIG-IP VE | `string` | Standard_DS4_v2 | no |
-| bigip_version | BIG-IP Version | `string` | 15.1.201000 | no |
-| image_name | F5 SKU (image) to deploy. Note: The disk size of the VM will be determined based on the option you select.  **Important**: If intending to provision multiple modules, ensure the appropriate value is selected, such as ****AllTwoBootLocations or AllOneBootLocation****. | `string` | f5-bigip-virtual-edition-1g-best-hourly | no |
-| license1 | The license token for the F5 BIG-IP VE (BYOL) | `string` | null | no |
-| license2 | The license token for the F5 BIG-IP VE (BYOL) | `string` | null | no |
-| ntp_server | Leave the default NTP server the BIG-IP uses, or replace the default NTP server with the one you want to use | `string` | 0.us.pool.ntp.org | no |
-| timezone | If you would like to change the time zone the BIG-IP uses, enter the time zone you want to use. This is based on the tz database found in /usr/share/zoneinfo (see the full list [here](https://github.com/F5Networks/f5-azure-arm-templates/blob/master/azure-timezone-list.md)). Example values: UTC, US/Pacific, US/Eastern, Europe/London or Asia/Singapore. | `string` | UTC | no |
-| dns_server | Leave the default DNS server the BIG-IP uses, or replace the default DNS server with the one you want to use | `string` | 8.8.8.8 | no |
-| INIT_URL | URL to download the BIG-IP runtime init | `string` | https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.2.1/dist/f5-bigip-runtime-init-1.2.1-1.gz.run | no |
-| DO_URL | URL to download the BIG-IP Declarative Onboarding module | `string` | https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.23.0/f5-declarative-onboarding-1.23.0-4.noarch.rpm | no |
-| AS3_URL | URL to download the BIG-IP Application Service Extension 3 (AS3) module | `string` | https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.30.0/f5-appsvcs-3.30.0-5.noarch.rpm | no |
-| TS_URL | URL to download the BIG-IP Telemetry Streaming module | `string` | https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.22.0/f5-telemetry-1.22.0-1.noarch.rpm | no |
-| FAST_URL | URL to download the BIG-IP FAST module | `string` | https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.11.0/f5-appsvcs-templates-1.11.0-1.noarch.rpm | no |
-| CFE_URL | URL to download the BIG-IP Cloud Failover Extension module | `string` | https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.9.0/f5-cloud-failover-1.9.0-0.noarch.rpm | no |
-| libs_dir | Directory on the BIG-IP to download the A&O Toolchain into | `string` | /config/cloud/azure/node_modules | no |
-| onboard_log | Directory on the BIG-IP to store the cloud-init logs | `string` | /var/log/startup-script.log | no |
-| f5_cloud_failover_nic_map | This is a tag used for failover NIC. | `string` | external | yes |
-| owner | This is a tag used for object creation. Example "lastname" | `string` | null | yes |
-| bigIqHost | This is the BIG-IQ License Manager host name or IP address | `string` | 200.200.200.200 | no |
-| bigIqUsername | BIG-IQ user name | `string` | admin | no |
-| bigIqPassword | BIG-IQ Password | `string` | Default12345! | no |
-| bigIqLicenseType | BIG-IQ license type | `string` | licensePool | no |
-| bigIqLicensePool | BIG-IQ license pool name | `string` | myPool | no |
-| bigIqSkuKeyword1 | BIG-IQ license SKU keyword 1 | `string` | key1 | no |
-| bigIqSkuKeyword2 | BIG-IQ license SKU keyword 1 | `string` | key2 | no |
-| bigIqUnitOfMeasure | BIG-IQ license unit of measure | `string` | hourly | no |
-| bigIqHypervisor | BIG-IQ hypervisor | `string` | azure | no |
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 0.14 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~> 2 |
 
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | ~> 2 |
+| <a name="provider_random"></a> [random](#provider\_random) | n/a |
+
+## Modules
+
+No modules.
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [azurerm_linux_virtual_machine.f5vm01](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/linux_virtual_machine) | resource |
+| [azurerm_linux_virtual_machine.f5vm02](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/linux_virtual_machine) | resource |
+| [azurerm_log_analytics_workspace.law](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_workspace) | resource |
+| [azurerm_network_interface.vm01-ext-nic](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_interface) | resource |
+| [azurerm_network_interface.vm01-int-nic](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_interface) | resource |
+| [azurerm_network_interface.vm01-mgmt-nic](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_interface) | resource |
+| [azurerm_network_interface.vm02-ext-nic](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_interface) | resource |
+| [azurerm_network_interface.vm02-int-nic](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_interface) | resource |
+| [azurerm_network_interface.vm02-mgmt-nic](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_interface) | resource |
+| [azurerm_public_ip.pubvippip](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
+| [azurerm_public_ip.vm01mgmtpip](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
+| [azurerm_public_ip.vm01selfpip](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
+| [azurerm_public_ip.vm02mgmtpip](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
+| [azurerm_public_ip.vm02selfpip](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
+| [azurerm_resource_group.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) | resource |
+| [azurerm_role_assignment.f5vm01ra](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.f5vm02ra](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_route_table.udr](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/route_table) | resource |
+| [azurerm_storage_account.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) | resource |
+| [azurerm_virtual_machine_extension.f5vm01-startup](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_machine_extension) | resource |
+| [azurerm_virtual_machine_extension.f5vm02-startup](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_machine_extension) | resource |
+| [random_id.buildSuffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
+| [azurerm_subnet.external](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/subnet) | data source |
+| [azurerm_subnet.internal](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/subnet) | data source |
+| [azurerm_subnet.mgmt](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/subnet) | data source |
+| [azurerm_subscription.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/subscription) | data source |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_ssh_key"></a> [ssh\_key](#input\_ssh\_key) | public key used for authentication in ssh-rsa format | `string` | n/a | yes |
+| <a name="input_AS3_URL"></a> [AS3\_URL](#input\_AS3\_URL) | URL to download the BIG-IP Application Service Extension 3 (AS3) module | `string` | `"https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.30.0/f5-appsvcs-3.30.0-5.noarch.rpm"` | no |
+| <a name="input_CFE_URL"></a> [CFE\_URL](#input\_CFE\_URL) | URL to download the BIG-IP Cloud Failover Extension module | `string` | `"https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.9.0/f5-cloud-failover-1.9.0-0.noarch.rpm"` | no |
+| <a name="input_DO_URL"></a> [DO\_URL](#input\_DO\_URL) | URL to download the BIG-IP Declarative Onboarding module | `string` | `"https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.23.0/f5-declarative-onboarding-1.23.0-4.noarch.rpm"` | no |
+| <a name="input_FAST_URL"></a> [FAST\_URL](#input\_FAST\_URL) | URL to download the BIG-IP FAST module | `string` | `"https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.11.0/f5-appsvcs-templates-1.11.0-1.noarch.rpm"` | no |
+| <a name="input_INIT_URL"></a> [INIT\_URL](#input\_INIT\_URL) | URL to download the BIG-IP runtime init | `string` | `"https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.2.1/dist/f5-bigip-runtime-init-1.2.1-1.gz.run"` | no |
+| <a name="input_TS_URL"></a> [TS\_URL](#input\_TS\_URL) | URL to download the BIG-IP Telemetry Streaming module | `string` | `"https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.22.0/f5-telemetry-1.22.0-1.noarch.rpm"` | no |
+| <a name="input_bigIqHost"></a> [bigIqHost](#input\_bigIqHost) | This is the BIG-IQ License Manager host name or IP address | `string` | `""` | no |
+| <a name="input_bigIqHypervisor"></a> [bigIqHypervisor](#input\_bigIqHypervisor) | BIG-IQ hypervisor | `string` | `"gce"` | no |
+| <a name="input_bigIqLicensePool"></a> [bigIqLicensePool](#input\_bigIqLicensePool) | BIG-IQ license pool name | `string` | `""` | no |
+| <a name="input_bigIqLicenseType"></a> [bigIqLicenseType](#input\_bigIqLicenseType) | BIG-IQ license type | `string` | `"licensePool"` | no |
+| <a name="input_bigIqPassword"></a> [bigIqPassword](#input\_bigIqPassword) | Admin Password for BIG-IQ | `string` | `"Default12345!"` | no |
+| <a name="input_bigIqSkuKeyword1"></a> [bigIqSkuKeyword1](#input\_bigIqSkuKeyword1) | BIG-IQ license SKU keyword 1 | `string` | `"key1"` | no |
+| <a name="input_bigIqSkuKeyword2"></a> [bigIqSkuKeyword2](#input\_bigIqSkuKeyword2) | BIG-IQ license SKU keyword 2 | `string` | `"key2"` | no |
+| <a name="input_bigIqUnitOfMeasure"></a> [bigIqUnitOfMeasure](#input\_bigIqUnitOfMeasure) | BIG-IQ license unit of measure | `string` | `"hourly"` | no |
+| <a name="input_bigIqUsername"></a> [bigIqUsername](#input\_bigIqUsername) | Admin name for BIG-IQ | `string` | `"azureuser"` | no |
+| <a name="input_bigip_version"></a> [bigip\_version](#input\_bigip\_version) | BIG-IP Version | `string` | `"15.1.201000"` | no |
+| <a name="input_cfe_managed_route"></a> [cfe\_managed\_route](#input\_cfe\_managed\_route) | A UDR route can used for testing managed-route failover. Enter address prefix like x.x.x.x/x | `string` | `"0.0.0.0/0"` | no |
+| <a name="input_dns_server"></a> [dns\_server](#input\_dns\_server) | Leave the default DNS server the BIG-IP uses, or replace the default DNS server with the one you want to use | `string` | `"8.8.8.8"` | no |
+| <a name="input_extSubnet"></a> [extSubnet](#input\_extSubnet) | Name of external subnet | `string` | `null` | no |
+| <a name="input_f5_cloud_failover_nic_map"></a> [f5\_cloud\_failover\_nic\_map](#input\_f5\_cloud\_failover\_nic\_map) | This is a tag used for failover NIC | `string` | `"external"` | no |
+| <a name="input_image_name"></a> [image\_name](#input\_image\_name) | F5 SKU (image) to deploy. Note: The disk size of the VM will be determined based on the option you select.  **Important**: If intending to provision multiple modules, ensure the appropriate value is selected, such as ****AllTwoBootLocations or AllOneBootLocation****. | `string` | `"f5-bigip-virtual-edition-1g-best-hourly"` | no |
+| <a name="input_instance_type"></a> [instance\_type](#input\_instance\_type) | Azure instance type to be used for the BIG-IP VE | `string` | `"Standard_DS4_v2"` | no |
+| <a name="input_intSubnet"></a> [intSubnet](#input\_intSubnet) | Name of internal subnet | `string` | `null` | no |
+| <a name="input_libs_dir"></a> [libs\_dir](#input\_libs\_dir) | Directory on the BIG-IP to download the A&O Toolchain into | `string` | `"/config/cloud/azure/node_modules"` | no |
+| <a name="input_license1"></a> [license1](#input\_license1) | The license token for the 1st F5 BIG-IP VE (BYOL) | `string` | `""` | no |
+| <a name="input_license2"></a> [license2](#input\_license2) | The license token for the 2nd F5 BIG-IP VE (BYOL) | `string` | `""` | no |
+| <a name="input_location"></a> [location](#input\_location) | Azure Location of the deployment | `string` | `"westus2"` | no |
+| <a name="input_mgmtSubnet"></a> [mgmtSubnet](#input\_mgmtSubnet) | Name of management subnet | `string` | `null` | no |
+| <a name="input_ntp_server"></a> [ntp\_server](#input\_ntp\_server) | Leave the default NTP server the BIG-IP uses, or replace the default NTP server with the one you want to use | `string` | `"0.us.pool.ntp.org"` | no |
+| <a name="input_onboard_log"></a> [onboard\_log](#input\_onboard\_log) | Directory on the BIG-IP to store the cloud-init logs | `string` | `"/var/log/startup-script.log"` | no |
+| <a name="input_owner"></a> [owner](#input\_owner) | This is a tag used for object creation. Example is last name. | `string` | `null` | no |
+| <a name="input_product"></a> [product](#input\_product) | Azure BIG-IP VE Offer | `string` | `"f5-big-ip-best"` | no |
+| <a name="input_projectPrefix"></a> [projectPrefix](#input\_projectPrefix) | This value is inserted at the beginning of each Azure object (alpha-numeric, no special character) | `string` | `"demo"` | no |
+| <a name="input_sp_client_id"></a> [sp\_client\_id](#input\_sp\_client\_id) | This is the service principal application/client ID | `string` | `""` | no |
+| <a name="input_sp_client_secret"></a> [sp\_client\_secret](#input\_sp\_client\_secret) | This is the service principal secret | `string` | `""` | no |
+| <a name="input_sp_subscription_id"></a> [sp\_subscription\_id](#input\_sp\_subscription\_id) | This is the service principal subscription ID | `string` | `""` | no |
+| <a name="input_sp_tenant_id"></a> [sp\_tenant\_id](#input\_sp\_tenant\_id) | This is the service principal tenant ID | `string` | `""` | no |
+| <a name="input_timezone"></a> [timezone](#input\_timezone) | If you would like to change the time zone the BIG-IP uses, enter the time zone you want to use. This is based on the tz database found in /usr/share/zoneinfo (see the full list [here](https://github.com/F5Networks/f5-azure-arm-templates/blob/master/azure-timezone-list.md)). Example values: UTC, US/Pacific, US/Eastern, Europe/London or Asia/Singapore. | `string` | `"UTC"` | no |
+| <a name="input_uname"></a> [uname](#input\_uname) | User name for the Virtual Machine | `string` | `"azureuser"` | no |
+| <a name="input_upassword"></a> [upassword](#input\_upassword) | Password for the Virtual Machine | `string` | `"Default12345!"` | no |
+| <a name="input_vnet_name"></a> [vnet\_name](#input\_vnet\_name) | Name of existing VNET | `string` | `null` | no |
+| <a name="input_vnet_rg"></a> [vnet\_rg](#input\_vnet\_rg) | Resource group name for existing VNET | `string` | `null` | no |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_Public_VIP_pip"></a> [Public\_VIP\_pip](#output\_Public\_VIP\_pip) | Public VIP IP for application |
+| <a name="output_bigip_resource_group"></a> [bigip\_resource\_group](#output\_bigip\_resource\_group) | Resource group name |
+| <a name="output_f5vm01_ext_private_ip"></a> [f5vm01\_ext\_private\_ip](#output\_f5vm01\_ext\_private\_ip) | External NIC private IP address for BIG-IP 1 |
+| <a name="output_f5vm01_int_private_ip"></a> [f5vm01\_int\_private\_ip](#output\_f5vm01\_int\_private\_ip) | Internal NIC private IP address for BIG-IP 1 |
+| <a name="output_f5vm01_mgmt_private_ip"></a> [f5vm01\_mgmt\_private\_ip](#output\_f5vm01\_mgmt\_private\_ip) | Management NIC private IP address for BIG-IP 1 |
+| <a name="output_f5vm01_mgmt_public_ip"></a> [f5vm01\_mgmt\_public\_ip](#output\_f5vm01\_mgmt\_public\_ip) | Management NIC public IP address for BIG-IP 1 |
+| <a name="output_f5vm02_ext_private_ip"></a> [f5vm02\_ext\_private\_ip](#output\_f5vm02\_ext\_private\_ip) | External NIC private IP address for BIG-IP 2 |
+| <a name="output_f5vm02_int_private_ip"></a> [f5vm02\_int\_private\_ip](#output\_f5vm02\_int\_private\_ip) | Internal NIC private IP address for BIG-IP 2 |
+| <a name="output_f5vm02_mgmt_private_ip"></a> [f5vm02\_mgmt\_private\_ip](#output\_f5vm02\_mgmt\_private\_ip) | Management NIC private IP address for BIG-IP 2 |
+| <a name="output_f5vm02_mgmt_public_ip"></a> [f5vm02\_mgmt\_public\_ip](#output\_f5vm02\_mgmt\_public\_ip) | Management NIC public IP address for BIG-IP 2 |
+| <a name="output_storage_bucket"></a> [storage\_bucket](#output\_storage\_bucket) | Storage account name |
+<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- markdownlint-enable no-inline-html -->
 
 ## Installation Example
 
@@ -283,6 +346,6 @@ az account set -s <subscriptionId>
   [
     "f5-AZR_xxxx", <-- name
     "xxx-xxx-xxx", <-- subscription id
-    true           <-- is this the default subscription 
+    true           <-- is this the default subscription
   ]
 ```

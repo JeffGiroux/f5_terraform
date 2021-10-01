@@ -19,9 +19,7 @@ output "bigipUserName" {
   value       = module.bigip.*.f5_username
 }
 output "bigipPassword" {
-  description = <<-EOT
- "The password for the BIG-IP"( if dynamic_password is choosen it will be random generated password or if azure_keyvault is choosen it will be key vault secret name )
-  EOT
+  description = "The password for the BIG-IP (if dynamic_password is choosen it will be random generated password or if azure_keyvault is choosen it will be key vault secret name )"
   value       = module.bigip.*.bigip_password
 }
 output "clientPublicIP" {

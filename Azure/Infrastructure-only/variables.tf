@@ -1,22 +1,47 @@
 # Variables
 
-# Azure Environment
-variable "prefix" { default = "mydemo123" }
-variable "location" { default = "westus2" }
-variable "adminSrcAddr" { default = "0.0.0.0/0" }
-
-
-# NETWORK
-variable "vnet_cidr" { default = "10.90.0.0/16" }
-variable "mgmt_address_prefix" { default = "10.90.1.0/24" }
-variable "ext_address_prefix" { default = "10.90.2.0/24" }
-variable "int_address_prefix" { default = "10.90.3.0/24" }
-
-# Tags
-variable "purpose" { default = "public" }
-variable "environment" { default = "f5env" } #ex. dev/staging/prod
-variable "owner" { default = "f5owner" }
-variable "group" { default = "f5group" }
-variable "costcenter" { default = "f5costcenter" }
-variable "application" { default = "f5app" }
-variable "f5_cloud_failover_label" { default = "mydeployment" } #Cloud Failover Tag
+variable "prefix" {
+  type        = string
+  default     = "demo"
+  description = "This value is inserted at the beginning of each Azure object (alpha-numeric, no special character)"
+}
+variable "location" {
+  type        = string
+  default     = null
+  description = "Azure Location of the deployment"
+}
+variable "adminSrcAddr" {
+  type        = string
+  description = "Allowed Admin source IP prefix"
+  default     = "0.0.0.0/0"
+}
+variable "vnet_cidr" {
+  type        = string
+  default     = "10.90.0.0/16"
+  description = "CIDR IP Address range of the Virtual Network"
+}
+variable "mgmt_address_prefix" {
+  type        = string
+  default     = "10.90.1.0/24"
+  description = "Management subnet address prefix"
+}
+variable "ext_address_prefix" {
+  type        = string
+  default     = "10.90.2.0/24"
+  description = "External subnet address prefix"
+}
+variable "int_address_prefix" {
+  type        = string
+  default     = "10.90.3.0/24"
+  description = "Internal subnet address prefix"
+}
+variable "owner" {
+  type        = string
+  default     = null
+  description = "This is a tag used for object creation. Example is last name."
+}
+variable "f5_cloud_failover_label" {
+  type        = string
+  default     = "mydeployment"
+  description = "This is a tag used for F5 Cloud Failover Extension to identity which cloud objects to move during a failover event."
+}
