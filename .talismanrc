@@ -13,3 +13,5 @@ fileignoreconfig:
   checksum: 48ce844973a607f616e09b660b91d1d58bf03a9fcbe48a41c3d52b21263a3ea0
 - filename: Azure/Secure_Enclave_Public_DMZ/README.md
   checksum: 493fed275ebab9fd6f0af48e0be45fb8d83bd2d2303f630d730b9e141f2179b6
+- filename: Azure/Route_Server/README.md
+  checksum: 34c61a9c10864b40505f85a88cca49e29196422f310f19bb8f9850483c365a45

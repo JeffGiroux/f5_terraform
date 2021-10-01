@@ -75,16 +75,16 @@ Net::BGP Instance (route-domain: 0)
   ----------------------------------------------------------------------------
   | Net::BGP Neighbor - 10.255.255.5 via 10.255.10.4
   ----------------------------------------------------------------------------
-  | Remote AS                   0           
+  | Remote AS                   0
   | State                       established   0:06:24
   | Notification                Cease/Administratively Shutdown.
   | Address Family              IPv4 Unicast  IPv6 Unicast
-  |  Prefix                   
-  |   Accepted                  3              
-  |   Announced                 6              
-  |  Table Version            
-  |   Local                     6              
-  |   Neighbor                  6              
+  |  Prefix
+  |   Accepted                  3
+  |   Announced                 6
+  |  Table Version
+  |   Local                     6
+  |   Neighbor                  6
   | Message/Notification/Queue  Sent          Received
   |  Message                    27            26
   |  Notification               0             2
@@ -95,11 +95,11 @@ Net::BGP Instance (route-domain: 0)
 - View running config on BIG-IP using imish
 ```bash
 (tmos)# imish
-f5vm01.example.com[0]#show running-config 
+f5vm01.example.com[0]#show running-config
 !
 service password-encryption
 !
-bgp extended-asn-cap 
+bgp extended-asn-cap
 !
 router bgp 65530
  bgp graceful-restart restart-time 120
@@ -198,6 +198,87 @@ Use the following command to destroy all of the resources
 ```bash
 ./destroy.sh
 ```
+
+<!-- markdownlint-disable no-inline-html -->
+<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 0.14 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~> 2 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 2.77.0 |
+| <a name="provider_local"></a> [local](#provider\_local) | 2.1.0 |
+| <a name="provider_null"></a> [null](#provider\_null) | 3.1.0 |
+| <a name="provider_random"></a> [random](#provider\_random) | 3.1.0 |
+
+## Modules
+
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_app"></a> [app](#module\_app) | Azure/compute/azurerm | n/a |
+| <a name="module_bigip"></a> [bigip](#module\_bigip) | github.com/JeffGiroux/terraform-azure-bigip-module | n/a |
+| <a name="module_client"></a> [client](#module\_client) | Azure/compute/azurerm | n/a |
+| <a name="module_network"></a> [network](#module\_network) | Azure/vnet/azurerm | n/a |
+| <a name="module_nsg-external"></a> [nsg-external](#module\_nsg-external) | Azure/network-security-group/azurerm | n/a |
+| <a name="module_nsg-internal"></a> [nsg-internal](#module\_nsg-internal) | Azure/network-security-group/azurerm | n/a |
+| <a name="module_nsg-mgmt"></a> [nsg-mgmt](#module\_nsg-mgmt) | Azure/network-security-group/azurerm | n/a |
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [azurerm_resource_group.rg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) | resource |
+| [azurerm_route_table.rt](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/route_table) | resource |
+| [azurerm_virtual_hub.routeServer](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_hub) | resource |
+| [azurerm_virtual_hub_bgp_connection.bigip](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_hub_bgp_connection) | resource |
+| [azurerm_virtual_hub_ip.routeServerIp](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_hub_ip) | resource |
+| [azurerm_virtual_network_peering.hubToSpoke](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network_peering) | resource |
+| [azurerm_virtual_network_peering.spokeToHub](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network_peering) | resource |
+| [null_resource.clusterDO](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
+| [random_id.buildSuffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
+| [azurerm_subnet.externalSubnetHub](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/subnet) | data source |
+| [azurerm_subnet.internalSubnetHub](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/subnet) | data source |
+| [azurerm_subnet.mgmtSubnetHub](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/subnet) | data source |
+| [azurerm_subnet.routeServerSubnetHub](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/subnet) | data source |
+| [local_file.appOnboard](https://registry.terraform.io/providers/hashicorp/local/latest/docs/data-sources/file) | data source |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_azureLocation"></a> [azureLocation](#input\_azureLocation) | location where Azure resources are deployed (abbreviated Azure Region name) | `string` | n/a | yes |
+| <a name="input_keyName"></a> [keyName](#input\_keyName) | instance key pair name | `string` | n/a | yes |
+| <a name="input_resourceOwner"></a> [resourceOwner](#input\_resourceOwner) | name of the person or customer running the solution | `string` | n/a | yes |
+| <a name="input_adminSrcAddr"></a> [adminSrcAddr](#input\_adminSrcAddr) | Allowed Admin source IP prefix | `string` | `"0.0.0.0/0"` | no |
+| <a name="input_availabilityZones"></a> [availabilityZones](#input\_availabilityZones) | If you want the VM placed in an Azure Availability Zone, and the Azure region you are deploying to supports it, specify the numbers of the existing Availability Zone you want to use. | `list(any)` | <pre>[<br>  1<br>]</pre> | no |
+| <a name="input_f5UserName"></a> [f5UserName](#input\_f5UserName) | The admin username of the F5 BIG-IP that will be deployed | `string` | `"azureuser"` | no |
+| <a name="input_f5Version"></a> [f5Version](#input\_f5Version) | The BIG-IP version | `string` | `"15.1.201000"` | no |
+| <a name="input_instanceCountBigIp"></a> [instanceCountBigIp](#input\_instanceCountBigIp) | Number of BIG-IP instances to deploy | `number` | `1` | no |
+| <a name="input_projectPrefix"></a> [projectPrefix](#input\_projectPrefix) | prefix for resources | `string` | `"demo"` | no |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_appPrivateIP"></a> [appPrivateIP](#output\_appPrivateIP) | The private ip address allocated for the webapp in Spoke 2 |
+| <a name="output_appPublicIP"></a> [appPublicIP](#output\_appPublicIP) | The public ip address allocated for the app in Spoke 2 |
+| <a name="output_bigipPassword"></a> [bigipPassword](#output\_bigipPassword) | The password for the BIG-IP (if dynamic\_password is choosen it will be random generated password or if azure\_keyvault is choosen it will be key vault secret name ) |
+| <a name="output_bigipPublicIP"></a> [bigipPublicIP](#output\_bigipPublicIP) | The public ip address allocated for the BIG-IP |
+| <a name="output_bigipUserName"></a> [bigipUserName](#output\_bigipUserName) | The user name for the BIG-IP |
+| <a name="output_clientPrivateIP"></a> [clientPrivateIP](#output\_clientPrivateIP) | The private ip address allocated for the client/jumphost in Spoke 1 |
+| <a name="output_clientPublicIP"></a> [clientPublicIP](#output\_clientPublicIP) | The public ip address allocated for the client/jumphost in Spoke 1 |
+| <a name="output_vnetIdHub"></a> [vnetIdHub](#output\_vnetIdHub) | Hub VNet ID |
+| <a name="output_vnetIdSpoke1"></a> [vnetIdSpoke1](#output\_vnetIdSpoke1) | Spoke1 VNet ID |
+| <a name="output_vnetIdSpoke2"></a> [vnetIdSpoke2](#output\_vnetIdSpoke2) | Spoke2 VNet ID |
+<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- markdownlint-enable no-inline-html -->
+
 
 ## How to Contribute
 
