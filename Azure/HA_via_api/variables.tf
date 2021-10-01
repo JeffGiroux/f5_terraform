@@ -168,7 +168,7 @@ variable "bigIqHost" {
 }
 variable "bigIqUsername" {
   type        = string
-  default     = "admin"
+  default     = "azureuser"
   description = "Admin name for BIG-IQ"
 }
 variable "bigIqPassword" {

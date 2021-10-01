@@ -10,12 +10,12 @@ fileignoreconfig:
 - filename: GCP/Autoscale_via_lb/3nic/README.md
   checksum: 12c945cad966cd291232ad7dd83456c93375198ec41de39e6a0352c1f5e0f8f5
 - filename: Azure/Standalone/README.md
-  checksum: 48ce844973a607f616e09b660b91d1d58bf03a9fcbe48a41c3d52b21263a3ea0
+  checksum: 4ae2e073ca0d495defadf8b98a4a749d8f12c3863dc4d1420a6286731a99fbc5
 - filename: Azure/Secure_Enclave_Public_DMZ/README.md
-  checksum: 493fed275ebab9fd6f0af48e0be45fb8d83bd2d2303f630d730b9e141f2179b6
+  checksum: 0d6df57c347f4f1e327f564eb5acb1e4d4cb7fc79d641850c0bb536161578692
 - filename: Azure/Route_Server/README.md
   checksum: 34c61a9c10864b40505f85a88cca49e29196422f310f19bb8f9850483c365a45
 - filename: Azure/HA_via_lb/README.md
-  checksum: 9ab71a340cdbfb7f79c168adc6bfef1a50610f1f55c362dd649dcaea6fd96ee8
+  checksum: c41ee266c076663299caa85f7c2fa98371e713a528123557b3f104e11cd42a69
 - filename: Azure/HA_via_api/README.md
   checksum: ffd438580af3d6717857749b588fe2ffd93b5689b52138a00664cba2feb70445

@@ -231,8 +231,13 @@ variable "bigIqHost" {
 }
 variable "bigIqUsername" {
   type        = string
-  default     = "admin"
-  description = "This is where the onboarding script logs all the events"
+  default     = "azureuser"
+  description = "Admin name for BIG-IQ"
+}
+variable "bigIqPassword" {
+  type        = string
+  default     = "Default12345!"
+  description = "Admin Password for BIG-IQ"
 }
 variable "bigIqLicenseType" {
   type        = string
