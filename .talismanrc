@@ -17,3 +17,5 @@ fileignoreconfig:
   checksum: 34c61a9c10864b40505f85a88cca49e29196422f310f19bb8f9850483c365a45
 - filename: Azure/HA_via_lb/README.md
   checksum: 9ab71a340cdbfb7f79c168adc6bfef1a50610f1f55c362dd649dcaea6fd96ee8
+- filename: Azure/HA_via_api/README.md
+  checksum: ffd438580af3d6717857749b588fe2ffd93b5689b52138a00664cba2feb70445
