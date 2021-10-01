@@ -78,12 +78,7 @@ resource "azurerm_network_security_group" "mgmt" {
   }
 
   tags = {
-    Name        = "${var.environment}-mgmt-nsg"
-    environment = var.environment
-    owner       = var.owner
-    group       = var.group
-    costcenter  = var.costcenter
-    application = var.application
+    owner = var.owner
   }
 }
 
@@ -119,12 +114,7 @@ resource "azurerm_network_security_group" "external" {
   }
 
   tags = {
-    Name        = "${var.environment}-ext-nsg"
-    environment = var.environment
-    owner       = var.owner
-    group       = var.group
-    costcenter  = var.costcenter
-    application = var.application
+    owner = var.owner
   }
 }
 
