@@ -85,6 +85,10 @@ No modules.
 
 To run this Terraform template, perform the following steps:
   1. Clone the repo to your favorite location
+  ```
+  git clone https://github.com/JeffGiroux/f5_terraform.git
+  cd f5_terraform/Azure/Front_Door_B2C
+  ```
   2. Modify terraform.tfvars with the required information
   ```
       # Azure Environment
