@@ -15,3 +15,5 @@ fileignoreconfig:
   checksum: 493fed275ebab9fd6f0af48e0be45fb8d83bd2d2303f630d730b9e141f2179b6
 - filename: Azure/Route_Server/README.md
   checksum: 34c61a9c10864b40505f85a88cca49e29196422f310f19bb8f9850483c365a45
+- filename: Azure/HA_via_lb/README.md
+  checksum: 9ab71a340cdbfb7f79c168adc6bfef1a50610f1f55c362dd649dcaea6fd96ee8

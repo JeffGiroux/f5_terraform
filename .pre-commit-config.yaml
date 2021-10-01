@@ -18,6 +18,7 @@ repos:
       - id: detect-private-key
         # excludes
         #exclude: 'path/file'
+        exclude: 'Azure/HA_via_lb/as3.json'
   - repo: https://github.com/thoughtworks/talisman
     rev: v1.9.0
     hooks:
