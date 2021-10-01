@@ -74,6 +74,16 @@ variable "allowedIps" {
   description = "Trusted source network for admin access"
   default     = ["0.0.0.0/0"]
 }
+variable "ntp_server" {
+  type        = string
+  default     = "0.us.pool.ntp.org"
+  description = "Leave the default NTP server the BIG-IP uses, or replace the default NTP server with the one you want to use"
+}
+variable "timezone" {
+  type        = string
+  default     = "UTC"
+  description = "If you would like to change the time zone the BIG-IP uses, enter the time zone you want to use. This is based on the tz database found in /usr/share/zoneinfo (see the full list [here](https://github.com/F5Networks/f5-azure-arm-templates/blob/master/azure-timezone-list.md)). Example values: UTC, US/Pacific, US/Eastern, Europe/London or Asia/Singapore."
+}
 variable "onboard_log" {
   description = "Directory on the BIG-IP to store the cloud-init logs"
   default     = "/var/log/cloud/startup-script.log"
