@@ -27,13 +27,6 @@ This solution uses a Terraform template to launch a 1-NIC deployment of a cloud-
 
 This solution leverages more traditional Auto Scale configuration management practices where each instance is created with an identical configuration as defined in the Scale Set's "model". Scale Set sizes are no longer restricted to the small limitations of the cluster. The BIG-IP's configuration, now defined in a single convenient YAML or JSON [F5 BIG-IP Runtime Init](https://github.com/F5Networks/f5-bigip-runtime-init) configuration file, leverages [F5 Automation Tool Chain](https://www.f5.com/pdf/products/automation-toolchain-overview.pdf) declarations which are easier to author, validate and maintain as code. For instance, if you need to change the configuration on the BIG-IPs in the deployment, you update the instance model by passing a new config file (which references the updated Automation Toolchain declarations) via template's runtimeConfig input parameter. New instances will be deployed with the updated configurations.
 
-## Version
-This template is tested and worked in the following versions:
-| Name | Version |
-| ---- | ------- |
-| terraform | ~> 0.14 |
-| aws | ~> 3 |
-
 
 ## Prerequisites
 
@@ -81,46 +74,80 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
             overwrite: true
   ```
 
-## Template Parameters
+<!-- markdownlint-disable no-inline-html -->
+<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 0.14 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 3 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 3 |
+| <a name="provider_random"></a> [random](#provider\_random) | n/a |
+
+## Modules
+
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_external-security-group"></a> [external-security-group](#module\_external-security-group) | terraform-aws-modules/security-group/aws | n/a |
+| <a name="module_nlb"></a> [nlb](#module\_nlb) | terraform-aws-modules/alb/aws | n/a |
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [aws_autoscaling_group.bigip-asg](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/autoscaling_group) | resource |
+| [aws_key_pair.bigip](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/key_pair) | resource |
+| [aws_launch_template.bigip-lt](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/launch_template) | resource |
+| [random_id.buildSuffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
+| [aws_ami.f5_ami](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami) | data source |
 
 ## Inputs
 
-| Parameter | Description | Type | Default | Required |
-| --------- | ----------- | ---- | ------- | -------- |
-| projectPrefix | This value is inserted at the beginning of each AWS object (alpha-numeric, no special character) | `string` | myDemo | no |
-| f5_username | User name for the BIG-IP (Note: currenlty not used. Defaults to 'admin' based on AMI | `string` | admin | no |
-| f5_password | BIG-IP Password | `string` | Default12345! | no |
-| f5_ssh_publickey | SSH public key -- format should ssh-rsa like "ssh-rsa AAAA....") | `string` | n/a | no |
-| allowedIps | Trusted source network for admin access | `list` | ["0.0.0.0/0"] | yes |
-| awsRegion | AWS Region for provider | `string` | us-west-2 | yes |
-| vpcId | The AWS network VPC ID | `string` | n/a | yes |
-| extSubnetAz1 | External subnet AZ1 | `string` | n/a | yes |
-| extSubnetAz2 | Internal subnet AZ2 | `string` | n/a | yes |
-| f5_ami_search_name | AWS AMI search filter to find correct BIG-IP VE for region | `string` | F5 BIGIP-15.1.2.1* PAYG-Best 200Mbps* | no |
-| ec2_instance_type | AWS instance type for the BIG-IP | `string` | m5.xlarge | no |
-| ntp_server | NTP server used by BIG-IP | `string` | 169.254.169.123 | no |
-| timezone | Timezone used by BIG-IP clock (ex: UTC, US/Pacific, US/Eastern, Europe/London or Asia/Singapore) | `string` | UTC | no |
-| onboard_log | This is where the onboarding script logs all the events | `string` | /var/log/cloud/onboard.log | no |
-| bigIqHost | This is the BIG-IQ License Manager host name or IP address | `string` | 200.200.200.200 | no |
-| bigIqUsername | BIG-IQ user name | `string` | admin | no |
-| bigIqPassword | BIG-IQ Password | `string` | Default12345! | no |
-| bigIqLicenseType | BIG-IQ license type | `string` | licensePool | no |
-| bigIqLicensePool | BIG-IQ license pool name | `string` | myPool | no |
-| bigIqSkuKeyword1 | BIG-IQ license SKU keyword 1 | `string` | key1 | no |
-| bigIqSkuKeyword2 | BIG-IQ license SKU keyword 1 | `string` | key2 | no |
-| bigIqUnitOfMeasure | BIG-IQ license unit of measure | `string` | hourly | no |
-| bigIqHypervisor | BIG-IQ hypervisor | `string` | aws | no |
-| asg_min_size | AWS autoscailng minimum size | `string` | 1 | no |
-| asg_max_size | AWS autoscailng maximum size | `string` | 2 | no |
-| asg_desired_capacity | AWS autoscailng desired capacity | `string` | 1 | no |
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_f5_ssh_publickey"></a> [f5\_ssh\_publickey](#input\_f5\_ssh\_publickey) | public key used for authentication in ssh-rsa format | `string` | n/a | yes |
+| <a name="input_allowedIps"></a> [allowedIps](#input\_allowedIps) | Trusted source network for admin access | `list(any)` | <pre>[<br>  "0.0.0.0/0"<br>]</pre> | no |
+| <a name="input_asg_desired_capacity"></a> [asg\_desired\_capacity](#input\_asg\_desired\_capacity) | AWS autoscailng desired capacity | `number` | `1` | no |
+| <a name="input_asg_max_size"></a> [asg\_max\_size](#input\_asg\_max\_size) | AWS autoscailng minimum size | `number` | `2` | no |
+| <a name="input_asg_min_size"></a> [asg\_min\_size](#input\_asg\_min\_size) | AWS autoscailng minimum size | `number` | `1` | no |
+| <a name="input_awsRegion"></a> [awsRegion](#input\_awsRegion) | aws region | `string` | `"us-west-2"` | no |
+| <a name="input_bigIqHost"></a> [bigIqHost](#input\_bigIqHost) | This is the BIG-IQ License Manager host name or IP address | `string` | `""` | no |
+| <a name="input_bigIqHypervisor"></a> [bigIqHypervisor](#input\_bigIqHypervisor) | BIG-IQ hypervisor | `string` | `"aws"` | no |
+| <a name="input_bigIqLicensePool"></a> [bigIqLicensePool](#input\_bigIqLicensePool) | BIG-IQ license pool name | `string` | `""` | no |
+| <a name="input_bigIqLicenseType"></a> [bigIqLicenseType](#input\_bigIqLicenseType) | BIG-IQ license type | `string` | `"licensePool"` | no |
+| <a name="input_bigIqPassword"></a> [bigIqPassword](#input\_bigIqPassword) | Admin Password for BIG-IQ | `string` | `"Default12345!"` | no |
+| <a name="input_bigIqSkuKeyword1"></a> [bigIqSkuKeyword1](#input\_bigIqSkuKeyword1) | BIG-IQ license SKU keyword 1 | `string` | `"key1"` | no |
+| <a name="input_bigIqSkuKeyword2"></a> [bigIqSkuKeyword2](#input\_bigIqSkuKeyword2) | BIG-IQ license SKU keyword 2 | `string` | `"key2"` | no |
+| <a name="input_bigIqUnitOfMeasure"></a> [bigIqUnitOfMeasure](#input\_bigIqUnitOfMeasure) | BIG-IQ license unit of measure | `string` | `"hourly"` | no |
+| <a name="input_bigIqUsername"></a> [bigIqUsername](#input\_bigIqUsername) | Admin name for BIG-IQ | `string` | `"azureuser"` | no |
+| <a name="input_ec2_instance_type"></a> [ec2\_instance\_type](#input\_ec2\_instance\_type) | AWS instance type for the BIG-IP | `string` | `"m5.xlarge"` | no |
+| <a name="input_extSubnetAz1"></a> [extSubnetAz1](#input\_extSubnetAz1) | ID of External subnet AZ1 | `string` | `null` | no |
+| <a name="input_extSubnetAz2"></a> [extSubnetAz2](#input\_extSubnetAz2) | ID of External subnet AZ2 | `string` | `null` | no |
+| <a name="input_f5_ami_search_name"></a> [f5\_ami\_search\_name](#input\_f5\_ami\_search\_name) | AWS AMI search filter to find correct BIG-IP VE for region | `string` | `"F5 BIGIP-15.1.2.1* PAYG-Best 200Mbps*"` | no |
+| <a name="input_f5_password"></a> [f5\_password](#input\_f5\_password) | BIG-IP Password | `string` | `"Default12345!"` | no |
+| <a name="input_f5_username"></a> [f5\_username](#input\_f5\_username) | User name for the BIG-IP (Note: currenlty not used. Defaults to 'admin' based on AMI | `string` | `"admin"` | no |
+| <a name="input_ntp_server"></a> [ntp\_server](#input\_ntp\_server) | Leave the default NTP server the BIG-IP uses, or replace the default NTP server with the one you want to use | `string` | `"0.us.pool.ntp.org"` | no |
+| <a name="input_onboard_log"></a> [onboard\_log](#input\_onboard\_log) | Directory on the BIG-IP to store the cloud-init logs | `string` | `"/var/log/cloud/startup-script.log"` | no |
+| <a name="input_projectPrefix"></a> [projectPrefix](#input\_projectPrefix) | prefix for resources | `string` | `"myDemo"` | no |
+| <a name="input_resourceOwner"></a> [resourceOwner](#input\_resourceOwner) | owner of the deployment, for tagging purposes | `string` | `"myName"` | no |
+| <a name="input_timezone"></a> [timezone](#input\_timezone) | If you would like to change the time zone the BIG-IP uses, enter the time zone you want to use. This is based on the tz database found in /usr/share/zoneinfo (see the full list [here](https://github.com/F5Networks/f5-azure-arm-templates/blob/master/azure-timezone-list.md)). Example values: UTC, US/Pacific, US/Eastern, Europe/London or Asia/Singapore. | `string` | `"UTC"` | no |
+| <a name="input_vpcId"></a> [vpcId](#input\_vpcId) | The AWS network VPC ID | `string` | `null` | no |
 
 ## Outputs
 
 | Name | Description |
-| ---- | ----------- |
-| asg_name | AWS autoscaling group name of BIG-IP devices |
-| public_vip | AWS NLB DNS name |
-| public_vip_url | http URL link for AWS NLB DNS name |
+|------|-------------|
+| <a name="output_asg_name"></a> [asg\_name](#output\_asg\_name) | AWS autoscaling group name of BIG-IP devices |
+| <a name="output_public_vip"></a> [public\_vip](#output\_public\_vip) | AWS NLB DNS name |
+| <a name="output_public_vip_url"></a> [public\_vip\_url](#output\_public\_vip\_url) | HTTP URL link for AWS NLB DNS name |
+<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- markdownlint-enable no-inline-html -->
 
 ## Installation Example
 
@@ -129,13 +156,13 @@ To run this Terraform template, perform the following steps:
   2. Modify terraform.tfvars with the required information
   ```
       # BIG-IP Environment
-      allowedIps        = ["0.0.0.0/0"]
-      vpcId             = "vpc-1234"
-      extSubnetAz1      = "subnet-1234"
-      extSubnetAz2      = "subnet-5678"
-      f5_ssh_publickey  = "ssh-rsa AAABC123....."
-      f5_username       = "admin"
-      f5_password       = "Default12345!"
+      allowedIps       = ["0.0.0.0/0"]
+      vpcId            = "vpc-1234"
+      extSubnetAz1     = "subnet-1234"
+      extSubnetAz2     = "subnet-5678"
+      f5_ssh_publickey = "ssh-rsa AAABC123....."
+      f5_username      = "admin"
+      f5_password      = "Default12345!"
 
       # AWS Environment
       awsRegion     = "us-west-2"

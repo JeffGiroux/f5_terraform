@@ -34,4 +34,3 @@ resource "aws_s3_bucket" "main" {
 data "aws_vpc" "main" {
   id = var.vpcId
 }
-

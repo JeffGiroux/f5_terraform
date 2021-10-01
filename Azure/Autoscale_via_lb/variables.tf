@@ -168,7 +168,7 @@ variable "bigIqUnitOfMeasure" {
 }
 variable "bigIqHypervisor" {
   type        = string
-  default     = "gce"
+  default     = "azure"
   description = "BIG-IQ hypervisor"
 }
 variable "owner" {

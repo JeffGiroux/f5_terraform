@@ -34,18 +34,18 @@ runtime_parameters:
   - name: SSH_KEYS
     type: static
     value: ${ssh_keypair}
-extension_packages: 
+extension_packages:
   install_operations:
     - extensionType: do
-      extensionVersion: 1.22.0
-      extensionUrl: https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.22.0/f5-declarative-onboarding-1.22.0-3.noarch.rpm
+      extensionVersion: 1.23.0
+      extensionUrl: https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.23.0/f5-declarative-onboarding-1.23.0-4.noarch.rpm
     - extensionType: as3
-      extensionVersion: 3.29.0
-      extensionUrl: https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.29.0/f5-appsvcs-3.29.0-3.noarch.rpm
+      extensionVersion: 3.30.0
+      extensionUrl: https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.30.0/f5-appsvcs-3.30.0-5.noarch.rpm
     - extensionType: ts
-      extensionVersion: 1.20.0
-      extensionUrl: https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.20.1/f5-telemetry-1.20.1-1.noarch.rpm
-extension_services: 
+      extensionVersion: 1.22.0
+      extensionUrl: https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.22.0/f5-telemetry-1.22.0-1.noarch.rpm
+extension_services:
   service_operations:
     - extensionType: do
       type: inline
@@ -124,7 +124,7 @@ extension_services:
           type: AWS_CloudWatch
           region: '{{{REGION}}}'
           logGroup: f5telemetry
-          logStream: default              
+          logStream: default
 post_onboard_enabled:
   - name: create_misc_routes
     type: inline
@@ -152,7 +152,7 @@ wait_bigip_ready
 sleep 15
 tmsh modify sys db config.allow.rfc3927 value enable
 tmsh save /sys config
-# Begin as usual.... 
+# Begin as usual....
 for i in {1..30}; do
    curl -fv --retry 1 --connect-timeout 5 -L https://github.com/F5Networks/f5-bigip-runtime-init/releases/download/1.2.0/f5-bigip-runtime-init-1.2.0-1.gz.run -o "/var/config/rest/downloads/f5-bigip-runtime-init.gz.run" && break || sleep 10
 done

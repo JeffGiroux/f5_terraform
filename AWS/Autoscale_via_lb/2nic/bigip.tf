@@ -56,20 +56,20 @@ resource "aws_launch_template" "bigip-lt" {
   name          = format("%s-bigip-lt-%s", var.projectPrefix, random_id.buildSuffix.hex)
   image_id      = data.aws_ami.f5_ami.id
   instance_type = var.ec2_instance_type
-  key_name      = var.ec2_key_name
-  user_data     = base64encode(local.f5_onboard)  
+  key_name      = var.f5_ssh_publickey
+  user_data     = base64encode(local.f5_onboard)
 
   network_interfaces {
     device_index          = 0
     description           = "eth0"
     delete_on_termination = true
-    security_groups       = [module.external-security-group.this_security_group_id]
+    security_groups       = [module.external-security-group.security_group_id]
   }
   network_interfaces {
     device_index          = 1
     description           = "eth1"
     delete_on_termination = true
-    security_groups       = [module.external-security-group.this_security_group_id]
+    security_groups       = [module.external-security-group.security_group_id]
   }
 
   tag_specifications {
