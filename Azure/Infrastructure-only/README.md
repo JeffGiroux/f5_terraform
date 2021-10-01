@@ -31,16 +31,6 @@ Terraform is beneficial as it allows composing resources a bit differently to ac
   - main.tf - resources for provider, versions
   - network.tf - resources for VNET, subnets, security groups
 
-## Template Parameters
-
-| Parameter | Required | Description |
-| --- | --- | --- |
-| prefix | Yes | This value is inserted at the beginning of each Azure object (alpha-numeric, no special character) |
-| adminSrcAddr | Yes | Trusted source network for admin access |
-| vnet_cidr | Yes | IP address CIDR range for VNET |
-| mgmt_address_prefix | Yes | IP address prefix for management subnet |
-| ext_address_prefix | Yes | IP address prefix for external subnet |
-| int_address_prefix | Yes | IP address prefix for internal subnet |
 
 <!-- markdownlint-disable no-inline-html -->
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
