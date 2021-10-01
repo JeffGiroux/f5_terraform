@@ -161,7 +161,7 @@ variable "libs_dir" {
 }
 variable "onboard_log" {
   description = "Directory on the BIG-IP to store the cloud-init logs"
-  default     = "/var/log/startup-script.log"
+  default     = "/var/log/cloud/startup-script.log"
   type        = string
 }
 variable "bigIqHost" {
@@ -206,7 +206,7 @@ variable "bigIqUnitOfMeasure" {
 }
 variable "bigIqHypervisor" {
   type        = string
-  default     = "gce"
+  default     = "aws"
   description = "BIG-IQ hypervisor"
 }
 variable "owner" {
