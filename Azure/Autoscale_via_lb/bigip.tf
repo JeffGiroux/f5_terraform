@@ -59,12 +59,7 @@ resource "azurerm_network_security_group" "main" {
   }
 
   tags = {
-    Name        = "${var.environment}-bigip-sg"
-    environment = var.environment
-    owner       = var.owner
-    group       = var.group
-    costcenter  = var.costcenter
-    application = var.application
+    owner = var.owner
   }
 }
 
@@ -112,7 +107,6 @@ data "template_file" "as3_json" {
   template = file("${path.module}/as3.json")
 
   vars = {
-    rg_name         = azurerm_resource_group.main.name
     subscription_id = var.sp_subscription_id
     tenant_id       = var.sp_tenant_id
     client_id       = var.sp_client_id
@@ -202,12 +196,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "f5vmss" {
   }
 
   tags = {
-    Name        = "${var.environment}-f5vmss"
-    environment = var.environment
-    owner       = var.owner
-    group       = var.group
-    costcenter  = var.costcenter
-    application = var.application
+    owner = var.owner
   }
 }
 
