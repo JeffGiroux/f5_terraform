@@ -59,9 +59,11 @@ No modules.
 
 | Name | Type |
 |------|------|
+| [azurerm_frontdoor.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/frontdoor) | resource |
+| [azurerm_frontdoor_custom_https_configuration.https1](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/frontdoor_custom_https_configuration) | resource |
+| [azurerm_frontdoor_custom_https_configuration.https2](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/frontdoor_custom_https_configuration) | resource |
 | [azurerm_resource_group.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) | resource |
 | [random_id.buildSuffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
-| [azurerm_subscription.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/subscription) | data source |
 
 ## Inputs
 
@@ -71,12 +73,16 @@ No modules.
 | <a name="input_resourceOwner"></a> [resourceOwner](#input\_resourceOwner) | name of the person or customer running the solution | `string` | n/a | yes |
 | <a name="input_ssh_key"></a> [ssh\_key](#input\_ssh\_key) | public key used for authentication in ssh-rsa format | `string` | n/a | yes |
 | <a name="input_adminSrcAddr"></a> [adminSrcAddr](#input\_adminSrcAddr) | Allowed Admin source IP prefix | `string` | `"0.0.0.0/0"` | no |
+| <a name="input_b2cBackendPool"></a> [b2cBackendPool](#input\_b2cBackendPool) | The Azure AD B2C tenant name (ex. contoso.b2clogin.com). | `string` | `null` | no |
+| <a name="input_frontdoorCustomDomain"></a> [frontdoorCustomDomain](#input\_frontdoorCustomDomain) | Custom domain to be associated with the Azure AD B2C user interface instead of the default domain (ex. login.contoso.com). You will be need to create a CNAME record in your DNS provider mapping the custom domain to the default domain (ex. login.contoso.com CNAME contoso-frontend.azurefd.net). | `string` | `null` | no |
+| <a name="input_frontdoorDefaultDomainPrefix"></a> [frontdoorDefaultDomainPrefix](#input\_frontdoorDefaultDomainPrefix) | Azure Front Door default domain prefix for subdomain 'azurefd.net' and must be unique (ex. contoso-frontend). | `string` | `null` | no |
 | <a name="input_projectPrefix"></a> [projectPrefix](#input\_projectPrefix) | prefix for resources | `string` | `"demo"` | no |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
+| <a name="output_front_door"></a> [front\_door](#output\_front\_door) | Front Door Host Name |
 | <a name="output_resource_group"></a> [resource\_group](#output\_resource\_group) | Resource group name |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 <!-- markdownlint-enable no-inline-html -->
@@ -92,10 +98,13 @@ To run this Terraform template, perform the following steps:
   2. Modify terraform.tfvars with the required information
   ```
       # Azure Environment
-      ssh_key       = "ssh-rsa REDACTED me@my.email"
-      azureLocation = "westus2"
-      projectPrefix = "mydemo123"
-      resourceOwner = "myLastName"
+      ssh_key                      = "ssh-rsa REDACTED me@my.email"
+      azureLocation                = "westus2"
+      projectPrefix                = "mydemo123"
+      resourceOwner                = "myLastName"
+      frontdoorDefaultDomainPrefix = "myDefaultDomainPrefix"
+      frontdoorCustomDomain        = "myCustomDomain.contoso.com"
+      b2cBackendPool               = "myTenantName.b2clogin.com"
   ```
   3. Initialize the directory
   ```

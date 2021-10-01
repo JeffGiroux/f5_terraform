@@ -32,6 +32,6 @@ fileignoreconfig:
 - filename: AWS/Autoscale_via_lb/2nic/README.md
   checksum: dd5a0e8d463722a8a960aad23c57ad25a41628e08a30d33e943545804792dc4e
 - filename: Azure/Front_Door_B2C/terraform.tfvars.example
-  checksum: d11a0e091a31d60039c75e410b3bc76e5b8b63e35b582b6560fbb5a480b9f5a5
+  checksum: afb96184fc2192b9589044d539f6b6e50943955352b2c334aceae57a05dacf04
 - filename: Azure/Front_Door_B2C/README.md
-  checksum: 2d5eb9c4adefaf975cf38f129eb13ca7ddb09ac5104b266717c503791525d115
+  checksum: d9c3f4d18193a6530dce4b51a0341ee369f572929e37f453e346e2a8d6bec6a9
