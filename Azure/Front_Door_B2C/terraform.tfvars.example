@@ -1,0 +1,5 @@
+# Azure Environment
+ssh_key       = "ssh-rsa REDACTED me@my.email"
+azureLocation = "westus2"
+projectPrefix = "mydemo123"
+resourceOwner = "myLastName"
