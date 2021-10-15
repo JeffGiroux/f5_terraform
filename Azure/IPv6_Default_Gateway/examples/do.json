@@ -53,6 +53,17 @@
                 }
             ]
         },
+        "internal": {
+            "class": "VLAN",
+            "tag": 4093,
+            "mtu": 1500,
+            "interfaces": [
+                {
+                    "name": "1.2",
+                    "tagged": false
+                }
+            ]
+        },
         "external-localself": {
             "class": "SelfIp",
             "address": "10.0.10.10/24",
@@ -83,7 +94,7 @@
         },
         "default": {
             "class": "Route",
-            "gw": "10.1.10.1",
+            "gw": "10.0.10.1",
             "network": "default",
             "mtu": 1500
         },
