@@ -31,3 +31,17 @@ fileignoreconfig:
   checksum: aa6e19dae19f0f9dec93ae320d20129510f8bb888eebe91a7d53d3543ad1aebe
 - filename: AWS/Autoscale_via_lb/2nic/README.md
   checksum: dd5a0e8d463722a8a960aad23c57ad25a41628e08a30d33e943545804792dc4e
+- filename: Azure/IPv6_Default_Gateway/terraform.tfvars.example
+  checksum: 95e6a96beeeeaa519bcdb2486abc707f7c17067e34850ac61b52b21d7de274ca
+- filename: Azure/IPv6_Default_Gateway/backend.tf
+  checksum: d5a571c468b5bfcb06968c4258152cb1f15696eb9728915866de8a3753a088c0
+- filename: Azure/IPv6_Default_Gateway/f5_onboard.tmpl
+  checksum: 129266185475da9d6d842142a58dfc5100e498a2a4f223500ade1514495cf571
+- filename: Azure/IPv6_Default_Gateway/examples/f5_onboard_do_as3_ts.tmpl
+  checksum: 4c05b57805e31dc03cd297dbca4dc609ed7de304de4b41f75250db45c6bd1a58
+- filename: Azure/IPv6_Default_Gateway/examples/f5_onboard_do_as3.tmpl
+  checksum: 50c73bd3a273e2053e0b6bb303ac953f5776169f55c062a8376ef72480f4749e
+- filename: Azure/IPv6_Default_Gateway/bigip.tf
+  checksum: 0cc66b5025235352aa6bcfbbc392616cbbdc08e2254f17f4657583f9ed72ab2c
+- filename: Azure/IPv6_Default_Gateway/README.md
+  checksum: 84e87b5e6d7208f4e50a1d55111973221e668802b54435cc9b64898c4a63efd6
