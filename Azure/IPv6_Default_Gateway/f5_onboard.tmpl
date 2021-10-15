@@ -188,22 +188,17 @@ extension_services:
             gw: '{{{ GATEWAY_EXTERNAL }}}'
             network: default
             mtu: 1500
-          default-v6:
-            class: Route
-            gw: '{{{ GATEWAY_EXTERNAL_V6 }}}'
-            target: external
-            network: default-inet6
-            mtu: 1500
 post_onboard_enabled:
   - name: misc_commands
     type: inline
     commands:
+    - tmsh create net route default-v6 network default-inet6 gw '{{{ GATEWAY_EXTERNAL_V6 }}}' interface external mtu 1500
     - tmsh save sys config
 EOF
 
 # Remove comment to do silly debugging on BIG-IP Runtime init
-export F5_BIGIP_RUNTIME_INIT_LOG_LEVEL=silly
-export F5_BIGIP_RUNTIME_EXTENSION_INSTALL_DELAY_IN_MS=60000
+#export F5_BIGIP_RUNTIME_INIT_LOG_LEVEL=silly
+#export F5_BIGIP_RUNTIME_EXTENSION_INSTALL_DELAY_IN_MS=60000
 
 # Download BIG-IP Runtime Init
 for i in {1..30}; do
