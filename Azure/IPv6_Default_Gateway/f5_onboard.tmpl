@@ -95,6 +95,9 @@ extension_packages:
     - extensionType: do
       extensionVersion: ${DO_VER}
       extensionUrl: ${DO_URL}
+    - extensionType: as3
+      extensionVersion: ${AS3_VER}
+      extensionUrl: ${AS3_URL}
 extension_services:
   service_operations:
     - extensionType: do
@@ -188,6 +191,80 @@ extension_services:
             gw: '{{{ GATEWAY_EXTERNAL }}}'
             network: default
             mtu: 1500
+    - extensionType: as3
+      type: inline
+      value:
+        class: AS3
+        action: deploy
+        persist: true
+        declaration:
+          class: ADC
+          schemaVersion: 3.0.0
+          label: Sample 1
+          remark: BIG-IP sample config
+          Tenant1:
+            class: Tenant
+            App1:
+              class: Application
+              template: generic
+              forwarder_ipv4:
+                class: Service_Forwarding
+                remark: Forwarding catch all for IPv4
+                allowVlans:
+                  - internal
+                virtualAddresses:
+                  - '0.0.0.0/0'
+                virtualPort: 0
+                forwardingType: ip
+                layer4: any
+                profileL4: basic
+                snat: auto
+              forwarder_ipv6:
+                class: Service_Forwarding
+                remark: Forwarding catch all for IPv6
+                allowVlans:
+                  - internal
+                virtualAddresses:
+                  - '::0/0'
+                virtualPort: 0
+                forwardingType: ip
+                layer4: any
+                profileL4: basic
+                snat: auto
+              forwarder_tcp_ipv4_1701-to-25:
+                class: Service_Generic
+                remark: Forwarding port 1701-to-25 IPv4
+                allowVlans:
+                  - internal
+                virtualAddresses:
+                  - '0.0.0.0/0'
+                virtualPort: 1701
+                layer4: tcp
+                profileL4: basic
+                snat: auto
+                translateServerAddress: false
+                translateServerPort: true
+                iRules:
+                  - ir_1701-to-25
+              forwarder_tcp_ipv6_1701-to-25:
+                class: Service_Generic
+                remark: Forwarding port 1701-to-25 IPv6
+                allowVlans:
+                  - internal
+                virtualAddresses:
+                  - '::0/0'
+                virtualPort: 1701
+                layer4: tcp
+                profileL4: basic
+                snat: auto
+                translateServerAddress: false
+                translateServerPort: true
+                iRules:
+                  - ir_1701-to-25
+              ir_1701-to-25:
+                class: iRule
+                remark: Translate port 1701 to 25
+                iRule: when CLIENT_ACCEPTED { node [IP::local_addr] 25 }
 post_onboard_enabled:
   - name: misc_commands
     type: inline
@@ -207,6 +284,15 @@ done
 
 # Install BIG-IP Runtime Init
 bash /var/config/rest/downloads/f5-bigip-runtime.gz.run -- '--cloud azure'
+
+# Create Route for Azure's Instance Metadata Service
+# https://clouddocs.f5.com/products/extensions/f5-cloud-failover/latest/userguide/azure.html#set-up-access-to-azure-s-instance-metadata-service
+source /usr/lib/bigstart/bigip-ready-functions
+wait_bigip_ready
+GATEWAY_MGMT=$(egrep routers /var/lib/dhclient/dhclient.leases | head -1 | grep -oE '[^ ]+$' | tr -d ';' )
+tmsh modify sys db config.allow.rfc3927 value enable
+tmsh create sys management-route azure_metadata network 169.254.169.254/32 gateway $GATEWAY_MGMT
+tmsh save sys config
 
 # Run BIG-IP Runtime Init and Process YAML
 f5-bigip-runtime-init --config-file /config/cloud/runtime-init-conf.yaml
