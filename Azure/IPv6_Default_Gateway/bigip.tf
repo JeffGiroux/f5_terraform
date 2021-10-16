@@ -237,24 +237,3 @@ resource "azurerm_virtual_machine_extension" "bigip-startup" {
     owner = var.owner
   }
 }
-
-# # Create Route for 'backend' subnet > BIG-IP as default gateway
-# resource "azurerm_route_table" "udr" {
-#   name                          = format("%s-udr-%s", var.projectPrefix, random_id.buildSuffix.hex)
-#   location                      = azurerm_resource_group.main.location
-#   resource_group_name           = azurerm_resource_group.main.name
-#   disable_bgp_route_propagation = false
-
-#   route {
-#     name                   = "route1"
-#     address_prefix         = var.cfe_managed_route
-#     next_hop_type          = "VirtualAppliance"
-#     next_hop_in_ip_address = azurerm_network_interface.vm02-ext-nic.private_ip_address
-#   }
-
-#   tags = {
-#     owner                   = var.owner
-#     f5_cloud_failover_label = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
-#     f5_self_ips             = "${azurerm_network_interface.vm01-ext-nic.private_ip_address},${azurerm_network_interface.vm02-ext-nic.private_ip_address}"
-#   }
-# }
