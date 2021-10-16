@@ -142,7 +142,7 @@ To run this Terraform template, perform the following steps:
   ```
       terraform plan
   ```
-  5. Finally, apply and deploy
+  5. Apply
   ```
       terraform apply
   ```
