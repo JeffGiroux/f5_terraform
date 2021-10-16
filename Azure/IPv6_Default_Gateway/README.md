@@ -1,8 +1,10 @@
 # Deploying BIG-IP VE in Azure with IPv6 - Standalone: 3-NIC
 
 ## To Do
-1. fix BIG-IP onboarding, currently failing
-2. AS3 still not used and not installed
+1. update readme
+2. update diagram
+3. more details in scenario
+4. need access to easily test from backend
 
 ## Contents
 
@@ -148,6 +150,29 @@ To run this Terraform template, perform the following steps:
   ```
       terraform destroy
   ```
+
+## Testing
+Access the BIG-IP or jumphost (TBD) via public IP address, then SSH to the backend machine. From bachend machine, perform the following quick tests...then check the BIG-IP stats.
+
+```
+# Testing IPv6 Outbound SMTP
+# Will test port translation from 1701 to 25
+# This should hit vs=forwarder_tcp_ipv6_1701-to-25
+telnet 2a01:111:f400:7e56::10 1701
+
+# Testing IPv4 Outbound SMTP
+# Will test port translation from 1701 to 25
+# This should hit vs=forwarder_tcp_ipv4_1701-to-25
+telnet smtp.gmail.com 1701
+
+# Testing IPv4 HTTP outbound
+# This should hit vs=forwarder_ipv4
+curl google.com
+
+# Testing IPv6 HTTP outbound
+# This should hit vs=forwarder_ipv6
+curl ipv6.google.com
+```
 
 ## Configuration Example
 
