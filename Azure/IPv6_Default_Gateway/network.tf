@@ -229,6 +229,18 @@ resource "azurerm_route_table" "backend" {
   name                = format("%s-backend-rt-%s", var.projectPrefix, random_id.buildSuffix.hex)
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
+  route {
+    name                   = "default_ipv4"
+    address_prefix         = "0.0.0.0/0"
+    next_hop_type          = "VirtualAppliance"
+    next_hop_in_ip_address = var.bigipIntPrivateIp4
+  }
+  route {
+    name                   = "default_ipv6"
+    address_prefix         = "::/0"
+    next_hop_type          = "VirtualAppliance"
+    next_hop_in_ip_address = var.bigipIntPrivateIp6
+  }
   tags = {
     owner = var.owner
   }
@@ -238,4 +250,7 @@ resource "azurerm_route_table" "backend" {
 resource "azurerm_subnet_route_table_association" "backend" {
   subnet_id      = azurerm_subnet.backend.id
   route_table_id = azurerm_route_table.backend.id
+  depends_on = [
+    azurerm_linux_virtual_machine.bigip
+  ]
 }
