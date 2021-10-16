@@ -39,13 +39,15 @@ EOF
 
 # Create backend VM
 resource "azurerm_linux_virtual_machine" "backend" {
-  name                  = format("%s-backend-%s", var.projectPrefix, random_id.buildSuffix.hex)
-  location              = azurerm_resource_group.main.location
-  resource_group_name   = azurerm_resource_group.main.name
-  network_interface_ids = [azurerm_network_interface.backend.id]
-  size                  = var.backendInstanceType
-  admin_username        = var.uname
-  custom_data           = base64encode(local.backendvm_custom_data)
+  name                            = format("%s-backend-%s", var.projectPrefix, random_id.buildSuffix.hex)
+  location                        = azurerm_resource_group.main.location
+  resource_group_name             = azurerm_resource_group.main.name
+  network_interface_ids           = [azurerm_network_interface.backend.id]
+  size                            = var.backendInstanceType
+  admin_username                  = var.uname
+  admin_password                  = var.upassword
+  disable_password_authentication = false
+  custom_data                     = base64encode(local.backendvm_custom_data)
   admin_ssh_key {
     username   = var.uname
     public_key = var.ssh_key

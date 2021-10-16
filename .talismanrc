@@ -34,7 +34,7 @@ fileignoreconfig:
 - filename: Azure/IPv6_Default_Gateway/terraform.tfvars.example
   checksum: 95e6a96beeeeaa519bcdb2486abc707f7c17067e34850ac61b52b21d7de274ca
 - filename: Azure/IPv6_Default_Gateway/backend.tf
-  checksum: d5a571c468b5bfcb06968c4258152cb1f15696eb9728915866de8a3753a088c0
+  checksum: e21b733b869c0a8dc4c719678d771126ca005ea3e62d877442066dea6a10664a
 - filename: Azure/IPv6_Default_Gateway/f5_onboard.tmpl
   checksum: 129266185475da9d6d842142a58dfc5100e498a2a4f223500ade1514495cf571
 - filename: Azure/IPv6_Default_Gateway/examples/f5_onboard_do_as3_ts.tmpl
