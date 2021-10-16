@@ -132,7 +132,7 @@ To run this Terraform template, perform the following steps:
       # Azure Environment
       location      = "westus2"
       projectPrefix = "mylab123"
-      owner         = "myLastName"
+      owner         = "your@email"
   ```
   3. Initialize the directory
   ```
