@@ -167,7 +167,7 @@ locals {
     self_ip_internal    = var.bigipIntPrivateIp4
     self_ip_internal_v6 = var.bigipIntPrivateIp6
     internal_vip_ip     = var.bigipIntSecondaryIp4
-    link_local_address  = var.linkLocalAddress
+    link_local_address  = var.linkLocalRouterAddress
     dns_server          = var.dns_server
     ntp_server          = var.ntp_server
     timezone            = var.timezone

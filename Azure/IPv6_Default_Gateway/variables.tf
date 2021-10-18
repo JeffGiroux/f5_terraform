@@ -128,10 +128,10 @@ variable "bigipIntSecondaryIp4" {
   default     = "10.0.20.11"
   description = "The private (secondary) IPv4 address for the BIG-IP internal NIC"
 }
-variable "linkLocalAddress" {
+variable "linkLocalRouterAddress" {
   type        = string
   default     = "fe80::1234:5678:9abc"
-  description = "The link local address RA for IPv6 default gateway in Azure"
+  description = "The link local address RA for IPv6 default gateway in Azure. The link local default gateway for IPv6 routing to work in Azure. Note: The RA from the Azure routers are not installed into the BIG-IP route table."
 }
 variable "uname" {
   type        = string

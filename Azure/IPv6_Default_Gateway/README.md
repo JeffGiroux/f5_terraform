@@ -335,7 +335,7 @@ No modules.
 | <a name="input_internalSubnetPrefix"></a> [internalSubnetPrefix](#input\_internalSubnetPrefix) | The address prefix to use for the internal subnet | `list(any)` | <pre>[<br>  "10.0.20.0/24",<br>  "fd00:db8:deca:dcba::/64"<br>]</pre> | no |
 | <a name="input_libs_dir"></a> [libs\_dir](#input\_libs\_dir) | Directory on the BIG-IP to download the A&O Toolchain into | `string` | `"/config/cloud/azure/node_modules"` | no |
 | <a name="input_license1"></a> [license1](#input\_license1) | The license token for the 1st F5 BIG-IP VE (BYOL) | `string` | `""` | no |
-| <a name="input_linkLocalAddress"></a> [linkLocalAddress](#input\_linkLocalAddress) | The link local address RA for IPv6 default gateway in Azure | `string` | `"fe80::1234:5678:9abc"` | no |
+| <a name="input_linkLocalRouterAddress"></a> [linkLocalRouterAddress](#input\_linkLocalRouterAddress) | The link local address RA for IPv6 default gateway in Azure. The link local default gateway for IPv6 routing to work in Azure. Note: The RA from the Azure routers are not installed into the BIG-IP route table. | `string` | `"fe80::1234:5678:9abc"` | no |
 | <a name="input_location"></a> [location](#input\_location) | Azure Location of the deployment | `string` | `"westus2"` | no |
 | <a name="input_mgmtSubnetPrefix"></a> [mgmtSubnetPrefix](#input\_mgmtSubnetPrefix) | The address prefix to use for the managment subnet | `list(any)` | <pre>[<br>  "10.0.1.0/24"<br>]</pre> | no |
 | <a name="input_ntp_server"></a> [ntp\_server](#input\_ntp\_server) | Leave the default NTP server the BIG-IP uses, or replace the default NTP server with the one you want to use | `string` | `"0.us.pool.ntp.org"` | no |
