@@ -131,7 +131,7 @@ variable "bigipIntSecondaryIp4" {
 variable "linkLocalRouterAddress" {
   type        = string
   default     = "fe80::1234:5678:9abc"
-  description = "The link local address RA for IPv6 default gateway in Azure. The link local default gateway for IPv6 routing to work in Azure. Note: The RA from the Azure routers are not installed into the BIG-IP route table."
+  description = "The link local address RA for IPv6 default gateway in Azure. The link local default gateway for IPv6 routing to work in Azure. Note: The RA from the Azure routers are not installed into the BIG-IP route table. See https://support.f5.com/csp/article/K12529 for reference."
 }
 variable "uname" {
   type        = string
