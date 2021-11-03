@@ -41,14 +41,14 @@ Terraform is beneficial as it allows composing resources a bit differently to ac
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 0.14 |
-| <a name="requirement_google"></a> [google](#requirement\_google) | ~> 3 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.14 |
+| <a name="requirement_google"></a> [google](#requirement\_google) | >= 3.90 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | ~> 3 |
+| <a name="provider_google"></a> [google](#provider\_google) | 3.90.1 |
 
 ## Modules
 
