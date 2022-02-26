@@ -16,11 +16,13 @@ resource "google_compute_forwarding_rule" "vip1" {
 resource "google_compute_target_instance" "f5vm01" {
   name     = "${var.prefix}-${var.host1_name}-ti"
   instance = google_compute_instance.f5vm01.id
+  zone = var.gcp_zone_1			 
 }
 
 resource "google_compute_target_instance" "f5vm02" {
   name     = "${var.prefix}-${var.host2_name}-ti"
   instance = google_compute_instance.f5vm02.id
+  zone = var.gcp_zone_2		     
 }
 
 # Setup Onboarding scripts
@@ -120,7 +122,7 @@ locals {
 resource "google_compute_instance" "f5vm01" {
   name           = "${var.prefix}-${var.host1_name}"
   machine_type   = var.bigipMachineType
-  zone           = var.gcp_zone
+  zone           = var.gcp_zone_1
   can_ip_forward = true
 
   labels = {
@@ -170,7 +172,7 @@ resource "google_compute_instance" "f5vm01" {
 resource "google_compute_instance" "f5vm02" {
   name           = "${var.prefix}-${var.host2_name}"
   machine_type   = var.bigipMachineType
-  zone           = var.gcp_zone
+  zone           = var.gcp_zone_2
   can_ip_forward = true
 
   labels = {

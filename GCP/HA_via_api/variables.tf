@@ -25,7 +25,12 @@ variable "gcp_region" {
   default     = "us-west1"
   description = "GCP Region for provider"
 }
-variable "gcp_zone" {
+variable "gcp_zone_1" {
+  type        = string
+  default     = "us-west1-a"
+  description = "GCP Zone for provider"
+}
+variable "gcp_zone_2" {
   type        = string
   default     = "us-west1-b"
   description = "GCP Zone for provider"
@@ -67,7 +72,7 @@ variable "mgmtSubnet" {
 }
 variable "alias_ip_range" {
   type        = string
-  default     = "10.1.10.100/32"
+  default     = ""
   description = "An array of alias IP ranges for the BIG-IP network interface (used for VIP traffic, SNAT IPs, etc)"
 }
 variable "managed_route1" {
