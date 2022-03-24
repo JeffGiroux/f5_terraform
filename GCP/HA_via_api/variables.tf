@@ -128,7 +128,7 @@ variable "adminSrcAddr" {
 variable "gceSshPubKey" {
   type        = string
   default     = null
-  description = "SSH public key for admin authentation"
+  description = "SSH public key for admin authentation. Must be in ssh-rsa format."
 }
 variable "host1_name" {
   type        = string

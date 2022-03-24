@@ -203,7 +203,7 @@ No modules.
 | <a name="input_extSubnet"></a> [extSubnet](#input\_extSubnet) | External subnet | `string` | `null` | no |
 | <a name="input_extVpc"></a> [extVpc](#input\_extVpc) | External VPC network | `string` | `null` | no |
 | <a name="input_f5_cloud_failover_label"></a> [f5\_cloud\_failover\_label](#input\_f5\_cloud\_failover\_label) | This is a tag used for F5 Cloud Failover Extension to identity which cloud objects to move during a failover event. | `string` | `"mydeployment"` | no |
-| <a name="input_gceSshPubKey"></a> [gceSshPubKey](#input\_gceSshPubKey) | SSH public key for admin authentation | `string` | `null` | no |
+| <a name="input_gceSshPubKey"></a> [gceSshPubKey](#input\_gceSshPubKey) | SSH public key for admin authentation. Must be in ssh-rsa format. | `string` | `null` | no |
 | <a name="input_gcp_project_id"></a> [gcp\_project\_id](#input\_gcp\_project\_id) | GCP Project ID for provider | `string` | `null` | no |
 | <a name="input_gcp_region"></a> [gcp\_region](#input\_gcp\_region) | GCP Region for provider | `string` | `"us-west1"` | no |
 | <a name="input_gcp_zone_1"></a> [gcp\_zone\_1](#input\_gcp\_zone\_1) | GCP Zone 1 for provider | `string` | `"us-west1-a"` | no |
