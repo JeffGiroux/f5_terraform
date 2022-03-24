@@ -306,7 +306,7 @@ The following is an example configuration diagram for this solution deployment. 
 
 ## Documentation
 
-For more information on F5 solutions for Google, including manual configuration procedures for some deployment scenarios, see the Google GCP section of [F5 CloudDocs](https://clouddocs.f5.com/cloud/public/v1/google_index.html). Also check out the [Using Cloud Templates for BIG-IP in Google](https://community.f5.com/t5/technical-articles/using-cloud-templates-to-change-big-ip-versions-google-gcp/ta-p/284366) on DevCentral. This particular HA example is based on the [BIG-IP Cluster "HA via API" F5 GDM Cloud Template on GitHub](https://github.com/F5Networks/f5-google-gdm-templates/tree/master/supported/failover/same-net/via-api/3nic/existing-stack/payg).
+For more information on F5 solutions for Google, including manual configuration procedures for some deployment scenarios, see the Google GCP section of [F5 CloudDocs](https://clouddocs.f5.com/cloud/public/v1/google_index.html). Also check out the [Using Cloud Templates for BIG-IP in Google](https://community.f5.com/t5/technical-articles/using-cloud-templates-to-change-big-ip-versions-google-gcp/ta-p/284366) on DevCentral. This particular HA example is based on the [BIG-IP example "Failover" F5 GDM Cloud Template on GitHub](https://github.com/F5Networks/f5-google-gdm-templates-v2/tree/main/examples/failover).
 
 ## Creating Virtual Servers on the BIG-IP VE
 
