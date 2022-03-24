@@ -11,6 +11,7 @@ mgmtSubnet   = "xxxxx-subnet-mgmt"
 extSubnet    = "xxxxx-subnet-ext"
 intSubnet    = "xxxxx-subnet-int"
 dns_suffix   = "example.com"
+alias_ip_range = "10.1.10.130/27"
 
 # BIG-IQ Environment
 bigIqUsername = "admin"
@@ -18,5 +19,6 @@ bigIqUsername = "admin"
 # Google Environment
 gcp_project_id = "xxxxx"
 gcp_region     = "us-west1"
-gcp_zone       = "us-west1-b"
+gcp_zone_1     = "us-west1-a"
+gcp_zone_2     = "us-west1-b"
 svc_acct       = "xxxxx@xxxxx.iam.gserviceaccount.com"
