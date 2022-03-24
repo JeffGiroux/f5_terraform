@@ -82,7 +82,7 @@ locals {
 resource "google_compute_instance" "f5vm01" {
   name           = "${var.prefix}-${var.host1_name}"
   machine_type   = var.bigipMachineType
-  zone           = var.gcp_zone
+  zone           = var.gcp_zone_1
   can_ip_forward = true
 
   tags = ["appfw-${var.prefix}", "mgmtfw-${var.prefix}"]
@@ -128,7 +128,7 @@ resource "google_compute_instance" "f5vm01" {
 resource "google_compute_instance" "f5vm02" {
   name           = "${var.prefix}-${var.host2_name}"
   machine_type   = var.bigipMachineType
-  zone           = var.gcp_zone
+  zone           = var.gcp_zone_2
   can_ip_forward = true
 
   tags = ["appfw-${var.prefix}", "mgmtfw-${var.prefix}"]
