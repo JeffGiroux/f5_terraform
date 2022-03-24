@@ -10,13 +10,13 @@ output "vnet" {
 }
 output "mgmt_subnet" {
   description = "Management subnet address prefix"
-  value       = azurerm_subnet.mgmt.address_prefix
+  value       = azurerm_subnet.mgmt.address_prefixes
 }
 output "external_subnet" {
   description = "External subnet address prefix"
-  value       = azurerm_subnet.external.address_prefix
+  value       = azurerm_subnet.external.address_prefixes
 }
 output "internal_subnet" {
   description = "Internal subnet address prefix"
-  value       = azurerm_subnet.internal.address_prefix
+  value       = azurerm_subnet.internal.address_prefixes
 }
