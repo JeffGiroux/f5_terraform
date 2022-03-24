@@ -10,10 +10,10 @@ variable "gcp_region" {
   default     = "us-west1"
   description = "GCP Region for provider"
 }
-variable "gcp_zone" {
+variable "gcp_zone_1" {
   type        = string
-  default     = "us-west1-b"
-  description = "GCP Zone for provider"
+  default     = "us-west1-a"
+  description = "GCP Zone 1 for provider"
 }
 variable "prefix" {
   type        = string
