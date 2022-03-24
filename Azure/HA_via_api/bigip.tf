@@ -5,7 +5,6 @@ resource "azurerm_public_ip" "vm01mgmtpip" {
   name                = format("%s-vm01-mgmt-pip-%s", var.projectPrefix, random_id.buildSuffix.hex)
   location            = azurerm_resource_group.main.location
   sku                 = "Standard"
-  availability_zone   = 1
   resource_group_name = azurerm_resource_group.main.name
   allocation_method   = "Static"
   tags = {
@@ -17,7 +16,6 @@ resource "azurerm_public_ip" "vm02mgmtpip" {
   name                = format("%s-vm02-mgmt-pip-%s", var.projectPrefix, random_id.buildSuffix.hex)
   location            = azurerm_resource_group.main.location
   sku                 = "Standard"
-  availability_zone   = 2
   resource_group_name = azurerm_resource_group.main.name
   allocation_method   = "Static"
   tags = {
@@ -30,7 +28,6 @@ resource "azurerm_public_ip" "vm01selfpip" {
   name                = format("%s-vm01-self-pip-%s", var.projectPrefix, random_id.buildSuffix.hex)
   location            = azurerm_resource_group.main.location
   sku                 = "Standard"
-  availability_zone   = 1
   resource_group_name = azurerm_resource_group.main.name
   allocation_method   = "Static"
   tags = {
@@ -42,7 +39,6 @@ resource "azurerm_public_ip" "vm02selfpip" {
   name                = format("%s-vm02-self-pip-%s", var.projectPrefix, random_id.buildSuffix.hex)
   location            = azurerm_resource_group.main.location
   sku                 = "Standard"
-  availability_zone   = 2
   resource_group_name = azurerm_resource_group.main.name
   allocation_method   = "Static"
   tags = {
@@ -55,7 +51,6 @@ resource "azurerm_public_ip" "pubvippip" {
   name                = format("%s-pubvip-pip-%s", var.projectPrefix, random_id.buildSuffix.hex)
   location            = azurerm_resource_group.main.location
   sku                 = "Standard"
-  availability_zone   = 1
   resource_group_name = azurerm_resource_group.main.name
   allocation_method   = "Static"
   tags = {
@@ -63,7 +58,7 @@ resource "azurerm_public_ip" "pubvippip" {
   }
 }
 
-# Create NIC for Management 
+# Create NIC for Management
 resource "azurerm_network_interface" "vm01-mgmt-nic" {
   name                = format("%s-vm01-mgmt-%s", var.projectPrefix, random_id.buildSuffix.hex)
   location            = azurerm_resource_group.main.location

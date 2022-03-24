@@ -1,7 +1,7 @@
 #!/bin/bash -x
 
 # NOTE: Startup Script is run once / initialization only (Cloud-Init behavior vs. typical re-entrant for Azure Custom Script Extension )
-# For 15.1+ and above, Cloud-Init will run the script directly and can remove Azure Custom Script Extension 
+# For 15.1+ and above, Cloud-Init will run the script directly and can remove Azure Custom Script Extension
 
 
 mkdir -p  /var/log/cloud /config/cloud /var/config/rest/downloads
@@ -16,10 +16,10 @@ tee <$npipe -a $LOG_FILE /dev/ttyS0 &
 exec 1>&-
 exec 1>$npipe
 exec 2>&1
-  
+
 
 ### write_files:
-# Download or Render BIG-IP Runtime Init Config 
+# Download or Render BIG-IP Runtime Init Config
 
 cat << 'EOF' > /config/cloud/runtime-init-conf.yaml
 ---
@@ -267,11 +267,11 @@ extension_services:
               - '{{{ SELF_IP_EXTERNAL }}}'
               - '${remote_selfip_ext}'
 post_onboard_enabled:
-  - name: trigger_failover_host2
+  - name: trigger_failover
     type: inline
     commands:
     - $(nohup bash /config/failover/tgactive &>/dev/null &)
-    - tmsh modify cm device-group Sync devices modify { '{{{ HOST2 }}}.example.com' { set-sync-leader } }
+    - $(nohup tmsh modify cm device-group failoverGroup devices modify { '{{{ HOST2 }}}.example.com' { set-sync-leader } } &>/dev/null &)
     - tmsh save sys config
 EOF
 
