@@ -160,7 +160,7 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 
 | Name | Version |
 |------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | >= 4 |
+| <a name="provider_google"></a> [google](#provider\_google) | 4.15.0 |
 
 ## Modules
 
@@ -177,7 +177,8 @@ No modules.
 | [google_compute_http_health_check.hc-ext](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_http_health_check) | resource |
 | [google_compute_instance.f5vm01](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance) | resource |
 | [google_compute_instance.f5vm02](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance) | resource |
-| [google_compute_instance_group.f5vm](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance_group) | resource |
+| [google_compute_instance_group.f5vm01](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance_group) | resource |
+| [google_compute_instance_group.f5vm02](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance_group) | resource |
 | [google_compute_region_backend_service.f5vm](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_region_backend_service) | resource |
 | [google_compute_target_pool.f5vm](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_target_pool) | resource |
 | [google_compute_subnetwork.vpc_ext_sub](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/compute_subnetwork) | data source |

@@ -55,7 +55,10 @@ resource "google_compute_region_backend_service" "f5vm" {
   load_balancing_scheme = "INTERNAL"
   network               = var.extVpc
   backend {
-    group = google_compute_instance_group.f5vm.id
+    group = google_compute_instance_group.f5vm01.id
+  }
+  backend {
+    group = google_compute_instance_group.f5vm02.id
   }
   health_checks    = [google_compute_health_check.hc-int.id]
   session_affinity = "CLIENT_IP"
@@ -63,10 +66,18 @@ resource "google_compute_region_backend_service" "f5vm" {
 }
 
 # Instance Group for Backend Pool
-resource "google_compute_instance_group" "f5vm" {
-  name = "${var.prefix}-ig"
+resource "google_compute_instance_group" "f5vm01" {
+  name = "${var.prefix}-ig1"
+  zone = var.gcp_zone_1
   instances = [
-    google_compute_instance.f5vm01.self_link,
+    google_compute_instance.f5vm01.self_link
+  ]
+}
+
+resource "google_compute_instance_group" "f5vm02" {
+  name = "${var.prefix}-ig2"
+  zone = var.gcp_zone_2
+  instances = [
     google_compute_instance.f5vm02.self_link
   ]
 }
