@@ -73,7 +73,7 @@ variable "mgmtSubnet" {
 variable "alias_ip_range" {
   type        = string
   default     = ""
-  description = "An array of alias IP ranges for the BIG-IP network interface (used for VIP traffic, SNAT IPs, etc)"
+  description = "An array of alias IP ranges for the BIG-IP network interface (used for VIP traffic, SNAT IPs, etc). Example IP in demo is x.x.x.x/32 to accomodate for easier AS3 declaration. If you do not plan to initially onboard with an AS3 declartaion, then you can adjust the alias IP range to be a broader CIDR range."
 }
 variable "managed_route1" {
   type        = string

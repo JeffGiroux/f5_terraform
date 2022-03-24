@@ -11,7 +11,7 @@ mgmtSubnet     = "xxxxx-subnet-mgmt"
 extSubnet      = "xxxxx-subnet-ext"
 intSubnet      = "xxxxx-subnet-int"
 dns_suffix     = "example.com"
-alias_ip_range = "10.1.10.130/27"
+alias_ip_range = "10.1.10.130/32"
 
 # BIG-IQ Environment
 bigIqUsername = "admin"
