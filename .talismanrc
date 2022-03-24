@@ -1,6 +1,8 @@
 fileignoreconfig:
+- filename: GCP/Standalone/terraform.tfvars.example
+  checksum: 9a19e8f9e569b1ed707d3ff7cb18c8f34aa4be1379f3052d97b0c7fc7bb1de58
 - filename: GCP/Standalone/README.md
-  checksum: 7a2f07e2f4d69028cbaeca01ca3faeff7cb8a3efe8e65fa945ef15b26eaf3be8
+  checksum: d82c3795eacfdf9d9e1529541b3a21b81588df6a24f59af0a42018fcf326868f
 - filename: GCP/HA_via_lb/README.md
   checksum: 05c9b6156e04b28d3c8ea9edc51061f7e0227e50ee70a438f17f87e7dcf9800d
 - filename: GCP/HA_via_api/terraform.tfvars.example
