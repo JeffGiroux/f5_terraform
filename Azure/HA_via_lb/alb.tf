@@ -2,17 +2,17 @@
 
 # Create Public IPs
 resource "azurerm_public_ip" "lbpip" {
-  name                = "${var.prefix}-lb-pip"
+  name                = format("%s-lb-pip-%s", var.projectPrefix, random_id.buildSuffix.hex)
   location            = azurerm_resource_group.main.location
   sku                 = "Standard"
   resource_group_name = azurerm_resource_group.main.name
   allocation_method   = "Static"
-  domain_name_label   = "${var.prefix}lbpip"
+  domain_name_label   = "${var.projectPrefix}lbpip"
 }
 
 # Create Azure LB
 resource "azurerm_lb" "lb" {
-  name                = "${var.prefix}lb"
+  name                = format("%s-lb-%s", var.projectPrefix, random_id.buildSuffix.hex)
   location            = azurerm_resource_group.main.location
   sku                 = "Standard"
   resource_group_name = azurerm_resource_group.main.name
@@ -31,11 +31,10 @@ resource "azurerm_lb_backend_address_pool" "backend_pool" {
 
 # Create health probe
 resource "azurerm_lb_probe" "lb_probe" {
-  resource_group_name = azurerm_resource_group.main.name
   loadbalancer_id     = azurerm_lb.lb.id
   name                = "tcpProbe"
-  protocol            = "tcp"
-  port                = 8443
+  protocol            = "Tcp"
+  port                = 80
   interval_in_seconds = 5
   number_of_probes    = 2
 }
@@ -43,28 +42,26 @@ resource "azurerm_lb_probe" "lb_probe" {
 # Create frontend LB rule
 resource "azurerm_lb_rule" "lb_rule1" {
   name                           = "LBRule1"
-  resource_group_name            = azurerm_resource_group.main.name
   loadbalancer_id                = azurerm_lb.lb.id
-  protocol                       = "tcp"
+  protocol                       = "Tcp"
   frontend_port                  = 443
-  backend_port                   = 8443
+  backend_port                   = 80
   frontend_ip_configuration_name = "LoadBalancerFrontEnd"
   enable_floating_ip             = false
-  backend_address_pool_id        = azurerm_lb_backend_address_pool.backend_pool.id
+  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.backend_pool.id]
   idle_timeout_in_minutes        = 5
   probe_id                       = azurerm_lb_probe.lb_probe.id
 }
 
 resource "azurerm_lb_rule" "lb_rule2" {
   name                           = "LBRule2"
-  resource_group_name            = azurerm_resource_group.main.name
   loadbalancer_id                = azurerm_lb.lb.id
-  protocol                       = "tcp"
+  protocol                       = "Tcp"
   frontend_port                  = 80
   backend_port                   = 80
   frontend_ip_configuration_name = "LoadBalancerFrontEnd"
   enable_floating_ip             = false
-  backend_address_pool_id        = azurerm_lb_backend_address_pool.backend_pool.id
+  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.backend_pool.id]
   idle_timeout_in_minutes        = 5
   probe_id                       = azurerm_lb_probe.lb_probe.id
 }
