@@ -245,10 +245,10 @@ No modules.
 |------|-------------|
 | <a name="output_Public_VIP_pip"></a> [Public\_VIP\_pip](#output\_Public\_VIP\_pip) | Public VIP IP for application |
 | <a name="output_ext_subnet_gw"></a> [ext\_subnet\_gw](#output\_ext\_subnet\_gw) | Default gateway of external subnet |
-| <a name="output_f5vm01_ext_private_ip"></a> [f5vm01\_ext\_private\_ip](#output\_f5vm01\_ext\_private\_ip) | External NIC private IP address for BIG-IP |
+| <a name="output_f5vm01_ext_private_ip"></a> [f5vm01\_ext\_private\_ip](#output\_f5vm01\_ext\_private\_ip) | External NIC private IP address for BIG-IP 1 |
 | <a name="output_f5vm01_id"></a> [f5vm01\_id](#output\_f5vm01\_id) | Virual machine ID for BIG-IP |
-| <a name="output_f5vm01_mgmt_private_ip"></a> [f5vm01\_mgmt\_private\_ip](#output\_f5vm01\_mgmt\_private\_ip) | Management NIC private IP address for BIG-IP |
-| <a name="output_f5vm01_mgmt_public_ip"></a> [f5vm01\_mgmt\_public\_ip](#output\_f5vm01\_mgmt\_public\_ip) | Management NIC public IP address for BIG-IP |
+| <a name="output_f5vm01_mgmt_private_ip"></a> [f5vm01\_mgmt\_private\_ip](#output\_f5vm01\_mgmt\_private\_ip) | Management NIC private IP address for BIG-IP 1 |
+| <a name="output_f5vm01_mgmt_public_ip"></a> [f5vm01\_mgmt\_public\_ip](#output\_f5vm01\_mgmt\_public\_ip) | Management NIC public IP address for BIG-IP 1 |
 | <a name="output_mgmt_subnet_gw"></a> [mgmt\_subnet\_gw](#output\_mgmt\_subnet\_gw) | Default gateway of management subnet |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 <!-- markdownlint-enable no-inline-html -->
