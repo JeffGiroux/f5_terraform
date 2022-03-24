@@ -23,6 +23,8 @@ fileignoreconfig:
   checksum: 34c61a9c10864b40505f85a88cca49e29196422f310f19bb8f9850483c365a45
 - filename: Azure/HA_via_lb/README.md
   checksum: c41ee266c076663299caa85f7c2fa98371e713a528123557b3f104e11cd42a69
+- filename: Azure/HA_via_lb/examples/as3.json
+  checksum: f2e4c01711a996cb6a84d3cb964b128cb04db3fb3a85d6ff4bb798f5675fe850
 - filename: Azure/HA_via_api/README.md
   checksum: ffd438580af3d6717857749b588fe2ffd93b5689b52138a00664cba2feb70445
 - filename: Azure/Autoscale_via_lb/README.md
