@@ -16,13 +16,13 @@ resource "google_compute_forwarding_rule" "vip1" {
 resource "google_compute_target_instance" "f5vm01" {
   name     = "${var.prefix}-${var.host1_name}-ti"
   instance = google_compute_instance.f5vm01.id
-  zone = var.gcp_zone_1			 
+  zone     = var.gcp_zone_1
 }
 
 resource "google_compute_target_instance" "f5vm02" {
   name     = "${var.prefix}-${var.host2_name}-ti"
   instance = google_compute_instance.f5vm02.id
-  zone = var.gcp_zone_2		     
+  zone     = var.gcp_zone_2
 }
 
 # Setup Onboarding scripts

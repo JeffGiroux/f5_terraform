@@ -26,7 +26,7 @@ Example...
 -> Run many X
 - [Redeploy BIG-IP for Replacement or Upgrade](#Redeploy-BIG-IP-for-replacement-or-upgrade)
 
-**Networking Stack Type:** This solution deploys into an *EXISTING* networking stack. You are required to have existing VPC networks, firewall rules, and proper routing. Refer to the [Prerequisites](#prerequisites). Visit DevCentral to read [Service Discovery in Google Cloud with F5 BIG-IP](https://devcentral.f5.com/s/articles/Service-Discovery-in-Google-Cloud-with-F5-BIG-IP) where I show you my basic VPC setup (networks, subnets) along with firewall rules.
+**Networking Stack Type:** This solution deploys into an *EXISTING* networking stack. You are required to have existing VPC networks, firewall rules, and proper routing. Refer to the [Prerequisites](#prerequisites). Visit DevCentral to read [Service Discovery in Google Cloud with F5 BIG-IP](https://community.f5.com/t5/technical-articles/service-discovery-in-google-cloud-with-f5-big-ip/ta-p/284457) where I show you my basic VPC setup (networks, subnets) along with firewall rules.
 
 ## Prerequisites
 
@@ -100,13 +100,14 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
           ...and some more
           f5-bigip-14-1-2-3-0-0-5-byol-ltm-1boot-loc-191218142225
           f5-bigip-15-1-2-1-0-0-10-payg-best-1gbps-210115161130
-          f5-bigip-15-1-2-1-0-0-10-byol-ltm-2boot-loc-210115160742
+          f5-bigip-16-1-2-1-0-0-10-payg-best-10gbps-211222204606
+          f5-bigip-16-1-2-1-0-0-10-byol-all-modules-2boot-loc-1222211103
           ...and more...
   ```
 2. In the "variables.tf", modify *image_name* with the image name from gcloud CLI results
   ```
           # BIGIP Image
-          variable image_name { default = "projects/f5-7626-networks-public/global/images/f5-bigip-15-1-2-1-0-0-10-byol-ltm-2boot-loc-210115160742" }
+          variable image_name { default = "projects/f5-7626-networks-public/global/images/f5-bigip-16-1-2-1-0-0-10-byol-all-modules-2boot-loc-1222211103" }
   ```
 3. In the "variables.tf", modify *license1* with a valid regkey
   ```
@@ -123,7 +124,7 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
   ```
 
 ## BIG-IQ License Manager
-This template uses PayGo BIG-IP image for the deployment (as default). If you would like to use BYOL/ELA/Subscription licenses from [BIG-IQ License Manager (LM)](https://devcentral.f5.com/s/articles/managing-big-ip-licensing-with-big-iq-31944), then these following steps are needed:
+This template uses PayGo BIG-IP image for the deployment (as default). If you would like to use BYOL/ELA/Subscription licenses from [BIG-IQ License Manager (LM)](https://community.f5.com/t5/technical-articles/managing-big-ip-licensing-with-big-iq/ta-p/279797), then these following steps are needed:
 1. Find BYOL image. Reference [BYOL Licensing](#byol-licensing) step #1.
 2. Replace BIG-IP *image_name* in "variables.tf". Reference [BYOL Licensing](#byol-licensing) step #2.
 3. In the "variables.tf", modify the BIG-IQ license section to match your environment
@@ -152,14 +153,14 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 0.14 |
-| <a name="requirement_google"></a> [google](#requirement\_google) | ~> 3 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.14.5 |
+| <a name="requirement_google"></a> [google](#requirement\_google) | >= 3 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | 3.86.0 |
+| <a name="provider_google"></a> [google](#provider\_google) | >= 3 |
 
 ## Modules
 
@@ -180,12 +181,12 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_AS3_URL"></a> [AS3\_URL](#input\_AS3\_URL) | URL to download the BIG-IP Application Service Extension 3 (AS3) module | `string` | `"https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.30.0/f5-appsvcs-3.30.0-5.noarch.rpm"` | no |
-| <a name="input_CFE_URL"></a> [CFE\_URL](#input\_CFE\_URL) | URL to download the BIG-IP Cloud Failover Extension module | `string` | `"https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.9.0/f5-cloud-failover-1.9.0-0.noarch.rpm"` | no |
-| <a name="input_DO_URL"></a> [DO\_URL](#input\_DO\_URL) | URL to download the BIG-IP Declarative Onboarding module | `string` | `"https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.23.0/f5-declarative-onboarding-1.23.0-4.noarch.rpm"` | no |
-| <a name="input_TS_URL"></a> [TS\_URL](#input\_TS\_URL) | URL to download the BIG-IP Telemetry Streaming module | `string` | `"https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.22.0/f5-telemetry-1.22.0-1.noarch.rpm"` | no |
+| <a name="input_AS3_URL"></a> [AS3\_URL](#input\_AS3\_URL) | URL to download the BIG-IP Application Service Extension 3 (AS3) module | `string` | `"https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.35.0/f5-appsvcs-3.35.0-4.noarch.rpm"` | no |
+| <a name="input_CFE_URL"></a> [CFE\_URL](#input\_CFE\_URL) | URL to download the BIG-IP Cloud Failover Extension module | `string` | `"https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.10.0/f5-cloud-failover-1.10.0-0.noarch.rpm"` | no |
+| <a name="input_DO_URL"></a> [DO\_URL](#input\_DO\_URL) | URL to download the BIG-IP Declarative Onboarding module | `string` | `"https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.28.0/f5-declarative-onboarding-1.28.0-4.noarch.rpm"` | no |
+| <a name="input_TS_URL"></a> [TS\_URL](#input\_TS\_URL) | URL to download the BIG-IP Telemetry Streaming module | `string` | `"https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.27.0/f5-telemetry-1.27.0-3.noarch.rpm"` | no |
 | <a name="input_adminSrcAddr"></a> [adminSrcAddr](#input\_adminSrcAddr) | Trusted source network for admin access | `string` | `"0.0.0.0/0"` | no |
-| <a name="input_alias_ip_range"></a> [alias\_ip\_range](#input\_alias\_ip\_range) | An array of alias IP ranges for the BIG-IP network interface (used for VIP traffic, SNAT IPs, etc) | `string` | `"10.1.10.100/32"` | no |
+| <a name="input_alias_ip_range"></a> [alias\_ip\_range](#input\_alias\_ip\_range) | An array of alias IP ranges for the BIG-IP network interface (used for VIP traffic, SNAT IPs, etc) | `string` | `""` | no |
 | <a name="input_bigIqHost"></a> [bigIqHost](#input\_bigIqHost) | This is the BIG-IQ License Manager host name or IP address | `string` | `""` | no |
 | <a name="input_bigIqHypervisor"></a> [bigIqHypervisor](#input\_bigIqHypervisor) | BIG-IQ hypervisor | `string` | `"gce"` | no |
 | <a name="input_bigIqLicensePool"></a> [bigIqLicensePool](#input\_bigIqLicensePool) | BIG-IQ license pool name | `string` | `""` | no |
@@ -205,10 +206,11 @@ No modules.
 | <a name="input_gceSshPubKey"></a> [gceSshPubKey](#input\_gceSshPubKey) | SSH public key for admin authentation | `string` | `null` | no |
 | <a name="input_gcp_project_id"></a> [gcp\_project\_id](#input\_gcp\_project\_id) | GCP Project ID for provider | `string` | `null` | no |
 | <a name="input_gcp_region"></a> [gcp\_region](#input\_gcp\_region) | GCP Region for provider | `string` | `"us-west1"` | no |
-| <a name="input_gcp_zone"></a> [gcp\_zone](#input\_gcp\_zone) | GCP Zone for provider | `string` | `"us-west1-b"` | no |
+| <a name="input_gcp_zone_1"></a> [gcp\_zone\_1](#input\_gcp\_zone\_1) | GCP Zone 1 for provider | `string` | `"us-west1-a"` | no |
+| <a name="input_gcp_zone_2"></a> [gcp\_zone\_2](#input\_gcp\_zone\_2) | GCP Zone 2 for provider | `string` | `"us-west1-b"` | no |
 | <a name="input_host1_name"></a> [host1\_name](#input\_host1\_name) | Hostname for the first BIG-IP | `string` | `"f5vm01"` | no |
 | <a name="input_host2_name"></a> [host2\_name](#input\_host2\_name) | Hostname for the second BIG-IP | `string` | `"f5vm02"` | no |
-| <a name="input_image_name"></a> [image\_name](#input\_image\_name) | F5 SKU (image) to deploy. Note: The disk size of the VM will be determined based on the option you select.  **Important**: If intending to provision multiple modules, ensure the appropriate value is selected, such as ****AllTwoBootLocations or AllOneBootLocation****. | `string` | `"projects/f5-7626-networks-public/global/images/f5-bigip-15-1-2-1-0-0-10-payg-best-1gbps-210115161130"` | no |
+| <a name="input_image_name"></a> [image\_name](#input\_image\_name) | F5 SKU (image) to deploy. Note: The disk size of the VM will be determined based on the option you select.  **Important**: If intending to provision multiple modules, ensure the appropriate value is selected, such as ****AllTwoBootLocations or AllOneBootLocation****. | `string` | `"projects/f5-7626-networks-public/global/images/f5-bigip-16-1-2-1-0-0-10-payg-best-plus-1gbps-211222210245"` | no |
 | <a name="input_intSubnet"></a> [intSubnet](#input\_intSubnet) | Internal subnet | `string` | `null` | no |
 | <a name="input_intVpc"></a> [intVpc](#input\_intVpc) | Internal VPC network | `string` | `null` | no |
 | <a name="input_ksecret"></a> [ksecret](#input\_ksecret) | Contains the value of the 'svc\_acct' private key. Currently used for BIG-IP telemetry streaming to Google Cloud Monitoring (aka StackDriver). If you are not using this feature, you do not need this secret in Secret Manager. | `string` | `""` | no |
@@ -255,18 +257,19 @@ To run this Terraform template, perform the following steps:
   2. Modify terraform.tfvars with the required information
   ```
       # BIG-IP Environment
-      uname        = "admin"
-      usecret      = "my-secret"
-      gceSshPubKey = "ssh-rsa xxxxx
-      prefix       = "mydemo123"
-      adminSrcAddr = "0.0.0.0/0"
-      mgmtVpc      = "xxxxx-net-mgmt"
-      extVpc       = "xxxxx-net-ext"
-      intVpc       = "xxxxx-net-int"
-      mgmtSubnet   = "xxxxx-subnet-mgmt"
-      extSubnet    = "xxxxx-subnet-ext"
-      intSubnet    = "xxxxx-subnet-int"
-      dns_suffix   = "c.xxxxx.xxxxx.internal"
+      uname          = "admin"
+      usecret        = "my-secret"
+      gceSshPubKey   = "ssh-rsa xxxxx
+      prefix         = "mydemo123"
+      adminSrcAddr   = "0.0.0.0/0"
+      mgmtVpc        = "xxxxx-net-mgmt"
+      extVpc         = "xxxxx-net-ext"
+      intVpc         = "xxxxx-net-int"
+      mgmtSubnet     = "xxxxx-subnet-mgmt"
+      extSubnet      = "xxxxx-subnet-ext"
+      intSubnet      = "xxxxx-subnet-int"
+      dns_suffix     = "c.xxxxx.xxxxx.internal"
+      alias_ip_range = "10.1.10.130/27"
 
       # BIG-IQ Environment
       bigIqUsername = "admin"
@@ -274,7 +277,8 @@ To run this Terraform template, perform the following steps:
       # Google Environment
       gcp_project_id = "xxxxx"
       gcp_region     = "us-west1"
-      gcp_zone       = "us-west1-b"
+      gcp_zone_1     = "us-west1-a"
+      gcp_zone_2     = "us-west1-b"
       svc_acct       = "xxxxx@xxxxx.iam.gserviceaccount.com"
   ```
   3. Initialize the directory
@@ -302,7 +306,7 @@ The following is an example configuration diagram for this solution deployment. 
 
 ## Documentation
 
-For more information on F5 solutions for Google, including manual configuration procedures for some deployment scenarios, see the Google GCP section of [F5 CloudDocs](https://clouddocs.f5.com/cloud/public/v1/google_index.html). Also check out the [Using Cloud Templates for BIG-IP in Google](https://devcentral.f5.com/s/articles/Using-Cloud-Templates-to-Change-BIG-IP-Versions-Google) on DevCentral. This particular HA example is based on the [BIG-IP Cluster "HA via API" F5 GDM Cloud Template on GitHub](https://github.com/F5Networks/f5-google-gdm-templates/tree/master/supported/failover/same-net/via-api/3nic/existing-stack/payg).
+For more information on F5 solutions for Google, including manual configuration procedures for some deployment scenarios, see the Google GCP section of [F5 CloudDocs](https://clouddocs.f5.com/cloud/public/v1/google_index.html). Also check out the [Using Cloud Templates for BIG-IP in Google](https://community.f5.com/t5/technical-articles/using-cloud-templates-to-change-big-ip-versions-google-gcp/ta-p/284366) on DevCentral. This particular HA example is based on the [BIG-IP Cluster "HA via API" F5 GDM Cloud Template on GitHub](https://github.com/F5Networks/f5-google-gdm-templates/tree/master/supported/failover/same-net/via-api/3nic/existing-stack/payg).
 
 ## Creating Virtual Servers on the BIG-IP VE
 
