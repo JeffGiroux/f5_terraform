@@ -18,5 +18,5 @@ bigIqUsername = "admin"
 # Google Environment
 gcp_project_id = "xxxxx"
 gcp_region     = "us-west1"
-gcp_zone       = "us-west1-b"
+gcp_zone_1     = "us-west1-a"
 svc_acct       = "xxxxx@xxxxx.iam.gserviceaccount.com"
