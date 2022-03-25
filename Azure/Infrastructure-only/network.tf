@@ -2,7 +2,7 @@
 
 # Create a Virtual Network
 resource "azurerm_virtual_network" "main" {
-  name                = "${var.prefix}-network"
+  name                = "${var.projectPrefix}-network"
   address_space       = [var.vnet_cidr]
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
@@ -34,7 +34,7 @@ resource "azurerm_subnet" "internal" {
 
 # Create Network Security Group and rules
 resource "azurerm_network_security_group" "mgmt" {
-  name                = "${var.prefix}-mgmt-nsg"
+  name                = "${var.projectPrefix}-mgmt-nsg"
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
 
@@ -83,7 +83,7 @@ resource "azurerm_network_security_group" "mgmt" {
 }
 
 resource "azurerm_network_security_group" "external" {
-  name                = "${var.prefix}-ext-nsg"
+  name                = "${var.projectPrefix}-ext-nsg"
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
 

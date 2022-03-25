@@ -15,7 +15,7 @@ provider "azurerm" {
 
 # Create a Resource Group
 resource "azurerm_resource_group" "main" {
-  name     = "${var.prefix}_rg"
+  name     = "${var.projectPrefix}_rg"
   location = var.location
   tags = {
     owner = var.owner

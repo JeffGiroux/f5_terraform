@@ -1,6 +1,6 @@
 # Variables
 
-variable "prefix" {
+variable "projectPrefix" {
   type        = string
   default     = "demo"
   description = "This value is inserted at the beginning of each Azure object (alpha-numeric, no special character)"
