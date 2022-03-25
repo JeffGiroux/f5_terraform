@@ -251,7 +251,7 @@ To run this Terraform template, perform the following steps:
   2. Modify terraform.tfvars with the required information
   ```
       # BIG-IP Environment
-      allowedIps    = ["0.0.0.0/0"]
+      adminSrcAddr  = "0.0.0.0/0"
       vpcId         = "vpc-1234"
       mgmtSubnetAz1 = "subnet-1111"
       mgmtSubnetAz2 = "subnet-2222"
