@@ -1,3 +1,5 @@
-awsRegion     = "us-west-2"
 projectPrefix = "myDemo"
 resourceOwner = "myName"
+awsRegion     = "us-west-2"
+awsAz1        = "us-west-2a"
+awsAz2        = "us-west-2b"

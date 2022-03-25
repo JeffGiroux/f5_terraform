@@ -1,28 +1,16 @@
 # Outputs
 
-output "subnets_external_Az1" {
-  description = "ID of External subnet AZ1"
-  value       = module.aws_network.subnetsAz1["public"]
+output "subnets_external" {
+  description = "ID of External subnets"
+  value       = module.vpc.public_subnets
 }
-output "subnets_external_Az2" {
-  description = "ID of External subnet AZ2"
-  value       = module.aws_network.subnetsAz2["public"]
+output "subnets_internal" {
+  description = "ID of Internal subnets"
+  value       = module.vpc.intra_subnets
 }
-output "subnets_internal_Az1" {
-  description = "ID of Internal subnet AZ1"
-  value       = module.aws_network.subnetsAz1["private"]
-}
-output "subnets_internal_Az2" {
-  description = "ID of Internal subnet AZ2"
-  value       = module.aws_network.subnetsAz2["private"]
-}
-output "subnets_mgmt_Az1" {
-  description = "ID of Management subnet AZ1"
-  value       = module.aws_network.subnetsAz1["mgmt"]
-}
-output "subnets_mgmt_Az2" {
-  description = "ID of Management subnet AZ1"
-  value       = module.aws_network.subnetsAz2["mgmt"]
+output "subnets_mgmt" {
+  description = "ID of Internal subnets"
+  value       = module.vpc.private_subnets
 }
 output "security_group_external" {
   description = "ID of External security group"
@@ -38,5 +26,5 @@ output "security_group_mgmt" {
 }
 output "vpc_id" {
   description = "VPC ID"
-  value       = module.aws_network.vpcs["main"]
+  value       = module.vpc.vpc_id
 }
