@@ -34,7 +34,7 @@ resource "azurerm_lb_probe" "lb_probe" {
   loadbalancer_id     = azurerm_lb.lb.id
   name                = "tcpProbe"
   protocol            = "Tcp"
-  port                = 8080
+  port                = 80
   interval_in_seconds = 5
   number_of_probes    = 2
 }
@@ -45,7 +45,7 @@ resource "azurerm_lb_rule" "lb_rule1" {
   loadbalancer_id                = azurerm_lb.lb.id
   protocol                       = "Tcp"
   frontend_port                  = 80
-  backend_port                   = 8080
+  backend_port                   = 80
   frontend_ip_configuration_name = "LoadBalancerFrontEnd"
   enable_floating_ip             = false
   backend_address_pool_ids       = [azurerm_lb_backend_address_pool.backend_pool.id]
