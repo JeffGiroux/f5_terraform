@@ -15,8 +15,12 @@ fileignoreconfig:
   checksum: a21478ef4050249abb98b7bd71f7f8b25647f736fbe0e900e959c5025731bbb1
 - filename: GCP/Autoscale_via_lb/3nic/README.md
   checksum: 12c945cad966cd291232ad7dd83456c93375198ec41de39e6a0352c1f5e0f8f5
+- filename: Azure/Standalone/terraform.tfvars.example
+  checksum: c8ebe4697e512763f913f67e2d8fa1b602ca1f739c49aefbbf9818a4f9bcea97
+- filename: Azure/Standalone/bigip.tf
+  checksum: 4888f366e13206b6da23835700eb8de02fdde2f5f6235f5cd6f048d2988f7e0b
 - filename: Azure/Standalone/README.md
-  checksum: 4ae2e073ca0d495defadf8b98a4a749d8f12c3863dc4d1420a6286731a99fbc5
+  checksum: 00994f73f17ce2964474fb502a90139ac8add1f93a5c033dca2b2c381dfcc1aa
 - filename: Azure/Standalone/f5_onboard.tmpl
   checksum: a29a3f5849bb8c656e88b208dda8371a49cb6175a5681bee422c3b4bfcb66641
 - filename: Azure/Secure_Enclave_Public_DMZ/README.md
