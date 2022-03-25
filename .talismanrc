@@ -55,3 +55,5 @@ fileignoreconfig:
   checksum: 2febd7b6451b52c1349f35b416d29422c0b03f5f6e39fa3ab8ec9558fb1679b1
 - filename: AWS/HA_via_api/README.md
   checksum: f6058047b5006464dff2433b35f54ecbe07b7b2a6677ec0f745eb9a18d54ba1e
+- filename: AWS/Autoscale_via_lb/1nic/terraform.tfvars.example
+  checksum: 7c4260a9f830faef736e223920c48c20491ac52a9681bf97f06c5eacbe01d239
