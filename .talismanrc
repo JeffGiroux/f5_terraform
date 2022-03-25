@@ -17,6 +17,8 @@ fileignoreconfig:
   checksum: 12c945cad966cd291232ad7dd83456c93375198ec41de39e6a0352c1f5e0f8f5
 - filename: Azure/Standalone/README.md
   checksum: 4ae2e073ca0d495defadf8b98a4a749d8f12c3863dc4d1420a6286731a99fbc5
+- filename: Azure/Standalone/f5_onboard.tmpl
+  checksum: a29a3f5849bb8c656e88b208dda8371a49cb6175a5681bee422c3b4bfcb66641
 - filename: Azure/Secure_Enclave_Public_DMZ/README.md
   checksum: 0d6df57c347f4f1e327f564eb5acb1e4d4cb7fc79d641850c0bb536161578692
 - filename: Azure/Route_Server/README.md

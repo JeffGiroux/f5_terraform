@@ -1,0 +1,226 @@
+#!/bin/bash -x
+
+# NOTE: Startup Script is run once / initialization only (Cloud-Init behavior vs. typical re-entrant for Azure Custom Script Extension )
+# For 15.1+ and above, Cloud-Init will run the script directly and can remove Azure Custom Script Extension
+
+
+mkdir -p  /var/log/cloud /config/cloud /var/config/rest/downloads
+
+
+LOG_FILE=/var/log/cloud/startup-script.log
+[[ ! -f $LOG_FILE ]] && touch $LOG_FILE || { echo "Run Only Once. Exiting"; exit; }
+npipe=/tmp/$$.tmp
+trap "rm -f $npipe" EXIT
+mknod $npipe p
+tee <$npipe -a $LOG_FILE /dev/ttyS0 &
+exec 1>&-
+exec 1>$npipe
+exec 2>&1
+
+
+### write_files:
+# Download or Render BIG-IP Runtime Init Config
+
+cat << 'EOF' > /config/cloud/runtime-init-conf.yaml
+---
+runtime_parameters:
+  - name: HOST_NAME
+    type: metadata
+    metadataProvider:
+      environment: azure
+      type: compute
+      field: name
+  - name: REGION
+    type: url
+    value: http://169.254.169.254/metadata/instance/compute/location?api-version=2021-05-01&format=text
+    headers:
+      - name: Metadata
+        value: true
+  - name: USER_NAME
+    type: static
+    value: ${f5_username}
+  - name: ADMIN_PASS
+    type: static
+    value: ${f5_password}
+  - name: SSH_KEYS
+    type: static
+    value: ${ssh_keypair}
+  - name: LAW_ID
+    type: static
+    value: ${law_id}
+  - name: LAW_PRIMKEY
+    type: static
+    value: ${law_primkey}
+  - name: GATEWAY_EXTERNAL
+    type: metadata
+    metadataProvider:
+      environment: azure
+      type: network
+      field: ipv4
+      index: 1
+      ipcalc: first
+  - name: SELF_IP_EXTERNAL
+    type: static
+    value: ${self_ip_external}
+  - name: SELF_IP_INTERNAL
+    type: static
+    value: ${self_ip_internal}
+  - name: DNS_SERVER
+    type: static
+    value: ${dns_server}
+  - name: NTP_SERVER
+    type: static
+    value: ${ntp_server}
+  - name: TIMEZONE
+    type: static
+    value: ${timezone}
+  - name: HOST1
+    type: static
+    value: ${host1}
+pre_onboard_enabled:
+  - name: provision_rest
+    type: inline
+    commands:
+      - /usr/bin/setdb provision.extramb 1000
+      - /usr/bin/setdb restjavad.useextramb true
+      - /usr/bin/setdb setup.run false
+extension_packages:
+  install_operations:
+    - extensionType: do
+      extensionVersion: ${DO_VER}
+      extensionUrl: ${DO_URL}
+    - extensionType: as3
+      extensionVersion: ${AS3_VER}
+      extensionUrl: ${AS3_URL}
+extension_services:
+  service_operations:
+    - extensionType: do
+      type: inline
+      value:
+        schemaVersion: 1.0.0
+        class: Device
+        async: true
+        label: Onboard BIG-IP standalone
+        Common:
+          class: Tenant
+          dbVars:
+            class: DbVariables
+            restjavad.useextramb: true
+            provision.extramb: 1000
+            config.allow.rfc3927: enable
+            ui.advisory.enabled: true
+            ui.advisory.color: blue
+            ui.advisory.text: '{{{ HOST_NAME }}}.example.com'
+          mySystem:
+            autoPhonehome: true
+            class: System
+            hostname: '{{{ HOST_NAME }}}.example.com'
+          '{{{ USER_NAME }}}':
+            class: User
+            partitionAccess:
+              all-partitions:
+                role: admin
+            password: '{{{ ADMIN_PASS }}}'
+            shell: bash
+            userType: regular
+            keys:
+              - '{{{ SSH_KEYS }}}'
+          myDns:
+            class: DNS
+            nameServers:
+              - '{{{ DNS_SERVER }}}'
+              - 2001:4860:4860::8844
+            search:
+              - f5.com
+          myNtp:
+            class: NTP
+            servers:
+              - '{{{ NTP_SERVER }}}'
+              - 1.pool.ntp.org
+              - 2.pool.ntp.org
+            timezone: '{{{ TIMEZONE }}}'
+          myProvisioning:
+            class: Provision
+            ltm: nominal
+          external:
+            class: VLAN
+            tag: 4094
+            mtu: 1500
+            interfaces:
+              - name: 1.1
+                tagged: false
+          external-localself:
+            class: SelfIp
+            address: '{{{ SELF_IP_EXTERNAL }}}/24'
+            vlan: external
+            allowService: default
+            trafficGroup: traffic-group-local-only
+          internal:
+            class: VLAN
+            tag: 4093
+            mtu: 1500
+            interfaces:
+              - name: 1.2
+                tagged: false
+          internal-localself:
+            class: SelfIp
+            address: '{{{ SELF_IP_INTERNAL }}}/24'
+            vlan: internal
+            allowService: default
+            trafficGroup: traffic-group-local-only
+          default:
+            class: Route
+            gw: '{{{ GATEWAY_EXTERNAL }}}'
+            network: default
+            mtu: 1500
+    - extensionType: as3
+      type: inline
+      value:
+        class: AS3
+        action: deploy
+        persist: true
+        declaration:
+          class: ADC
+          schemaVersion: 3.0.0
+          label: Sample 1
+          remark: An HTTP sample application
+          Sample_01:
+            class: Tenant
+            A1:
+              class: Application
+              template: http
+              serviceMain:
+                class: Service_HTTP
+                virtualAddresses:
+                  - '0.0.0.0/0'
+                pool: web_pool
+              web_pool:
+                class: Pool
+                monitors:
+                  - tcp
+                members:
+                  - servicePort: 80
+                    addressDiscovery: fqdn
+                    autoPopulate: true
+                    hostname: httpbin.org
+post_onboard_enabled:
+  - name: misc
+    type: inline
+    commands:
+    - tmsh save sys config
+EOF
+
+# Download BIG-IP Runtime Init
+for i in {1..30}; do
+    curl -fv --retry 1 --connect-timeout 5 -L ${INIT_URL} -o "/var/config/rest/downloads/f5-bigip-runtime.gz.run" && break || sleep 10
+done
+
+# Remove comment to do silly debugging on BIG-IP Runtime init
+#export F5_BIGIP_RUNTIME_INIT_LOG_LEVEL=silly
+#export F5_BIGIP_RUNTIME_EXTENSION_INSTALL_DELAY_IN_MS=60000
+
+# Install BIG-IP Runtime Init
+bash /var/config/rest/downloads/f5-bigip-runtime.gz.run -- '--cloud azure'
+
+# Run BIG-IP Runtime Init and Process YAML
+f5-bigip-runtime-init --config-file /config/cloud/runtime-init-conf.yaml
