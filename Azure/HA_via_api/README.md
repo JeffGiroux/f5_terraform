@@ -87,12 +87,12 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
           variable license1 { default = "" }
           variable license2 { default = "" }
   ```
-4. In the "f5_onboard.tmpl", add the "myLicense" block under the "Common" declaration ([example here](https://github.com/F5Networks/f5-aws-cloudformation-v2/blob/main/examples/failover/bigip-configurations/runtime-init-conf-3nic-byol-instance01.yaml))
+4. In the "f5_onboard.tmpl", add the "myLicense" block under the "Common" declaration ([example here](https://github.com/F5Networks/f5-azure-arm-templates-v2/blob/main/examples/failover/bigip-configurations/runtime-init-conf-3nic-byol-instance01.yaml))
   ```
           myLicense:
             class: License
             licenseType: regKey
-            regKey: ${regKey}
+            regKey: '${regKey}'
   ```
 
 ## BIG-IQ License Manager

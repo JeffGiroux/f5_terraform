@@ -39,8 +39,6 @@ fileignoreconfig:
   checksum: e5d651274921bfb44a113d079f47198a7b78234afdf73fff42175964a7908e10
 - filename: Azure/Autoscale_via_lb/f5_onboard.tmpl
   checksum: af9e58aa6b1c7c6da435cf166b3842f3b2c8e9a8032d712ffce4369d008941c0
-- filename: AWS/HA_via_api/README.md
-  checksum: de53b3709f7fd13753b84a3a65c08ab785769c88002596b6dd463b8d44229237
 - filename: AWS/Autoscale_via_lb/1nic/README.md
   checksum: 1f14055edcefe18aa237d56a29cab1dafd3346ba1646080b3659c8d1d42eac74
 - filename: AWS/Autoscale_via_lb/2nic/bigip.tf
@@ -51,7 +49,9 @@ fileignoreconfig:
   checksum: dd5a0e8d463722a8a960aad23c57ad25a41628e08a30d33e943545804792dc4e
 - filename: Azure/Standalone/README.md
   checksum: d405579d8a7af17c181fb308a2ca23e6315399491ec7487a5269b1ecebc3eca5
-- filename: Azure/HA_via_api/README.md
-  checksum: b51a8573c0b44b48c371f16646e2cabd574a59b4e4c88e2025859c141e4c25fa
 - filename: Azure/HA_via_lb/README.md
   checksum: 1e0da6af543c06c95cdb9ff7097dec2fb0fbf6cdd3abd57c6ce794c403a2ba4a
+- filename: Azure/HA_via_api/README.md
+  checksum: 2febd7b6451b52c1349f35b416d29422c0b03f5f6e39fa3ab8ec9558fb1679b1
+- filename: AWS/HA_via_api/README.md
+  checksum: f6058047b5006464dff2433b35f54ecbe07b7b2a6677ec0f745eb9a18d54ba1e
