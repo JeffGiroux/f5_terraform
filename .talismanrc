@@ -39,6 +39,8 @@ fileignoreconfig:
   checksum: ffd438580af3d6717857749b588fe2ffd93b5689b52138a00664cba2feb70445
 - filename: Azure/Autoscale_via_lb/README.md
   checksum: 210f56d29d8a52b0e328034ba59e689ef5c324425bdffa8dfe2472f50d44c92c
+- filename: Azure/Autoscale_via_lb/terraform.tfvars.example
+  checksum: e5d651274921bfb44a113d079f47198a7b78234afdf73fff42175964a7908e10
 - filename: AWS/HA_via_api/README.md
   checksum: de53b3709f7fd13753b84a3a65c08ab785769c88002596b6dd463b8d44229237
 - filename: AWS/Autoscale_via_lb/1nic/README.md
