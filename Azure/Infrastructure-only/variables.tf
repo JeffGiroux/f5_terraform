@@ -7,7 +7,7 @@ variable "projectPrefix" {
 }
 variable "location" {
   type        = string
-  default     = null
+  default     = "westus2"
   description = "Azure Location of the deployment"
 }
 variable "adminSrcAddr" {
