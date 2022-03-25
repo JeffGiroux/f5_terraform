@@ -37,8 +37,10 @@ fileignoreconfig:
   checksum: f1332e3f00f744b76a7330ec3c173b519003f8206bb498f9e0af50e657ec56ea
 - filename: Azure/HA_via_api/README.md
   checksum: ffd438580af3d6717857749b588fe2ffd93b5689b52138a00664cba2feb70445
+- filename: Azure/Autoscale_via_lb/bigip.tf
+  checksum: a921ff3c67214dacae5f60f13d570f4483b010a64b84a72be4a241d2b95cb885
 - filename: Azure/Autoscale_via_lb/README.md
-  checksum: 210f56d29d8a52b0e328034ba59e689ef5c324425bdffa8dfe2472f50d44c92c
+  checksum: 5c2ad7885e3293a867946e2ec27e87d93a7324fdd2341c3e700b1a7cc9aadfa3
 - filename: Azure/Autoscale_via_lb/terraform.tfvars.example
   checksum: e5d651274921bfb44a113d079f47198a7b78234afdf73fff42175964a7908e10
 - filename: Azure/Autoscale_via_lb/f5_onboard.tmpl
