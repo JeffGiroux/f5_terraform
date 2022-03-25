@@ -39,8 +39,6 @@ fileignoreconfig:
   checksum: e5d651274921bfb44a113d079f47198a7b78234afdf73fff42175964a7908e10
 - filename: Azure/Autoscale_via_lb/f5_onboard.tmpl
   checksum: af9e58aa6b1c7c6da435cf166b3842f3b2c8e9a8032d712ffce4369d008941c0
-- filename: AWS/Autoscale_via_lb/1nic/README.md
-  checksum: 1f14055edcefe18aa237d56a29cab1dafd3346ba1646080b3659c8d1d42eac74
 - filename: AWS/Autoscale_via_lb/2nic/bigip.tf
   checksum: 54f13abf6d1590c2c1473d32e6473cf22f3b418793b2506997c2b8c3f96f879c
 - filename: AWS/Autoscale_via_lb/2nic/terraform.tfvars.example
@@ -57,3 +55,7 @@ fileignoreconfig:
   checksum: f6058047b5006464dff2433b35f54ecbe07b7b2a6677ec0f745eb9a18d54ba1e
 - filename: AWS/Autoscale_via_lb/1nic/terraform.tfvars.example
   checksum: 7c4260a9f830faef736e223920c48c20491ac52a9681bf97f06c5eacbe01d239
+- filename: AWS/Autoscale_via_lb/1nic/bigip.tf
+  checksum: b804d6207160ef0040e7c33e37506741d9de750b04d895a001d853402c17367b
+- filename: AWS/Autoscale_via_lb/1nic/README.md
+  checksum: 90ffe08f50eb53f9f8ff5cd10b1a10273effdf7da85bb287d3898c4b2ffb9773

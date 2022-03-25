@@ -1,19 +1,29 @@
 # Variables
 
+variable "projectPrefix" {
+  type        = string
+  default     = "demo"
+  description = "This value is inserted at the beginning of each AWS object (alpha-numeric, no special character)"
+}
 variable "awsRegion" {
   description = "aws region"
   type        = string
   default     = "us-west-2"
 }
-variable "projectPrefix" {
+variable "awsAz1" {
+  description = "Availability zone, will dynamically choose one if left empty"
   type        = string
-  description = "prefix for resources"
-  default     = "myDemo"
+  default     = "us-west-2a"
 }
-variable "resourceOwner" {
+variable "awsAz2" {
+  description = "Availability zone, will dynamically choose one if left empty"
   type        = string
-  description = "owner of the deployment, for tagging purposes"
-  default     = "myName"
+  default     = "us-west-2b"
+}
+variable "adminSrcAddr" {
+  type        = string
+  description = "Allowed Admin source IP prefix"
+  default     = "0.0.0.0/0"
 }
 variable "vpcId" {
   type        = string
@@ -28,6 +38,11 @@ variable "extSubnetAz1" {
 variable "extSubnetAz2" {
   type        = string
   description = "ID of External subnet AZ2"
+  default     = null
+}
+variable "extNsg" {
+  type        = string
+  description = "ID of external security group"
   default     = null
 }
 variable "asg_min_size" {
@@ -48,7 +63,7 @@ variable "asg_desired_capacity" {
 variable "f5_ami_search_name" {
   type        = string
   description = "AWS AMI search filter to find correct BIG-IP VE for region"
-  default     = "F5 BIGIP-15.1.2.1* PAYG-Best 200Mbps*"
+  default     = "F5 BIGIP-16.1.2.1* PAYG-Best 200Mbps*"
 }
 variable "ec2_instance_type" {
   type        = string
@@ -65,14 +80,14 @@ variable "f5_password" {
   description = "BIG-IP Password"
   default     = "Default12345!"
 }
-variable "f5_ssh_publickey" {
+variable "ssh_key" {
   type        = string
   description = "public key used for authentication in ssh-rsa format"
 }
-variable "allowedIps" {
-  type        = list(any)
-  description = "Trusted source network for admin access"
-  default     = ["0.0.0.0/0"]
+variable "dns_server" {
+  type        = string
+  default     = "8.8.8.8"
+  description = "Leave the default DNS server the BIG-IP uses, or replace the default DNS server with the one you want to use"
 }
 variable "ntp_server" {
   type        = string
@@ -83,6 +98,36 @@ variable "timezone" {
   type        = string
   default     = "UTC"
   description = "If you would like to change the time zone the BIG-IP uses, enter the time zone you want to use. This is based on the tz database found in /usr/share/zoneinfo (see the full list [here](https://github.com/F5Networks/f5-azure-arm-templates/blob/master/azure-timezone-list.md)). Example values: UTC, US/Pacific, US/Eastern, Europe/London or Asia/Singapore."
+}
+variable "DO_URL" {
+  type        = string
+  default     = "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.28.0/f5-declarative-onboarding-1.28.0-4.noarch.rpm"
+  description = "URL to download the BIG-IP Declarative Onboarding module"
+}
+variable "AS3_URL" {
+  type        = string
+  default     = "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.35.0/f5-appsvcs-3.35.0-4.noarch.rpm"
+  description = "URL to download the BIG-IP Application Service Extension 3 (AS3) module"
+}
+variable "TS_URL" {
+  type        = string
+  default     = "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.27.0/f5-telemetry-1.27.0-3.noarch.rpm"
+  description = "URL to download the BIG-IP Telemetry Streaming module"
+}
+variable "FAST_URL" {
+  description = "URL to download the BIG-IP FAST module"
+  type        = string
+  default     = "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.16.0/f5-appsvcs-templates-1.16.0-1.noarch.rpm"
+}
+variable "INIT_URL" {
+  description = "URL to download the BIG-IP runtime init"
+  type        = string
+  default     = "https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.4.1/dist/f5-bigip-runtime-init-1.4.1-1.gz.run"
+}
+variable "libs_dir" {
+  description = "Directory on the BIG-IP to download the A&O Toolchain into"
+  default     = "/config/cloud/aws/node_modules"
+  type        = string
 }
 variable "onboard_log" {
   description = "Directory on the BIG-IP to store the cloud-init logs"
@@ -133,4 +178,9 @@ variable "bigIqHypervisor" {
   type        = string
   default     = "aws"
   description = "BIG-IQ hypervisor"
+}
+variable "resourceOwner" {
+  type        = string
+  default     = null
+  description = "This is a tag used for object creation. Example is last name."
 }

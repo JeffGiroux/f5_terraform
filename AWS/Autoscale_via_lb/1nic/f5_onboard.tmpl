@@ -1,5 +1,6 @@
-#!/bin/bash
-mkdir -p  /var/log/cloud /config/cloud /var/lib/cloud/icontrollx_installs /var/config/rest/downloads
+#!/bin/bash -x
+
+mkdir -p  /var/log/cloud /config/cloud /var/config/rest/downloads
 LOG_FILE=/var/log/cloud/startup-script.log
 [[ ! -f $LOG_FILE ]] && touch $LOG_FILE || { echo "Run Only Once. Exiting"; exit; }
 npipe=/tmp/$$.tmp
@@ -9,9 +10,10 @@ tee <$npipe -a $LOG_FILE /dev/ttyS0 &
 exec 1>&-
 exec 1>$npipe
 exec 2>&1
-/usr/bin/setdb provision.extramb 500
-/usr/bin/setdb restjavad.useextramb true
-# BIG-IP Runtime Init YAML declaration
+
+
+### write_files:
+# Download or Render BIG-IP Runtime Init Config
 cat << 'EOF' > /config/cloud/runtime-init-conf.yaml
 ---
 runtime_parameters:
@@ -37,14 +39,11 @@ runtime_parameters:
 extension_packages:
   install_operations:
     - extensionType: do
-      extensionVersion: 1.23.0
-      extensionUrl: https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.23.0/f5-declarative-onboarding-1.23.0-4.noarch.rpm
+      extensionVersion: ${DO_VER}
+      extensionUrl: ${DO_URL}
     - extensionType: as3
-      extensionVersion: 3.30.0
-      extensionUrl: https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.30.0/f5-appsvcs-3.30.0-5.noarch.rpm
-    - extensionType: ts
-      extensionVersion: 1.22.0
-      extensionUrl: https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.22.0/f5-telemetry-1.22.0-1.noarch.rpm
+      extensionVersion: ${AS3_VER}
+      extensionUrl: ${AS3_URL}
 extension_services:
   service_operations:
     - extensionType: do
@@ -53,21 +52,21 @@ extension_services:
         schemaVersion: 1.0.0
         class: Device
         async: true
-        label: Autoscale 1NIC BIG-IP declaration for Declarative Onboarding with PAYG license
+        label: Onboard BIG-IP Autoscale
         Common:
           class: Tenant
           dbVars:
             class: DbVariables
             restjavad.useextramb: true
-            provision.extramb: 500
+            provision.extramb: 1000
             config.allow.rfc3927: enable
             ui.advisory.enabled: true
             ui.advisory.color: blue
-            ui.advisory.text: "BIG-IP Autoscale"
+            ui.advisory.text: '{{{ HOST_NAME }}}'
           mySystem:
             autoPhonehome: true
             class: System
-            hostname: '{{{HOST_NAME}}}'
+            hostname: '{{{ HOST_NAME }}}'
           '{{{ USER_NAME }}}':
             class: User
             partitionAccess:
@@ -78,6 +77,9 @@ extension_services:
             userType: regular
             keys:
               - '{{{ SSH_KEYS }}}'
+          myProvisioning:
+            class: Provision
+            ltm: nominal
     - extensionType: as3
       type: inline
       value:
@@ -88,8 +90,8 @@ extension_services:
           class: ADC
           schemaVersion: 3.0.0
           label: Sample 1
-          remark: An HTTP sample application
-          Sample_01:
+          remark: A HTTP sample application
+          Tenant_1:
             class: Tenant
             A1:
               class: Application
@@ -126,39 +128,19 @@ extension_services:
           logGroup: f5telemetry
           logStream: default
 post_onboard_enabled:
-  - name: create_misc_routes
+  - name: misc
     type: inline
     commands:
     - tmsh save sys config
 EOF
 
-# Retrieve self IP and update yaml declaration
-SELF_IP=$(egrep fixed-address /var/lib/dhclient/dhclient.leases | head -1 | grep -oE '[^ ]+$' | tr -d ';' )
-sed -i "s/\$SELF_IP/$SELF_IP/g" /config/cloud/runtime-init-conf.yaml
-
-# startup-script
-cat << 'EOF' > /config/startup-script.sh
-#!/bin/bash
-npipe=/tmp/$$.tmp
-trap "rm -f $npipe" EXIT
-mknod $npipe p
-tee <$npipe -a $LOG_FILE /dev/ttyS0 &
-exec 1>&-
-exec 1>$npipe
-exec 2>&1
-source /usr/lib/bigstart/bigip-ready-functions
-wait_bigip_ready
-# Wait until a little more until dhcp/chmand is finished re-configuring MGMT IP w/ "chmand[4267]: 012a0003:3: Mgmt Operation:0 Dest:0.0.0.0"
-sleep 15
-tmsh modify sys db config.allow.rfc3927 value enable
-tmsh save /sys config
-# Begin as usual....
+# Download BIG-IP Runtime Init
 for i in {1..30}; do
-   curl -fv --retry 1 --connect-timeout 5 -L https://github.com/F5Networks/f5-bigip-runtime-init/releases/download/1.2.0/f5-bigip-runtime-init-1.2.0-1.gz.run -o "/var/config/rest/downloads/f5-bigip-runtime-init.gz.run" && break || sleep 10
+    curl -fv --retry 1 --connect-timeout 5 -L ${INIT_URL} -o "/var/config/rest/downloads/f5-bigip-runtime.gz.run" && break || sleep 10
 done
-# Install
-bash /var/config/rest/downloads/f5-bigip-runtime-init.gz.run -- '--cloud aws'
-/usr/local/bin/f5-bigip-runtime-init --config-file /config/cloud/runtime-init-conf.yaml
-EOF
-chmod 755 /config/startup-script.sh
-nohup /config/startup-script.sh & >> $LOG_FILE
+
+# Install BIG-IP Runtime Init
+bash /var/config/rest/downloads/f5-bigip-runtime.gz.run -- '--cloud aws'
+
+# Run BIG-IP Runtime Init and Process YAML
+f5-bigip-runtime-init --config-file /config/cloud/runtime-init-conf.yaml

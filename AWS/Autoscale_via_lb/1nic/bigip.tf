@@ -5,7 +5,16 @@ locals {
   f5_onboard = templatefile("${path.module}/f5_onboard.tmpl", {
     f5_username        = var.f5_username
     f5_password        = var.f5_password
-    ssh_keypair        = var.f5_ssh_publickey
+    ssh_keypair        = var.ssh_key
+    INIT_URL           = var.INIT_URL
+    DO_URL             = var.DO_URL
+    AS3_URL            = var.AS3_URL
+    TS_URL             = var.TS_URL
+    FAST_URL           = var.FAST_URL
+    DO_VER             = split("/", var.DO_URL)[7]
+    AS3_VER            = split("/", var.AS3_URL)[7]
+    TS_VER             = split("/", var.TS_URL)[7]
+    FAST_VER           = split("/", var.FAST_URL)[7]
     bigIqLicenseType   = var.bigIqLicenseType
     bigIqHost          = var.bigIqHost
     bigIqPassword      = var.bigIqPassword
@@ -16,26 +25,6 @@ locals {
     bigIqUnitOfMeasure = var.bigIqUnitOfMeasure
     bigIqHypervisor    = var.bigIqHypervisor
   })
-}
-
-# Create security groups for EC2 instances
-module "external-security-group" {
-  source      = "terraform-aws-modules/security-group/aws"
-  name        = format("%s-external-sg-%s", var.projectPrefix, random_id.buildSuffix.hex)
-  description = "Security group for BIG-IP"
-  vpc_id      = var.vpcId
-
-  ingress_cidr_blocks = var.allowedIps
-  ingress_rules       = ["http-80-tcp", "https-443-tcp", "https-8443-tcp", "ssh-tcp"]
-
-  # Allow ec2 instances outbound Internet connectivity
-  egress_cidr_blocks = ["0.0.0.0/0"]
-  egress_rules       = ["all-all"]
-
-  tags = {
-    Name  = "${var.projectPrefix}-external-sg-${random_id.buildSuffix.hex}"
-    Owner = var.resourceOwner
-  }
 }
 
 # Find BIG-IP AMI
@@ -51,7 +40,7 @@ data "aws_ami" "f5_ami" {
 
 resource "aws_key_pair" "bigip" {
   key_name   = format("%s-key-%s", var.projectPrefix, random_id.buildSuffix.hex)
-  public_key = var.f5_ssh_publickey
+  public_key = var.ssh_key
 }
 
 # Create BIG-IP launch template
@@ -66,7 +55,7 @@ resource "aws_launch_template" "bigip-lt" {
     device_index                = 0
     description                 = "eth0"
     delete_on_termination       = true
-    security_groups             = [module.external-security-group.security_group_id]
+    security_groups             = [var.extNsg]
     associate_public_ip_address = true
   }
 
