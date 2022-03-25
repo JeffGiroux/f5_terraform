@@ -82,9 +82,12 @@ Terraform is beneficial as it allows composing resources a bit differently to ac
 | <a name="output_security_group_external"></a> [security\_group\_external](#output\_security\_group\_external) | ID of External security group |
 | <a name="output_security_group_internal"></a> [security\_group\_internal](#output\_security\_group\_internal) | ID of Internal security group |
 | <a name="output_security_group_mgmt"></a> [security\_group\_mgmt](#output\_security\_group\_mgmt) | ID of Management security group |
-| <a name="output_subnets_external"></a> [subnets\_external](#output\_subnets\_external) | ID of External subnets |
-| <a name="output_subnets_internal"></a> [subnets\_internal](#output\_subnets\_internal) | ID of Internal subnets |
-| <a name="output_subnets_mgmt"></a> [subnets\_mgmt](#output\_subnets\_mgmt) | ID of Internal subnets |
+| <a name="output_subnets_external_az1"></a> [subnets\_external\_az1](#output\_subnets\_external\_az1) | ID of External subnet AZ1 |
+| <a name="output_subnets_external_az2"></a> [subnets\_external\_az2](#output\_subnets\_external\_az2) | ID of External subnet AZ2 |
+| <a name="output_subnets_internal_az1"></a> [subnets\_internal\_az1](#output\_subnets\_internal\_az1) | ID of Internal subnet AZ1 |
+| <a name="output_subnets_internal_az2"></a> [subnets\_internal\_az2](#output\_subnets\_internal\_az2) | ID of Internal subnet AZ2 |
+| <a name="output_subnets_mgmt_az1"></a> [subnets\_mgmt\_az1](#output\_subnets\_mgmt\_az1) | ID of Internal subnet AZ1 |
+| <a name="output_subnets_mgmt_az2"></a> [subnets\_mgmt\_az2](#output\_subnets\_mgmt\_az2) | ID of Internal subnet AZ2 |
 | <a name="output_vpc_id"></a> [vpc\_id](#output\_vpc\_id) | VPC ID |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 <!-- markdownlint-enable no-inline-html -->
