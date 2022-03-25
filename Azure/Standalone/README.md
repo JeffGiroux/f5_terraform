@@ -19,6 +19,7 @@ The BIG-IP VEs have the [Local Traffic Manager (LTM)](https://f5.com/products/bi
 
 Terraform is beneficial as it allows composing resources a bit differently to account for dependencies into Immutable/Mutable elements. For example, mutable includes items you would typically frequently change/mutate, such as traditional configs on the BIG-IP. Once the template is deployed, there are certain resources (network infrastructure) that are fixed while others (BIG-IP VMs and configurations) can be changed.
 
+
 ## Prerequisites
 
 - ***Important***: When you configure the admin password for the BIG-IP VE in the template, you cannot use the character **#**.  Additionally, there are a number of other special characters that you should avoid using for F5 product user accounts.  See [K2873](https://support.f5.com/csp/article/K2873) for details.
@@ -84,13 +85,12 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
           # BIGIP Setup
           variable license1 { default = "" }
   ```
-4. In the "do.json", add the "myLicense" block under the "Common" declaration ([full declaration example here](https://clouddocs.f5.com/products/extensions/f5-declarative-onboarding/latest/bigip-examples.html#standalone-declaration))
+4. In the "f5_onboard.tmpl", add the "myLicense" block under the "Common" declaration ([example here](https://github.com/F5Networks/f5-aws-cloudformation-v2/blob/main/examples/failover/bigip-configurations/runtime-init-conf-3nic-byol-instance01.yaml))
   ```
-        "myLicense": {
-            "class": "License",
-            "licenseType": "regKey",
-            "regKey": "${regKey}"
-        },
+          myLicense:
+            class: License
+            licenseType: regKey
+            regKey: ${regKey}
   ```
 
 ## BIG-IQ License Manager
@@ -98,24 +98,22 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 1. Find BYOL image. Reference [BYOL Licensing](#byol-licensing) step #1.
 2. Replace BIG-IP *image_name* and *product* in "variables.tf". Reference [BYOL Licensing](#byol-licensing) step #2.
 3. In the "variables.tf", modify the BIG-IQ license section to match your environment
-4. In the "do.json", add the "myLicense" block under the "Common" declaration ([full declaration example here](https://clouddocs.f5.com/products/extensions/f5-declarative-onboarding/latest/bigiq-examples.html#licensing-with-big-iq-regkey-pool-route-to-big-ip))
+4. In the "f5_onboard.tmpl", add the "myLicense" block under the "Common" declaration ([example here](https://github.com/F5Networks/f5-aws-cloudformation-v2/blob/main/examples/autoscale/bigip-configurations/runtime-init-conf-bigiq.yaml))
   ```
-        "myLicense": {
-            "class": "License",
-            "licenseType": "${bigIqLicenseType}",
-            "bigIqHost": "${bigIqHost}",
-            "bigIqUsername": "${bigIqUsername}",
-            "bigIqPassword": "$${bigIqPassword}",
-            "licensePool": "${bigIqLicensePool}",
-            "skuKeyword1": "${bigIqSkuKeyword1}",
-            "skuKeyword2": "${bigIqSkuKeyword2}",
-            "unitOfMeasure": "${bigIqUnitOfMeasure}",
-            "reachable": false,
-            "hypervisor": "${bigIqHypervisor}",
-            "overwrite": true
-        },
+          myLicense:
+            class: License
+            licenseType: ${bigIqLicenseType}
+            bigIqHost: ${bigIqHost}
+            bigIqUsername: ${bigIqUsername}
+            bigIqPassword: ${bigIqPassword}
+            licensePool: ${bigIqLicensePool}
+            skuKeyword1: ${bigIqSkuKeyword1}
+            skuKeyword2: ${bigIqSkuKeyword2}
+            unitOfMeasure: ${bigIqUnitOfMeasure}
+            reachable: false
+            hypervisor: ${bigIqHypervisor}
+            overwrite: true
   ```
-  ***Note***: The [onboard.tpl](./onboard.tpl) startup script will use the same 'usecret' payload value (aka password) for BIG-IP password AND the BIG-IQ password. In the onboard.tpl file, this happens in the 'passwd' variable. You can use a separate password for BIG-IQ by creating a new Google Secret Manager secret for the BIG-IQ password, then add a new variable for the secret in [variables.tf](./variables.tf), modify [bigip.tf](./bigip.tf) to include the secret in the local templatefile section similar to 'usecret', then update [onboard.tpl](./onboard.tpl) to query Secret Manager for the BIG-IQ secret name. Reference code example *usecret='${usecret}'*.
 
 <!-- markdownlint-disable no-inline-html -->
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

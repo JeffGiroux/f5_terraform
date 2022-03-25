@@ -82,18 +82,6 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
           variable image_name { default = "f5-big-ltm-2slot-byol" }
   ```
 3. In the "variables.tf", modify the BIG-IQ license section to match your environment
-  ```
-          # BIGIQ License Manager Setup
-          variable bigIqHost { default = "200.200.200.200" }
-          variable bigIqUsername {}
-          variable bigIqPassword {}
-          variable bigIqLicenseType { default = "licensePool" }
-          variable bigIqLicensePool { default = "myPool" }
-          variable bigIqSkuKeyword1 { default = "key1" }
-          variable bigIqSkuKeyword2 { default = "key1" }
-          variable bigIqUnitOfMeasure { default = "hourly" }
-          variable bigIqHypervisor { default = "azure" }
-  ```
 4. In the "f5_onboard.tmpl", add the "myLicense" block under the "Common" declaration ([example here](https://github.com/F5Networks/f5-aws-cloudformation-v2/blob/main/examples/autoscale/bigip-configurations/runtime-init-conf-bigiq.yaml))
   ```
           myLicense:
