@@ -19,19 +19,42 @@ module "vpc" {
   cidr                 = var.vpc_cidr
   azs                  = [local.awsAz1, local.awsAz2]
   public_subnets       = var.ext_address_prefixes
-  private_subnets      = var.mgmt_address_prefixes
   intra_subnets        = var.int_address_prefixes
   enable_dns_hostnames = true
-  enable_nat_gateway   = true
   tags = {
     resourceOwner = var.resourceOwner
     Name          = "${var.projectPrefix}-vpc-${random_id.buildSuffix.hex}"
   }
 }
 
-# Retrieve AWS VPC info
-data "aws_vpc" "main" {
-  id = module.vpc.vpc_id
+resource "aws_subnet" "mgmtAz1" {
+  vpc_id            = module.vpc.vpc_id
+  availability_zone = local.awsAz1
+  cidr_block        = var.mgmt_address_prefixes[0]
+  tags = {
+    resourceOwner = var.resourceOwner
+    Name          = "${var.projectPrefix}-mgmtAz1-${random_id.buildSuffix.hex}"
+  }
+}
+
+resource "aws_subnet" "mgmtAz2" {
+  vpc_id            = module.vpc.vpc_id
+  availability_zone = local.awsAz2
+  cidr_block        = var.mgmt_address_prefixes[1]
+  tags = {
+    resourceOwner = var.resourceOwner
+    Name          = "${var.projectPrefix}-mgmtAz2-${random_id.buildSuffix.hex}"
+  }
+}
+
+resource "aws_route_table_association" "mgmtAz1" {
+  subnet_id      = aws_subnet.mgmtAz1.id
+  route_table_id = module.vpc.public_route_table_ids[0]
+}
+
+resource "aws_route_table_association" "mgmtAz2" {
+  subnet_id      = aws_subnet.mgmtAz2.id
+  route_table_id = module.vpc.public_route_table_ids[0]
 }
 
 ############################ Security Groups ############################
@@ -118,7 +141,7 @@ resource "aws_security_group" "internal" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = [data.aws_vpc.main.cidr_block]
+    cidr_blocks = [module.vpc.vpc_cidr_block]
   }
   ingress {
     from_port   = 80

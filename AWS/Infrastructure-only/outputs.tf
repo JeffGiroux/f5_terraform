@@ -17,12 +17,12 @@ output "subnets_internal_az2" {
   value       = module.vpc.intra_subnets[1]
 }
 output "subnets_mgmt_az1" {
-  description = "ID of Internal subnet AZ1"
-  value       = module.vpc.private_subnets[0]
+  description = "ID of Management subnet AZ1"
+  value       = aws_subnet.mgmtAz1.id
 }
 output "subnets_mgmt_az2" {
-  description = "ID of Internal subnet AZ2"
-  value       = module.vpc.private_subnets[1]
+  description = "ID of Management subnet AZ2"
+  value       = aws_subnet.mgmtAz2.id
 }
 output "security_group_external" {
   description = "ID of External security group"

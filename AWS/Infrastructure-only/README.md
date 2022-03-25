@@ -53,12 +53,15 @@ Terraform is beneficial as it allows composing resources a bit differently to ac
 
 | Name | Type |
 |------|------|
+| [aws_route_table_association.mgmtAz1](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table_association) | resource |
+| [aws_route_table_association.mgmtAz2](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table_association) | resource |
 | [aws_security_group.external](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [aws_security_group.internal](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [aws_security_group.mgmt](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
+| [aws_subnet.mgmtAz1](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
+| [aws_subnet.mgmtAz2](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
 | [random_id.buildSuffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
 | [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones) | data source |
-| [aws_vpc.main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/vpc) | data source |
 
 ## Inputs
 
@@ -86,8 +89,8 @@ Terraform is beneficial as it allows composing resources a bit differently to ac
 | <a name="output_subnets_external_az2"></a> [subnets\_external\_az2](#output\_subnets\_external\_az2) | ID of External subnet AZ2 |
 | <a name="output_subnets_internal_az1"></a> [subnets\_internal\_az1](#output\_subnets\_internal\_az1) | ID of Internal subnet AZ1 |
 | <a name="output_subnets_internal_az2"></a> [subnets\_internal\_az2](#output\_subnets\_internal\_az2) | ID of Internal subnet AZ2 |
-| <a name="output_subnets_mgmt_az1"></a> [subnets\_mgmt\_az1](#output\_subnets\_mgmt\_az1) | ID of Internal subnet AZ1 |
-| <a name="output_subnets_mgmt_az2"></a> [subnets\_mgmt\_az2](#output\_subnets\_mgmt\_az2) | ID of Internal subnet AZ2 |
+| <a name="output_subnets_mgmt_az1"></a> [subnets\_mgmt\_az1](#output\_subnets\_mgmt\_az1) | ID of Management subnet AZ1 |
+| <a name="output_subnets_mgmt_az2"></a> [subnets\_mgmt\_az2](#output\_subnets\_mgmt\_az2) | ID of Management subnet AZ2 |
 | <a name="output_vpc_id"></a> [vpc\_id](#output\_vpc\_id) | VPC ID |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 <!-- markdownlint-enable no-inline-html -->
