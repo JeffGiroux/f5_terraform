@@ -1,28 +1,12 @@
 # Outputs
 
-output "sg_id" {
-  description = "Security group ID"
-  value       = azurerm_network_security_group.main.id
+output "bigip_resource_group" {
+  description = "Resource group name"
+  value       = azurerm_resource_group.main.name
 }
-output "sg_name" {
-  description = "Security group name"
-  value       = azurerm_network_security_group.main.name
-}
-output "mgmt_subnet_gw" {
-  description = "Default gateway of management subnet"
-  value       = var.mgmt_gw
-}
-output "ext_subnet_gw" {
-  description = "Default gateway of external subnet"
-  value       = var.ext_gw
-}
-output "ALB_app1_pip" {
+output "Public_VIP_pip" {
   description = "Public VIP IP for application"
   value       = azurerm_public_ip.lbpip.ip_address
-}
-output "f5vm01_id" {
-  description = "Virual machine ID for BIG-IP 1"
-  value       = azurerm_linux_virtual_machine.f5vm01.id
 }
 output "f5vm01_mgmt_private_ip" {
   description = "Management NIC private IP address for BIG-IP 1"
@@ -36,9 +20,9 @@ output "f5vm01_ext_private_ip" {
   description = "External NIC private IP address for BIG-IP 1"
   value       = azurerm_network_interface.vm01-ext-nic.private_ip_address
 }
-output "f5vm02_id" {
-  description = "Virual machine ID for BIG-IP 2"
-  value       = azurerm_linux_virtual_machine.f5vm02.id
+output "f5vm01_int_private_ip" {
+  description = "Internal NIC private IP address for BIG-IP 1"
+  value       = azurerm_network_interface.vm01-int-nic.private_ip_address
 }
 output "f5vm02_mgmt_private_ip" {
   description = "Management NIC private IP address for BIG-IP 2"
@@ -51,4 +35,8 @@ output "f5vm02_mgmt_public_ip" {
 output "f5vm02_ext_private_ip" {
   description = "External NIC private IP address for BIG-IP 2"
   value       = azurerm_network_interface.vm02-ext-nic.private_ip_address
+}
+output "f5vm02_int_private_ip" {
+  description = "Internal NIC private IP address for BIG-IP 2"
+  value       = azurerm_network_interface.vm02-int-nic.private_ip_address
 }

@@ -1,50 +1,5 @@
 # Variables
 
-variable "rest_do_uri" {
-  type        = string
-  default     = "/mgmt/shared/declarative-onboarding"
-  description = "URI of the Declarative Onboarding REST call"
-}
-variable "rest_as3_uri" {
-  type        = string
-  default     = "/mgmt/shared/appsvcs/declare"
-  description = "URI of the AS3 REST call"
-}
-variable "rest_do_method" {
-  type        = string
-  default     = "POST"
-  description = "Available options are GET, POST, and DELETE"
-}
-variable "rest_as3_method" {
-  type        = string
-  default     = "POST"
-  description = "Available options are GET, POST, and DELETE"
-}
-variable "rest_vm01_do_file" {
-  type        = string
-  default     = "vm01_do_data.json"
-  description = "Terraform will generate the vm01 DO json file, where you can manually run it again for debugging"
-}
-variable "rest_vm02_do_file" {
-  type        = string
-  default     = "vm02_do_data.json"
-  description = "Terraform will generate the vm02 DO json file, where you can manually run it again for debugging"
-}
-variable "rest_vm_as3_file" {
-  type        = string
-  default     = "vm_as3_data.json"
-  description = "Terraform will generate the AS3 json file, where you can manually run it again for debugging"
-}
-variable "rest_ts_uri" {
-  type        = string
-  default     = "/mgmt/shared/telemetry/declare"
-  description = "URI of the TS REST call"
-}
-variable "rest_vm_ts_file" {
-  type        = string
-  default     = "vm_ts_data.json"
-  description = "Terraform will generate the TS json file, where you can manually run it again for debugging"
-}
 variable "sp_subscription_id" {
   type        = string
   default     = ""
@@ -65,74 +20,40 @@ variable "sp_tenant_id" {
   default     = ""
   description = "This is the service principal tenant ID"
 }
-variable "prefix" {
+variable "projectPrefix" {
   type        = string
   default     = "demo"
   description = "This value is inserted at the beginning of each Azure object (alpha-numeric, no special character)"
 }
 variable "location" {
   type        = string
-  default     = null
+  default     = "westus2"
   description = "Azure Location of the deployment"
 }
-variable "cidr" {
+variable "vnet_rg" {
   type        = string
-  default     = "10.90.0.0/16"
-  description = "CIDR IP Address range of the Virtual Network"
+  default     = null
+  description = "Resource group name for existing VNET"
 }
-variable "subnets" {
-  type = map(any)
-  default = {
-    "subnet1" = "10.90.1.0/24"
-    "subnet2" = "10.90.2.0/24"
-    "subnet3" = "10.90.3.0/24"
-  }
-  description = "Subnet IP range of the management network (subnet1), external network (subnet2), and internal network (subnet3)"
-}
-variable "f5vm01mgmt" {
+variable "vnet_name" {
   type        = string
-  default     = "10.90.1.4"
-  description = "IP address for 1st BIG-IP's management interface"
+  default     = null
+  description = "Name of existing VNET"
 }
-variable "f5vm01ext" {
+variable "mgmtSubnet" {
   type        = string
-  default     = "10.90.2.4"
-  description = "Private IP address for 1st BIG-IP's external interface"
+  default     = null
+  description = "Name of management subnet"
 }
-variable "f5vm01ext_sec" {
+variable "extSubnet" {
   type        = string
-  default     = "10.90.2.11"
-  description = "Secondary Private IP address for 1st BIG-IP's external interface"
+  default     = null
+  description = "Name of external subnet"
 }
-variable "f5vm02mgmt" {
+variable "intSubnet" {
   type        = string
-  default     = "10.90.1.5"
-  description = "IP address for 2nd BIG-IP's management interface"
-}
-variable "f5vm02ext" {
-  type        = string
-  default     = "10.90.2.5"
-  description = "Private IP address for 2nd BIG-IP's external interface"
-}
-variable "f5vm02ext_sec" {
-  type        = string
-  default     = "10.90.2.12"
-  description = "Secondary Private IP address for 2nd BIG-IP's external interface"
-}
-variable "backend01ext" {
-  type        = string
-  default     = "10.90.2.101"
-  description = "IP address for backend origin server"
-}
-variable "mgmt_gw" {
-  type        = string
-  default     = "10.90.1.1"
-  description = "Default gateway for management subnet"
-}
-variable "ext_gw" {
-  type        = string
-  default     = "10.90.2.1"
-  description = "Default gateway for external subnet"
+  default     = null
+  description = "Name of internal subnet"
 }
 variable "instance_type" {
   type        = string
@@ -151,7 +72,7 @@ variable "product" {
 }
 variable "bigip_version" {
   type        = string
-  default     = "15.1.201000"
+  default     = "16.1.201000"
   description = "BIG-IP Version"
 }
 variable "uname" {
@@ -164,6 +85,10 @@ variable "upassword" {
   default     = "Default12345!"
   description = "Password for the Virtual Machine"
 }
+variable "ssh_key" {
+  type        = string
+  description = "public key used for authentication in ssh-rsa format"
+}
 variable "license1" {
   type        = string
   default     = ""
@@ -173,16 +98,6 @@ variable "license2" {
   type        = string
   default     = ""
   description = "The license token for the 2nd F5 BIG-IP VE (BYOL)"
-}
-variable "host1_name" {
-  type        = string
-  default     = "f5vm01"
-  description = "Hostname for the 1st BIG-IP"
-}
-variable "host2_name" {
-  type        = string
-  default     = "f5vm02"
-  description = "Hostname for the 2nd BIG-IP"
 }
 variable "dns_server" {
   type        = string
@@ -201,28 +116,38 @@ variable "timezone" {
 }
 variable "DO_URL" {
   type        = string
-  default     = "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.23.0/f5-declarative-onboarding-1.23.0-4.noarch.rpm"
+  default     = "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.28.0/f5-declarative-onboarding-1.28.0-4.noarch.rpm"
   description = "URL to download the BIG-IP Declarative Onboarding module"
 }
 variable "AS3_URL" {
   type        = string
-  default     = "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.30.0/f5-appsvcs-3.30.0-5.noarch.rpm"
+  default     = "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.35.0/f5-appsvcs-3.35.0-4.noarch.rpm"
   description = "URL to download the BIG-IP Application Service Extension 3 (AS3) module"
 }
 variable "TS_URL" {
   type        = string
-  default     = "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.22.0/f5-telemetry-1.22.0-1.noarch.rpm"
+  default     = "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.27.0/f5-telemetry-1.27.0-3.noarch.rpm"
   description = "URL to download the BIG-IP Telemetry Streaming module"
 }
-variable "onboard_log" {
+variable "FAST_URL" {
+  description = "URL to download the BIG-IP FAST module"
   type        = string
-  default     = "/var/log/startup-script.log"
-  description = "This is where the onboarding script logs all the events"
+  default     = "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.16.0/f5-appsvcs-templates-1.16.0-1.noarch.rpm"
+}
+variable "INIT_URL" {
+  description = "URL to download the BIG-IP runtime init"
+  type        = string
+  default     = "https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.4.1/dist/f5-bigip-runtime-init-1.4.1-1.gz.run"
 }
 variable "libs_dir" {
-  type        = string
+  description = "Directory on the BIG-IP to download the A&O Toolchain into"
   default     = "/config/cloud/azure/node_modules"
-  description = "This is where all the temporary libs and RPM will be store in BIG-IP"
+  type        = string
+}
+variable "onboard_log" {
+  description = "Directory on the BIG-IP to store the cloud-init logs"
+  default     = "/var/log/startup-script.log"
+  type        = string
 }
 variable "bigIqHost" {
   type        = string
