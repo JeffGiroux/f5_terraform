@@ -1,5 +1,5 @@
 # BIG-IP Environment
-allowedIps    = ["0.0.0.0/0"]
+adminSrcAddr  = "0.0.0.0/0"
 vpcId         = "vpc-1234"
 mgmtSubnetAz1 = "subnet-1111"
 mgmtSubnetAz2 = "subnet-2222"
