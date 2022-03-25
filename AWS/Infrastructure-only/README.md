@@ -34,7 +34,7 @@ Terraform is beneficial as it allows composing resources a bit differently to ac
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.14 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 3 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4 |
 
 ## Providers
 
@@ -106,9 +106,11 @@ To run this Terraform template, perform the following steps:
   ```
   3. Modify terraform.tfvars with the required information
   ```
-      awsRegion     = "us-west-2"
       projectPrefix = "myDemo"
       resourceOwner = "myName"
+      awsRegion     = "us-west-2"
+      awsAz1        = "us-west-2a"
+      awsAz2        = "us-west-2b"
   ```
   4. Initialize the directory
   ```
