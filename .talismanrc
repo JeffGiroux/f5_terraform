@@ -59,3 +59,13 @@ fileignoreconfig:
   checksum: b804d6207160ef0040e7c33e37506741d9de750b04d895a001d853402c17367b
 - filename: AWS/Autoscale_via_lb/1nic/README.md
   checksum: 90ffe08f50eb53f9f8ff5cd10b1a10273effdf7da85bb287d3898c4b2ffb9773
+- filename: AWS/Standalone/terraform.tfvars.example
+  checksum: 30a19fbffa8fc521c773c47a73800aff9a79fa89a7b33764d3c46269671f6d7c
+- filename: AWS/Standalone/bigip.tf
+  checksum: e53804552e930d8057ce2befc036b3b5ef64816a48b08b007c3035b2134c4c6c
+- filename: AWS/Standalone/f5_onboard.tmpl
+  checksum: e26c9a1dcbd682df30762e3d79ee778f337aeeda270ae4955dac1ba6e10f4c43
+- filename: AWS/Standalone/README.md
+  checksum: 0d9cab74275768da7c3a5a33e2a536344ef53fc3fd0bd80db62292d15e399d68
+- filename: AWS/Standalone/bigip.tf
+  checksum: 879544a677a28bf5acc2aabb0c234ee20629c7b7d324413c0f8419627e799f0f
