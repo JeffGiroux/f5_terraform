@@ -2,7 +2,7 @@
 uname          = "admin"
 usecret        = "my-secret"
 gceSshPubKey   = "ssh-rsa xxxxx"
-prefix         = "mydemo123"
+projectPrefix  = "mydemo123"
 adminSrcAddr   = "0.0.0.0/0"
 mgmtVpc        = "xxxxx-net-mgmt"
 extVpc         = "xxxxx-net-ext"

@@ -30,7 +30,7 @@ variable "gcp_zone_1" {
   default     = "us-west1-a"
   description = "GCP Zone 1 for provider"
 }
-variable "prefix" {
+variable "projectPrefix" {
   type        = string
   default     = "demo"
   description = "This value is inserted at the beginning of each Google object (alpha-numeric, no special character)"
@@ -114,11 +114,6 @@ variable "gceSshPubKey" {
   type        = string
   default     = null
   description = "SSH public key for admin authentation. Must be in ssh-rsa format."
-}
-variable "host1_name" {
-  type        = string
-  default     = "f5vm01"
-  description = "Hostname for the first BIG-IP"
 }
 variable "dns_server" {
   type        = string

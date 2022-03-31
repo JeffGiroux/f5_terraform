@@ -2,19 +2,19 @@
 
 # Public IP for VIP
 resource "google_compute_address" "vip1" {
-  name = "${var.prefix}-vip1"
+  name = format("%s-vip1-%s", var.projectPrefix, random_id.buildSuffix.hex)
 }
 
 # Forwarding rule for Public IP
 resource "google_compute_forwarding_rule" "vip1" {
-  name       = "${var.prefix}-forwarding-rule"
+  name       = format("%s-forwarding-rule-%s", var.projectPrefix, random_id.buildSuffix.hex)
   target     = google_compute_target_instance.f5vm01.id
   ip_address = google_compute_address.vip1.address
   port_range = "1-65535"
 }
 
 resource "google_compute_target_instance" "f5vm01" {
-  name     = "${var.prefix}-${var.host1_name}-ti"
+  name     = format("%s-ti-%s", var.projectPrefix, random_id.buildSuffix.hex)
   instance = google_compute_instance.f5vm01.id
   zone     = var.gcp_zone_1
 }
@@ -65,12 +65,12 @@ locals {
 
 # Create F5 BIG-IP VMs
 resource "google_compute_instance" "f5vm01" {
-  name           = "${var.prefix}-${var.host1_name}"
+  name           = format("%s-f5vm01-%s", var.projectPrefix, random_id.buildSuffix.hex)
   machine_type   = var.bigipMachineType
   zone           = var.gcp_zone_1
   can_ip_forward = true
 
-  tags = ["appfw-${var.prefix}", "mgmtfw-${var.prefix}"]
+  tags = ["appfw-${var.projectPrefix}", "mgmtfw-${var.projectPrefix}"]
 
   boot_disk {
     initialize_params {
@@ -112,9 +112,3 @@ resource "google_compute_instance" "f5vm01" {
     scopes = ["cloud-platform"]
   }
 }
-
-# # Troubleshooting - create local output files
-# resource "local_file" "onboard_file" {
-#   content  = local.vm01_onboard
-#   filename = "${path.module}/vm01_onboard.tpl_data.json"
-# }
