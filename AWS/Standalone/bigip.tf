@@ -59,10 +59,8 @@ resource "aws_network_interface" "vm01-ext-nic" {
   private_ips_count = 1
   source_dest_check = false
   tags = {
-    Name                      = format("%s-vm01-ext-%s", var.projectPrefix, random_id.buildSuffix.hex)
-    Owner                     = var.resourceOwner
-    f5_cloud_failover_label   = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
-    f5_cloud_failover_nic_map = "external"
+    Name  = format("%s-vm01-ext-%s", var.projectPrefix, random_id.buildSuffix.hex)
+    Owner = var.resourceOwner
   }
 }
 
@@ -72,10 +70,8 @@ resource "aws_network_interface" "vm01-int-nic" {
   security_groups   = [var.intNsg]
   source_dest_check = false
   tags = {
-    Name                      = format("%s-vm01-int-%s", var.projectPrefix, random_id.buildSuffix.hex)
-    Owner                     = var.resourceOwner
-    f5_cloud_failover_label   = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
-    f5_cloud_failover_nic_map = "internal"
+    Name  = format("%s-vm01-int-%s", var.projectPrefix, random_id.buildSuffix.hex)
+    Owner = var.resourceOwner
   }
 }
 
@@ -110,10 +106,8 @@ resource "aws_eip" "vip-pip" {
   network_interface         = aws_network_interface.vm01-ext-nic.id
   associate_with_private_ip = local.vm01_vip_ips.app1.ip
   tags = {
-    Name                    = format("%s-vip-pip-%s", var.projectPrefix, random_id.buildSuffix.hex)
-    Owner                   = var.resourceOwner
-    f5_cloud_failover_label = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
-    f5_cloud_failover_vips  = "${local.vm01_vip_ips.app1.ip},${local.vm02_vip_ips.app1.ip}"
+    Name  = format("%s-vip-pip-%s", var.projectPrefix, random_id.buildSuffix.hex)
+    Owner = var.resourceOwner
   }
   depends_on = [aws_network_interface.vm01-ext-nic]
 }
@@ -123,44 +117,36 @@ resource "aws_eip" "vip-pip" {
 # Setup Onboarding scripts
 locals {
   f5_onboard1 = templatefile("${path.module}/f5_onboard.tmpl", {
-    regKey                  = var.license1
-    f5_username             = var.f5_username
-    f5_password             = var.f5_password
-    ssh_keypair             = var.ssh_key
-    INIT_URL                = var.INIT_URL
-    DO_URL                  = var.DO_URL
-    AS3_URL                 = var.AS3_URL
-    TS_URL                  = var.TS_URL
-    CFE_URL                 = var.CFE_URL
-    FAST_URL                = var.FAST_URL
-    DO_VER                  = split("/", var.DO_URL)[7]
-    AS3_VER                 = split("/", var.AS3_URL)[7]
-    TS_VER                  = split("/", var.TS_URL)[7]
-    CFE_VER                 = split("/", var.CFE_URL)[7]
-    FAST_VER                = split("/", var.FAST_URL)[7]
-    vpc_cidr_block          = data.aws_vpc.main.cidr_block
-    self_ip_external        = aws_network_interface.vm01-ext-nic.private_ip
-    self_ip_internal        = aws_network_interface.vm01-int-nic.private_ip
-    remote_selfip_ext       = aws_network_interface.vm02-ext-nic.private_ip
-    vip_az1                 = local.vm01_vip_ips.app1.ip
-    vip_az2                 = local.vm02_vip_ips.app1.ip
-    dns_server              = var.dns_server
-    ntp_server              = var.ntp_server
-    timezone                = var.timezone
-    host1                   = aws_network_interface.vm01-mgmt-nic.private_dns_name
-    host2                   = aws_network_interface.vm02-mgmt-nic.private_dns_name
-    remote_host             = aws_network_interface.vm02-int-nic.private_ip
-    f5_cloud_failover_label = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
-    cfe_managed_route       = var.cfe_managed_route
-    bigIqLicenseType        = var.bigIqLicenseType
-    bigIqHost               = var.bigIqHost
-    bigIqPassword           = var.bigIqPassword
-    bigIqUsername           = var.bigIqUsername
-    bigIqLicensePool        = var.bigIqLicensePool
-    bigIqSkuKeyword1        = var.bigIqSkuKeyword1
-    bigIqSkuKeyword2        = var.bigIqSkuKeyword2
-    bigIqUnitOfMeasure      = var.bigIqUnitOfMeasure
-    bigIqHypervisor         = var.bigIqHypervisor
+    regKey             = var.license1
+    f5_username        = var.f5_username
+    f5_password        = var.f5_password
+    ssh_keypair        = var.ssh_key
+    INIT_URL           = var.INIT_URL
+    DO_URL             = var.DO_URL
+    AS3_URL            = var.AS3_URL
+    TS_URL             = var.TS_URL
+    FAST_URL           = var.FAST_URL
+    DO_VER             = split("/", var.DO_URL)[7]
+    AS3_VER            = split("/", var.AS3_URL)[7]
+    TS_VER             = split("/", var.TS_URL)[7]
+    FAST_VER           = split("/", var.FAST_URL)[7]
+    vpc_cidr_block     = data.aws_vpc.main.cidr_block
+    self_ip_external   = aws_network_interface.vm01-ext-nic.private_ip
+    self_ip_internal   = aws_network_interface.vm01-int-nic.private_ip
+    vip_az1            = local.vm01_vip_ips.app1.ip
+    dns_server         = var.dns_server
+    ntp_server         = var.ntp_server
+    timezone           = var.timezone
+    host1              = aws_network_interface.vm01-mgmt-nic.private_dns_name
+    bigIqLicenseType   = var.bigIqLicenseType
+    bigIqHost          = var.bigIqHost
+    bigIqPassword      = var.bigIqPassword
+    bigIqUsername      = var.bigIqUsername
+    bigIqLicensePool   = var.bigIqLicensePool
+    bigIqSkuKeyword1   = var.bigIqSkuKeyword1
+    bigIqSkuKeyword2   = var.bigIqSkuKeyword2
+    bigIqUnitOfMeasure = var.bigIqUnitOfMeasure
+    bigIqHypervisor    = var.bigIqHypervisor
   })
 }
 
@@ -168,11 +154,10 @@ locals {
 
 # Create F5 BIG-IP VMs
 resource "aws_instance" "f5vm01" {
-  ami                  = data.aws_ami.f5_ami.id
-  instance_type        = var.ec2_instance_type
-  key_name             = aws_key_pair.bigip.key_name
-  user_data            = base64encode(local.f5_onboard1)
-  iam_instance_profile = aws_iam_instance_profile.bigip_profile.name
+  ami           = data.aws_ami.f5_ami.id
+  instance_type = var.ec2_instance_type
+  key_name      = aws_key_pair.bigip.key_name
+  user_data     = base64encode(local.f5_onboard1)
 
   network_interface {
     network_interface_id = aws_network_interface.vm01-mgmt-nic.id
