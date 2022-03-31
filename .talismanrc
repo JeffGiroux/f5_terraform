@@ -61,3 +61,5 @@ fileignoreconfig:
   checksum: 90ffe08f50eb53f9f8ff5cd10b1a10273effdf7da85bb287d3898c4b2ffb9773
 - filename: AWS/Standalone/terraform.tfvars.example
   checksum: 30a19fbffa8fc521c773c47a73800aff9a79fa89a7b33764d3c46269671f6d7c
+- filename: AWS/Standalone/README.md
+  checksum: e1107c735f1bc0627a5e9136acbfb01b853f284a224039229dd5cca296296a28
