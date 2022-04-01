@@ -58,7 +58,7 @@ cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
       environment: gcp
       type: network
       field: ipv4
-      index: 1
+      index: 0
       ipcalc: first
   - name: NETWORK_BASE_EXTERNAL
     type: metadata
@@ -66,7 +66,7 @@ cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
       environment: gcp
       type: network
       field: ipv4
-      index: 1
+      index: 0
       ipcalc: base
   - name: NETWORK_MASK_EXTERNAL
     type: metadata
@@ -74,7 +74,7 @@ cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
       environment: gcp
       type: network
       field: ipv4
-      index: 1
+      index: 0
       ipcalc: bitmask
   - name: GATEWAY_INTERNAL
     type: metadata
@@ -106,7 +106,7 @@ cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
       environment: gcp
       type: network
       field: ipv4
-      index: 1
+      index: 0
       ipcalc: address
   - name: SELF_IP_INTERNAL
     type: metadata
