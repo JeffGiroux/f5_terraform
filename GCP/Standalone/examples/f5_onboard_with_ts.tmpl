@@ -158,6 +158,12 @@ extension_packages:
     - extensionType: as3
       extensionVersion: ${AS3_VER}
       extensionUrl: ${AS3_URL}
+    - extensionType: ts
+      extensionVersion: ${TS_VER}
+      extensionUrl: ${TS_URL}
+    - extensionType: fast
+      extensionVersion: ${FAST_VER}
+      extensionUrl: ${FAST_URL}
 extension_services:
   service_operations:
     - extensionType: do
@@ -180,7 +186,7 @@ extension_services:
           mySystem:
             autoPhonehome: true
             class: System
-            hostname: '{{{ HOST_NAME }}}.{{{ DNS_SUFFIX }}}'
+            hostname: '{{{ HOST_NAME }}}'
           '{{{ USER_NAME }}}':
             class: User
             partitionAccess:
@@ -290,6 +296,25 @@ extension_services:
                     addressDiscovery: fqdn
                     autoPopulate: true
                     hostname: httpbin.org
+    - extensionType: ts
+      type: inline
+      value:
+        class: Telemetry
+        My_System:
+          class: Telemetry_System
+          systemPoller:
+            interval: 60
+        My_Listener:
+          class: Telemetry_Listener
+          port: 6514
+        My_Consumer:
+          class: Telemetry_Consumer
+          type: Google_Cloud_Monitoring
+          privateKey:
+            cipherText: '{{{ ANALYTICS_PRIVATE_KEY }}}'
+          projectId: ${gcp_project_id}
+          privateKeyId: ${telemetry_privateKeyId}
+          serviceEmail: ${svc_acct}
 post_onboard_enabled:
   - name: misc
     type: inline
