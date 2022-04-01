@@ -57,7 +57,7 @@ cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
     metadataProvider:
       environment: gcp
       type: network
-      field: ipv4
+      field: ip
       index: 0
       ipcalc: first
   - name: NETWORK_BASE_EXTERNAL
@@ -65,7 +65,7 @@ cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
     metadataProvider:
       environment: gcp
       type: network
-      field: ipv4
+      field: ip
       index: 0
       ipcalc: base
   - name: NETWORK_MASK_EXTERNAL
@@ -73,7 +73,7 @@ cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
     metadataProvider:
       environment: gcp
       type: network
-      field: ipv4
+      field: ip
       index: 0
       ipcalc: bitmask
   - name: GATEWAY_INTERNAL
@@ -81,7 +81,7 @@ cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
     metadataProvider:
       environment: gcp
       type: network
-      field: ipv4
+      field: ip
       index: 2
       ipcalc: first
   - name: NETWORK_BASE_INTERNAL
@@ -89,7 +89,7 @@ cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
     metadataProvider:
       environment: gcp
       type: network
-      field: ipv4
+      field: ip
       index: 2
       ipcalc: base
   - name: NETWORK_MASK_INTERNAL
@@ -97,7 +97,7 @@ cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
     metadataProvider:
       environment: gcp
       type: network
-      field: ipv4
+      field: ip
       index: 2
       ipcalc: bitmask
   - name: SELF_IP_EXTERNAL
@@ -105,7 +105,7 @@ cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
     metadataProvider:
       environment: gcp
       type: network
-      field: ipv4
+      field: ip
       index: 0
       ipcalc: address
   - name: SELF_IP_INTERNAL
@@ -113,7 +113,7 @@ cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
     metadataProvider:
       environment: gcp
       type: network
-      field: ipv4
+      field: ip
       index: 2
       ipcalc: address
   - name: DNS_SERVER
@@ -129,11 +129,12 @@ cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
     type: static
     value: ${timezone}
   - name: HOST_NAME
-    type: metadata
-    metadataProvider:
-      environment: gcp
-      type: compute
-      field: hostname
+    type: url
+    value: http://169.254.169.254/computeMetadata/v1/instance/name
+    returnType: string
+    headers:
+      - name: Metadata-Flavor
+        value: Google
 pre_onboard_enabled:
   - name: provision_rest
     type: inline
