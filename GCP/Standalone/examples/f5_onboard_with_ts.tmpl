@@ -186,7 +186,7 @@ extension_services:
           mySystem:
             autoPhonehome: true
             class: System
-            hostname: '{{{ HOST_NAME }}}'
+            hostname: '{{{ HOST_NAME }}}.{{{ DNS_SUFFIX }}}'
           '{{{ USER_NAME }}}':
             class: User
             partitionAccess:
@@ -261,9 +261,9 @@ extension_services:
             target: internal
             network: '{{{ GATEWAY_INTERNAL }}}/32'
             mtu: 1460
-          ext_rt:
+          int_rt:
             class: Route
-            gw: '{{{ GATEWAY_EXTERNAL }}}'
+            gw: '{{{ GATEWAY_INTERNAL }}}'
             network: '{{{ NETWORK_BASE_INTERNAL }}}/{{{ NETWORK_MASK_INTERNAL }}}'
             mtu: 1460
     - extensionType: as3

@@ -41,22 +41,12 @@ if ${gcp_secret_manager_authentication}; then
       type: SecretsManager
       version: latest
       secretId: ${f5_password}
-  - name: ANALYTICS_PRIVATE_KEY
-    type: secret
-    secretProvider:
-      environment: gcp
-      type: SecretsManager
-      version: latest
-      secretId: ${telemetry_secret}
 EOF
 else
    cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
   - name: ADMIN_PASS
     type: static
     value: ${f5_password}
-  - name: ANALYTICS_PRIVATE_KEY
-    type: static
-    value: ${telemetry_secret}
 EOF
 fi
 
@@ -255,9 +245,9 @@ extension_services:
             target: internal
             network: '{{{ GATEWAY_INTERNAL }}}/32'
             mtu: 1460
-          ext_rt:
+          int_rt:
             class: Route
-            gw: '{{{ GATEWAY_EXTERNAL }}}'
+            gw: '{{{ GATEWAY_INTERNAL }}}'
             network: '{{{ NETWORK_BASE_INTERNAL }}}/{{{ NETWORK_MASK_INTERNAL }}}'
             mtu: 1460
     - extensionType: as3
