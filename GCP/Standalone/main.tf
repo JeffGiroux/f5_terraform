@@ -4,7 +4,7 @@
 terraform {
   required_version = ">= 0.14.5"
   required_providers {
-    google = ">= 4"
+    google = ">= 3"
   }
 }
 

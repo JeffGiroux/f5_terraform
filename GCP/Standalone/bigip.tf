@@ -1,6 +1,8 @@
 # BIG-IP
 
-# Public IP for VIP
+############################ Public IPs ############################
+
+# Create Public IPs - VIP
 resource "google_compute_address" "vip1" {
   name = format("%s-vip1-%s", var.projectPrefix, random_id.buildSuffix.hex)
 }
@@ -15,100 +17,65 @@ resource "google_compute_forwarding_rule" "vip1" {
 
 resource "google_compute_target_instance" "f5vm01" {
   name     = format("%s-ti-%s", var.projectPrefix, random_id.buildSuffix.hex)
-  instance = google_compute_instance.f5vm01.id
+  instance = module.bigip.bigip_instance_ids
   zone     = var.gcp_zone_1
 }
 
+############################ Onboard Scripts ############################
+
 # Setup Onboarding scripts
 locals {
-  vm01_onboard = templatefile("${path.module}/onboard.tpl", {
-    uname          = var.uname
-    usecret        = var.usecret
-    ksecret        = var.ksecret
-    gcp_project_id = var.gcp_project_id
-    DO_URL         = var.DO_URL
-    AS3_URL        = var.AS3_URL
-    TS_URL         = var.TS_URL
-    onboard_log    = var.onboard_log
-    DO_Document    = local.vm01_do_json
-    AS3_Document   = local.as3_json
-    TS_Document    = local.ts_json
-  })
-  vm01_do_json = templatefile("${path.module}/do.json", {
-    regKey             = var.license1
-    admin_username     = var.uname
-    dns_server         = var.dns_server
-    dns_suffix         = var.dns_suffix
-    ntp_server         = var.ntp_server
-    timezone           = var.timezone
-    bigIqLicenseType   = var.bigIqLicenseType
-    bigIqHost          = var.bigIqHost
-    bigIqUsername      = var.bigIqUsername
-    bigIqLicensePool   = var.bigIqLicensePool
-    bigIqSkuKeyword1   = var.bigIqSkuKeyword1
-    bigIqSkuKeyword2   = var.bigIqSkuKeyword2
-    bigIqUnitOfMeasure = var.bigIqUnitOfMeasure
-    bigIqHypervisor    = var.bigIqHypervisor
-  })
-  as3_json = templatefile("${path.module}/as3.json", {
-    gcp_region = var.gcp_region
-    #publicvip  = "0.0.0.0"
-    publicvip  = google_compute_address.vip1.address
-    privatevip = var.alias_ip_range
-  })
-  ts_json = templatefile("${path.module}/ts.json", {
-    gcp_project_id = var.gcp_project_id
-    svc_acct       = var.svc_acct
-    privateKeyId   = var.privateKeyId
+  f5_onboard1 = templatefile("${path.module}/f5_onboard.tmpl", {
+    regKey                            = var.license1
+    f5_username                       = var.f5_username
+    f5_password                       = var.f5_password
+    svc_acct                          = var.svc_acct
+    telemetry_secret                  = var.telemetry_secret
+    telemetry_privateKeyId            = var.telemetry_privateKeyId
+    ssh_keypair                       = var.ssh_key
+    gcp_project_id                    = var.gcp_project_id
+    INIT_URL                          = var.INIT_URL
+    DO_URL                            = var.DO_URL
+    AS3_URL                           = var.AS3_URL
+    TS_URL                            = var.TS_URL
+    FAST_URL                          = var.FAST_URL
+    DO_VER                            = split("/", var.DO_URL)[7]
+    AS3_VER                           = split("/", var.AS3_URL)[7]
+    TS_VER                            = split("/", var.TS_URL)[7]
+    FAST_VER                          = split("/", var.FAST_URL)[7]
+    dns_server                        = var.dns_server
+    dns_suffix                        = var.dns_suffix
+    ntp_server                        = var.ntp_server
+    timezone                          = var.timezone
+    host1                             = format("%s-f5vm01-%s", var.projectPrefix, random_id.buildSuffix.hex)
+    bigIqLicenseType                  = var.bigIqLicenseType
+    bigIqHost                         = var.bigIqHost
+    bigIqPassword                     = var.bigIqPassword
+    bigIqUsername                     = var.bigIqUsername
+    bigIqLicensePool                  = var.bigIqLicensePool
+    bigIqSkuKeyword1                  = var.bigIqSkuKeyword1
+    bigIqSkuKeyword2                  = var.bigIqSkuKeyword2
+    bigIqUnitOfMeasure                = var.bigIqUnitOfMeasure
+    bigIqHypervisor                   = var.bigIqHypervisor
+    NIC_COUNT                         = true
+    gcp_secret_manager_authentication = var.gcp_secret_manager_authentication
   })
 }
 
 # Create F5 BIG-IP VMs
-resource "google_compute_instance" "f5vm01" {
-  name           = format("%s-f5vm01-%s", var.projectPrefix, random_id.buildSuffix.hex)
-  machine_type   = var.bigipMachineType
-  zone           = var.gcp_zone_1
-  can_ip_forward = true
-
-  tags = ["appfw-${var.projectPrefix}", "mgmtfw-${var.projectPrefix}"]
-
-  boot_disk {
-    initialize_params {
-      image = var.customImage != "" ? var.customImage : var.image_name
-      size  = "128"
-    }
-  }
-
-  network_interface {
-    network    = var.extVpc
-    subnetwork = var.extSubnet
-    access_config {
-    }
-    alias_ip_range {
-      ip_cidr_range = var.alias_ip_range
-    }
-  }
-
-  network_interface {
-    network    = var.mgmtVpc
-    subnetwork = var.mgmtSubnet
-    access_config {
-    }
-  }
-
-  network_interface {
-    network    = var.intVpc
-    subnetwork = var.intSubnet
-  }
-
-  metadata = {
-    ssh-keys               = "${var.uname}:${var.gceSshPubKey}"
-    block-project-ssh-keys = true
-    startup-script         = var.customImage != "" ? var.customUserData : local.vm01_onboard
-  }
-
-  service_account {
-    email  = var.svc_acct
-    scopes = ["cloud-platform"]
-  }
+module "bigip" {
+  source              = "F5Networks/bigip-module/gcp"
+  prefix              = format("%s-3nic", var.projectPrefix)
+  project_id          = var.gcp_project_id
+  zone                = var.gcp_zone_1
+  image               = var.image_name
+  service_account     = var.svc_acct
+  f5_username         = var.f5_username
+  f5_password         = var.f5_password
+  f5_ssh_publickey    = var.ssh_key
+  mgmt_subnet_ids     = [{ "subnet_id" = var.mgmtSubnet, "public_ip" = true, "private_ip_primary" = "" }]
+  external_subnet_ids = [{ "subnet_id" = var.extSubnet, "public_ip" = true, "private_ip_primary" = "", "private_ip_secondary" = var.alias_ip_range }]
+  internal_subnet_ids = [{ "subnet_id" = var.intSubnet, "public_ip" = false, "private_ip_primary" = "", "private_ip_secondary" = "" }]
+  custom_user_data    = local.f5_onboard1
+  sleep_time          = "30s"
 }
