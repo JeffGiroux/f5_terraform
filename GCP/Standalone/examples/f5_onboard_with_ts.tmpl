@@ -86,6 +86,13 @@ cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
       field: ip
       index: 0
       ipcalc: bitmask
+  - name: MTU_EXTERNAL
+    type: url
+    value: http://169.254.169.254/computeMetadata/v1/instance/network-interfaces/0
+    query: mtu
+    headers:
+      - name: Metadata-Flavor
+        value: Google
   - name: GATEWAY_INTERNAL
     type: metadata
     metadataProvider:
@@ -110,6 +117,13 @@ cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
       field: ip
       index: 2
       ipcalc: bitmask
+  - name: MTU_INTERNAL
+    type: url
+    value: http://169.254.169.254/computeMetadata/v1/instance/network-interfaces/2
+    query: mtu
+    headers:
+      - name: Metadata-Flavor
+        value: Google
   - name: SELF_IP_EXTERNAL
     type: metadata
     metadataProvider:
@@ -131,7 +145,7 @@ cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
     value: ${dns_server}
   - name: DNS_SUFFIX
     type: static
-    value: ${dns_server}
+    value: ${dns_suffix}
   - name: NTP_SERVER
     type: static
     value: ${ntp_server}
@@ -186,7 +200,7 @@ extension_services:
           mySystem:
             autoPhonehome: true
             class: System
-            hostname: '{{{ HOST_NAME }}}.{{{ DNS_SUFFIX }}}'
+            hostname: '{{{ HOST_NAME }}}'
           '{{{ USER_NAME }}}':
             class: User
             partitionAccess:
@@ -218,7 +232,7 @@ extension_services:
           external:
             class: VLAN
             tag: 4094
-            mtu: 1460
+            mtu: '{{{ MTU_EXTERNAL }}}'
             interfaces:
               - name: '1.0'
                 tagged: false
@@ -231,7 +245,7 @@ extension_services:
           internal:
             class: VLAN
             tag: 4093
-            mtu: 1460
+            mtu: '{{{ MTU_INTERNAL }}}'
             interfaces:
               - name: '1.2'
                 tagged: false
@@ -245,27 +259,27 @@ extension_services:
             class: Route
             target: external
             network: '{{{ GATEWAY_EXTERNAL }}}/32'
-            mtu: 1460
+            mtu: '{{{ MTU_EXTERNAL }}}'
           ext_rt:
             class: Route
             gw: '{{{ GATEWAY_EXTERNAL }}}'
             network: '{{{ NETWORK_BASE_EXTERNAL }}}/{{{ NETWORK_MASK_EXTERNAL }}}'
-            mtu: 1460
+            mtu: '{{{ MTU_EXTERNAL }}}'
           default:
             class: Route
             gw: '{{{ GATEWAY_EXTERNAL }}}'
             network: default
-            mtu: 1460
+            mtu: '{{{ MTU_EXTERNAL }}}'
           int_gw_interface:
             class: Route
             target: internal
             network: '{{{ GATEWAY_INTERNAL }}}/32'
-            mtu: 1460
+            mtu: '{{{ MTU_INTERNAL }}}'
           int_rt:
             class: Route
             gw: '{{{ GATEWAY_INTERNAL }}}'
             network: '{{{ NETWORK_BASE_INTERNAL }}}/{{{ NETWORK_MASK_INTERNAL }}}'
-            mtu: 1460
+            mtu: '{{{ MTU_INTERNAL }}}'
     - extensionType: as3
       type: inline
       value:
