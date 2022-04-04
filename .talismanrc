@@ -1,10 +1,16 @@
 fileignoreconfig:
 - filename: GCP/Standalone/terraform.tfvars.example
-  checksum: 9a19e8f9e569b1ed707d3ff7cb18c8f34aa4be1379f3052d97b0c7fc7bb1de58
+  checksum: c22be6470b040de169e95e88cf724b275d4154dcb1540831087eec19c55bb77e
+- filename: GCP/Standalone/variables.tf
+  checksum: 38814d0c8930fae605aa798d4b4c408d5519bc8c19f33e11d578eb9864d0c970
+- filename: GCP/Standalone/bigip.tf
+  checksum: d0bd7db45911680d47965e63b182bdba74c9dae552a3eb7b9a9455b1467d6c1e
 - filename: GCP/Standalone/README.md
-  checksum: d82c3795eacfdf9d9e1529541b3a21b81588df6a24f59af0a42018fcf326868f
-- filename: GCP/Standalone/onboard.tpl
-  checksum: cc4dd14b90de07432781c0ffee4ee481a991cb7a520cda290c5570066fb27c8f
+  checksum: 62a7624c11103e27e0d8698c1669510ebbb0ca6e2bd862b87c0bdb5720eea3f1
+- filename: GCP/Standalone/f5_onboard.tmpl
+  checksum: 2183ee764c7691a2748947ad2b9a3249fabde9c526e54cd35a60dd95af00bd1f
+- filename: GCP/Standalone/examples/f5_onboard_with_ts.tmpl
+  checksum: 98ff92b95be5cc20170aa6f254196f08e08411861eff298fba7e5053adef63a2
 - filename: GCP/HA_via_lb/README.md
   checksum: 05c9b6156e04b28d3c8ea9edc51061f7e0227e50ee70a438f17f87e7dcf9800d
 - filename: GCP/HA_via_api/terraform.tfvars.example
