@@ -6,7 +6,7 @@ fileignoreconfig:
 - filename: GCP/Standalone/bigip.tf
   checksum: d0bd7db45911680d47965e63b182bdba74c9dae552a3eb7b9a9455b1467d6c1e
 - filename: GCP/Standalone/README.md
-  checksum: 62a7624c11103e27e0d8698c1669510ebbb0ca6e2bd862b87c0bdb5720eea3f1
+  checksum: 3ce04459f8195c252c99e071e6c9eab88debcf38114407fa5012893a62d21c4d
 - filename: GCP/Standalone/f5_onboard.tmpl
   checksum: 2183ee764c7691a2748947ad2b9a3249fabde9c526e54cd35a60dd95af00bd1f
 - filename: GCP/Standalone/examples/f5_onboard_with_ts.tmpl
