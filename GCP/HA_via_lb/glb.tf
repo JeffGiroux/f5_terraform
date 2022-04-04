@@ -21,8 +21,8 @@ resource "google_compute_forwarding_rule" "vip1" {
 resource "google_compute_target_pool" "f5vm" {
   name = format("%s-target-pool-%s", var.projectPrefix, random_id.buildSuffix.hex)
   instances = [
-    google_compute_instance.f5vm01.self_link,
-    google_compute_instance.f5vm02.self_link
+    module.bigip.self_link,
+    module.bigip2.self_link
   ]
   health_checks = [
     google_compute_http_health_check.hc-ext.name,
@@ -70,7 +70,7 @@ resource "google_compute_instance_group" "f5vm01" {
   name = format("%s-ig1-%s", var.projectPrefix, random_id.buildSuffix.hex)
   zone = var.gcp_zone_1
   instances = [
-    google_compute_instance.f5vm01.self_link
+    module.bigip.self_link
   ]
 }
 
@@ -78,7 +78,7 @@ resource "google_compute_instance_group" "f5vm02" {
   name = format("%s-ig2-%s", var.projectPrefix, random_id.buildSuffix.hex)
   zone = var.gcp_zone_2
   instances = [
-    google_compute_instance.f5vm02.self_link
+    module.bigip2.self_link
   ]
 }
 
