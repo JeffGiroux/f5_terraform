@@ -32,7 +32,7 @@ locals {
     svc_acct                          = var.svc_acct
     telemetry_secret                  = var.telemetry_secret
     telemetry_privateKeyId            = var.telemetry_privateKeyId
-    ssh_keypair                       = var.ssh_key
+    ssh_keypair                       = file(var.ssh_key)
     gcp_project_id                    = var.gcp_project_id
     INIT_URL                          = var.INIT_URL
     DO_URL                            = var.DO_URL
@@ -71,7 +71,7 @@ module "bigip" {
   service_account     = var.svc_acct
   f5_username         = var.f5_username
   f5_password         = var.f5_password
-  f5_ssh_publickey    = file(var.ssh_key)
+  f5_ssh_publickey    = var.ssh_key
   mgmt_subnet_ids     = [{ "subnet_id" = var.mgmtSubnet, "public_ip" = true, "private_ip_primary" = "" }]
   external_subnet_ids = [{ "subnet_id" = var.extSubnet, "public_ip" = true, "private_ip_primary" = "", "private_ip_secondary" = var.alias_ip_range }]
   internal_subnet_ids = [{ "subnet_id" = var.intSubnet, "public_ip" = false, "private_ip_primary" = "", "private_ip_secondary" = "" }]
