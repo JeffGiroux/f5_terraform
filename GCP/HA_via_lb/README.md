@@ -148,30 +148,38 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 
 | Name | Version |
 |------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | 4.15.0 |
-| <a name="provider_random"></a> [random](#provider\_random) | n/a |
+| <a name="provider_google"></a> [google](#provider\_google) | 3.90.1 |
+| <a name="provider_random"></a> [random](#provider\_random) | 3.1.2 |
 
 ## Modules
 
-No modules.
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_bigip"></a> [bigip](#module\_bigip) | F5Networks/bigip-module/gcp | n/a |
+| <a name="module_bigip2"></a> [bigip2](#module\_bigip2) | F5Networks/bigip-module/gcp | n/a |
 
 ## Resources
 
 | Name | Type |
 |------|------|
+| [google_compute_address.ext](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_address) | resource |
+| [google_compute_address.ext2](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_address) | resource |
+| [google_compute_address.int](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_address) | resource |
+| [google_compute_address.int2](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_address) | resource |
+| [google_compute_address.mgt](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_address) | resource |
+| [google_compute_address.mgt2](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_address) | resource |
+| [google_compute_address.vip](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_address) | resource |
 | [google_compute_address.vip1](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_address) | resource |
+| [google_compute_address.vip2](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_address) | resource |
 | [google_compute_forwarding_rule.vip1](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_forwarding_rule) | resource |
 | [google_compute_forwarding_rule.vip2-internal](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_forwarding_rule) | resource |
 | [google_compute_health_check.hc-int](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_health_check) | resource |
 | [google_compute_http_health_check.hc-ext](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_http_health_check) | resource |
-| [google_compute_instance.f5vm01](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance) | resource |
-| [google_compute_instance.f5vm02](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance) | resource |
 | [google_compute_instance_group.f5vm01](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance_group) | resource |
 | [google_compute_instance_group.f5vm02](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance_group) | resource |
 | [google_compute_region_backend_service.f5vm](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_region_backend_service) | resource |
 | [google_compute_target_pool.f5vm](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_target_pool) | resource |
 | [random_id.buildSuffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
-| [google_compute_subnetwork.vpc_ext_sub](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/compute_subnetwork) | data source |
 
 ## Inputs
 

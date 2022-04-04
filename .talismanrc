@@ -77,3 +77,5 @@ fileignoreconfig:
   checksum: 092f6b1c8cd3c1f94115ac6c6d330e53ac07eb0043168165e2130900cd895349
 - filename: Azure/HA_via_lb/README.md
   checksum: ee5190df812f75cfdb25b6d74e542f8ac3d4e7827830785c3b835b275a10c877
+- filename: GCP/HA_via_lb/bigip.tf
+  checksum: dd41614fb55fb82182518a62708c30b97323fd1a4c0c7da9a36bef376eec6d72
