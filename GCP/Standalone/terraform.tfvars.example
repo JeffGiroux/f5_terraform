@@ -19,4 +19,5 @@ bigIqPassword = "Default12345!"
 # Google Environment
 gcp_project_id = "xxxxx"
 gcp_region     = "us-west1"
+gcp_zone_1     = "us-west1-a"
 svc_acct       = "xxxxx@xxxxx.iam.gserviceaccount.com"

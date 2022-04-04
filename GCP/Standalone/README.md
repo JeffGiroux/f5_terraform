@@ -107,7 +107,7 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
           myLicense:
             class: License
             licenseType: regKey
-            regKey: ${regKey}
+            regKey: '${regKey}'
   ```
 
 ## BIG-IQ License Manager
@@ -257,6 +257,7 @@ To run this Terraform template, perform the following steps:
       # Google Environment
       gcp_project_id = "xxxxx"
       gcp_region     = "us-west1"
+      gcp_zone_1     = "us-west1-a"
       svc_acct       = "xxxxx@xxxxx.iam.gserviceaccount.com"
   ```
   3. Initialize the directory
