@@ -2,7 +2,7 @@
 
 output "f5vm01_ext_selfip" {
   description = "f5vm01 external self IP private address"
-  value       = module.bigip.private_addresses[0]
+  value       = google_compute_address.ext.address
 }
 output "f5vm01_ext_selfip_pip" {
   description = "f5vm01 external self IP public address"
@@ -10,7 +10,7 @@ output "f5vm01_ext_selfip_pip" {
 }
 output "f5vm01_mgmt_ip" {
   description = "f5vm01 management private IP address"
-  value       = module.bigip.private_addresses[1]
+  value       = google_compute_address.mgt.address
 }
 output "f5vm01_mgmt_pip" {
   description = "f5vm01 management public IP address"

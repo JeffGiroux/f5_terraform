@@ -65,11 +65,6 @@ variable "mgmtSubnet" {
   default     = null
   description = "Management subnet"
 }
-variable "alias_ip_range" {
-  type        = string
-  default     = null
-  description = "An array of alias IP ranges for the BIG-IP network interface (used for VIP traffic, SNAT IPs, etc)"
-}
 variable "bigipMachineType" {
   type        = string
   default     = "n1-standard-8"

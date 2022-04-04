@@ -1,5 +1,39 @@
 # BIG-IP
 
+############################ Private IPs ############################
+
+# Reserve IPs on external subnet for BIG-IP nic0
+resource "google_compute_address" "ext" {
+  name         = "bigip-ext"
+  subnetwork   = var.extSubnet
+  address_type = "INTERNAL"
+  region       = replace(var.gcp_zone_1, "/-[a-z]$/", "")
+}
+
+# Reserve VIP on external subnet for BIG-IP nic0
+resource "google_compute_address" "vip" {
+  name         = "bigip-ext-vip"
+  subnetwork   = var.extSubnet
+  address_type = "INTERNAL"
+  region       = replace(var.gcp_zone_1, "/-[a-z]$/", "")
+}
+
+# Reserve IPs on management subnet for BIG-IP nic1
+resource "google_compute_address" "mgt" {
+  name         = "bigip-mgt"
+  subnetwork   = var.mgmtSubnet
+  address_type = "INTERNAL"
+  region       = replace(var.gcp_zone_1, "/-[a-z]$/", "")
+}
+
+# Reserve IPs on internal subnet for BIG-IP nic2
+resource "google_compute_address" "int" {
+  name         = "bigip-int"
+  subnetwork   = var.intSubnet
+  address_type = "INTERNAL"
+  region       = replace(var.gcp_zone_1, "/-[a-z]$/", "")
+}
+
 ############################ Public IPs ############################
 
 # Create Public IPs - VIP
@@ -72,9 +106,9 @@ module "bigip" {
   f5_username         = var.f5_username
   f5_password         = var.f5_password
   f5_ssh_publickey    = var.ssh_key
-  mgmt_subnet_ids     = [{ "subnet_id" = var.mgmtSubnet, "public_ip" = true, "private_ip_primary" = "" }]
-  external_subnet_ids = [{ "subnet_id" = var.extSubnet, "public_ip" = true, "private_ip_primary" = "", "private_ip_secondary" = var.alias_ip_range }]
-  internal_subnet_ids = [{ "subnet_id" = var.intSubnet, "public_ip" = false, "private_ip_primary" = "", "private_ip_secondary" = "" }]
+  mgmt_subnet_ids     = [{ "subnet_id" = var.mgmtSubnet, "public_ip" = true, "private_ip_primary" = google_compute_address.mgt.address }]
+  external_subnet_ids = [{ "subnet_id" = var.extSubnet, "public_ip" = true, "private_ip_primary" = google_compute_address.ext.address, "private_ip_secondary" = google_compute_address.vip.address }]
+  internal_subnet_ids = [{ "subnet_id" = var.intSubnet, "public_ip" = false, "private_ip_primary" = google_compute_address.int.address, "private_ip_secondary" = "" }]
   custom_user_data    = local.f5_onboard1
   sleep_time          = "30s"
 }
