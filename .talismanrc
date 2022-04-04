@@ -11,8 +11,10 @@ fileignoreconfig:
   checksum: 2183ee764c7691a2748947ad2b9a3249fabde9c526e54cd35a60dd95af00bd1f
 - filename: GCP/Standalone/examples/f5_onboard_with_ts.tmpl
   checksum: 98ff92b95be5cc20170aa6f254196f08e08411861eff298fba7e5053adef63a2
+- filename: GCP/HA_via_lb/variables.tf
+  checksum: c8cd97c66f74f4dc9cfe29fedb007b982bc3876586648104badce67ebca6db1f
 - filename: GCP/HA_via_lb/README.md
-  checksum: 05c9b6156e04b28d3c8ea9edc51061f7e0227e50ee70a438f17f87e7dcf9800d
+  checksum: 1f7afdfffb1f1ddc75f47a11071ee68f7c1b4c45277f4dbd277f6693348781a3
 - filename: GCP/HA_via_api/terraform.tfvars.example
   checksum: 46a7d4bb84e1d9e7c238526a573638c3d51697a08dce856eff023baa744d7ed5
 - filename: GCP/HA_via_api/README.md

@@ -5,12 +5,12 @@ variable "svc_acct" {
   default     = null
   description = "Service Account for VM instance"
 }
-variable "ksecret" {
+variable "telemetry_secret" {
   type        = string
   default     = ""
   description = "Contains the value of the 'svc_acct' private key. Currently used for BIG-IP telemetry streaming to Google Cloud Monitoring (aka StackDriver). If you are not using this feature, you do not need this secret in Secret Manager."
 }
-variable "privateKeyId" {
+variable "telemetry_privateKeyId" {
   type        = string
   default     = ""
   description = "ID of private key for the 'svc_acct' used in Telemetry Streaming to Google Cloud Monitoring. If you are not using this feature, you do not need this secret in Secret Manager."
@@ -35,7 +35,7 @@ variable "gcp_zone_2" {
   default     = "us-west1-b"
   description = "GCP Zone 2 for provider"
 }
-variable "prefix" {
+variable "projectPrefix" {
   type        = string
   default     = "demo"
   description = "This value is inserted at the beginning of each Google object (alpha-numeric, no special character)"
@@ -90,15 +90,20 @@ variable "customUserData" {
   default     = ""
   description = "The custom user data to deploy when using the 'customImage' paramater too."
 }
-variable "uname" {
+variable "f5_username" {
   type        = string
   default     = "admin"
   description = "User name for the Virtual Machine"
 }
-variable "usecret" {
+variable "f5_password" {
   type        = string
   default     = null
-  description = "Used during onboarding to query the Google Cloud Secret Manager API and retrieve the admin password (use the secret name, not the secret value/password)"
+  description = "Password for the Virtual Machine"
+}
+variable "gcp_secret_manager_authentication" {
+  description = "Whether to use secret manager to pass authentication"
+  type        = bool
+  default     = false
 }
 variable "license1" {
   type        = string
@@ -115,10 +120,10 @@ variable "adminSrcAddr" {
   default     = "0.0.0.0/0"
   description = "Trusted source network for admin access"
 }
-variable "gceSshPubKey" {
+variable "ssh_key" {
   type        = string
   default     = null
-  description = "SSH public key for admin authentation. Must be in ssh-rsa format."
+  description = "Path to the public key to be used for ssh access to the VM.  Only used with non-Windows vms and can be left as-is even if using Windows vms. If specifying a path to a certification on a Windows machine to provision a linux vm use the / in the path versus backslash. e.g. c:/home/id_rsa.pub"
 }
 variable "host1_name" {
   type        = string
@@ -165,6 +170,16 @@ variable "TS_URL" {
   default     = "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.27.0/f5-telemetry-1.27.0-3.noarch.rpm"
   description = "URL to download the BIG-IP Telemetry Streaming module"
 }
+variable "FAST_URL" {
+  description = "URL to download the BIG-IP FAST module"
+  type        = string
+  default     = "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.16.0/f5-appsvcs-templates-1.16.0-1.noarch.rpm"
+}
+variable "INIT_URL" {
+  description = "URL to download the BIG-IP runtime init"
+  type        = string
+  default     = "https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.4.1/dist/f5-bigip-runtime-init-1.4.1-1.gz.run"
+}
 variable "onboard_log" {
   type        = string
   default     = "/var/log/cloud/onboard.log"
@@ -179,6 +194,11 @@ variable "bigIqUsername" {
   type        = string
   default     = "admin"
   description = "Admin name for BIG-IQ"
+}
+variable "bigIqPassword" {
+  type        = string
+  default     = "Default12345!"
+  description = "Admin Password for BIG-IQ"
 }
 variable "bigIqLicenseType" {
   type        = string
