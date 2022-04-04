@@ -1,11 +1,18 @@
 # Description
 Azure Route Server and BIG-IP using BGP and eCMP for traffic distribution
 
-## TO DO - WORK IN PROGRESS
-1. Wait for Azure Route Server GA...currently in preview
-2. Finish BIG-IP setup with test app
-3. Remove test network virtuals (10.100, 10.101, 10.102)...testing only
-4. More README, more how-to steps
+## To Do
+- Community support only. Not F5 supported.
+- Document Azure Vault usage
+- Telemtry Streaming not used (see example folder)
+- Tested only during Azure Route Server Preview (need to test with GA release)
+- Finish BIG-IP setup with test app
+- Remove test network virtuals (10.100, 10.101, 10.102)...testing only
+- More README, more how-to steps
+
+
+## Issues
+- Find an issue? Fork, clone, create branch, fix and PR. I'll review and merge into the main branch. Or submit a GitHub issue with all necessary details and logs.
 
 ## Diagram
 

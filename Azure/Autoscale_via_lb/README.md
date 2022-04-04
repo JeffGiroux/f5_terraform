@@ -1,6 +1,13 @@
 # Deploying BIG-IP VEs in Azure - Auto Scale (Active/Active): 3-NICs
 
-***To Do:*** Add auto scaling policies. Currently VMSS is manual sizing.
+## To Do
+- Community support only. Not F5 supported.
+- Document Azure Vault usage
+- Telemtry Streaming not used (see example folder)
+- Add auto scaling policies. Currently VMSS is manual sizing.
+
+## Issues
+- Find an issue? Fork, clone, create branch, fix and PR. I'll review and merge into the main branch. Or submit a GitHub issue with all necessary details and logs.
 
 ## Contents
 
@@ -10,6 +17,8 @@
 - [BIG-IQ License Manager](#big-iq-license-manager)
 - [Installation Example](#installation-example)
 - [Configuration Example](#configuration-example)
+- [Service Principal Authentication](#service-principal-authentication)
+- [Troubleshooting](#troubleshooting)
 
 ## Introduction
 
@@ -21,6 +30,8 @@ Terraform is beneficial as it allows composing resources a bit differently to ac
 
 This template deploys each BIG-IP in an Azure VMSS as a standalone device and NOT in a [BIG-IP Device Service Cluster (DSC)](https://www.youtube.com/watch?v=NEguvpkmteM). As a result, there is no traditional BIG-IP clustering in regards to config sync and/or network failover. Each device is standalone, each device retreives its onboarding from custom-data, and each device is treated as [immutable](https://www.f5.com/company/blog/you-cant-do-immutable-infrastructure-without-a-per-app-architecture). If changes are required to the network/application config of the BIG-IP device, then you do this in custom-data via changes to Terraform TF files. The Azure VMSS will perform a rolling upgrade (aka replacement) of each BIG-IP device.
 
+**Networking Stack Type:** This solution deploys into an *EXISTING* networking stack. You are required to have existing VPC networks, firewall rules, and proper routing. Refer to the [Prerequisites](#prerequisites)
+
 ## Prerequisites
 
 - ***Important***: When you configure the admin password for the BIG-IP VE in the template, you cannot use the character **#**.  Additionally, there are a number of other special characters that you should avoid using for F5 product user accounts.  See [K2873](https://support.f5.com/csp/article/K2873) for details.
@@ -29,12 +40,7 @@ This template deploys each BIG-IP in an Azure VMSS as a standalone device and NO
     - Performed by VM instance during onboarding to retrieve passwords and private keys
   - Backend pool service discovery - requires "Reader"
     - Performed by F5 Application Services AS3
-- If this is the first time to deploy the F5 image, the subscription used in this deployment needs to be enabled to programatically deploy. For more information, please refer to [Configure Programatic Deployment](https://azure.microsoft.com/en-us/blog/working-with-marketplace-images-on-azure-resource-manager/)
-- This template requires a service account to deploy with the Terraform Azure provider and build out all the neccessary Azure objects
-  - See the [Terraform Azure Provider "Authenticating Using a Service Principal"](https://www.terraform.io/docs/providers/azurerm/guides/service_principal_client_secret.html) for details. Also, review the [available Azure built-in roles](https://docs.microsoft.com/en-gb/azure/role-based-access-control/built-in-roles) too.
   - Permissions will depend on the objects you are creating
-  - My service account for Terraform deployments in Azure uses the following roles:
-    - Contributor
   - ***Note***: Make sure to [practice least privilege](https://docs.microsoft.com/en-us/azure/security/fundamentals/identity-management-best-practices#lower-exposure-of-privileged-accounts)
 - This template deploys into an existing network
   - You must have a VNET with three (3) subnets: management, external, internal
@@ -42,6 +48,7 @@ This template deploys each BIG-IP in an Azure VMSS as a standalone device and NO
     - BIG-IP will require tcp/22 and tcp/443 on the mgmt network
     - Application access will require tcp/80 and tcp/443 on the external network
   - If you require a new network first, see the [Infrastructure Only folder](../Infrastructure-only) to get started.
+- If this is the first time to deploy the F5 image, the subscription used in this deployment needs to be enabled to programatically deploy. For more information, please refer to [Configure Programatic Deployment](https://azure.microsoft.com/en-us/blog/working-with-marketplace-images-on-azure-resource-manager/)
 
 
 ## Important Configuration Notes
@@ -51,13 +58,13 @@ This template deploys each BIG-IP in an Azure VMSS as a standalone device and NO
   - ***Note***: Passwords and secrets will be moved to Azure Key Vault in the future
   - (TBD) The BIG-IP instance will query Azure Metadata API to retrieve the service account's token for authentication
   - (TBD) The BIG-IP instance will then use the secret name and the service account's token to query Azure Metadata API and dynamically retrieve the password for device onboarding
-- This template uses Declarative Onboarding (DO) and Application Services 3 (AS3) for the initial configuration. As part of the onboarding script, it will download the RPMs automatically. See the [AS3 documentation](http://f5.com/AS3Docs) and [DO documentation](http://f5.com/DODocs) for details on how to use AS3 and Declarative Onboarding on your BIG-IP VE(s). The [Telemetry Streaming](http://f5.com/TSDocs) extension is also downloaded and can be configured to point to [F5 Beacon](https://f5.com/beacon-get-started), Azure Log Analytics, or many other consumers.
+- This template uses BIG-IP Runtime Init for the initial configuration. As part of the onboarding script, it will download the F5 Toolchain RPMs automatically. See the [AS3 documentation](http://f5.com/AS3Docs) and [DO documentation](http://f5.com/DODocs) for details on how to use AS3 and Declarative Onboarding on your BIG-IP VE(s). The [Telemetry Streaming](http://f5.com/TSDocs) extension is also downloaded and can be configured to point to [F5 Beacon](https://f5.com/beacon-get-started), Azure Log Analytics, or many other consumers.
 - Files
   - alb.tf - resources for Azure LB
   - bigip.tf - resources for BIG-IP, NICs, public IPs
   - main.tf - resources for provider, versions, resource group
   - network.tf - data for existing subnets
-  - f5_onboard.tpl - onboarding script which is run by commandToExecute (user data). It will be copied to /var/lib/waagent/CustomData upon bootup. This script is responsible for downloading the neccessary F5 Automation Toolchain RPM files, installing them, and then executing the onboarding REST calls via the [BIG-IP Runtime Init tool](https://github.com/F5Networks/f5-bigip-runtime-init).
+  - f5_onboard.tmpl - onboarding script which is run by commandToExecute (user data). It will be copied to /var/lib/waagent/CustomData upon bootup. This script is responsible for downloading the neccessary F5 Automation Toolchain RPM files, installing them, and then executing the onboarding REST calls via the [BIG-IP Runtime Init tool](https://github.com/F5Networks/f5-bigip-runtime-init).
 
 ## BIG-IQ License Manager
 This template uses PayGo BIG-IP image for the deployment (as default). If you would like to use BYOL/ELA/Subscription licenses from [BIG-IQ License Manager (LM)](https://community.f5.com/t5/technical-articles/managing-big-ip-licensing-with-big-iq/ta-p/279797), then these following steps are needed:
@@ -311,3 +318,20 @@ az account set -s <subscriptionId>
     true           <-- is this the default subscription
   ]
 ```
+## Troubleshooting
+
+### Serial Logs
+TBD
+
+### Onboard Logs
+Depending on where onboard fails, you can attempt SSH login and try to troubleshoot further. Inspect the /config/cloud directory for correct runtime init YAML files. Inspec the /var/log/cloud location for error logs.
+
+### F5 Automation Toolchain Components
+F5 BIG-IP Runtime Init uses the F5 Automation Toolchain for configuration of BIG-IP instances.  Any errors thrown from these components will be surfaced in the bigIpRuntimeInit.log (or a custom log location as specified below).
+
+Help with troubleshooting individual Automation Toolchain components can be found at F5's [Public Cloud Docs](http://clouddocs.f5.com/cloud/public/v1/):
+- DO: https://clouddocs.f5.com/products/extensions/f5-declarative-onboarding/latest/troubleshooting.html
+- AS3: https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/userguide/troubleshooting.html
+- FAST: https://clouddocs.f5.com/products/extensions/f5-appsvcs-templates/latest/userguide/troubleshooting.html
+- TS: https://clouddocs.f5.com/products/extensions/f5-telemetry-streaming/latest/userguide/troubleshooting.html
+- CFE: https://clouddocs.f5.com/products/extensions/f5-cloud-failover/latest/userguide/troubleshooting.html
