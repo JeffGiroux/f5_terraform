@@ -47,7 +47,6 @@ locals {
     dns_suffix                        = var.dns_suffix
     ntp_server                        = var.ntp_server
     timezone                          = var.timezone
-    host1                             = format("%s-f5vm01-%s", var.projectPrefix, random_id.buildSuffix.hex)
     bigIqLicenseType                  = var.bigIqLicenseType
     bigIqHost                         = var.bigIqHost
     bigIqPassword                     = var.bigIqPassword
