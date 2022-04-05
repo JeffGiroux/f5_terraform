@@ -160,21 +160,30 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 
 | Name | Version |
 |------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | 4.16.0 |
-| <a name="provider_random"></a> [random](#provider\_random) | n/a |
+| <a name="provider_google"></a> [google](#provider\_google) | 3.90.1 |
+| <a name="provider_random"></a> [random](#provider\_random) | 3.1.2 |
 
 ## Modules
 
-No modules.
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_bigip"></a> [bigip](#module\_bigip) | F5Networks/bigip-module/gcp | n/a |
+| <a name="module_bigip2"></a> [bigip2](#module\_bigip2) | F5Networks/bigip-module/gcp | n/a |
 
 ## Resources
 
 | Name | Type |
 |------|------|
+| [google_compute_address.ext](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_address) | resource |
+| [google_compute_address.ext2](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_address) | resource |
+| [google_compute_address.int](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_address) | resource |
+| [google_compute_address.int2](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_address) | resource |
+| [google_compute_address.mgt](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_address) | resource |
+| [google_compute_address.mgt2](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_address) | resource |
+| [google_compute_address.vip](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_address) | resource |
 | [google_compute_address.vip1](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_address) | resource |
+| [google_compute_address.vip2](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_address) | resource |
 | [google_compute_forwarding_rule.vip1](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_forwarding_rule) | resource |
-| [google_compute_instance.f5vm01](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance) | resource |
-| [google_compute_instance.f5vm02](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance) | resource |
 | [google_compute_target_instance.f5vm01](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_target_instance) | resource |
 | [google_compute_target_instance.f5vm02](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_target_instance) | resource |
 | [random_id.buildSuffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
@@ -219,7 +228,7 @@ No modules.
 | <a name="input_license1"></a> [license1](#input\_license1) | The license token for the first F5 BIG-IP VE (BYOL) | `string` | `""` | no |
 | <a name="input_license2"></a> [license2](#input\_license2) | The license token for the second F5 BIG-IP VE (BYOL) | `string` | `""` | no |
 | <a name="input_machine_type"></a> [machine\_type](#input\_machine\_type) | Google machine type to be used for the BIG-IP VE | `string` | `"n1-standard-8"` | no |
-| <a name="input_managed_route1"></a> [managed\_route1](#input\_managed\_route1) | A UDR route can used for testing managed-route failover. Enter address prefix like x.x.x.x/x. | `string` | `"192.0.2.0/24"` | no |
+| <a name="input_managed_route"></a> [managed\_route](#input\_managed\_route) | A custom route can used for testing managed-route failover. Enter address prefix like x.x.x.x/x. | `string` | `"192.0.2.0/24"` | no |
 | <a name="input_mgmtSubnet"></a> [mgmtSubnet](#input\_mgmtSubnet) | Management subnet | `string` | `null` | no |
 | <a name="input_mgmtVpc"></a> [mgmtVpc](#input\_mgmtVpc) | Management VPC network | `string` | `null` | no |
 | <a name="input_ntp_server"></a> [ntp\_server](#input\_ntp\_server) | Leave the default NTP server the BIG-IP uses, or replace the default NTP server with the one you want to use | `string` | `"0.us.pool.ntp.org"` | no |

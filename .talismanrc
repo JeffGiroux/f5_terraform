@@ -85,3 +85,7 @@ fileignoreconfig:
   checksum: 241b3fac37b35ee35d3c17cd28af7bdf0cfd15a9120388700774a6e0b6a2dd3a
 - filename: GCP/HA_via_api/README.md
   checksum: 8f8743287b8f7bb32baa513e5c4dee4dc67c96f2366e23f5fb8750f30b8115c2
+- filename: GCP/HA_via_api/bigip.tf
+  checksum: 70d747c3af894ca966951c35c992efad92761168454be9c2e55db1454a523b22
+- filename: GCP/HA_via_api/f5_onboard.tmpl
+  checksum: 62cdf56735be6afd8c45b31b3a8ef0755966f91aa83029e73cba7b0c54527b71

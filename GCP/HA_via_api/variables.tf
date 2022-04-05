@@ -70,10 +70,10 @@ variable "mgmtSubnet" {
   default     = null
   description = "Management subnet"
 }
-variable "managed_route1" {
+variable "managed_route" {
   type        = string
   default     = "192.0.2.0/24"
-  description = "A UDR route can used for testing managed-route failover. Enter address prefix like x.x.x.x/x."
+  description = "A custom route can used for testing managed-route failover. Enter address prefix like x.x.x.x/x."
 }
 variable "machine_type" {
   type        = string
