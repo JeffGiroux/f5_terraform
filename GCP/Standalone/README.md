@@ -248,7 +248,7 @@ To run this Terraform template, perform the following steps:
       mgmtSubnet     = "xxxxx-subnet-mgmt"
       extSubnet      = "xxxxx-subnet-ext"
       intSubnet      = "xxxxx-subnet-int"
-      dns_suffix     = "c.xxxxx.xxxxx.internal"
+      dns_suffix     = "example.com"
 
       # BIG-IQ Environment
       bigIqUsername = "admin"
