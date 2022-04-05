@@ -369,6 +369,8 @@ post_onboard_enabled:
   - name: trigger_failover
     type: inline
     commands:
+    - $(nohup bash /config/failover/tgactive &>/dev/null &)
+    - $(nohup tmsh modify cm device-group failoverGroup devices modify { '{{{ HOST2 }}}' { set-sync-leader } } &>/dev/null &)
     - tmsh save sys config
 EOF
 fi
