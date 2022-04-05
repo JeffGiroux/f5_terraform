@@ -65,7 +65,7 @@ variable "mgmtSubnet" {
   default     = null
   description = "Management subnet"
 }
-variable "bigipMachineType" {
+variable "machine_type" {
   type        = string
   default     = "n1-standard-8"
   description = "Google machine type to be used for the BIG-IP VE"

@@ -101,6 +101,7 @@ module "bigip" {
   project_id          = var.gcp_project_id
   zone                = var.gcp_zone_1
   image               = var.image_name
+  machine_type        = var.machine_type
   service_account     = var.svc_acct
   f5_username         = var.f5_username
   f5_password         = var.f5_password
