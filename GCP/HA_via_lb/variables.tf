@@ -125,16 +125,6 @@ variable "ssh_key" {
   default     = null
   description = "Path to the public key to be used for ssh access to the VM.  Only used with non-Windows vms and can be left as-is even if using Windows vms. If specifying a path to a certification on a Windows machine to provision a linux vm use the / in the path versus backslash. e.g. c:/home/id_rsa.pub"
 }
-variable "host1_name" {
-  type        = string
-  default     = "f5vm01"
-  description = "Hostname for the first BIG-IP"
-}
-variable "host2_name" {
-  type        = string
-  default     = "f5vm02"
-  description = "Hostname for the second BIG-IP"
-}
 variable "dns_server" {
   type        = string
   default     = "8.8.8.8"
