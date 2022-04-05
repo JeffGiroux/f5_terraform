@@ -146,7 +146,8 @@ locals {
   })
 }
 
-# Create F5 BIG-IP VMs
+############################ Compute ############################
+
 module "bigip" {
   source              = "F5Networks/bigip-module/gcp"
   prefix              = format("%s-bigip1", var.projectPrefix)
