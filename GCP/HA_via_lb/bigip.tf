@@ -4,7 +4,7 @@
 
 # Reserve IPs on external subnet for BIG-IP 1 nic0
 resource "google_compute_address" "ext" {
-  name         = "bigip-ext"
+  name         = format("%s-bigip-ext-%s", var.projectPrefix, random_id.buildSuffix.hex)
   subnetwork   = var.extSubnet
   address_type = "INTERNAL"
   region       = replace(var.gcp_zone_1, "/-[a-z]$/", "")
@@ -12,7 +12,7 @@ resource "google_compute_address" "ext" {
 
 # Reserve VIP on external subnet for BIG-IP 1 nic0
 resource "google_compute_address" "vip" {
-  name         = "bigip-ext-vip"
+  name         = format("%s-bigip-ext-vip-%s", var.projectPrefix, random_id.buildSuffix.hex)
   subnetwork   = var.extSubnet
   address_type = "INTERNAL"
   region       = replace(var.gcp_zone_1, "/-[a-z]$/", "")
@@ -20,7 +20,7 @@ resource "google_compute_address" "vip" {
 
 # Reserve IPs on management subnet for BIG-IP 1 nic1
 resource "google_compute_address" "mgt" {
-  name         = "bigip-mgt"
+  name         = format("%s-bigip-mgt-%s", var.projectPrefix, random_id.buildSuffix.hex)
   subnetwork   = var.mgmtSubnet
   address_type = "INTERNAL"
   region       = replace(var.gcp_zone_1, "/-[a-z]$/", "")
@@ -28,7 +28,7 @@ resource "google_compute_address" "mgt" {
 
 # Reserve IPs on internal subnet for BIG-IP 1 nic2
 resource "google_compute_address" "int" {
-  name         = "bigip-int"
+  name         = format("%s-bigip-int-%s", var.projectPrefix, random_id.buildSuffix.hex)
   subnetwork   = var.intSubnet
   address_type = "INTERNAL"
   region       = replace(var.gcp_zone_1, "/-[a-z]$/", "")
@@ -36,7 +36,7 @@ resource "google_compute_address" "int" {
 
 # Reserve IPs on external subnet for BIG-IP 2 nic0
 resource "google_compute_address" "ext2" {
-  name         = "bigip2-ext"
+  name         = format("%s-bigip2-ext-%s", var.projectPrefix, random_id.buildSuffix.hex)
   subnetwork   = var.extSubnet
   address_type = "INTERNAL"
   region       = replace(var.gcp_zone_2, "/-[a-z]$/", "")
@@ -44,7 +44,7 @@ resource "google_compute_address" "ext2" {
 
 # Reserve VIP on external subnet for BIG-IP 2 nic0
 resource "google_compute_address" "vip2" {
-  name         = "bigip2-ext-vip"
+  name         = format("%s-bigip2-ext-vip-%s", var.projectPrefix, random_id.buildSuffix.hex)
   subnetwork   = var.extSubnet
   address_type = "INTERNAL"
   region       = replace(var.gcp_zone_2, "/-[a-z]$/", "")
@@ -52,7 +52,7 @@ resource "google_compute_address" "vip2" {
 
 # Reserve IPs on management subnet for BIG-IP 2 nic1
 resource "google_compute_address" "mgt2" {
-  name         = "bigip2-mgt"
+  name         = format("%s-bigip2-mgt-%s", var.projectPrefix, random_id.buildSuffix.hex)
   subnetwork   = var.mgmtSubnet
   address_type = "INTERNAL"
   region       = replace(var.gcp_zone_2, "/-[a-z]$/", "")
@@ -60,7 +60,7 @@ resource "google_compute_address" "mgt2" {
 
 # Reserve IPs on internal subnet for BIG-IP 2 nic2
 resource "google_compute_address" "int2" {
-  name         = "bigip2-int"
+  name         = format("%s-bigip2-int-%s", var.projectPrefix, random_id.buildSuffix.hex)
   subnetwork   = var.intSubnet
   address_type = "INTERNAL"
   region       = replace(var.gcp_zone_2, "/-[a-z]$/", "")
