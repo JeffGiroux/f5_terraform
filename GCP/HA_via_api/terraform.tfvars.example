@@ -1,8 +1,8 @@
 # BIG-IP Environment
-uname          = "admin"
-usecret        = "my-secret"
-gceSshPubKey   = "ssh-rsa xxxxx"
-prefix         = "mydemo123"
+f5_username    = "admin"
+f5_password    = "Default12345!"
+ssh_key        = "~/.ssh/id_rsa.pub"
+projectPrefix  = "mydemo123"
 adminSrcAddr   = "0.0.0.0/0"
 mgmtVpc        = "xxxxx-net-mgmt"
 extVpc         = "xxxxx-net-ext"
@@ -11,10 +11,10 @@ mgmtSubnet     = "xxxxx-subnet-mgmt"
 extSubnet      = "xxxxx-subnet-ext"
 intSubnet      = "xxxxx-subnet-int"
 dns_suffix     = "example.com"
-alias_ip_range = "10.1.10.130/32"
 
 # BIG-IQ Environment
 bigIqUsername = "admin"
+bigIqPassword = "Default12345!"
 
 # Google Environment
 gcp_project_id = "xxxxx"
