@@ -1,5 +1,12 @@
 # Deploying BIG-IP VEs in Google - High Availability (Active/Standby): 3-NIC, Failover via API
 
+## To Do
+- Community support only. Not F5 supported.
+- Telemtry Streaming not used (see example folder)
+
+## Issues
+- Find an issue? Fork, clone, create branch, fix and PR. I'll review and merge into the main branch. Or submit a GitHub issue with all necessary details and logs.
+
 ## Contents
 
 - [Introduction](#introduction)
@@ -9,6 +16,7 @@
 - [BIG-IQ License Manager](#big-iq-license-manager)
 - [Installation Example](#installation-example)
 - [Configuration Example](#configuration-example)
+- [Troubleshooting](#troubleshooting)
 
 ## Introduction
 
@@ -17,14 +25,6 @@ This solution uses a Terraform template to launch a 3-NIC deployment of a cloud-
 The BIG-IP VEs have the [Local Traffic Manager (LTM)](https://f5.com/products/big-ip/local-traffic-manager-ltm) module enabled to provide advanced traffic management functionality. In addition, the [Application Security Module (ASM)](https://www.f5.com/pdf/products/big-ip-application-security-manager-overview.pdf) can be enabled to provide F5's L4/L7 security features for web application firewall (WAF) and bot protection.
 
 Terraform is beneficial as it allows composing resources a bit differently to account for dependencies into Immutable/Mutable elements. For example, mutable includes items you would typically frequently change/mutate, such as traditional configs on the BIG-IP. Once the template is deployed, there are certain resources (network infrastructure) that are fixed while others (BIG-IP VMs and configurations) can be changed.
-
-Example...
-
--> Run once
-- Deploy the entire infrastructure with all the neccessary resources, then use Declarative Onboarding (DO) to configure the BIG-IP cluster, Application Services (AS3) to create a sample app proxy, then lastly use Service Discovery to automatically add the DVWA container app to the BIG-IP pool.
-
--> Run many X
-- [Redeploy BIG-IP for Replacement or Upgrade](#Redeploy-BIG-IP-for-replacement-or-upgrade)
 
 **Networking Stack Type:** This solution deploys into an *EXISTING* networking stack. You are required to have existing VPC networks, firewall rules, and proper routing. Refer to the [Prerequisites](#prerequisites). Visit DevCentral to read [Service Discovery in Google Cloud with F5 BIG-IP](https://community.f5.com/t5/technical-articles/service-discovery-in-google-cloud-with-f5-big-ip/ta-p/284457) where I show you my basic VPC setup (networks, subnets) along with firewall rules.
 
@@ -43,20 +43,15 @@ Example...
 - This template requires a service account to deploy with the Terraform Google provider and build out all the neccessary Google objects
   - See the [Terraform Google Provider "Adding Credentials"](https://www.terraform.io/docs/providers/google/guides/getting_started.html#adding-credentials) for details. Also, review the [available Google GCP permission scopes](https://cloud.google.com/sdk/gcloud/reference/alpha/compute/instances/set-scopes#--scopes) too.
   - Permissions will depend on the objects you are creating
-  - My service account for Terraform deployments in GCP uses the following roles:
-    - Compute Admin
-    - Storage Admin
-    - Service Account User
-    - Service Account Admin
-    - Project IAM Admin
   - ***Note***: Make sure to [practice least privilege](https://cloud.google.com/iam/docs/understanding-service-accounts#granting_minimum)
 - ***Shared Service Accounts***: For lab purposes, you can create one service account and use it for everything. Alternatively, you can create a more secure environment with separate service accounts for various functions. Example...
   - Service Account #1 - the svc-acct used for Terraform to deploy cloud objects
   - Service Account #2 - the svc-acct assigned to BIG-IP instance during creation (ex. service discovery, query Pub/Sub, storage, failover)
   - Service Account #3 - the svc-acct used in F5 Telemetry Streaming referenced in [ts.json](./ts.json) (ex. analytics)
-- Passwords and secrets are located in [Google Cloud Secret Manager](https://cloud.google.com/secret-manager/docs/quickstart#secretmanager-quickstart-web). Make sure you have an existing Google Cloud "secret" with the data containing the clear text passwords for each relevant item: BIG-IP password, service account credentials, BIG-IQ password, etc.
-  - 'usecret' contains the value of the adminstrator password (ex. "Default12345!")
-  - 'ksecret' Contains the value of the 'svc_acct' private key. Currently used for BIG-IP telemetry streaming to Google Cloud Monitoring (aka StackDriver). If you are not using this feature, you do not need this secret in Secret Manager.
+- Passwords and secrets can be located in [Google Cloud Secret Manager](https://cloud.google.com/secret-manager/docs/quickstart#secretmanager-quickstart-web). Make sure you have an existing Google Cloud "secret" with the data containing the clear text passwords for each relevant item: BIG-IP password, service account credentials, BIG-IQ password, etc.
+  - 'f5_password' contains the value of the adminstrator password (ex. "Default12345!")
+  - If 'gcp_secret_manager_authentication' is TRUE, then 'f5_password' will be the name of the Google Cloud secret which contains the value of the password in clear text.
+  - 'telemetry_secret' Contains the value of the 'svc_acct' private key. Currently used for BIG-IP telemetry streaming to Google Cloud Monitoring (aka StackDriver). If you are not using this feature, you do not need this secret in Secret Manager.
   - Refer to [Template Parameters](#template-parameters)
 - This template deploys into an existing network
   - You must have a VPC for management and a VPC for data traffic (client/server). The management VPC will have one subnet for management traffic. The External VPC will have one subnet for data traffic. The Internal VPC will have one subnet as well.
@@ -72,18 +67,14 @@ Example...
 
 - Variables are configured in variables.tf
 - Sensitive variables like Google SSH keys are configured in terraform.tfvars
-  - ***Note***: Other items like BIG-IP password are stored in Google Cloud Secret Manager. Refer to the [Prerequisites](#prerequisites).
+  - ***Note***: Other items like BIG-IP password can be stored in Google Cloud Secret Manager. Refer to the [Prerequisites](#prerequisites).
   - The BIG-IP instance will query Google Metadata API to retrieve the service account's token for authentication.
   - The BIG-IP instance will then use the secret name and the service account's token to query Google Metadata API and dynamically retrieve the password for device onboarding.
-- This template uses Declarative Onboarding (DO), Application Services 3 (AS3), and Cloud Failover Extension packages for the initial configuration. As part of the onboarding script, it will download the RPMs automatically. See the [AS3 documentation](http://f5.com/AS3Docs) and [DO documentation](http://f5.com/DODocs) for details on how to use AS3 and Declarative Onboarding on your BIG-IP VE(s). The [Telemetry Streaming](http://f5.com/TSDocs) extension is also downloaded and can be configured to point to [F5 Beacon](https://f5.com/beacon-get-started), Google Cloud Monitoring (old name StackDriver), or many other consumers. The [Cloud Failover Extension](http://f5.com/CFEDocs) documentation is also available.
+- This template uses BIG-IP Runtime Init for the initial configuration. As part of the onboarding script, it will download the F5 Toolchain RPMs automatically. See the [AS3 documentation](http://f5.com/AS3Docs) and [DO documentation](http://f5.com/DODocs) for details on how to use AS3 and Declarative Onboarding on your BIG-IP VE(s). The [Telemetry Streaming](http://f5.com/TSDocs) extension is also downloaded and can be configured to point to [F5 Beacon](https://f5.com/beacon-get-started), Google Cloud Monitoring (old name StackDriver), or many other consumers.
 - Files
   - bigip.tf - resources for BIG-IP, NICs, public IPs
   - main.tf - resources for provider, versions
-  - onboard.tpl - onboarding script which is run by startup-script (user data). It will be copied to **startup-script=*path-to-file*** upon bootup. This script is responsible for downloading the neccessary F5 Automation Toolchain RPM files, installing them, and then executing the onboarding REST calls.
-  - do.json - contains the L1-L3 BIG-IP configurations used by DO for items like VLANs, IPs, and routes
-  - as3.json - contains the L4-L7 BIG-IP configurations used by AS3 for items like pool members, virtual server listeners, security policies, and more
-  - ts.json - contains the BIG-IP configurations used by TS for items like telemetry streaming, CPU, memory, application statistics, and more
-  - cfe.json - contains the BIG-IP configurations used for failover operations of cloud objects like IPs and routes
+  - f5_onboard.tmpl - onboarding script which is run by commandToExecute (user data). It will be copied to /var/lib/waagent/CustomData upon bootup. This script is responsible for downloading the neccessary F5 Automation Toolchain RPM files, installing them, and then executing the onboarding REST calls via the [BIG-IP Runtime Init tool](https://github.com/F5Networks/f5-bigip-runtime-init).
 
 ## BYOL Licensing
 This template uses PayGo BIG-IP image for the deployment (as default). If you would like to use BYOL licenses, then these following steps are needed:
@@ -114,13 +105,12 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
           # BIGIP Setup
           variable license1 { default = "" }
   ```
-4. In the "do.json", add the "myLicense" block under the "Common" declaration ([full declaration example here](https://clouddocs.f5.com/products/extensions/f5-declarative-onboarding/latest/bigip-examples.html#standalone-declaration))
+4. In the "f5_onboard.tmpl", add the "myLicense" block under the "Common" declaration ([example here](https://github.com/F5Networks/f5-google-gdm-templates-v2/blob/main/examples/quickstart/bigip-configurations/runtime-init-conf-3nic-byol.yaml))
   ```
-        "myLicense": {
-            "class": "License",
-            "licenseType": "regKey",
-            "regKey": "${regKey}"
-        },
+          myLicense:
+            class: License
+            licenseType: regKey
+            regKey: '${regKey}'
   ```
 
 ## BIG-IQ License Manager
@@ -128,24 +118,22 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 1. Find BYOL image. Reference [BYOL Licensing](#byol-licensing) step #1.
 2. Replace BIG-IP *image_name* in "variables.tf". Reference [BYOL Licensing](#byol-licensing) step #2.
 3. In the "variables.tf", modify the BIG-IQ license section to match your environment
-4. In the "do.json", add the "myLicense" block under the "Common" declaration ([full declaration example here](https://clouddocs.f5.com/products/extensions/f5-declarative-onboarding/latest/bigiq-examples.html#licensing-with-big-iq-regkey-pool-route-to-big-ip))
+4. In the "f5_onboard.tmpl", add the "myLicense" block under the "Common" declaration ([example here](https://github.com/F5Networks/f5-google-gdm-templates-v2/blob/main/examples/autoscale/bigip-configurations/runtime-init-conf-bigiq.yaml))
   ```
-        "myLicense": {
-            "class": "License",
-            "licenseType": "${bigIqLicenseType}",
-            "bigIqHost": "${bigIqHost}",
-            "bigIqUsername": "${bigIqUsername}",
-            "bigIqPassword": "$${bigIqPassword}",
-            "licensePool": "${bigIqLicensePool}",
-            "skuKeyword1": "${bigIqSkuKeyword1}",
-            "skuKeyword2": "${bigIqSkuKeyword2}",
-            "unitOfMeasure": "${bigIqUnitOfMeasure}",
-            "reachable": false,
-            "hypervisor": "${bigIqHypervisor}",
-            "overwrite": true
-        },
+          myLicense:
+            class: License
+            licenseType: ${bigIqLicenseType}
+            bigIqHost: ${bigIqHost}
+            bigIqUsername: ${bigIqUsername}
+            bigIqPassword: ${bigIqPassword}
+            licensePool: ${bigIqLicensePool}
+            skuKeyword1: ${bigIqSkuKeyword1}
+            skuKeyword2: ${bigIqSkuKeyword2}
+            unitOfMeasure: ${bigIqUnitOfMeasure}
+            reachable: false
+            hypervisor: ${bigIqHypervisor}
+            overwrite: true
   ```
-  ***Note***: The [onboard.tpl](./onboard.tpl) startup script will use the same 'usecret' payload value (aka password) for BIG-IP password AND the BIG-IQ password. In the onboard.tpl file, this happens in the 'passwd' variable. You can use a separate password for BIG-IQ by creating a new Google Secret Manager secret for the BIG-IQ password, then add a new variable for the secret in [variables.tf](./variables.tf), modify [bigip.tf](./bigip.tf) to include the secret in the local templatefile section similar to 'usecret', then update [onboard.tpl](./onboard.tpl) to query Secret Manager for the BIG-IQ secret name. Reference code example *usecret='${usecret}'*.
 
 <!-- markdownlint-disable no-inline-html -->
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
@@ -268,10 +256,10 @@ To run this Terraform template, perform the following steps:
   2. Modify terraform.tfvars with the required information
   ```
       # BIG-IP Environment
-      uname          = "admin"
-      usecret        = "my-secret"
-      gceSshPubKey   = "ssh-rsa xxxxx
-      prefix         = "mydemo123"
+      f5_username    = "admin"
+      f5_password    = "Default12345!"
+      ssh_key        = "~/.ssh/id_rsa.pub"
+      projectPrefix  = "mydemo123"
       adminSrcAddr   = "0.0.0.0/0"
       mgmtVpc        = "xxxxx-net-mgmt"
       extVpc         = "xxxxx-net-ext"
@@ -279,11 +267,11 @@ To run this Terraform template, perform the following steps:
       mgmtSubnet     = "xxxxx-subnet-mgmt"
       extSubnet      = "xxxxx-subnet-ext"
       intSubnet      = "xxxxx-subnet-int"
-      dns_suffix     = "c.xxxxx.xxxxx.internal"
-      alias_ip_range = "10.1.10.130/32"
+      dns_suffix     = "example.com"
 
       # BIG-IQ Environment
       bigIqUsername = "admin"
+      bigIqPassword = "Default12345!"
 
       # Google Environment
       gcp_project_id = "xxxxx"
@@ -321,7 +309,7 @@ For more information on F5 solutions for Google, including manual configuration 
 
 ## Creating Virtual Servers on the BIG-IP VE
 
-In order to pass traffic from your clients to the servers through the BIG-IP system, you must create a virtual server on the BIG-IP VE. In this template, the AS3 declaration creates 2 VIPs: one for public internet facing, and one for private internal usage. It is preconfigured as an example.
+In order to pass traffic from your clients to the servers through the BIG-IP system, you must create a virtual server on the BIG-IP VE. In this template, the AS3 declaration creates 1 VIP listening on 0.0.0.0/0:80 as an example.
 
 In this template, the Google public IP address is associated with the active BIG-IP device NIC0. The address is created with a [Google Forwarding Rule](https://cloud.google.com/load-balancing/docs/forwarding-rule-concepts), and this IP address will be the same IP you see as a virtual server on the BIG-IP.
 
@@ -330,8 +318,8 @@ In this template, the Google public IP address is associated with the active BIG
 2. Click **Local Traffic > Virtual Servers**
 3. Click the **Create** button
 4. Type a name in the **Name** field
-4. Type an address (ex. x.x.x.x/x) in the **Destination/Mask** field
-5. Type a port (ex. 443) in the **Service Port**
+4. Type an address (ex. 0.0.0.0/0) in the **Destination/Mask** field
+5. Type a port (ex. 80) in the **Service Port**
 6. Configure the rest of the virtual server as appropriate
 7. Select a pool name from the **Default Pool** list
 8. Click the **Finished** button
@@ -343,8 +331,8 @@ This example illustrates how to replace or upgrade the BIG-IP VE.
   2. Revoke the problematic BIG-IP VE's license (if BYOL)
   3. Run command
 ```
-terraform taint google_compute_instance.f5vm01
-terraform taint google_compute_instance.f5vm02
+terraform taint module.bigip.google_compute_instance.f5vm01
+terraform taint module.bigip2.google_compute_instance.f5vm01
 terraform taint google_compute_target_instance.f5vm01
 terraform taint google_compute_target_instance.f5vm02
 terraform taint google_compute_forwarding_rule.vip1
@@ -353,3 +341,21 @@ terraform taint google_compute_forwarding_rule.vip1
 ```
 terraform apply
 ```
+
+## Troubleshooting
+
+### Serial Logs
+Review the serial logs for the Google virtual machine. Login to the Google Cloud console, open "Compute Engine", then locate your instance...click it. Then review the serial logs for errors.
+
+### Onboard Logs
+Depending on where onboard fails, you can attempt SSH login and try to troubleshoot further. Inspect the /config/cloud directory for correct runtime init YAML files. Inspec the /var/log/cloud location for error logs.
+
+### F5 Automation Toolchain Components
+F5 BIG-IP Runtime Init uses the F5 Automation Toolchain for configuration of BIG-IP instances.  Any errors thrown from these components will be surfaced in the bigIpRuntimeInit.log (or a custom log location as specified below).
+
+Help with troubleshooting individual Automation Toolchain components can be found at F5's [Public Cloud Docs](http://clouddocs.f5.com/cloud/public/v1/):
+- DO: https://clouddocs.f5.com/products/extensions/f5-declarative-onboarding/latest/troubleshooting.html
+- AS3: https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/userguide/troubleshooting.html
+- FAST: https://clouddocs.f5.com/products/extensions/f5-appsvcs-templates/latest/userguide/troubleshooting.html
+- TS: https://clouddocs.f5.com/products/extensions/f5-telemetry-streaming/latest/userguide/troubleshooting.html
+- CFE: https://clouddocs.f5.com/products/extensions/f5-cloud-failover/latest/userguide/troubleshooting.html
