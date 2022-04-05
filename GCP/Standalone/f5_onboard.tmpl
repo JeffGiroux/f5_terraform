@@ -347,7 +347,7 @@ if [[ ${NIC_COUNT} && ! -f /config/nicswap_finished ]]; then
    tmsh create sys management-route default gateway $${MGMTGATEWAY} mtu $${MGMTMTU}
    tmsh modify sys global-settings remote-host add { metadata.google.internal { hostname metadata.google.internal addr 169.254.169.254 } }
    tmsh modify sys management-dhcp sys-mgmt-dhcp-config request-options delete { ntp-servers }
-   # Use GCP metadata server for DNS during onboarding
+   # JeffGiroux - Use GCP metadata server for DNS during onboarding
    tmsh modify sys dns name-servers add { 169.254.169.254 }
    tmsh save /sys config
    /usr/bin/touch /config/nicswap_finished
