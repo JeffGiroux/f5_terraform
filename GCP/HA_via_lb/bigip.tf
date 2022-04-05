@@ -131,7 +131,7 @@ locals {
     dns_suffix                        = var.dns_suffix
     ntp_server                        = var.ntp_server
     timezone                          = var.timezone
-    host_name2                        = module.bigip.name
+    host_name2                        = format("%s.%s", module.bigip.name, var.dns_suffix)
     remote_host                       = google_compute_address.ext.address
     bigIqLicenseType                  = var.bigIqLicenseType
     bigIqHost                         = var.bigIqHost
