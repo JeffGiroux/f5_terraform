@@ -160,7 +160,7 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 
 | Name | Version |
 |------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | >= 4 |
+| <a name="provider_google"></a> [google](#provider\_google) | 4.16.0 |
 
 ## Modules
 
