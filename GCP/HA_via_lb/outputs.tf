@@ -54,7 +54,7 @@ output "public_vip" {
 }
 output "public_vip_url" {
   description = "public URL for application"
-  value       = "https://${google_compute_forwarding_rule.vip1.ip_address}"
+  value       = "http://${google_compute_forwarding_rule.vip1.ip_address}"
 }
 output "internal_vip" {
   description = "private IP address for application"
@@ -62,5 +62,5 @@ output "internal_vip" {
 }
 output "internal_vip_url" {
   description = "private URL for application"
-  value       = "https://${google_compute_forwarding_rule.vip2-internal.ip_address}"
+  value       = "http://${google_compute_forwarding_rule.vip2-internal.ip_address}"
 }
