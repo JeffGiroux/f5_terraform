@@ -346,8 +346,8 @@ This example illustrates how to replace or upgrade the BIG-IP VE.
   2. Revoke the problematic BIG-IP VE's license (if BYOL)
   3. Run command
 ```
-terraform taint google_compute_instance.f5vm01
-terraform taint google_compute_instance.f5vm02
+terraform taint module.bigip.google_compute_instance.f5vm01
+terraform taint module.bigip.google_compute_instance.f5vm02
 ```
   3. Run command
 ```
