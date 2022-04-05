@@ -59,8 +59,6 @@ Terraform is beneficial as it allows composing resources a bit differently to ac
     - Application access will require tcp/80 and tcp/443 on the external network
     - Google Health Checks will require tcp/40000 on the external network. Refer to [Google Health Check Concepts](https://cloud.google.com/load-balancing/docs/health-check-concepts) to see source IP ranges for the Google probes. These IP ranges and ports (tcp/40000 in this example) need to be open in your firewall rules on the external network.
   - If you require a new network first, see the [Infrastructure Only folder](../Infrastructure-only) to get started.
-  - The parameter 'dns_suffix' must match the DNS suffix assigned by the GCP project. You can retrieve this value by logging into an existing VM in the same project and running 'uname -a' or reviewing the /etc/resolv.conf file. Failure to properly set 'dns_suffix' will result in failed hostname lookup during HA setup.
-
 
 ## Important Configuration Notes
 
@@ -274,7 +272,7 @@ To run this Terraform template, perform the following steps:
       mgmtSubnet     = "xxxxx-subnet-mgmt"
       extSubnet      = "xxxxx-subnet-ext"
       intSubnet      = "xxxxx-subnet-int"
-      dns_suffix     = "c.xxxxx.xxxxx.internal"
+      dns_suffix     = "example.com"
 
       # BIG-IQ Environment
       bigIqUsername = "admin"
