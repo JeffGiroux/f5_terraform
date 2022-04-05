@@ -160,11 +160,6 @@ variable "INIT_URL" {
   type        = string
   default     = "https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.4.1/dist/f5-bigip-runtime-init-1.4.1-1.gz.run"
 }
-variable "onboard_log" {
-  type        = string
-  default     = "/var/log/cloud/onboard.log"
-  description = "This is where the onboarding script logs all the events"
-}
 variable "bigIqHost" {
   type        = string
   default     = ""
