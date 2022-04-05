@@ -160,6 +160,12 @@ cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
     headers:
       - name: Metadata-Flavor
         value: Google
+  - name: HOST1
+    type: static
+    value: ${host1}
+  - name: HOST2
+    type: static
+    value: ${host2}
   - name: PUBLIC_VIP
     type: static
     value: ${public_vip}
@@ -191,7 +197,7 @@ extension_services:
         schemaVersion: 1.0.0
         class: Device
         async: true
-        label: Onboard BIG-IP standalone
+        label: Onboard BIG-IP into an HA Pair
         Common:
           class: Tenant
           dbVars:
@@ -285,6 +291,31 @@ extension_services:
             gw: '{{{ GATEWAY_INTERNAL }}}'
             network: '{{{ NETWORK_BASE_INTERNAL }}}/{{{ NETWORK_MASK_INTERNAL }}}'
             mtu: '{{{ MTU_INTERNAL }}}'
+          configsync:
+            class: ConfigSync
+            configsyncIp: /Common/internal-localself/address
+          failoverAddress:
+            class: FailoverUnicast
+            address: /Common/internal-localself/address
+          failoverGroup:
+            class: DeviceGroup
+            type: sync-failover
+            members:
+              - '{{{ HOST1 }}}'
+              - '{{{ HOST2 }}}'
+            owner: /Common/failoverGroup/members/0
+            autoSync: true
+            saveOnAutoSync: false
+            networkFailover: true
+            fullLoadOnSync: false
+            asmSync: false
+          trust:
+            class: DeviceTrust
+            localUsername: '{{{ USER_NAME }}}'
+            localPassword: '{{{ ADMIN_PASS }}}'
+            remoteHost: /Common/failoverGroup/members/0
+            remoteUsername: '{{{ USER_NAME }}}'
+            remotePassword: '{{{ ADMIN_PASS }}}'
     - extensionType: as3
       type: inline
       value:
@@ -298,13 +329,23 @@ extension_services:
           remark: An HTTP sample application
           Sample_01:
             class: Tenant
+            Shared:
+              class: Application
+              template: shared
+              ILB_serviceAddress:
+                class: Service_Address
+                virtualAddress: '0.0.0.0/0'
+              GLB_serviceAddress:
+                class: Service_Address
+                virtualAddress: '{{{ PUBLIC_VIP }}}'
             A1:
               class: Application
               template: http
               serviceMain:
                 class: Service_HTTP
                 virtualAddresses:
-                  - '{{{ PUBLIC_VIP }}}'
+                  - use: /Sample_01/Shared/ILB_serviceAddress
+                  - use: /Sample_01/Shared/GLB_serviceAddress
                 pool: web_pool
               web_pool:
                 class: Pool
@@ -315,6 +356,27 @@ extension_services:
                     addressDiscovery: fqdn
                     autoPopulate: true
                     hostname: httpbin.org
+            GLB_Probe_Ext:
+              class: Application
+              fr-probe-external:
+                class: Service_HTTP
+                remark: Health check listener for external GLB
+                virtualPort: 40000
+                virtualAddresses:
+                  - use: /Sample_01/Shared/GLB_serviceAddress
+                iRules:
+                  - monitor_respond_200
+              monitor_respond_200:
+                class: iRule
+                iRule: when HTTP_REQUEST { HTTP::respond 200 content OK Content-Type text/plain }
+            ILB_Probe_Int:
+              class: Application
+              fr-probe-internal:
+                class: Service_TCP
+                remark: Health check listener for internal ILB
+                virtualPort: 40000
+                virtualAddresses:
+                  - use: /Sample_01/Shared/ILB_serviceAddress
     - extensionType: ts
       type: inline
       value:

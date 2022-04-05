@@ -6,13 +6,17 @@ fileignoreconfig:
 - filename: GCP/Standalone/bigip.tf
   checksum: d0bd7db45911680d47965e63b182bdba74c9dae552a3eb7b9a9455b1467d6c1e
 - filename: GCP/Standalone/README.md
-  checksum: 1da63702c6d849290ef6aca4d516c362a5ff669d5726c73a432f7170436fb0b8
+  checksum: b68b73aafa82d66475ae4fb25a91b087a0a8423872e38a1dbfd41fdeeba345b6
 - filename: GCP/Standalone/f5_onboard.tmpl
   checksum: 2183ee764c7691a2748947ad2b9a3249fabde9c526e54cd35a60dd95af00bd1f
 - filename: GCP/Standalone/examples/f5_onboard_with_ts.tmpl
   checksum: 98ff92b95be5cc20170aa6f254196f08e08411861eff298fba7e5053adef63a2
+- filename: GCP/HA_via_lb/variables.tf
+  checksum: c8cd97c66f74f4dc9cfe29fedb007b982bc3876586648104badce67ebca6db1f
+- filename: GCP/HA_via_lb/terraform.tfvars.example
+  checksum: 8b82a38ba39debf0b8ce79388f554853affe3595016e777bd494049d449d0bb5
 - filename: GCP/HA_via_lb/README.md
-  checksum: 05c9b6156e04b28d3c8ea9edc51061f7e0227e50ee70a438f17f87e7dcf9800d
+  checksum: 256d71ef902b939820d527ce15980f417be3b64aba4e36de2cc824681c8a391b
 - filename: GCP/HA_via_api/terraform.tfvars.example
   checksum: 46a7d4bb84e1d9e7c238526a573638c3d51697a08dce856eff023baa744d7ed5
 - filename: GCP/HA_via_api/README.md
@@ -73,3 +77,9 @@ fileignoreconfig:
   checksum: 092f6b1c8cd3c1f94115ac6c6d330e53ac07eb0043168165e2130900cd895349
 - filename: Azure/HA_via_lb/README.md
   checksum: ee5190df812f75cfdb25b6d74e542f8ac3d4e7827830785c3b835b275a10c877
+- filename: GCP/HA_via_lb/bigip.tf
+  checksum: dd41614fb55fb82182518a62708c30b97323fd1a4c0c7da9a36bef376eec6d72
+- filename: GCP/HA_via_lb/f5_onboard.tmpl
+  checksum: 08965ffcc489eea51c1beed3248845cf9f4ca4339a5aba279647fe10ac3c097a
+- filename: GCP/HA_via_lb/examples/f5_onboard_with_ts.tmpl
+  checksum: 43b67531bdd14504532ad714fc459a70ba5004e68322cf0e1dc785bbfcb45e17

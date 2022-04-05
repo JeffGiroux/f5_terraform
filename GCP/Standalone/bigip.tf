@@ -1,39 +1,5 @@
 # BIG-IP
 
-############################ Private IPs ############################
-
-# Reserve IPs on external subnet for BIG-IP nic0
-resource "google_compute_address" "ext" {
-  name         = "bigip-ext"
-  subnetwork   = var.extSubnet
-  address_type = "INTERNAL"
-  region       = replace(var.gcp_zone_1, "/-[a-z]$/", "")
-}
-
-# Reserve VIP on external subnet for BIG-IP nic0
-resource "google_compute_address" "vip" {
-  name         = "bigip-ext-vip"
-  subnetwork   = var.extSubnet
-  address_type = "INTERNAL"
-  region       = replace(var.gcp_zone_1, "/-[a-z]$/", "")
-}
-
-# Reserve IPs on management subnet for BIG-IP nic1
-resource "google_compute_address" "mgt" {
-  name         = "bigip-mgt"
-  subnetwork   = var.mgmtSubnet
-  address_type = "INTERNAL"
-  region       = replace(var.gcp_zone_1, "/-[a-z]$/", "")
-}
-
-# Reserve IPs on internal subnet for BIG-IP nic2
-resource "google_compute_address" "int" {
-  name         = "bigip-int"
-  subnetwork   = var.intSubnet
-  address_type = "INTERNAL"
-  region       = replace(var.gcp_zone_1, "/-[a-z]$/", "")
-}
-
 ############################ Public IPs ############################
 
 # Create Public IPs - VIP
@@ -53,6 +19,39 @@ resource "google_compute_target_instance" "f5vm01" {
   name     = format("%s-ti-%s", var.projectPrefix, random_id.buildSuffix.hex)
   instance = module.bigip.bigip_instance_ids
   zone     = var.gcp_zone_1
+}
+############################ Private IPs ############################
+
+# Reserve IPs on external subnet for BIG-IP 1 nic0
+resource "google_compute_address" "ext" {
+  name         = format("%s-bigip-ext-%s", var.projectPrefix, random_id.buildSuffix.hex)
+  subnetwork   = var.extSubnet
+  address_type = "INTERNAL"
+  region       = replace(var.gcp_zone_1, "/-[a-z]$/", "")
+}
+
+# Reserve VIP on external subnet for BIG-IP 1 nic0
+resource "google_compute_address" "vip" {
+  name         = format("%s-bigip-ext-vip-%s", var.projectPrefix, random_id.buildSuffix.hex)
+  subnetwork   = var.extSubnet
+  address_type = "INTERNAL"
+  region       = replace(var.gcp_zone_1, "/-[a-z]$/", "")
+}
+
+# Reserve IPs on management subnet for BIG-IP 1 nic1
+resource "google_compute_address" "mgt" {
+  name         = format("%s-bigip-mgt-%s", var.projectPrefix, random_id.buildSuffix.hex)
+  subnetwork   = var.mgmtSubnet
+  address_type = "INTERNAL"
+  region       = replace(var.gcp_zone_1, "/-[a-z]$/", "")
+}
+
+# Reserve IPs on internal subnet for BIG-IP 1 nic2
+resource "google_compute_address" "int" {
+  name         = format("%s-bigip-int-%s", var.projectPrefix, random_id.buildSuffix.hex)
+  subnetwork   = var.intSubnet
+  address_type = "INTERNAL"
+  region       = replace(var.gcp_zone_1, "/-[a-z]$/", "")
 }
 
 ############################ Onboard Scripts ############################
@@ -92,6 +91,7 @@ locals {
     bigIqHypervisor                   = var.bigIqHypervisor
     NIC_COUNT                         = true
     gcp_secret_manager_authentication = var.gcp_secret_manager_authentication
+    public_vip                        = google_compute_address.vip1.address
   })
 }
 
@@ -102,6 +102,7 @@ module "bigip" {
   project_id          = var.gcp_project_id
   zone                = var.gcp_zone_1
   image               = var.image_name
+  machine_type        = var.machine_type
   service_account     = var.svc_acct
   f5_username         = var.f5_username
   f5_password         = var.f5_password
