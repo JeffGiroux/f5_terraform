@@ -79,3 +79,5 @@ fileignoreconfig:
   checksum: ee5190df812f75cfdb25b6d74e542f8ac3d4e7827830785c3b835b275a10c877
 - filename: GCP/HA_via_lb/bigip.tf
   checksum: dd41614fb55fb82182518a62708c30b97323fd1a4c0c7da9a36bef376eec6d72
+- filename: GCP/HA_via_lb/f5_onboard.tmpl
+  checksum: 6149b4612f4189b55d3c29312ac83b5344b5310375c533be12d41c5ec6c2b234

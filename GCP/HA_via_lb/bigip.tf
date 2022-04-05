@@ -88,10 +88,13 @@ locals {
     AS3_VER                           = split("/", var.AS3_URL)[7]
     TS_VER                            = split("/", var.TS_URL)[7]
     FAST_VER                          = split("/", var.FAST_URL)[7]
+    remote_selfip_ext                 = google_compute_address.ext2.address
     dns_server                        = var.dns_server
     dns_suffix                        = var.dns_suffix
     ntp_server                        = var.ntp_server
     timezone                          = var.timezone
+    host_name2                        = ""
+    remote_host                       = google_compute_address.ext2.address
     bigIqLicenseType                  = var.bigIqLicenseType
     bigIqHost                         = var.bigIqHost
     bigIqPassword                     = var.bigIqPassword
@@ -103,6 +106,7 @@ locals {
     bigIqHypervisor                   = var.bigIqHypervisor
     NIC_COUNT                         = true
     gcp_secret_manager_authentication = var.gcp_secret_manager_authentication
+    public_vip                        = google_compute_address.vip1.address
   })
   f5_onboard2 = templatefile("${path.module}/f5_onboard.tmpl", {
     regKey                            = var.license2
@@ -122,10 +126,13 @@ locals {
     AS3_VER                           = split("/", var.AS3_URL)[7]
     TS_VER                            = split("/", var.TS_URL)[7]
     FAST_VER                          = split("/", var.FAST_URL)[7]
+    remote_selfip_ext                 = google_compute_address.ext.address
     dns_server                        = var.dns_server
     dns_suffix                        = var.dns_suffix
     ntp_server                        = var.ntp_server
     timezone                          = var.timezone
+    host_name2                        = module.bigip.name
+    remote_host                       = google_compute_address.ext.address
     bigIqLicenseType                  = var.bigIqLicenseType
     bigIqHost                         = var.bigIqHost
     bigIqPassword                     = var.bigIqPassword
@@ -137,6 +144,7 @@ locals {
     bigIqHypervisor                   = var.bigIqHypervisor
     NIC_COUNT                         = true
     gcp_secret_manager_authentication = var.gcp_secret_manager_authentication
+    public_vip                        = google_compute_address.vip1.address
   })
 }
 
