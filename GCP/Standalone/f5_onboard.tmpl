@@ -150,6 +150,9 @@ cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
     headers:
       - name: Metadata-Flavor
         value: Google
+  - name: PUBLIC_VIP
+    type: static
+    value: ${public_vip}
 pre_onboard_enabled:
   - name: provision_rest
     type: inline
@@ -285,7 +288,7 @@ extension_services:
               serviceMain:
                 class: Service_HTTP
                 virtualAddresses:
-                  - '0.0.0.0/0'
+                  - '{{{ PUBLIC_VIP }}}'
                 pool: web_pool
               web_pool:
                 class: Pool
