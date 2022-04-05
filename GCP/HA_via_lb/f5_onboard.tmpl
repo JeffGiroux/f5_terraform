@@ -153,9 +153,12 @@ cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
     headers:
       - name: Metadata-Flavor
         value: Google
-  - name: HOST_NAME2
+  - name: HOST1
     type: static
-    value: ${host_name2}
+    value: ${host1}
+  - name: HOST2
+    type: static
+    value: ${host2}
   - name: PUBLIC_VIP
     type: static
     value: ${public_vip}
@@ -285,8 +288,8 @@ extension_services:
             class: DeviceGroup
             type: sync-failover
             members:
-              - '{{{ HOST_NAME }}}'
-              - '{{{ HOST_NAME2 }}}'
+              - '{{{ HOST1 }}}'
+              - '{{{ HOST2 }}}'
             owner: /Common/failoverGroup/members/0
             autoSync: true
             saveOnAutoSync: false
@@ -297,7 +300,7 @@ extension_services:
             class: DeviceTrust
             localUsername: '{{{ USER_NAME }}}'
             localPassword: '{{{ ADMIN_PASS }}}'
-            remoteHost: '{{{ REMOTE_HOST }}}'
+            remoteHost: /Common/failoverGroup/members/0
             remoteUsername: '{{{ USER_NAME }}}'
             remotePassword: '{{{ ADMIN_PASS }}}'
     - extensionType: as3
@@ -352,7 +355,7 @@ extension_services:
                   - monitor_respond_200
               monitor_respond_200:
                 class: iRule
-                iRule: d2hlbiBIVFRQX1JFUVVFU1Qge1xuICAgSFRUUDo6cmVzcG9uZCAyMDAgU3lzdGVtIFJlc3BvbmRpbmcgXG59XG4=
+                iRule: when HTTP_REQUEST { HTTP::respond 200 content OK Content-Type text/plain }
             ILB_Probe_Int:
               class: Application
               fr-probe-internal:
@@ -412,6 +415,8 @@ if [[ ${NIC_COUNT} && ! -f /config/nicswap_finished ]]; then
    tmsh create sys management-route default gateway $${MGMTGATEWAY} mtu $${MGMTMTU}
    tmsh modify sys global-settings remote-host add { metadata.google.internal { hostname metadata.google.internal addr 169.254.169.254 } }
    tmsh modify sys management-dhcp sys-mgmt-dhcp-config request-options delete { ntp-servers }
+   # JeffGiroux - Use GCP metadata server for DNS during onboarding
+   tmsh modify sys dns name-servers add { 169.254.169.254 }
    tmsh save /sys config
    /usr/bin/touch /config/nicswap_finished
    reboot
