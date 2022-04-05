@@ -124,7 +124,7 @@ locals {
     host1                             = google_compute_address.mgt.address
     host2                             = google_compute_address.mgt2.address
     remote_selfip_ext                 = google_compute_address.ext2.address
-    f5_cloud_failover_label           = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
+    f5_cloud_failover_label           = var.projectPrefix
     managed_route                     = var.managed_route
     bigIqLicenseType                  = var.bigIqLicenseType
     bigIqHost                         = var.bigIqHost
@@ -166,7 +166,7 @@ locals {
     host1                             = google_compute_address.mgt.address
     host2                             = google_compute_address.mgt2.address
     remote_selfip_ext                 = google_compute_address.ext.address
-    f5_cloud_failover_label           = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
+    f5_cloud_failover_label           = var.projectPrefix
     managed_route                     = var.managed_route
     bigIqLicenseType                  = var.bigIqLicenseType
     bigIqHost                         = var.bigIqHost
@@ -201,7 +201,7 @@ module "bigip" {
   internal_subnet_ids = [{ "subnet_id" = var.intSubnet, "public_ip" = false, "private_ip_primary" = google_compute_address.int.address, "private_ip_secondary" = "" }]
   custom_user_data    = local.f5_onboard1
   sleep_time          = "30s"
-  labels              = { "f5_cloud_failover_label" : format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex) }
+  labels              = { "f5_cloud_failover_label" : var.projectPrefix }
 }
 
 module "bigip2" {
@@ -216,9 +216,9 @@ module "bigip2" {
   f5_password         = var.f5_password
   f5_ssh_publickey    = var.ssh_key
   mgmt_subnet_ids     = [{ "subnet_id" = var.mgmtSubnet, "public_ip" = true, "private_ip_primary" = google_compute_address.mgt2.address }]
-  external_subnet_ids = [{ "subnet_id" = var.extSubnet, "public_ip" = true, "private_ip_primary" = google_compute_address.ext2.address, "private_ip_secondary" = "" }]
+  external_subnet_ids = [{ "subnet_id" = var.extSubnet, "public_ip" = true, "private_ip_primary" = google_compute_address.ext2.address, "private_ip_secondary" = google_compute_address.vip.address }]
   internal_subnet_ids = [{ "subnet_id" = var.intSubnet, "public_ip" = false, "private_ip_primary" = google_compute_address.int2.address, "private_ip_secondary" = "" }]
   custom_user_data    = local.f5_onboard2
   sleep_time          = "30s"
-  labels              = { "f5_cloud_failover_label" : format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex) }
+  labels              = { "f5_cloud_failover_label" : var.projectPrefix }
 }
