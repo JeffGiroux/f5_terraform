@@ -1,5 +1,25 @@
 # BIG-IP
 
+############################ Public IPs ############################
+
+# Create Public IPs - VIP
+resource "google_compute_address" "vip1" {
+  name = format("%s-vip1-%s", var.projectPrefix, random_id.buildSuffix.hex)
+}
+
+# Forwarding rule for Public IP
+resource "google_compute_forwarding_rule" "vip1" {
+  name       = format("%s-forwarding-rule-%s", var.projectPrefix, random_id.buildSuffix.hex)
+  target     = google_compute_target_instance.f5vm01.id
+  ip_address = google_compute_address.vip1.address
+  port_range = "1-65535"
+}
+
+resource "google_compute_target_instance" "f5vm01" {
+  name     = format("%s-ti-%s", var.projectPrefix, random_id.buildSuffix.hex)
+  instance = module.bigip.bigip_instance_ids
+  zone     = var.gcp_zone_1
+}
 ############################ Private IPs ############################
 
 # Reserve IPs on external subnet for BIG-IP nic0
@@ -32,27 +52,6 @@ resource "google_compute_address" "int" {
   subnetwork   = var.intSubnet
   address_type = "INTERNAL"
   region       = replace(var.gcp_zone_1, "/-[a-z]$/", "")
-}
-
-############################ Public IPs ############################
-
-# Create Public IPs - VIP
-resource "google_compute_address" "vip1" {
-  name = format("%s-vip1-%s", var.projectPrefix, random_id.buildSuffix.hex)
-}
-
-# Forwarding rule for Public IP
-resource "google_compute_forwarding_rule" "vip1" {
-  name       = format("%s-forwarding-rule-%s", var.projectPrefix, random_id.buildSuffix.hex)
-  target     = google_compute_target_instance.f5vm01.id
-  ip_address = google_compute_address.vip1.address
-  port_range = "1-65535"
-}
-
-resource "google_compute_target_instance" "f5vm01" {
-  name     = format("%s-ti-%s", var.projectPrefix, random_id.buildSuffix.hex)
-  instance = module.bigip.bigip_instance_ids
-  zone     = var.gcp_zone_1
 }
 
 ############################ Onboard Scripts ############################
