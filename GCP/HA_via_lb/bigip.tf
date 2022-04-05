@@ -88,7 +88,6 @@ locals {
     AS3_VER                           = split("/", var.AS3_URL)[7]
     TS_VER                            = split("/", var.TS_URL)[7]
     FAST_VER                          = split("/", var.FAST_URL)[7]
-    remote_selfip_ext                 = google_compute_address.ext2.address
     dns_server                        = var.dns_server
     dns_suffix                        = var.dns_suffix
     ntp_server                        = var.ntp_server
@@ -126,7 +125,6 @@ locals {
     AS3_VER                           = split("/", var.AS3_URL)[7]
     TS_VER                            = split("/", var.TS_URL)[7]
     FAST_VER                          = split("/", var.FAST_URL)[7]
-    remote_selfip_ext                 = google_compute_address.ext.address
     dns_server                        = var.dns_server
     dns_suffix                        = var.dns_suffix
     ntp_server                        = var.ntp_server
