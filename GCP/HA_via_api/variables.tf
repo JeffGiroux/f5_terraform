@@ -132,7 +132,7 @@ variable "ssh_key" {
 }
 variable "dns_server" {
   type        = string
-  default     = "8.8.8.8"
+  default     = "169.254.169.254"
   description = "Leave the default DNS server the BIG-IP uses, or replace the default DNS server with the one you want to use"
 }
 variable "dns_suffix" {
