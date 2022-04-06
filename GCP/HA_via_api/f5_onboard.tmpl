@@ -311,6 +311,29 @@ extension_services:
             remoteHost: /Common/failoverGroup/members/0
             remoteUsername: '{{{ USER_NAME }}}'
             remotePassword: '{{{ ADMIN_PASS }}}'
+    - extensionType: cf
+      type: inline
+      value:
+        class: Cloud_Failover
+        environment: gcp
+        externalStorage:
+          scopingTags:
+            f5_cloud_failover_label: '{{{ FAILOVER_LABEL }}}'
+        failoverAddresses:
+          enabled: true
+          scopingTags:
+            f5_cloud_failover_label: '{{{ FAILOVER_LABEL }}}'
+        failoverRoutes:
+          enabled: true
+          scopingTags:
+            f5_cloud_failover_label: '{{{ FAILOVER_LABEL }}}'
+          scopingAddressRanges:
+            - range: '{{{ MANAGED_ROUTE }}}'
+          defaultNextHopAddresses:
+            discoveryType: static
+            items:
+              - '{{{ SELF_IP_EXTERNAL }}}'
+              - '{{{ REMOTE_SELF_IP_EXTERNAL }}}'
     - extensionType: as3
       type: inline
       value:
@@ -341,29 +364,6 @@ extension_services:
                     addressDiscovery: fqdn
                     autoPopulate: true
                     hostname: httpbin.org
-    - extensionType: cf
-      type: inline
-      value:
-        class: Cloud_Failover
-        environment: gcp
-        externalStorage:
-          scopingTags:
-            f5_cloud_failover_label: '{{{ FAILOVER_LABEL }}}'
-        failoverAddresses:
-          enabled: true
-          scopingTags:
-            f5_cloud_failover_label: '{{{ FAILOVER_LABEL }}}'
-        failoverRoutes:
-          enabled: true
-          scopingTags:
-            f5_cloud_failover_label: '{{{ FAILOVER_LABEL }}}'
-          scopingAddressRanges:
-            - range: '{{{ MANAGED_ROUTE }}}'
-          defaultNextHopAddresses:
-            discoveryType: static
-            items:
-              - '{{{ SELF_IP_EXTERNAL }}}'
-              - '{{{ REMOTE_SELF_IP_EXTERNAL }}}'
 post_onboard_enabled:
   - name: trigger_failover
     type: inline
