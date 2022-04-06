@@ -172,7 +172,7 @@ pre_onboard_enabled:
   - name: provision_rest
     type: inline
     commands:
-      - /usr/bin/setdb provision.extramb 1024
+      - /usr/bin/setdb provision.extramb 1536
       - /usr/bin/setdb restjavad.useextramb true
 extension_packages:
   install_operations:
@@ -199,7 +199,7 @@ extension_services:
           dbVars:
             class: DbVariables
             restjavad.useextramb: true
-            provision.extramb: 1024
+            provision.extramb: 1536
             config.allow.rfc3927: enable
             ui.advisory.enabled: true
             ui.advisory.color: blue
