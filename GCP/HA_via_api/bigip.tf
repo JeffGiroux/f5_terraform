@@ -10,7 +10,7 @@ resource "google_compute_address" "vip1" {
 # Forwarding rule for Public IP
 resource "google_compute_forwarding_rule" "vip1" {
   name       = format("%s-forwarding-rule-%s", var.projectPrefix, random_id.buildSuffix.hex)
-  target     = google_compute_target_instance.f5vm02.id
+  target     = google_compute_target_instance.f5vm01.id
   ip_address = google_compute_address.vip1.address
   port_range = "1-65535"
 }
@@ -197,7 +197,7 @@ module "bigip" {
   f5_password         = var.f5_password
   f5_ssh_publickey    = var.ssh_key
   mgmt_subnet_ids     = [{ "subnet_id" = var.mgmtSubnet, "public_ip" = true, "private_ip_primary" = google_compute_address.mgt.address }]
-  external_subnet_ids = [{ "subnet_id" = var.extSubnet, "public_ip" = true, "private_ip_primary" = google_compute_address.ext.address, "private_ip_secondary" = "" }]
+  external_subnet_ids = [{ "subnet_id" = var.extSubnet, "public_ip" = true, "private_ip_primary" = google_compute_address.ext.address, "private_ip_secondary" = google_compute_address.vip.address }]
   internal_subnet_ids = [{ "subnet_id" = var.intSubnet, "public_ip" = false, "private_ip_primary" = google_compute_address.int.address, "private_ip_secondary" = "" }]
   custom_user_data    = local.f5_onboard1
   sleep_time          = "30s"
@@ -216,7 +216,7 @@ module "bigip2" {
   f5_password         = var.f5_password
   f5_ssh_publickey    = var.ssh_key
   mgmt_subnet_ids     = [{ "subnet_id" = var.mgmtSubnet, "public_ip" = true, "private_ip_primary" = google_compute_address.mgt2.address }]
-  external_subnet_ids = [{ "subnet_id" = var.extSubnet, "public_ip" = true, "private_ip_primary" = google_compute_address.ext2.address, "private_ip_secondary" = google_compute_address.vip.address }]
+  external_subnet_ids = [{ "subnet_id" = var.extSubnet, "public_ip" = true, "private_ip_primary" = google_compute_address.ext2.address, "private_ip_secondary" = "" }]
   internal_subnet_ids = [{ "subnet_id" = var.intSubnet, "public_ip" = false, "private_ip_primary" = google_compute_address.int2.address, "private_ip_secondary" = "" }]
   custom_user_data    = local.f5_onboard2
   sleep_time          = "30s"
