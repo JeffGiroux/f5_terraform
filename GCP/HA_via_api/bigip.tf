@@ -138,6 +138,7 @@ locals {
     NIC_COUNT                         = true
     gcp_secret_manager_authentication = var.gcp_secret_manager_authentication
     public_vip                        = google_compute_address.vip1.address
+    private_vip                       = google_compute_address.vip.address
   })
   f5_onboard2 = templatefile("${path.module}/f5_onboard.tmpl", {
     regKey                            = var.license2
@@ -180,6 +181,7 @@ locals {
     NIC_COUNT                         = true
     gcp_secret_manager_authentication = var.gcp_secret_manager_authentication
     public_vip                        = google_compute_address.vip1.address
+    private_vip                       = google_compute_address.vip.address
   })
 }
 
