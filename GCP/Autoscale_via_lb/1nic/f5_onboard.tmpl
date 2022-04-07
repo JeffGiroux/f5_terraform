@@ -121,11 +121,7 @@ cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
   - name: PUBLIC_VIP
     type: static
     value: ${public_vip}
-pre_onboard_enabled:
-  - name: set temporary password
-    type: inline
-    commands:
-      - tmsh modify auth user admin password ${f5_password}
+pre_onboard_enabled: []
 extension_packages:
   install_operations:
     - extensionType: do
