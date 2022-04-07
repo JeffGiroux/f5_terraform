@@ -18,6 +18,13 @@ fi
 
 mkdir -p  /var/log/cloud /config/cloud /var/config/rest/downloads /var/lib/cloud/icontrollx_installs
 
+# Optional optimizations required as early as possible in boot sequence before MCDP starts up.
+# JeffGiroux - If placed into runtime init pre-onboard,
+#              you receive error "Error getting project
+#              ID Unable to detect a Project Id in the
+#              current environment"
+/usr/bin/setdb provision.extramb 1024
+/usr/bin/setdb restjavad.useextramb true
 
 # Create runtime configuration on first boot
 if [[ ! -f /config/nicswap_finished ]]; then
@@ -114,11 +121,10 @@ cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
     type: static
     value: ${public_vip}
 pre_onboard_enabled:
-  - name: provision_rest
+  - name: set temporary password
     type: inline
     commands:
-      - /usr/bin/setdb provision.extramb 1024
-      - /usr/bin/setdb restjavad.useextramb true
+      - tmsh modify auth user admin password ${f5_password}
 extension_packages:
   install_operations:
     - extensionType: do
@@ -178,34 +184,6 @@ extension_services:
           myProvisioning:
             class: Provision
             ltm: nominal
-          external:
-            class: VLAN
-            tag: 4094
-            mtu: '{{{ MTU_EXTERNAL }}}'
-            interfaces:
-              - name: '1.0'
-                tagged: false
-          external-localself:
-            class: SelfIp
-            address: '{{{ SELF_IP_EXTERNAL }}}/32'
-            vlan: external
-            allowService: default
-            trafficGroup: traffic-group-local-only
-          ext_gw_interface:
-            class: Route
-            target: external
-            network: '{{{ GATEWAY_EXTERNAL }}}/32'
-            mtu: '{{{ MTU_EXTERNAL }}}'
-          ext_rt:
-            class: Route
-            gw: '{{{ GATEWAY_EXTERNAL }}}'
-            network: '{{{ NETWORK_BASE_EXTERNAL }}}/{{{ NETWORK_MASK_EXTERNAL }}}'
-            mtu: '{{{ MTU_EXTERNAL }}}'
-          default:
-            class: Route
-            gw: '{{{ GATEWAY_EXTERNAL }}}'
-            network: default
-            mtu: '{{{ MTU_EXTERNAL }}}'
     - extensionType: as3
       type: inline
       value:
@@ -340,7 +318,9 @@ if [[ ! -f /config/nicswap_finished ]]; then
   for i in {1..30}; do
     curl -fv --retry 1 --connect-timeout 5 -L ${INIT_URL} -o "/var/config/rest/downloads/f5-bigip-runtime-init.gz.run" && break || sleep 10
   done
-  bash /var/config/rest/downloads/f5-bigip-runtime-init.gz.run -- '--cloud gcp' 2>&1
+  # debugging, comment export line to remove verbose logging
+  export F5_BIGIP_RUNTIME_INIT_LOG_LEVEL=silly && bash /var/config/rest/downloads/f5-bigip-runtime-init.gz.run -- '--cloud gcp' 2>&1
+  #bash /var/config/rest/downloads/f5-bigip-runtime-init.gz.run -- '--cloud gcp' 2>&1
   /usr/local/bin/f5-bigip-runtime-init --config-file /config/cloud/runtime-init-conf.yaml 2>&1
   /usr/bin/touch /config/startup_finished
 EOF
