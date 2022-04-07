@@ -89,3 +89,5 @@ fileignoreconfig:
   checksum: 13eeeff7122ec254c26b4cd5cd225c01b90ac5437d233160ed5751fb09c59f60
 - filename: GCP/Autoscale_via_lb/1nic/README.md
   checksum: 2114b3aeab499d1764c22d1fafa95093f396976ec6da476ce9b88b4c865180d1
+- filename: GCP/Autoscale_via_lb/1nic/terraform.tfvars.example
+  checksum: fabd3e55dbd08266ec7df65213c8b8e7803e9a1edd4a1e943ba15a2f6c72d48e
