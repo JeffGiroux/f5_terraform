@@ -5,12 +5,12 @@ variable "svc_acct" {
   default     = null
   description = "Service Account for VM instance"
 }
-variable "ksecret" {
+variable "telemetry_secret" {
   type        = string
   default     = ""
   description = "Contains the value of the 'svc_acct' private key. Currently used for BIG-IP telemetry streaming to Google Cloud Monitoring (aka StackDriver). If you are not using this feature, you do not need this secret in Secret Manager."
 }
-variable "privateKeyId" {
+variable "telemetry_privateKeyId" {
   type        = string
   default     = ""
   description = "ID of private key for the 'svc_acct' used in Telemetry Streaming to Google Cloud Monitoring. If you are not using this feature, you do not need this secret in Secret Manager."
@@ -35,7 +35,7 @@ variable "gcp_zone_2" {
   default     = "us-west1-b"
   description = "GCP Zone 2 for provider"
 }
-variable "prefix" {
+variable "projectPrefix" {
   type        = string
   default     = "demo"
   description = "This value is inserted at the beginning of each Google object (alpha-numeric, no special character)"
@@ -70,17 +70,12 @@ variable "mgmtSubnet" {
   default     = null
   description = "Management subnet"
 }
-variable "alias_ip_range" {
-  type        = string
-  default     = ""
-  description = "An array of alias IP ranges for the BIG-IP network interface (used for VIP traffic, SNAT IPs, etc). Example IP in demo is x.x.x.x/32 to accomodate for easier AS3 declaration. If you do not plan to initially onboard with an AS3 declartaion, then you can adjust the alias IP range to be a broader CIDR range."
-}
-variable "managed_route1" {
+variable "managed_route" {
   type        = string
   default     = "192.0.2.0/24"
-  description = "A UDR route can used for testing managed-route failover. Enter address prefix like x.x.x.x/x."
+  description = "A custom route can used for testing managed-route failover. Enter address prefix like x.x.x.x/x."
 }
-variable "bigipMachineType" {
+variable "machine_type" {
   type        = string
   default     = "n1-standard-8"
   description = "Google machine type to be used for the BIG-IP VE"
@@ -100,15 +95,20 @@ variable "customUserData" {
   default     = ""
   description = "The custom user data to deploy when using the 'customImage' paramater too."
 }
-variable "uname" {
+variable "f5_username" {
   type        = string
   default     = "admin"
   description = "User name for the Virtual Machine"
 }
-variable "usecret" {
+variable "f5_password" {
   type        = string
   default     = null
-  description = "Used during onboarding to query the Google Cloud Secret Manager API and retrieve the admin password (use the secret name, not the secret value/password)"
+  description = "Password for the Virtual Machine"
+}
+variable "gcp_secret_manager_authentication" {
+  description = "Whether to use secret manager to pass authentication"
+  type        = bool
+  default     = false
 }
 variable "license1" {
   type        = string
@@ -125,24 +125,14 @@ variable "adminSrcAddr" {
   default     = "0.0.0.0/0"
   description = "Trusted source network for admin access"
 }
-variable "gceSshPubKey" {
+variable "ssh_key" {
   type        = string
   default     = null
-  description = "SSH public key for admin authentation. Must be in ssh-rsa format."
-}
-variable "host1_name" {
-  type        = string
-  default     = "f5vm01"
-  description = "Hostname for the first BIG-IP"
-}
-variable "host2_name" {
-  type        = string
-  default     = "f5vm02"
-  description = "Hostname for the second BIG-IP"
+  description = "Path to the public key to be used for ssh access to the VM.  Only used with non-Windows vms and can be left as-is even if using Windows vms. If specifying a path to a certification on a Windows machine to provision a linux vm use the / in the path versus backslash. e.g. c:/home/id_rsa.pub"
 }
 variable "dns_server" {
   type        = string
-  default     = "8.8.8.8"
+  default     = "169.254.169.254"
   description = "Leave the default DNS server the BIG-IP uses, or replace the default DNS server with the one you want to use"
 }
 variable "dns_suffix" {
@@ -175,15 +165,20 @@ variable "TS_URL" {
   default     = "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.27.0/f5-telemetry-1.27.0-3.noarch.rpm"
   description = "URL to download the BIG-IP Telemetry Streaming module"
 }
+variable "FAST_URL" {
+  description = "URL to download the BIG-IP FAST module"
+  type        = string
+  default     = "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.16.0/f5-appsvcs-templates-1.16.0-1.noarch.rpm"
+}
 variable "CFE_URL" {
   description = "URL to download the BIG-IP Cloud Failover Extension module"
   type        = string
   default     = "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.10.0/f5-cloud-failover-1.10.0-0.noarch.rpm"
 }
-variable "onboard_log" {
+variable "INIT_URL" {
+  description = "URL to download the BIG-IP runtime init"
   type        = string
-  default     = "/var/log/cloud/onboard.log"
-  description = "This is where the onboarding script logs all the events"
+  default     = "https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.4.1/dist/f5-bigip-runtime-init-1.4.1-1.gz.run"
 }
 variable "bigIqHost" {
   type        = string
@@ -194,6 +189,11 @@ variable "bigIqUsername" {
   type        = string
   default     = "admin"
   description = "Admin name for BIG-IQ"
+}
+variable "bigIqPassword" {
+  type        = string
+  default     = "Default12345!"
+  description = "Admin Password for BIG-IQ"
 }
 variable "bigIqLicenseType" {
   type        = string
@@ -230,8 +230,8 @@ variable "owner" {
   default     = null
   description = "This is a tag used for object creation. Example is last name."
 }
-variable "f5_cloud_failover_label" {
+variable "f5_cloud_failover_nic_map" {
   type        = string
-  default     = "mydeployment"
-  description = "This is a tag used for F5 Cloud Failover Extension to identity which cloud objects to move during a failover event."
+  default     = "external"
+  description = "This is a tag used for failover NIC"
 }
