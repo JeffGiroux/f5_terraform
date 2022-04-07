@@ -2,8 +2,6 @@
 
 ############################ Onboard Scripts ############################
 
-############################ Onboard Scripts ############################
-
 # Setup Onboarding scripts
 locals {
   f5_onboard1 = templatefile("${path.module}/f5_onboard.tmpl", {
@@ -46,8 +44,9 @@ locals {
 ############################ Compute ############################
 
 # F5 BIG-IP VMs Instance Template
-resource "google_compute_instance_template" "f5vm" {
-  name_prefix    = format("%s-f5vm-%s", var.projectPrefix, random_id.buildSuffix.hex)
+resource "google_compute_instance_template" "bigip" {
+  name_prefix    = format("%s-bigip-%s", var.projectPrefix, random_id.buildSuffix.hex)
+  project        = var.gcp_project_id
   machine_type   = var.machine_type
   can_ip_forward = true
 
@@ -81,8 +80,8 @@ resource "google_compute_instance_template" "f5vm" {
 }
 
 # Health Check for BIG-IP instance group for auto healing
-resource "google_compute_health_check" "f5vm" {
-  name                = format("%s-hc-f5vm-%s", var.projectPrefix, random_id.buildSuffix.hex)
+resource "google_compute_health_check" "bigip" {
+  name                = format("%s-hc-bigip-%s", var.projectPrefix, random_id.buildSuffix.hex)
   timeout_sec         = 10
   check_interval_sec  = 30
   healthy_threshold   = 2
@@ -94,20 +93,20 @@ resource "google_compute_health_check" "f5vm" {
 }
 
 # Managed Instance Group (auto healing, upgrades)
-resource "google_compute_region_instance_group_manager" "f5vm" {
+resource "google_compute_region_instance_group_manager" "bigip" {
   name               = format("%s-igm-%s", var.projectPrefix, random_id.buildSuffix.hex)
-  base_instance_name = format("%s-f5vm", var.projectPrefix)
+  base_instance_name = format("%s-bigip", var.projectPrefix)
   region             = var.gcp_region
-  target_pools       = [google_compute_target_pool.f5vm.id]
+  target_pools       = [google_compute_target_pool.bigip.id]
   wait_for_instances = false
 
   version {
-    name              = google_compute_instance_template.f5vm.name
-    instance_template = google_compute_instance_template.f5vm.id
+    name              = google_compute_instance_template.bigip.name
+    instance_template = google_compute_instance_template.bigip.id
   }
 
   auto_healing_policies {
-    health_check      = google_compute_health_check.f5vm.self_link
+    health_check      = google_compute_health_check.bigip.self_link
     initial_delay_sec = var.auto_healing_initial_delay_sec
   }
 
@@ -121,9 +120,9 @@ resource "google_compute_region_instance_group_manager" "f5vm" {
 }
 
 # Autoscaling policies
-resource "google_compute_region_autoscaler" "f5vm" {
-  name   = format("%s-f5vm-as-%s", var.projectPrefix, random_id.buildSuffix.hex)
-  target = google_compute_region_instance_group_manager.f5vm.id
+resource "google_compute_region_autoscaler" "bigip" {
+  name   = format("%s-bigip-as-%s", var.projectPrefix, random_id.buildSuffix.hex)
+  target = google_compute_region_instance_group_manager.bigip.id
 
   autoscaling_policy {
     max_replicas    = var.autoscaling_max_replicas
