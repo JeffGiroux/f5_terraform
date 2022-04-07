@@ -3,6 +3,7 @@
 ## To Do
 - Community support only. Not F5 supported.
 - Telemtry Streaming not used (see example folder)
+- Tracking appsvc async 503 error - https://github.com/F5Networks/f5-bigip-runtime-init/issues/42
 
 ## Issues
 - Find an issue? Fork, clone, create branch, fix and PR. I'll review and merge into the main branch. Or submit a GitHub issue with all necessary details and logs.
