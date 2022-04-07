@@ -159,12 +159,7 @@ cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
   - name: PUBLIC_VIP
     type: static
     value: ${public_vip}
-pre_onboard_enabled:
-  - name: provision_rest
-    type: inline
-    commands:
-      - /usr/bin/setdb provision.extramb 1024
-      - /usr/bin/setdb restjavad.useextramb true
+pre_onboard_enabled: []
 extension_packages:
   install_operations:
     - extensionType: do
