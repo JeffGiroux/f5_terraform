@@ -23,6 +23,7 @@ mkdir -p  /var/log/cloud /config/cloud /var/config/rest/downloads /var/lib/cloud
 #              you receive error "Error getting project
 #              ID Unable to detect a Project Id in the
 #              current environment"
+echo "Provisioning extra restjavad memory"
 /usr/bin/setdb provision.extramb 1024
 /usr/bin/setdb restjavad.useextramb true
 
@@ -318,9 +319,7 @@ if [[ ! -f /config/nicswap_finished ]]; then
   for i in {1..30}; do
     curl -fv --retry 1 --connect-timeout 5 -L ${INIT_URL} -o "/var/config/rest/downloads/f5-bigip-runtime-init.gz.run" && break || sleep 10
   done
-  # debugging, comment export line to remove verbose logging
-  export F5_BIGIP_RUNTIME_INIT_LOG_LEVEL=silly && bash /var/config/rest/downloads/f5-bigip-runtime-init.gz.run -- '--cloud gcp' 2>&1
-  #bash /var/config/rest/downloads/f5-bigip-runtime-init.gz.run -- '--cloud gcp' 2>&1
+  bash /var/config/rest/downloads/f5-bigip-runtime-init.gz.run -- '--cloud gcp' 2>&1
   /usr/local/bin/f5-bigip-runtime-init --config-file /config/cloud/runtime-init-conf.yaml 2>&1
   /usr/bin/touch /config/startup_finished
 EOF
