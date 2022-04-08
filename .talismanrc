@@ -95,3 +95,5 @@ fileignoreconfig:
   checksum: 693d7bb2f6f0c721eacdf2d112fbece97bec76435bd7e502fd5fbfd85a922153
 - filename: GCP/Autoscale_via_lb/1nic/f5_onboard.tmpl
   checksum: 7b332ae1f15b9542c197ec2d4af8231fbc7ef7f64de2e4ce7e4310e16e3e6261
+- filename: GCP/Autoscale_via_lb/3nic/terraform.tfvars.example
+  checksum: 30b37ca5f811352fa4306611cee8c4bce14927f2946a5f244cc940c486ccd733
