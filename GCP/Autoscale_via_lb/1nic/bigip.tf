@@ -1,54 +1,56 @@
 # BIG-IP
 
+############################ Onboard Scripts ############################
+
 # Setup Onboarding scripts
 locals {
-  vm01_onboard = templatefile("${path.module}/onboard.tpl", {
-    uname          = var.uname
-    usecret        = var.usecret
-    ksecret        = var.ksecret
-    gcp_project_id = var.gcp_project_id
-    DO_URL         = var.DO_URL
-    AS3_URL        = var.AS3_URL
-    TS_URL         = var.TS_URL
-    onboard_log    = var.onboard_log
-    DO_Document    = local.vm01_do_json
-    AS3_Document   = local.as3_json
-    TS_Document    = local.ts_json
-  })
-  vm01_do_json = templatefile("${path.module}/do.json", {
-    admin_username     = var.uname
-    dns_server         = var.dns_server
-    dns_suffix         = var.dns_suffix
-    ntp_server         = var.ntp_server
-    timezone           = var.timezone
-    bigIqLicenseType   = var.bigIqLicenseType
-    bigIqHost          = var.bigIqHost
-    bigIqUsername      = var.bigIqUsername
-    bigIqLicensePool   = var.bigIqLicensePool
-    bigIqSkuKeyword1   = var.bigIqSkuKeyword1
-    bigIqSkuKeyword2   = var.bigIqSkuKeyword2
-    bigIqUnitOfMeasure = var.bigIqUnitOfMeasure
-    bigIqHypervisor    = var.bigIqHypervisor
-  })
-  as3_json = templatefile("${path.module}/as3.json", {
-    gcp_region = var.gcp_region
-    publicvip  = google_compute_address.vip1.address
-    #publicvip = "0.0.0.0/0"
-  })
-  ts_json = templatefile("${path.module}/ts.json", {
-    gcp_project_id = var.gcp_project_id
-    svc_acct       = var.svc_acct
-    privateKeyId   = var.privateKeyId
+  f5_onboard1 = templatefile("${path.module}/f5_onboard.tmpl", {
+    regKey                            = var.license1
+    f5_username                       = var.f5_username
+    f5_password                       = var.f5_password
+    svc_acct                          = var.svc_acct
+    telemetry_secret                  = var.telemetry_secret
+    telemetry_privateKeyId            = var.telemetry_privateKeyId
+    ssh_keypair                       = file(var.ssh_key)
+    gcp_project_id                    = var.gcp_project_id
+    INIT_URL                          = var.INIT_URL
+    DO_URL                            = var.DO_URL
+    AS3_URL                           = var.AS3_URL
+    TS_URL                            = var.TS_URL
+    FAST_URL                          = var.FAST_URL
+    DO_VER                            = split("/", var.DO_URL)[7]
+    AS3_VER                           = split("/", var.AS3_URL)[7]
+    TS_VER                            = split("/", var.TS_URL)[7]
+    FAST_VER                          = split("/", var.FAST_URL)[7]
+    dns_server                        = var.dns_server
+    dns_suffix                        = var.dns_suffix
+    ntp_server                        = var.ntp_server
+    timezone                          = var.timezone
+    bigIqLicenseType                  = var.bigIqLicenseType
+    bigIqHost                         = var.bigIqHost
+    bigIqPassword                     = var.bigIqPassword
+    bigIqUsername                     = var.bigIqUsername
+    bigIqLicensePool                  = var.bigIqLicensePool
+    bigIqSkuKeyword1                  = var.bigIqSkuKeyword1
+    bigIqSkuKeyword2                  = var.bigIqSkuKeyword2
+    bigIqUnitOfMeasure                = var.bigIqUnitOfMeasure
+    bigIqHypervisor                   = var.bigIqHypervisor
+    NIC_COUNT                         = false
+    gcp_secret_manager_authentication = var.gcp_secret_manager_authentication
+    public_vip                        = google_compute_address.vip1.address
   })
 }
 
+############################ Compute ############################
+
 # F5 BIG-IP VMs Instance Template
-resource "google_compute_instance_template" "f5vm" {
-  name_prefix    = "${var.prefix}-f5vm-"
-  machine_type   = var.bigipMachineType
+resource "google_compute_instance_template" "bigip" {
+  name_prefix    = format("%s-bigip-%s", var.projectPrefix, random_id.buildSuffix.hex)
+  project        = var.gcp_project_id
+  machine_type   = var.machine_type
   can_ip_forward = true
 
-  tags = ["appfw-${var.prefix}", "mgmtfw-${var.prefix}"]
+  tags = ["appfw-${var.projectPrefix}", "mgmtfw-${var.projectPrefix}"]
 
   disk {
     source_image = var.customImage != "" ? var.customImage : var.image_name
@@ -62,9 +64,9 @@ resource "google_compute_instance_template" "f5vm" {
   }
 
   metadata = {
-    ssh-keys               = "${var.uname}:${var.gceSshPubKey}"
+    ssh-keys               = "${var.f5_username}:${var.ssh_key}"
     block-project-ssh-keys = true
-    startup-script         = var.customImage != "" ? var.customUserData : local.vm01_onboard
+    startup-script         = var.customImage != "" ? var.customUserData : local.f5_onboard1
   }
 
   service_account {
@@ -78,8 +80,8 @@ resource "google_compute_instance_template" "f5vm" {
 }
 
 # Health Check for BIG-IP instance group for auto healing
-resource "google_compute_health_check" "f5vm" {
-  name                = "${var.prefix}-hc-f5vm"
+resource "google_compute_health_check" "bigip" {
+  name                = format("%s-hc-bigip-%s", var.projectPrefix, random_id.buildSuffix.hex)
   timeout_sec         = 10
   check_interval_sec  = 30
   healthy_threshold   = 2
@@ -91,20 +93,20 @@ resource "google_compute_health_check" "f5vm" {
 }
 
 # Managed Instance Group (auto healing, upgrades)
-resource "google_compute_region_instance_group_manager" "f5vm" {
-  name               = "${var.prefix}-igm"
-  base_instance_name = "${var.prefix}-f5vm"
+resource "google_compute_region_instance_group_manager" "bigip" {
+  name               = format("%s-igm-%s", var.projectPrefix, random_id.buildSuffix.hex)
+  base_instance_name = format("%s-bigip", var.projectPrefix)
   region             = var.gcp_region
-  target_pools       = [google_compute_target_pool.f5vm.id]
+  target_pools       = [google_compute_target_pool.bigip.id]
   wait_for_instances = false
 
   version {
-    name              = google_compute_instance_template.f5vm.name
-    instance_template = google_compute_instance_template.f5vm.id
+    name              = google_compute_instance_template.bigip.name
+    instance_template = google_compute_instance_template.bigip.id
   }
 
   auto_healing_policies {
-    health_check      = google_compute_health_check.f5vm.self_link
+    health_check      = google_compute_health_check.bigip.self_link
     initial_delay_sec = var.auto_healing_initial_delay_sec
   }
 
@@ -118,9 +120,9 @@ resource "google_compute_region_instance_group_manager" "f5vm" {
 }
 
 # Autoscaling policies
-resource "google_compute_region_autoscaler" "f5vm" {
-  name   = "${var.prefix}-f5vm-as"
-  target = google_compute_region_instance_group_manager.f5vm.id
+resource "google_compute_region_autoscaler" "bigip" {
+  name   = format("%s-bigip-as-%s", var.projectPrefix, random_id.buildSuffix.hex)
+  target = google_compute_region_instance_group_manager.bigip.id
 
   autoscaling_policy {
     max_replicas    = var.autoscaling_max_replicas
@@ -132,9 +134,3 @@ resource "google_compute_region_autoscaler" "f5vm" {
     }
   }
 }
-
-# # Troubleshooting - create local output files
-# resource "local_file" "onboard_file" {
-#   content  = local.vm01_onboard
-#   filename = "${path.module}/vm01_onboard.tpl_data.json"
-# }

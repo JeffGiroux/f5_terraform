@@ -6,5 +6,5 @@ output "public_vip" {
 }
 output "public_vip_url" {
   description = "public URL for application"
-  value       = "https://${google_compute_forwarding_rule.vip1.ip_address}"
+  value       = "http://${google_compute_forwarding_rule.vip1.ip_address}"
 }

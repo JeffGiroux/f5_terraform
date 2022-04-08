@@ -19,10 +19,6 @@ fileignoreconfig:
   checksum: 256d71ef902b939820d527ce15980f417be3b64aba4e36de2cc824681c8a391b
 - filename: GCP/HA_via_api/terraform.tfvars.example
   checksum: f6ea35c21254781aa3bf2add99848730d6898ce9a4e3c44f4e072b5e1a458f71
-- filename: GCP/Autoscale_via_lb/1nic/README.md
-  checksum: a21478ef4050249abb98b7bd71f7f8b25647f736fbe0e900e959c5025731bbb1
-- filename: GCP/Autoscale_via_lb/3nic/README.md
-  checksum: 12c945cad966cd291232ad7dd83456c93375198ec41de39e6a0352c1f5e0f8f5
 - filename: Azure/Standalone/terraform.tfvars.example
   checksum: c8ebe4697e512763f913f67e2d8fa1b602ca1f739c49aefbbf9818a4f9bcea97
 - filename: Azure/Standalone/bigip.tf
@@ -89,3 +85,13 @@ fileignoreconfig:
   checksum: 70d747c3af894ca966951c35c992efad92761168454be9c2e55db1454a523b22
 - filename: GCP/HA_via_api/f5_onboard.tmpl
   checksum: ebabb91a8bad370778d6ae50f8a73aebc1defc7832772769f053d1298854b442
+- filename: GCP/Autoscale_via_lb/1nic/variables.tf
+  checksum: 13eeeff7122ec254c26b4cd5cd225c01b90ac5437d233160ed5751fb09c59f60
+- filename: GCP/Autoscale_via_lb/1nic/README.md
+  checksum: 2114b3aeab499d1764c22d1fafa95093f396976ec6da476ce9b88b4c865180d1
+- filename: GCP/Autoscale_via_lb/1nic/terraform.tfvars.example
+  checksum: fabd3e55dbd08266ec7df65213c8b8e7803e9a1edd4a1e943ba15a2f6c72d48e
+- filename: GCP/Autoscale_via_lb/1nic/bigip.tf
+  checksum: 693d7bb2f6f0c721eacdf2d112fbece97bec76435bd7e502fd5fbfd85a922153
+- filename: GCP/Autoscale_via_lb/1nic/f5_onboard.tmpl
+  checksum: 7b332ae1f15b9542c197ec2d4af8231fbc7ef7f64de2e4ce7e4310e16e3e6261
