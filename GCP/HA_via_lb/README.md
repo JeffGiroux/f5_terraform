@@ -53,7 +53,7 @@ Terraform is beneficial as it allows composing resources a bit differently to ac
   - 'telemetry_secret' Contains the value of the 'svc_acct' private key. Currently used for BIG-IP telemetry streaming to Google Cloud Monitoring (aka StackDriver). If you are not using this feature, you do not need this secret in Secret Manager.
   - Refer to [Template Parameters](#template-parameters)
 - This template deploys into an existing network
-  - You must have a VPC for management and a VPC for data traffic (client/server). The management VPC will have one subnet for management traffic. The External VPC will have one subnet for data traffic. The Internal VPC will have one subnet as well.
+  - You must have three VPCs: a VPC for management, an external VPC, and an internal VPC. The management VPC will have one subnet for management traffic. The External VPC will have one subnet for data traffic. The Internal VPC will have one subnet as well.
   - Firewall rules are required to pass traffic to the application
     - BIG-IP will require tcp/22 and tcp/443 on the mgmt network
     - Application access will require tcp/80 and tcp/443 on the external network

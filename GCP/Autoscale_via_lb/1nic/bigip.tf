@@ -5,7 +5,6 @@
 # Setup Onboarding scripts
 locals {
   f5_onboard1 = templatefile("${path.module}/f5_onboard.tmpl", {
-    regKey                            = var.license1
     f5_username                       = var.f5_username
     f5_password                       = var.f5_password
     svc_acct                          = var.svc_acct
@@ -46,7 +45,6 @@ locals {
 # F5 BIG-IP VMs Instance Template
 resource "google_compute_instance_template" "bigip" {
   name_prefix    = format("%s-bigip-%s", var.projectPrefix, random_id.buildSuffix.hex)
-  project        = var.gcp_project_id
   machine_type   = var.machine_type
   can_ip_forward = true
 

@@ -130,16 +130,6 @@ variable "gcp_secret_manager_authentication" {
   type        = bool
   default     = false
 }
-variable "license1" {
-  type        = string
-  default     = ""
-  description = "The license token for the first F5 BIG-IP VE (BYOL)"
-}
-variable "license2" {
-  type        = string
-  default     = ""
-  description = "The license token for the second F5 BIG-IP VE (BYOL)"
-}
 variable "adminSrcAddr" {
   type        = string
   default     = "0.0.0.0/0"
