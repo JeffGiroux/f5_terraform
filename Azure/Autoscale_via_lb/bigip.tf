@@ -19,7 +19,6 @@ locals {
     dns_server         = var.dns_server
     ntp_server         = var.ntp_server
     timezone           = var.timezone
-    host1              = format("%s-f5vm01-%s", var.projectPrefix, random_id.buildSuffix.hex)
     law_id             = azurerm_log_analytics_workspace.law.workspace_id
     law_primkey        = azurerm_log_analytics_workspace.law.primary_shared_key
     bigIqLicenseType   = var.bigIqLicenseType
