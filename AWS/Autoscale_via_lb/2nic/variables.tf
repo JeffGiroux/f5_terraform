@@ -48,7 +48,7 @@ variable "asg_desired_capacity" {
 variable "f5_ami_search_name" {
   type        = string
   description = "AWS AMI search filter to find correct BIG-IP VE for region"
-  default     = "F5 BIGIP-15.1.2.1* PAYG-Best 200Mbps*"
+  default     = "F5 BIGIP-16.1.2.2* PAYG-Best 200Mbps*"
 }
 variable "ec2_instance_type" {
   type        = string
