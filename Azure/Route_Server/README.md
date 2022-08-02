@@ -212,17 +212,17 @@ Use the following command to destroy all of the resources
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 0.14 |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~> 2 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.14.5 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | >= 3 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 2.77.0 |
-| <a name="provider_local"></a> [local](#provider\_local) | 2.1.0 |
-| <a name="provider_null"></a> [null](#provider\_null) | 3.1.0 |
-| <a name="provider_random"></a> [random](#provider\_random) | 3.1.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.16.0 |
+| <a name="provider_local"></a> [local](#provider\_local) | 2.2.3 |
+| <a name="provider_null"></a> [null](#provider\_null) | 3.1.1 |
+| <a name="provider_random"></a> [random](#provider\_random) | 3.3.2 |
 
 ## Modules
 
