@@ -40,5 +40,5 @@ output "appPrivateIP" {
 }
 output "bigip-private-ips" {
   description = "The private ip address for BIG-IP"
-  value       = element(module.bigip.*.private_addresses.public_private.private_ip, 0)
+  value       = element(flatten(module.bigip.*.private_addresses.public_private.private_ip), 0)
 }
