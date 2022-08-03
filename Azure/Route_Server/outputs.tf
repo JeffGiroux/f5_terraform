@@ -38,3 +38,7 @@ output "appPrivateIP" {
   description = "The private ip address allocated for the webapp in Spoke 2"
   value       = module.app.network_interface_private_ip
 }
+output "bigip-private-ips" {
+  description = "The private ip address for BIG-IP"
+  value       = module.bigip.*.private_addresses
+}
