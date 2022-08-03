@@ -159,9 +159,8 @@ extension_services:
             class: SelfIp
             address: '{{{ SELF_IP_EXTERNAL }}}/24'
             vlan: external
-            "allowService": [
-                "tcp:179"
-            ],
+            allowService:
+              - tcp:179
             trafficGroup: traffic-group-local-only
           internal:
             class: VLAN
