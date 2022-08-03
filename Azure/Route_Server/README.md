@@ -188,7 +188,7 @@ You can view BIG-IP onboard config files in /config/cloud. Review the declarativ
 If BIG-IP imish commands do not provide results to "show ip bgp" or "show run" but you do see "tmsh list net routing", then something happen in the preview tmsh BGP/routing feature. You should simply delete and recreate the device.
 ```bash
 # taint BIG-IP resource
-terraform taint module.bigip[0].azurerm_virtual_machine.f5vm01
+terraform taint module.bigip[0].azurerm_linux_virtual_machine.f5vm01
 terraform taint module.bigip[0].azurerm_virtual_machine_extension.vmext
 # re-run terraform
 ./setup.sh
