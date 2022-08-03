@@ -274,9 +274,8 @@ resource "azurerm_virtual_hub_bgp_connection" "bigip" {
   name           = "bigip-${count.index}"
   virtual_hub_id = azurerm_virtual_hub.routeServer.id
   peer_asn       = 65530
-  #peer_ip        = element(flatten(module.bigip.*.private_addresses["external_private"]), 0)
-  peer_ip    = "10.1.1.1"
-  depends_on = [azurerm_virtual_hub_ip.routeServerIp]
+  peer_ip        = element(module.bigip.*.private_addresses.public_private.private_ip, 0)
+  depends_on     = [azurerm_virtual_hub_ip.routeServerIp]
 }
 
 ############################ VM for Client ############################

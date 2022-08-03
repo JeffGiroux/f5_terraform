@@ -47,7 +47,7 @@ variable "f5_instance_type" {
 }
 variable "f5_version" {
   type        = string
-  default     = "16.1.300000"
+  default     = "16.1.301000"
   description = "BIG-IP Version"
 }
 variable "dns_server" {
@@ -93,11 +93,6 @@ variable "INIT_URL" {
 variable "libs_dir" {
   description = "Directory on the BIG-IP to download the A&O Toolchain into"
   default     = "/config/cloud/azure/node_modules"
-  type        = string
-}
-variable "onboard_log" {
-  description = "Directory on the BIG-IP to store the cloud-init logs"
-  default     = "/var/log/cloud/startup-script.log"
   type        = string
 }
 variable "bigIqHost" {

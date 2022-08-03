@@ -1,3 +1,4 @@
+############################ Locals ############################
 
 # Setup Onboarding scripts
 locals {
@@ -50,18 +51,4 @@ module "bigip" {
   f5_instance_type           = var.f5_instance_type
   f5_version                 = var.f5_version
   custom_user_data           = local.f5_onboard1
-}
-
-resource "null_resource" "clusterDO" {
-  count = var.instanceCountBigIp
-
-  provisioner "local-exec" {
-    command = "cat > DO_3nic-instance${count.index}.json <<EOL\n ${module.bigip[count.index].onboard_do}\nEOL"
-  }
-  provisioner "local-exec" {
-    when    = destroy
-    command = "rm -rf DO_3nic-instance${count.index}.json"
-  }
-
-  depends_on = [module.bigip.onboard_do]
 }
