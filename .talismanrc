@@ -27,8 +27,16 @@ fileignoreconfig:
   checksum: a29a3f5849bb8c656e88b208dda8371a49cb6175a5681bee422c3b4bfcb66641
 - filename: Azure/Secure_Enclave_Public_DMZ/README.md
   checksum: 0d6df57c347f4f1e327f564eb5acb1e4d4cb7fc79d641850c0bb536161578692
+- filename: Azure/Route_Server/admin.auto.tfvars.example
+  checksum: c8c6580605408e6483e7ae40916c0486dbc1d735b10821f8e64c1de8fc02334f
+- filename: Azure/Route_Server/bigip.tf
+  checksum: 8fb40ee7b1916b4454472f4ea6ee2a875883dc94d74ebdcf4d848373d0a77ec0
+- filename: Azure/Route_Server/main.tf
+  checksum: a52d02ea12d225954d242a3cfa72b5eb5b079e4c2ca90d60ea1cc42cf78546b2
+- filename: Azure/Route_Server/f5_onboard.tmpl
+  checksum: ee89040f31adaf0fa9656cb7cb42cf38cb42bab6e083532d1dca706ebf0721e4
 - filename: Azure/Route_Server/README.md
-  checksum: 34c61a9c10864b40505f85a88cca49e29196422f310f19bb8f9850483c365a45
+  checksum: f467ef023e7d47c4cb46337a911f97d8b51281876197275a40515b33bcf246c5
 - filename: Azure/HA_via_lb/f5_onboard.tmpl
   checksum: 3c49a3711eab7fce192cad700642735f36fbbc10ede1a8e3e68af5beb31aeba5
 - filename: Azure/HA_via_lb/bigip.tf
