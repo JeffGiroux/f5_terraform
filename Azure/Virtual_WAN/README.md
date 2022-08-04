@@ -83,7 +83,7 @@ Net::BGP Instance (route-domain: 0)
   Local AS                           65530
 
   ----------------------------------------------------------------------------
-  | Net::BGP Neighbor - 10.255.255.5 via 10.255.10.4
+  | Net::BGP Neighbor - 10.0.0.68 via 10.255.10.4
   ----------------------------------------------------------------------------
   | Remote AS                   0
   | State                       established   0:06:24
@@ -123,15 +123,15 @@ router bgp 65530
  no neighbor Neighbor capability route-refresh
  neighbor Neighbor soft-reconfiguration inbound
  neighbor Neighbor prefix-list /Common/myPrefixList1 out
- neighbor 10.255.255.4 peer-group Neighbor
- neighbor 10.255.255.5 peer-group Neighbor
+ neighbor 10.0.0.68 peer-group Neighbor
+ neighbor 10.0.0.69 peer-group Neighbor
  !
  address-family ipv6
  neighbor Neighbor activate
- no neighbor 10.255.255.4 activate
- no neighbor 10.255.255.4 capability graceful-restart
- no neighbor 10.255.255.5 activate
- no neighbor 10.255.255.5 capability graceful-restart
+ no neighbor 10.0.0.68 activate
+ no neighbor 10.0.0.68 capability graceful-restart
+ no neighbor 10.0.0.69 activate
+ no neighbor 10.0.0.69 capability graceful-restart
  exit-address-family
 !
 ip route 0.0.0.0/0 10.255.10.1
@@ -155,8 +155,8 @@ BGP table version is 6
 0 BGP community entries
 
 Neighbor        V    AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State/PfxRcd
-10.255.255.4    4 65515      20      17        6    0    0 00:02:38        3
-10.255.255.5    4 65515      19      20        6    0    0 00:02:38        3
+10.0.0.68    4 65515      20      17        6    0    0 00:02:38        3
+10.0.0.69    4 65515      19      20        6    0    0 00:02:38        3
 
 Total number of neighbors 2
 
@@ -168,15 +168,15 @@ Status codes: s suppressed, d damped, h history, * valid, > best, i - internal, 
 Origin codes: i - IGP, e - EGP, ? - incomplete
 
    Network          Next Hop            Metric     LocPrf     Weight Path
-*  10.1.0.0/16      10.255.255.5             0                     0 65515 i
-*>                  10.255.255.4             0                     0 65515 i
-*  10.2.0.0/16      10.255.255.5             0                     0 65515 i
-*>                  10.255.255.4             0                     0 65515 i
+*  10.1.0.0/16      10.0.0.69             0                     0 65515 i
+*>                  10.0.0.68             0                     0 65515 i
+*  10.2.0.0/16      10.0.0.69             0                     0 65515 i
+*>                  10.0.0.68             0                     0 65515 i
 *> 10.100.0.0/16    0.0.0.0                                    32768 ?
 *> 10.101.0.0/16    0.0.0.0                                    32768 ?
 *> 10.102.0.0/16    0.0.0.0                                    32768 ?
-*  10.255.0.0/16    10.255.255.5             0                     0 65515 i
-*>                  10.255.255.4             0                     0 65515 i
+*  10.255.0.0/16    10.0.0.69             0                     0 65515 i
+*>                  10.0.0.68             0                     0 65515 i
 
 Total number of prefixes 6
 ```
