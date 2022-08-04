@@ -150,35 +150,31 @@ end
 ```bash
 f5vm01.example.com[0]>show ip bgp summary
 BGP router identifier 10.255.20.4, local AS number 65530
-BGP table version is 6
-2 BGP AS-PATH entries
+BGP table version is 2
+3 BGP AS-PATH entries
 0 BGP community entries
 
 Neighbor        V    AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State/PfxRcd
-10.0.0.68    4 65515      20      17        6    0    0 00:02:38        3
-10.0.0.69    4 65515      19      20        6    0    0 00:02:38        3
+10.0.0.68       4 65515      24      47        2    0    0 00:09:11        1
+10.0.0.69       4 65515      24      46        2    0    0 00:09:11        1
 
 Total number of neighbors 2
 
 ##
 f5vm01.example.com[0]>show ip bgp
-BGP table version is 6, local router ID is 10.255.20.4
+BGP table version is 2, local router ID is 10.255.20.4
 Status codes: s suppressed, d damped, h history, * valid, > best, i - internal, l - labeled
               S Stale
 Origin codes: i - IGP, e - EGP, ? - incomplete
 
    Network          Next Hop            Metric     LocPrf     Weight Path
-*  10.1.0.0/16      10.0.0.69             0                     0 65515 i
-*>                  10.0.0.68             0                     0 65515 i
-*  10.2.0.0/16      10.0.0.69             0                     0 65515 i
-*>                  10.0.0.68             0                     0 65515 i
+*  10.0.0.0/24      10.0.0.68                0                     0 65515 i
+*>                  10.0.0.69                0                     0 65515 i
 *> 10.100.0.0/16    0.0.0.0                                    32768 ?
 *> 10.101.0.0/16    0.0.0.0                                    32768 ?
 *> 10.102.0.0/16    0.0.0.0                                    32768 ?
-*  10.255.0.0/16    10.0.0.69             0                     0 65515 i
-*>                  10.0.0.68             0                     0 65515 i
 
-Total number of prefixes 6
+Total number of prefixes 4
 ```
 
 ## Troubleshooting
