@@ -1,0 +1,5 @@
+owner            = "fred"
+location         = "westus2"
+f5_ssh_publickey = "~/.ssh/id_rsa.pub"
+prefix           = "demo"
+adminSrcAddr     = "0.0.0.0/0"
