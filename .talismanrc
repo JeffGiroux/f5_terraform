@@ -113,3 +113,13 @@ fileignoreconfig:
   checksum: 8688e82c29f35a3b64a5fde443f25af495e9a7eca1556ca67896560193a3642c
 - filename: GCP/Autoscale_via_lb/3nic/README.md
   checksum: e871e6e0c54e3dffc5d1c050fc32366f2cd2b8fca58f951e3343035b3102ae39
+- filename: Azure/Virtual_WAN/admin.auto.tfvars.example
+  checksum: 272c0d4e5e09b5e93c8da3d5d47edbcda67022f4cc706ca3fe5f4ccca75d04d3
+- filename: Azure/Virtual_WAN/bigip.tf
+  checksum: 730ca9b5db7f2bd617ec24454a2c4bde03f215b6689b2e0ca3579b3447af65e6
+- filename: Azure/Virtual_WAN/f5_onboard.tmpl
+  checksum: 69b6921f46063b762a561f66d3cbbd351e9fe18574a488336807f7ad5cc48d22
+- filename: Azure/Virtual_WAN/main.tf
+  checksum: 0250b35b25db6d2619b6dab4f0c25c41112fdb39392ebe495284c45e79703e9e
+- filename: Azure/Virtual_WAN/README.md
+  checksum: 408d2b0adc77d4f0108e9fb9397cc5c2a9f7826fcd5e60676eb1fd108ad7085d
