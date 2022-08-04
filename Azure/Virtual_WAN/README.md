@@ -59,6 +59,23 @@ vi admin.auto.tfvars
 ./setup.sh
 ```
 
+- (REMOVE LATER) Due to Azure API bug, BGP peering connection fails in Terraform code and must be done manually in the Azure Portal. Follow the steps in the link below to "Add BGP Peer". You will add a BGP peer for each BIG-IP device (using the primary external NIC selfIP).
+
+Bug = https://github.com/hashicorp/terraform-provider-azurerm/issues/17872
+BGP peer how-to = https://docs.microsoft.com/en-us/azure/virtual-wan/create-bgp-peering-hub-portal
+
+For reference, this code will automate the BGP peering but is currently commented in main.tf.
+```
+# Create BGP peer between vHub and BIG-IP devices
+resource "azurerm_virtual_hub_bgp_connection" "bigip" {
+  count          = var.instanceCountBigIp
+  name           = "bigip-${count.index}"
+  virtual_hub_id = azurerm_virtual_hub.vHub.id
+  peer_asn       = 65530
+  peer_ip        = element(flatten(module.bigip[count.index].private_addresses.public_private.private_ip), 0)
+}
+```
+
 ## Test your setup
 
 - View the created objects in Azure Portal. Choose a VM instance or NIC from a spoke VNet and view "Effective Routes". You will see BIG-IP advertised routes via BGP across the VNet peering. This deployment will launch a single BIG-IP instance, but if you modified 'instanceCountBigIp' then you will see identical network prefixes advertised from multiple BIG-IP devices (aka BGP peers) like the screenshot below. The 10.255.10.4 is BIG-IP #1 and 10.255.10.6 is BIG-IP #2.
