@@ -59,6 +59,8 @@ vi admin.auto.tfvars
 ./setup.sh
 ```
 
+## Manually Add BGP Peers
+
 - (REMOVE LATER) Due to Azure API bug, BGP peering connection fails in Terraform code and must be done manually in the Azure Portal. Follow the steps in the link below to "Add BGP Peer". You will add a BGP peer for each BIG-IP device (using the primary external NIC selfIP).
 
 Bug = https://github.com/hashicorp/terraform-provider-azurerm/issues/17872
