@@ -67,6 +67,8 @@ Bug = https://github.com/hashicorp/terraform-provider-azurerm/issues/17872
 
 BGP peer how-to = https://docs.microsoft.com/en-us/azure/virtual-wan/create-bgp-peering-hub-portal
 
+![Add BGP Peer](images/bgp-peer-add.png)
+
 For reference, this code will automate the BGP peering but is currently commented in main.tf.
 ```
 # Create BGP peer between vHub and BIG-IP devices
