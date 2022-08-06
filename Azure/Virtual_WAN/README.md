@@ -17,7 +17,7 @@ Azure Virtual WAN and BIG-IP using BGP and eCMP for traffic distribution
 
 ![Azure Virtual WAN and BIG-IP](images/azure-virtual-wan-overview.png)
 
-## Requirements
+## Prerequisites
 
 - Azure CLI
 - Terraform
