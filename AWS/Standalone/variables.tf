@@ -75,6 +75,11 @@ variable "f5_password" {
   description = "BIG-IP Password"
   default     = "Default12345!"
 }
+variable "aws_secretmanager_auth" {
+  description = "Whether to use secret manager to pass authentication"
+  type        = bool
+  default     = false
+}
 variable "ssh_key" {
   type        = string
   description = "public key used for authentication in ssh-rsa format"
