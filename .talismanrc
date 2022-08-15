@@ -119,3 +119,5 @@ fileignoreconfig:
   checksum: 716c1afc3af46a219e5794ab2aba5202bcc96ec910cf1a8d7a03840ad04e348f
 - filename: AWS/Standalone/f5_onboard.tmpl
   checksum: 2bb1aaa30fdd1c71bf76f7ab8be762d3d8d0496f175e85eadafce2ede4b6d680
+- filename: AWS/Standalone/bigip.tf
+  checksum: 1402e13a38997eca6d52f89a7580bd56a2ff4f2ceeb8dd9bdf4d6be8402b5495

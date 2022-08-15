@@ -134,20 +134,15 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 
 ## Modules
 
-No modules.
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_bigip"></a> [bigip](#module\_bigip) | F5Networks/bigip-module/aws | n/a |
 
 ## Resources
 
 | Name | Type |
 |------|------|
-| [aws_eip.vip-pip](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eip) | resource |
-| [aws_eip.vm01-ext-pip](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eip) | resource |
-| [aws_eip.vm01-mgmt-pip](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eip) | resource |
-| [aws_instance.f5vm01](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance) | resource |
 | [aws_key_pair.bigip](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/key_pair) | resource |
-| [aws_network_interface.vm01-ext-nic](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/network_interface) | resource |
-| [aws_network_interface.vm01-int-nic](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/network_interface) | resource |
-| [aws_network_interface.vm01-mgmt-nic](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/network_interface) | resource |
 | [random_id.buildSuffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
 | [aws_ami.f5_ami](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami) | data source |
 | [aws_vpc.main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/vpc) | data source |
