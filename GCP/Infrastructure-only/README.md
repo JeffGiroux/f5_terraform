@@ -48,7 +48,7 @@ Terraform is beneficial as it allows composing resources a bit differently to ac
 
 | Name | Version |
 |------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | >= 4 |
+| <a name="provider_google"></a> [google](#provider\_google) | 4.31.0 |
 
 ## Modules
 
