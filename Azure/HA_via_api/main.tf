@@ -1,13 +1,5 @@
 # Main
 
-# Terraform Version Pinning
-terraform {
-  required_version = ">= 0.14.5"
-  required_providers {
-    azurerm = ">= 3"
-  }
-}
-
 # Azure Provider
 provider "azurerm" {
   features {}

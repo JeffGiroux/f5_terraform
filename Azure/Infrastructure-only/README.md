@@ -45,7 +45,7 @@ Terraform is beneficial as it allows composing resources a bit differently to ac
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 3 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.18.0 |
 
 ## Modules
 
