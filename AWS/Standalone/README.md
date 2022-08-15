@@ -271,6 +271,19 @@ In order to pass traffic from your clients to the servers through the BIG-IP sys
 8. Click the **Finished** button
 9. Repeat as necessary for other applications
 
+## Redeploy BIG-IP for Replacement or Upgrade
+This example illustrates how to replace or upgrade the BIG-IP VE.
+  1. Change the *f5_ami_search_name* variable to the desired release
+  2. Revoke the problematic BIG-IP VE's license (if BYOL)
+  3. Run command
+```
+terraform taint module.bigip.aws_instance.f5_bigip
+```
+  3. Run command
+```
+terraform apply
+```
+
 ## Troubleshooting
 
 ### F5 Automation Toolchain Components
