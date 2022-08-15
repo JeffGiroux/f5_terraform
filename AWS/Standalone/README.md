@@ -53,14 +53,13 @@ The BIG-IP's configuration, now defined in a single convenient YAML or JSON [F5 
   - ***Note***: Passwords and secrets will be moved to AWS Secrets Manager in the future
   - (TBD) The BIG-IP instance will query AWS Metadata API to retrieve the service account's token for authentication
   - (TBD) The BIG-IP instance will then use the secret name and the service account's token to query AWS Metadata API and dynamically retrieve the password for device onboarding
-- This template uses Declarative Onboarding (DO) and Application Services 3 (AS3) for the initial configuration. As part of the onboarding script, it will download the RPMs automatically. See the [AS3 documentation](http://f5.com/AS3Docs) and [DO documentation](http://f5.com/DODocs) for details on how to use AS3 and Declarative Onboarding on your BIG-IP VE(s). The [Telemetry Streaming](http://f5.com/TSDocs) extension is also downloaded and can be configured to point to AWS Cloud Watch.
+- This template uses BIG-IP Runtime Init for the initial configuration. As part of the onboarding script, it will download the F5 Toolchain RPMs automatically. See the [AS3 documentation](http://f5.com/AS3Docs) and [DO documentation](http://f5.com/DODocs) for details on how to use AS3 and Declarative Onboarding on your BIG-IP VE(s). The [Telemetry Streaming](http://f5.com/TSDocs) extension is also downloaded and can be configured to point to AWS Cloud Watch.
 
 - Files
   - bigip.tf - resources for BIG-IP, NICs, public IPs
   - main.tf - resources for provider, versions
-  - network.tf - data for existing subnets
-  - bigip.tf - resources for BIG-IP
   - f5_onboard.tmpl - onboarding script which is run by user-data. This script is responsible for downloading the neccessary F5 Automation Toolchain RPM files, installing them, and then executing the onboarding REST calls via the [BIG-IP Runtime Init tool](https://github.com/F5Networks/f5-bigip-runtime-init).
+  - (TBD) network.tf - data for existing subnets
 
 ## BYOL Licensing
 This template uses PayGo BIG-IP image for the deployment (as default). If you would like to use BYOL licenses, then these following steps are needed:
@@ -68,26 +67,26 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
   ```
           aws ec2 describe-images \
             --region us-west-2 \
-            --filters "Name=name,Values=*BIGIP*16.1.2.1*BYOL*" \
+            --filters "Name=name,Values=*BIGIP*16.1.3.1*BYOL*" \
             --query 'Images[*].[ImageId,Name]'
 
           #Output similar to this...
           [
-              "ami-0b58fbcc973de5e3b",
-              "F5 BIGIP-16.1.2.1-0.0.10 BYOL-All Modules 2Boot Loc-211222202511-5f5a1994-65df-4235-b79c-a3ea049dc1db"
+              "ami-089182acbfc02e3bf",
+              "F5 BIGIP-16.1.3.1-0.0.11 BYOL-All Modules 2Boot Loc-220721050816-5f5a1994-65df-4235-b79c-a3ea049dc1db"
           ],
   ```
 2. In the "variables.tf", modify *f5_ami_search_name* with a value from previous output
   ```
           # BIGIP Image
-          variable "f5_ami_search_name" { default = "F5 BIGIP-16.1.2.1* BYOL-All* 2Boot*" }
+          variable "f5_ami_search_name" { default = "F5 BIGIP-16.1.3.1* BYOL-All* 2Boot*" }
   ```
 3. In the "variables.tf", modify *license1* with a valid regkey
   ```
           # BIGIP Setup
           variable license1 { default = "" }
   ```
-4. In the "f5_onboard.tmpl", add the "myLicense" block under the "Common" declaration ([example here](https://github.com/F5Networks/f5-aws-cloudformation-v2/blob/main/examples/failover/bigip-configurations/runtime-init-conf-3nic-byol-instance01.yaml))
+4. In the "f5_onboard.tmpl", add the "myLicense" block under the "Common" declaration ([example here](https://github.com/F5Networks/f5-aws-cloudformation-v2/blob/main/examples/quickstart/bigip-configurations/runtime-init-conf-3nic-byol.yaml))
   ```
           myLicense:
             class: License
@@ -97,13 +96,10 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 
 ## BIG-IQ License Manager
 This template uses PayGo BIG-IP image for the deployment (as default). If you would like to use BYOL/ELA/Subscription licenses from [BIG-IQ License Manager (LM)](https://community.f5.com/t5/technical-articles/managing-big-ip-licensing-with-big-iq/ta-p/279797), then these following steps are needed:
-1. In the "variables.tf", modify *f5_ami_search_name* value with a BYOL filter in the name. Example below...
-  ```
-          # BIGIP Image
-          variable "f5_ami_search_name" { default = "F5 BIGIP-16.1.2.1* BYOL-All* 2Boot*" }
-  ```
+1. Find BYOL image. Reference [BYOL Licensing](#byol-licensing) step #1.
+2. Replace BIG-IP *f5_ami_search_name* in "variables.tf". Reference [BYOL Licensing](#byol-licensing) step #2.
 2. In the "variables.tf", modify the BIG-IQ license section to match your environment
-3. In the "f5_onboard.tmpl", add the "myLicense" block under the "Common" declaration ([example here](https://github.com/F5Networks/f5-aws-cloudformation-v2/blob/main/examples/autoscale/bigip-configurations/runtime-init-conf-bigiq.yaml))
+3. In the "f5_onboard.tmpl", add the "myLicense" block under the "Common" declaration ([example here](https://github.com/F5Networks/f5-aws-cloudformation-v2/blob/main/examples/autoscale/bigip-configurations/runtime-init-conf-bigiq-with-app.yaml))
   ```
           myLicense:
             class: License
@@ -201,12 +197,14 @@ No modules.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_f5vm01_ext_private_ip"></a> [f5vm01\_ext\_private\_ip](#output\_f5vm01\_ext\_private\_ip) | f5vm01 external primary IP address (self IP) |
-| <a name="output_f5vm01_ext_secondary_ip"></a> [f5vm01\_ext\_secondary\_ip](#output\_f5vm01\_ext\_secondary\_ip) | f5vm01 external secondary IP address (VIP) |
-| <a name="output_f5vm01_int_private_ip"></a> [f5vm01\_int\_private\_ip](#output\_f5vm01\_int\_private\_ip) | f5vm01 internal primary IP address |
-| <a name="output_f5vm01_mgmt_private_ip"></a> [f5vm01\_mgmt\_private\_ip](#output\_f5vm01\_mgmt\_private\_ip) | f5vm01 management private IP address |
-| <a name="output_f5vm01_mgmt_public_ip"></a> [f5vm01\_mgmt\_public\_ip](#output\_f5vm01\_mgmt\_public\_ip) | f5vm01 management public IP address |
-| <a name="output_public_vip_pip"></a> [public\_vip\_pip](#output\_public\_vip\_pip) | Public IP for the BIG-IP listener (VIP) |
+| <a name="output_f5vm01_ext_selfip"></a> [f5vm01\_ext\_selfip](#output\_f5vm01\_ext\_selfip) | f5vm01 external self IP private address |
+| <a name="output_f5vm01_ext_selfip_pip"></a> [f5vm01\_ext\_selfip\_pip](#output\_f5vm01\_ext\_selfip\_pip) | f5vm01 external self IP public address |
+| <a name="output_f5vm01_instance_ids"></a> [f5vm01\_instance\_ids](#output\_f5vm01\_instance\_ids) | f5vm01 management device name |
+| <a name="output_f5vm01_mgmt_ip"></a> [f5vm01\_mgmt\_ip](#output\_f5vm01\_mgmt\_ip) | f5vm01 management private IP address |
+| <a name="output_f5vm01_mgmt_pip"></a> [f5vm01\_mgmt\_pip](#output\_f5vm01\_mgmt\_pip) | f5vm01 management public IP address |
+| <a name="output_f5vm01_mgmt_pip_url"></a> [f5vm01\_mgmt\_pip\_url](#output\_f5vm01\_mgmt\_pip\_url) | f5vm01 management public URL |
+| <a name="output_public_vip"></a> [public\_vip](#output\_public\_vip) | public IP address for application |
+| <a name="output_public_vip_url"></a> [public\_vip\_url](#output\_public\_vip\_url) | public URL for application |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 <!-- markdownlint-enable no-inline-html -->
 
