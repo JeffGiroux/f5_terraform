@@ -40,7 +40,7 @@ Terraform is beneficial as it allows composing resources a bit differently to ac
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.7.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.8.0 |
 | <a name="provider_random"></a> [random](#provider\_random) | 3.1.2 |
 
 ## Modules

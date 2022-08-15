@@ -58,7 +58,7 @@ variable "intNsg" {
 variable "f5_ami_search_name" {
   type        = string
   description = "AWS AMI search filter to find correct BIG-IP VE for region"
-  default     = "F5 BIGIP-16.1.3* PAYG-Best 200Mbps*"
+  default     = "F5 BIGIP-16.1.3.1* PAYG-Best Plus 200Mbps*"
 }
 variable "ec2_instance_type" {
   type        = string
@@ -101,17 +101,17 @@ variable "timezone" {
 }
 variable "DO_URL" {
   type        = string
-  default     = "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.30.0/f5-declarative-onboarding-1.30.0-3.noarch.rpm"
+  default     = "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.31.0/f5-declarative-onboarding-1.31.0-6.noarch.rpm"
   description = "URL to download the BIG-IP Declarative Onboarding module"
 }
 variable "AS3_URL" {
   type        = string
-  default     = "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.36.1/f5-appsvcs-3.36.1-1.noarch.rpm"
+  default     = "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.38.0/f5-appsvcs-3.38.0-4.noarch.rpm"
   description = "URL to download the BIG-IP Application Service Extension 3 (AS3) module"
 }
 variable "TS_URL" {
   type        = string
-  default     = "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.29.0/f5-telemetry-1.29.0-1.noarch.rpm"
+  default     = "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.30.0/f5-telemetry-1.30.0-1.noarch.rpm"
   description = "URL to download the BIG-IP Telemetry Streaming module"
 }
 variable "FAST_URL" {
@@ -127,11 +127,6 @@ variable "INIT_URL" {
 variable "libs_dir" {
   description = "Directory on the BIG-IP to download the A&O Toolchain into"
   default     = "/config/cloud/aws/node_modules"
-  type        = string
-}
-variable "onboard_log" {
-  description = "Directory on the BIG-IP to store the cloud-init logs"
-  default     = "/var/log/cloud/startup-script.log"
   type        = string
 }
 variable "bigIqHost" {
