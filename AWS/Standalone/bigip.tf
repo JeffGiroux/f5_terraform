@@ -1,5 +1,18 @@
 # BIG-IP
 
+############################ Secrets Manager ############################
+
+# Validate the secret exists
+data "aws_secretsmanager_secret" "password" {
+  count = var.aws_secretmanager_auth ? 1 : 0
+  name  = var.f5_password
+}
+
+data "aws_secretsmanager_secret_version" "current" {
+  count     = var.aws_secretmanager_auth ? 1 : 0
+  secret_id = data.aws_secretsmanager_secret.password[count.index].id
+}
+
 ############################ AMI ############################
 
 # Find BIG-IP AMI
@@ -27,7 +40,7 @@ locals {
   f5_onboard1 = templatefile("${path.module}/f5_onboard.tmpl", {
     regKey                 = var.license1
     f5_username            = var.f5_username
-    f5_password            = var.f5_password
+    f5_password            = var.aws_secretmanager_auth ? data.aws_secretsmanager_secret_version.current[0].secret_id : var.f5_password
     aws_secretmanager_auth = var.aws_secretmanager_auth
     ssh_keypair            = var.ssh_key
     INIT_URL               = var.INIT_URL
