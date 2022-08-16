@@ -115,8 +115,6 @@ fileignoreconfig:
   checksum: 0250b35b25db6d2619b6dab4f0c25c41112fdb39392ebe495284c45e79703e9e
 - filename: Azure/Virtual_WAN/README.md
   checksum: 408d2b0adc77d4f0108e9fb9397cc5c2a9f7826fcd5e60676eb1fd108ad7085d
-- filename: AWS/Standalone/README.md
-  checksum: 716c1afc3af46a219e5794ab2aba5202bcc96ec910cf1a8d7a03840ad04e348f
 - filename: AWS/Standalone/f5_onboard.tmpl
   checksum: 2bb1aaa30fdd1c71bf76f7ab8be762d3d8d0496f175e85eadafce2ede4b6d680
 - filename: AWS/Standalone/bigip.tf
