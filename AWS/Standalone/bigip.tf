@@ -1,5 +1,25 @@
 # BIG-IP
 
+############################ Locals ############################
+
+locals {
+  # Retrieve all BIG-IP secondary IPs
+  vm01_ext_ips = {
+    0 = {
+      ip = element(flatten(module.bigip.private_addresses["public_private"]["private_ips"][0]), 0)
+    }
+    1 = {
+      ip = element(flatten(module.bigip.private_addresses["public_private"]["private_ips"][0]), 1)
+    }
+  }
+  # Determine BIG-IP secondary IPs to be used for VIP
+  vm01_vip_ips = {
+    app1 = {
+      ip = module.bigip.private_addresses["public_private"]["private_ip"][0] != local.vm01_ext_ips.0.ip ? local.vm01_ext_ips.0.ip : local.vm01_ext_ips.1.ip
+    }
+  }
+}
+
 ############################ Secrets Manager ############################
 
 # Validate the secret exists
