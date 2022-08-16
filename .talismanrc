@@ -122,4 +122,4 @@ fileignoreconfig:
 - filename: AWS/Standalone/bigip.tf
   checksum: 317a45c84597dc4c936d628cca86bb1bd8fa47016850b14f526e5d2024afbd4c
 - filename: AWS/Standalone/README.md
-  checksum: fac3294642772423bef6f36adafb36b4d1a37e62f272f5496910945c3b4d1e60
+  checksum: 55209d1648ff79184137d921564ae288eab6cc1d76dffcc57b3542488e26e163

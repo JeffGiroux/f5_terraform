@@ -31,7 +31,7 @@ The BIG-IP's configuration, now defined in a single convenient YAML or JSON [F5 
 
 - ***Important***: When you configure the admin password for the BIG-IP VE in the template, you cannot use the character **#**.  Additionally, there are a number of other special characters that you should avoid using for F5 product user accounts.  See [K2873](https://support.f5.com/csp/article/K2873) for details.
 - This template requires one or more service accounts for the BIG-IP instance to perform various tasks:
-  - AWS Secrets Manager - requires IAM Profile (see TBD)
+  - AWS Secrets Manager - requires IAM Profile to retrieve secrets (see [IAM policy examples for secrets in AWS Secrets Manager](https://docs.aws.amazon.com/mediaconnect/latest/ug/iam-policy-examples-asm-secrets.html))
     - Performed by VM instance during onboarding to retrieve passwords and private keys
   - Backend pool service discovery - requires various roles
     - Performed by F5 Application Services AS3
@@ -41,8 +41,7 @@ The BIG-IP's configuration, now defined in a single convenient YAML or JSON [F5 
   - ***Note***: Make sure to [practice least privilege](https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html)
 - Passwords and secrets can be located in [AWS Secrets Manager](https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html).
   - Set *aws_secretmanager_auth* to 'true'
-  - A new IAM profile (aka role and permissions) is created with permissions to list secrets
-  - 'f5_password' contains the value of the adminstrator password (ex. "Default12345!")
+  - A new IAM profile (aka role and permissions) is created with permissions to list secrets (see iam.tf)
   - If *aws_secretmanager_auth* is 'true', then 'f5_password' should be the ARN of the AWS Secrets Manager secret. The secret needs to contain ONLY the password as 'plain text' type.
 - This templates deploys into an *EXISTING* networking stack. You are required to have an existing VPC network, subnets, and security groups.
   - A NAT gateway or public IP is also required for outbound Internet traffic
