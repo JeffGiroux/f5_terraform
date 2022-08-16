@@ -80,6 +80,11 @@ variable "aws_secretmanager_auth" {
   type        = bool
   default     = false
 }
+variable "aws_iam_instance_profile" {
+  description = "AWS IAM instance profile that can be associate for BIG-IP with required permissions"
+  type        = string
+  default     = null
+}
 variable "ssh_key" {
   type        = string
   description = "public key used for authentication in ssh-rsa format"

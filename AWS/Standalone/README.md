@@ -2,12 +2,10 @@
 
 ## To Do
 - Community support only. Not F5 supported.
-- Move to AWS secret manager. Currently passwords are stored in clear text in the runtime init YAML file local to the BIG-IP box.
 - TS still not used and not installed
 
 ## Issues
 - Find an issue? Fork, clone, create branch, fix and PR. I'll review and merge into the main branch. Or submit a GitHub issue with all necessary details and logs.
-
 
 ## Contents
 
@@ -33,7 +31,7 @@ The BIG-IP's configuration, now defined in a single convenient YAML or JSON [F5 
 
 - ***Important***: When you configure the admin password for the BIG-IP VE in the template, you cannot use the character **#**.  Additionally, there are a number of other special characters that you should avoid using for F5 product user accounts.  See [K2873](https://support.f5.com/csp/article/K2873) for details.
 - This template requires one or more service accounts for the BIG-IP instance to perform various tasks:
-  - AWS Secrets Manager - requires (TBD...not tested yet)
+  - AWS Secrets Manager - requires IAM Profile (see TBD)
     - Performed by VM instance during onboarding to retrieve passwords and private keys
   - Backend pool service discovery - requires various roles
     - Performed by F5 Application Services AS3
@@ -41,6 +39,11 @@ The BIG-IP's configuration, now defined in a single convenient YAML or JSON [F5 
   - See the [Terraform "AWS Provider"](https://registry.terraform.io/providers/hashicorp/aws/latest/docs#authentication) for details
   - You will require at minimum `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`
   - ***Note***: Make sure to [practice least privilege](https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html)
+- Passwords and secrets can be located in [AWS Secrets Manager](https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html).
+  - Set *aws_secretmanager_auth* to 'True'
+  - A new IAM profile (aka role and permissions) is created with permissions to list secrets
+  - 'f5_password' contains the value of the adminstrator password (ex. "Default12345!")
+  - If 'aws_secretmanager_auth' is TRUE, then 'f5_password' will be the name of the AWS Secrets Manager secret which contains the value of the password in clear text.
 - This templates deploys into an *EXISTING* networking stack. You are required to have an existing VPC network, subnets, and security groups.
   - A NAT gateway or public IP is also required for outbound Internet traffic
   - If you require a new network first, see the [Infrastructure Only folder](../Infrastructure-only) to get started
@@ -50,16 +53,16 @@ The BIG-IP's configuration, now defined in a single convenient YAML or JSON [F5 
 
 - Variables are configured in variables.tf
 - Sensitive variables like AWS SSH keys are configured in terraform.tfvars or AWS Secrets Manager
-  - ***Note***: Passwords and secrets will be moved to AWS Secrets Manager in the future
-  - (TBD) The BIG-IP instance will query AWS Metadata API to retrieve the service account's token for authentication
-  - (TBD) The BIG-IP instance will then use the secret name and the service account's token to query AWS Metadata API and dynamically retrieve the password for device onboarding
+  - ***Note***: Other items like BIG-IP password can be stored in AWS Secrets Manager. Refer to the [Prerequisites](#prerequisites).
+  - The BIG-IP instance will query AWS Metadata API to retrieve the service account's token for authentication
+  - The BIG-IP instance will then use the secret name and the service account's token to query AWS Metadata API and dynamically retrieve the password for device onboarding
 - This template uses BIG-IP Runtime Init for the initial configuration. As part of the onboarding script, it will download the F5 Toolchain RPMs automatically. See the [AS3 documentation](http://f5.com/AS3Docs) and [DO documentation](http://f5.com/DODocs) for details on how to use AS3 and Declarative Onboarding on your BIG-IP VE(s). The [Telemetry Streaming](http://f5.com/TSDocs) extension is also downloaded and can be configured to point to AWS Cloud Watch.
 
 - Files
   - bigip.tf - resources for BIG-IP, NICs, public IPs
+  - iam.tf - resources to create IAM roles and permissions
   - main.tf - resources for provider, versions
   - f5_onboard.tmpl - onboarding script which is run by user-data. This script is responsible for downloading the neccessary F5 Automation Toolchain RPM files, installing them, and then executing the onboarding REST calls via the [BIG-IP Runtime Init tool](https://github.com/F5Networks/f5-bigip-runtime-init).
-  - (TBD) network.tf - data for existing subnets
 
 ## BYOL Licensing
 This template uses PayGo BIG-IP image for the deployment (as default). If you would like to use BYOL licenses, then these following steps are needed:
@@ -142,9 +145,13 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 
 | Name | Type |
 |------|------|
+| [aws_iam_instance_profile.bigip_profile](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_instance_profile) | resource |
+| [aws_iam_role.bigip_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_key_pair.bigip](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/key_pair) | resource |
 | [random_id.buildSuffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
 | [aws_ami.f5_ami](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami) | data source |
+| [aws_iam_policy_document.bigip_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.bigip_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_vpc.main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/vpc) | data source |
 
 ## Inputs
@@ -160,6 +167,7 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | <a name="input_adminSrcAddr"></a> [adminSrcAddr](#input\_adminSrcAddr) | Allowed Admin source IP prefix | `string` | `"0.0.0.0/0"` | no |
 | <a name="input_awsAz1"></a> [awsAz1](#input\_awsAz1) | Availability zone, will dynamically choose one if left empty | `string` | `"us-west-2a"` | no |
 | <a name="input_awsRegion"></a> [awsRegion](#input\_awsRegion) | aws region | `string` | `"us-west-2"` | no |
+| <a name="input_aws_iam_instance_profile"></a> [aws\_iam\_instance\_profile](#input\_aws\_iam\_instance\_profile) | AWS IAM instance profile that can be associate for BIG-IP with required permissions | `string` | `null` | no |
 | <a name="input_aws_secretmanager_auth"></a> [aws\_secretmanager\_auth](#input\_aws\_secretmanager\_auth) | Whether to use secret manager to pass authentication | `bool` | `false` | no |
 | <a name="input_bigIqHost"></a> [bigIqHost](#input\_bigIqHost) | This is the BIG-IQ License Manager host name or IP address | `string` | `""` | no |
 | <a name="input_bigIqHypervisor"></a> [bigIqHypervisor](#input\_bigIqHypervisor) | BIG-IQ hypervisor | `string` | `"aws"` | no |
@@ -285,6 +293,12 @@ terraform apply
 ```
 
 ## Troubleshooting
+
+### Serial Logs
+Review the serial logs for the Google virtual machine. Login to the AWS portal, open "EC2", then locate your instance...click it. Hit Actions > Monitor and Troubleshoot > Get stem log. Then review the serial logs for errors.
+
+### Onboard Logs
+Depending on where onboard fails, you can attempt SSH login and try to troubleshoot further. Inspect the /config/cloud directory for correct runtime init YAML files. Inspec the /var/log/cloud location for error logs.
 
 ### F5 Automation Toolchain Components
 F5 BIG-IP Runtime Init uses the F5 Automation Toolchain for configuration of BIG-IP instances.  Any errors thrown from these components will be surfaced in the bigIpRuntimeInit.log (or a custom log location as specified below).
