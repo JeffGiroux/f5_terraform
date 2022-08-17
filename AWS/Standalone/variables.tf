@@ -72,7 +72,7 @@ variable "f5_username" {
 }
 variable "f5_password" {
   type        = string
-  description = "BIG-IP Password"
+  description = "BIG-IP Password or Secret ARN (value should be ARN of secret when aws_secretmanager_auth = true, ex. arn:aws:secretsmanager:us-west-2:1234:secret:bigip-secret-abcd)"
   default     = "Default12345!"
 }
 variable "aws_secretmanager_auth" {
