@@ -122,9 +122,6 @@ cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
   - name: VIP_AZ2
     type: static
     value: ${vip_az2}
-  - name: REMOTE_HOST
-    type: static
-    value: ${remote_host}
 pre_onboard_enabled:
   - name: provision_rest
     type: inline
@@ -253,7 +250,7 @@ extension_services:
             class: DeviceTrust
             localUsername: '{{{ USER_NAME }}}'
             localPassword: '{{{ ADMIN_PASS }}}'
-            remoteHost: '{{{ REMOTE_HOST }}}'
+            remoteHost: /Common/failoverGroup/members/0
             remoteUsername: '{{{ USER_NAME }}}'
             remotePassword: '{{{ ADMIN_PASS }}}'
     - extensionType: as3
