@@ -31,6 +31,10 @@ locals {
       ip = module.bigip2.private_addresses["public_private"]["private_ip"][0] != local.vm02_ext_ips.0.ip ? local.vm02_ext_ips.0.ip : local.vm02_ext_ips.1.ip
     }
   }
+  # Custom tags
+  tags = {
+    Owner = var.resourceOwner
+  }
 }
 
 ############################ Secrets Manager ############################
@@ -170,6 +174,7 @@ module "bigip" {
   internal_securitygroup_ids = [var.intNsg]
   custom_user_data           = local.f5_onboard1
   sleep_time                 = "30s"
+  tags                       = local.tags
 }
 
 module "bigip2" {
@@ -189,6 +194,7 @@ module "bigip2" {
   internal_securitygroup_ids = [var.intNsg]
   custom_user_data           = local.f5_onboard2
   sleep_time                 = "30s"
+  tags                       = local.tags
 }
 
 ############################ Collect Network Info ############################
@@ -328,7 +334,7 @@ resource "aws_route_table" "main" {
 
   route {
     cidr_block           = var.cfe_managed_route
-    network_interface_id = data.aws_network_interface.bigip_ext.id
+    network_interface_id = data.aws_network_interface.bigip2_ext.id
   }
 
   tags = {
