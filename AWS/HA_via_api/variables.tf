@@ -219,8 +219,3 @@ variable "resourceOwner" {
   default     = null
   description = "This is a tag used for object creation. Example is last name."
 }
-variable "f5_cloud_failover_nic_map" {
-  type        = string
-  default     = "external"
-  description = "This is a tag used for failover NIC"
-}
