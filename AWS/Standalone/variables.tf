@@ -75,6 +75,11 @@ variable "f5_password" {
   description = "BIG-IP Password"
   default     = "Default12345!"
 }
+variable "aws_secretmanager_auth" {
+  description = "Whether to use secret manager to pass authentication"
+  type        = bool
+  default     = false
+}
 variable "ssh_key" {
   type        = string
   description = "public key used for authentication in ssh-rsa format"
@@ -122,7 +127,7 @@ variable "FAST_URL" {
 variable "INIT_URL" {
   description = "URL to download the BIG-IP runtime init"
   type        = string
-  default     = "https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.5.0/dist/f5-bigip-runtime-init-1.5.0-1.gz.run"
+  default     = "https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.5.1/dist/f5-bigip-runtime-init-1.5.1-1.gz.run"
 }
 variable "libs_dir" {
   description = "Directory on the BIG-IP to download the A&O Toolchain into"

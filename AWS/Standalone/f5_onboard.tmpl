@@ -1,5 +1,6 @@
-#!/bin/bash -x
+#!/bin/bash
 
+# Send output to log file and serial console
 mkdir -p  /var/log/cloud /config/cloud /var/config/rest/downloads
 LOG_FILE=/var/log/cloud/startup-script.log
 [[ ! -f $LOG_FILE ]] && touch $LOG_FILE || { echo "Run Only Once. Exiting"; exit; }
@@ -18,28 +19,34 @@ exec 2>&1
 cat << 'EOF' > /config/cloud/runtime-init-conf.yaml
 ---
 runtime_parameters:
-  - name: HOST_NAME
-    type: metadata
-    metadataProvider:
-      environment: aws
-      type: compute
-      field: hostname
-  - name: REGION
-    type: url
-    value: http://169.254.169.254/latest/dynamic/instance-identity/document
-    query: region
   - name: USER_NAME
     type: static
     value: ${f5_username}
-  - name: ADMIN_PASS
-    type: static
-    value: ${f5_password}
   - name: SSH_KEYS
     type: static
     value: ${ssh_keypair}
-  - name: VPC_CIDR_BLOCK
+EOF
+
+if ${aws_secretmanager_auth}; then
+   cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
+  - name: ADMIN_PASS
+    type: secret
+    secretProvider:
+      environment: aws
+      type: SecretsManager
+      version: AWSCURRENT
+      secretId: ${f5_password}
+EOF
+else
+   cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
+  - name: ADMIN_PASS
     type: static
-    value: ${vpc_cidr_block}
+    value: ${f5_password}
+EOF
+fi
+
+# Add remaining runtime_parameters
+cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
   - name: GATEWAY_EXTERNAL
     type: metadata
     metadataProvider:
@@ -57,14 +64,21 @@ runtime_parameters:
       index: 2
       ipcalc: first
   - name: SELF_IP_EXTERNAL
-    type: static
-    value: ${self_ip_external}
+    type: metadata
+    metadataProvider:
+      environment: aws
+      type: network
+      field: local-ipv4s
+      index: 1
+      ipcalc: address
   - name: SELF_IP_INTERNAL
-    type: static
-    value: ${self_ip_internal}
-  - name: VIP_AZ1
-    type: static
-    value: ${vip_az1}
+    type: metadata
+    metadataProvider:
+      environment: aws
+      type: network
+      field: local-ipv4s
+      index: 2
+      ipcalc: address
   - name: DNS_SERVER
     type: static
     value: ${dns_server}
@@ -74,14 +88,24 @@ runtime_parameters:
   - name: TIMEZONE
     type: static
     value: ${timezone}
-  - name: HOST1
+  - name: HOST_NAME
+    type: metadata
+    metadataProvider:
+      environment: aws
+      type: compute
+      field: hostname
+  - name: REGION
+    type: url
+    value: http://169.254.169.254/latest/dynamic/instance-identity/document
+    query: region
+  - name: VPC_CIDR_BLOCK
     type: static
-    value: ${host1}
+    value: ${vpc_cidr_block}
 pre_onboard_enabled:
   - name: provision_rest
     type: inline
     commands:
-      - /usr/bin/setdb provision.extramb 1000
+      - /usr/bin/setdb provision.extramb 1024
       - /usr/bin/setdb restjavad.useextramb true
       - /usr/bin/setdb setup.run false
 extension_packages:
@@ -106,7 +130,7 @@ extension_services:
           dbVars:
             class: DbVariables
             restjavad.useextramb: true
-            provision.extramb: 1000
+            provision.extramb: 1024
             config.allow.rfc3927: enable
             ui.advisory.enabled: true
             ui.advisory.color: blue
@@ -210,23 +234,6 @@ extension_services:
                     addressDiscovery: fqdn
                     autoPopulate: true
                     hostname: httpbin.org
-    - extensionType: ts
-      type: inline
-      value:
-        class: Telemetry
-        My_System:
-          class: Telemetry_System
-          systemPoller:
-            interval: 60
-        My_Listener:
-          class: Telemetry_Listener
-          port: 6514
-        My_Consumer:
-          class: Telemetry_Consumer
-          type: AWS_CloudWatch
-          region: '{{{REGION}}}'
-          logGroup: f5telemetry
-          logStream: default
 post_onboard_enabled:
   - name: misc
     type: inline
@@ -238,6 +245,10 @@ EOF
 for i in {1..30}; do
     curl -fv --retry 1 --connect-timeout 5 -L ${INIT_URL} -o "/var/config/rest/downloads/f5-bigip-runtime.gz.run" && break || sleep 10
 done
+
+# Remove comment to do silly debugging on BIG-IP Runtime init
+# export F5_BIGIP_RUNTIME_INIT_LOG_LEVEL=silly
+# export F5_BIGIP_RUNTIME_EXTENSION_INSTALL_DELAY_IN_MS=60000
 
 # Install BIG-IP Runtime Init
 bash /var/config/rest/downloads/f5-bigip-runtime.gz.run -- '--cloud aws'

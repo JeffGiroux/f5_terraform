@@ -43,36 +43,11 @@ fileignoreconfig:
   checksum: b91ce8d5cc4495a7d19fe71a0bb92983f70b2ef6235ecce50a81b597c289839c
 - filename: Azure/HA_via_lb/terraform.tfvars.example
   checksum: f1332e3f00f744b76a7330ec3c173b519003f8206bb498f9e0af50e657ec56ea
-- filename: Azure/Autoscale_via_lb/bigip.tf
-  checksum: a921ff3c67214dacae5f60f13d570f4483b010a64b84a72be4a241d2b95cb885
 - filename: Azure/Autoscale_via_lb/terraform.tfvars.example
-  checksum: e5d651274921bfb44a113d079f47198a7b78234afdf73fff42175964a7908e10
-- filename: Azure/Autoscale_via_lb/f5_onboard.tmpl
-  checksum: af9e58aa6b1c7c6da435cf166b3842f3b2c8e9a8032d712ffce4369d008941c0
-- filename: AWS/Autoscale_via_lb/2nic/bigip.tf
-  checksum: 54f13abf6d1590c2c1473d32e6473cf22f3b418793b2506997c2b8c3f96f879c
-- filename: AWS/Autoscale_via_lb/2nic/terraform.tfvars.example
-  checksum: aa6e19dae19f0f9dec93ae320d20129510f8bb888eebe91a7d53d3543ad1aebe
-- filename: AWS/Autoscale_via_lb/2nic/README.md
-  checksum: dd5a0e8d463722a8a960aad23c57ad25a41628e08a30d33e943545804792dc4e
-- filename: AWS/HA_via_api/README.md
-  checksum: f6058047b5006464dff2433b35f54ecbe07b7b2a6677ec0f745eb9a18d54ba1e
 - filename: AWS/Autoscale_via_lb/1nic/terraform.tfvars.example
   checksum: 7c4260a9f830faef736e223920c48c20491ac52a9681bf97f06c5eacbe01d239
-- filename: AWS/Autoscale_via_lb/1nic/bigip.tf
-  checksum: b804d6207160ef0040e7c33e37506741d9de750b04d895a001d853402c17367b
-- filename: AWS/Autoscale_via_lb/1nic/README.md
-  checksum: 90ffe08f50eb53f9f8ff5cd10b1a10273effdf7da85bb287d3898c4b2ffb9773
 - filename: AWS/Standalone/terraform.tfvars.example
   checksum: 30a19fbffa8fc521c773c47a73800aff9a79fa89a7b33764d3c46269671f6d7c
-- filename: AWS/Standalone/bigip.tf
-  checksum: e53804552e930d8057ce2befc036b3b5ef64816a48b08b007c3035b2134c4c6c
-- filename: AWS/Standalone/f5_onboard.tmpl
-  checksum: e26c9a1dcbd682df30762e3d79ee778f337aeeda270ae4955dac1ba6e10f4c43
-- filename: AWS/Standalone/README.md
-  checksum: 0d9cab74275768da7c3a5a33e2a536344ef53fc3fd0bd80db62292d15e399d68
-- filename: AWS/Standalone/bigip.tf
-  checksum: 879544a677a28bf5acc2aabb0c234ee20629c7b7d324413c0f8419627e799f0f
 - filename: Azure/HA_via_api/README.md
   checksum: c303e945b2cf32edbf52a0aa94db450cb05d225a993ddf8a10e33e3ec41251cb
 - filename: Azure/Standalone/README.md
@@ -123,3 +98,29 @@ fileignoreconfig:
   checksum: 0250b35b25db6d2619b6dab4f0c25c41112fdb39392ebe495284c45e79703e9e
 - filename: Azure/Virtual_WAN/README.md
   checksum: 408d2b0adc77d4f0108e9fb9397cc5c2a9f7826fcd5e60676eb1fd108ad7085d
+- filename: AWS/Standalone/f5_onboard.tmpl
+  checksum: 2bb1aaa30fdd1c71bf76f7ab8be762d3d8d0496f175e85eadafce2ede4b6d680
+- filename: AWS/Standalone/iam.tf
+  checksum: ceb0254163eb760b9d7b28cf041bf39a34cc6523f245e1459d9f52f74a47cad9
+- filename: AWS/Standalone/bigip.tf
+  checksum: 317a45c84597dc4c936d628cca86bb1bd8fa47016850b14f526e5d2024afbd4c
+- filename: AWS/Standalone/README.md
+  checksum: 55209d1648ff79184137d921564ae288eab6cc1d76dffcc57b3542488e26e163
+- filename: AWS/HA_via_api/iam.tf
+  checksum: 963a08b04930c5a28e2c778c80a5c1938b13050e6e4a4d9edfb1717d360ca6ff
+- filename: AWS/HA_via_api/f5_onboard.tmpl
+  checksum: 1670abbdb18345df1298b13a6d1940ecccf8226d496a551556fb00bf8fe94698
+- filename: AWS/HA_via_api/bigip.tf
+  checksum: 56d853f7d772b6fe5d0e128252f8bb07f8bdaf097f074bcb178603a29c6f6fe0
+- filename: AWS/HA_via_api/variables.tf
+  checksum: 979c385e3173d56e36f02cf05d8e66bfee4f4a20764368fe29ece85ca6cf49cb
+- filename: AWS/HA_via_api/README.md
+  checksum: d8e0c41bc1093631dd57eb33b23ff66802e5202367a04302e1949319a4933bd1
+- filename: AWS/Autoscale_via_lb/1nic/variables.tf
+  checksum: b66042a0b339fd78deb79125c3ee6303fb0a743c121c3b44fb6c3255a00e1827
+- filename: AWS/Autoscale_via_lb/1nic/f5_onboard.tmpl
+  checksum: 24ec0b36b997410be7732f348178799916cedb80bbb0c3c6b1b6752457b3f7f0
+- filename: AWS/Autoscale_via_lb/1nic/bigip.tf
+  checksum: b5f765e36a9227f07df481d8832514b6f232c5147dc54abe806886368fbfae6f
+- filename: AWS/Autoscale_via_lb/1nic/README.md
+  checksum: d618e9950f03d65992d8e60a8409837bcd9d7d02a948427cc5a7144d0f81e5a5

@@ -26,50 +26,6 @@ data "aws_iam_policy_document" "bigip_policy" {
     resources = ["*"]
     effect    = "Allow"
   }
-  statement {
-    actions = [
-      "ec2:DescribeInstances",
-      "ec2:DescribeInstanceStatus",
-      "ec2:DescribeAddresses",
-      "ec2:DescribeNetworkInterfaces",
-      "ec2:DescribeNetworkInterfaceAttribute",
-      "ec2:DescribeRouteTables",
-      "s3:ListAllMyBuckets",
-      "s3:GetBucketLocation",
-      "ec2:AssociateAddress",
-      "ec2:DisassociateAddress",
-      "ec2:AssignPrivateIpAddresses",
-      "ec2:UnassignPrivateIpAddresses"
-    ]
-    resources = ["*"]
-    effect    = "Allow"
-  }
-  statement {
-    actions = [
-      "ec2:CreateRoute",
-      "ec2:ReplaceRoute"
-    ]
-    resources = ["*"]
-    effect    = "Allow"
-  }
-  statement {
-    actions = [
-      "s3:ListBucket",
-      "s3:GetBucketLocation",
-      "s3:GetBucketTagging"
-    ]
-    resources = [aws_s3_bucket.main.arn]
-    effect    = "Allow"
-  }
-  statement {
-    actions = [
-      "s3:PutObject",
-      "s3:GetObject",
-      "s3:DeleteObject"
-    ]
-    resources = ["${aws_s3_bucket.main.arn}/*"]
-    effect    = "Allow"
-  }
 }
 
 resource "aws_iam_role" "bigip_role" {
