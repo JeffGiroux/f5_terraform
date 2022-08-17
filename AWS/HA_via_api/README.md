@@ -2,13 +2,11 @@
 
 ## To Do
 - Community support only. Not F5 supported.
-- Move to AWS secret manager. Currently passwords are stored in clear text in the runtime init YAML file local to the BIG-IP box.
 - TS still not used and not installed
 - Route table created for CFE demonstration but not associated with subnets
 
 ## Issues
 - Find an issue? Fork, clone, create branch, fix and PR. I'll review and merge into the main branch. Or submit a GitHub issue with all necessary details and logs.
-
 
 ## Contents
 
@@ -34,7 +32,7 @@ The BIG-IP's configuration, now defined in a single convenient YAML or JSON [F5 
 
 - ***Important***: When you configure the admin password for the BIG-IP VE in the template, you cannot use the character **#**.  Additionally, there are a number of other special characters that you should avoid using for F5 product user accounts.  See [K2873](https://support.f5.com/csp/article/K2873) for details.
 - This template requires one or more service accounts for the BIG-IP instance to perform various tasks:
-  - AWS Secrets Manager - requires (TBD...not tested yet)
+  - AWS Secrets Manager - requires IAM Profile to retrieve secrets (see [IAM policy examples for secrets in AWS Secrets Manager](https://docs.aws.amazon.com/mediaconnect/latest/ug/iam-policy-examples-asm-secrets.html))
     - Performed by VM instance during onboarding to retrieve passwords and private keys
   - Backend pool service discovery - requires various roles
     - Performed by F5 Application Services AS3
@@ -45,6 +43,10 @@ The BIG-IP's configuration, now defined in a single convenient YAML or JSON [F5 
   - See the [Terraform "AWS Provider"](https://registry.terraform.io/providers/hashicorp/aws/latest/docs#authentication) for details
   - You will require at minimum `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`
   - ***Note***: Make sure to [practice least privilege](https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html)
+- Passwords and secrets can be located in [AWS Secrets Manager](https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html).
+  - Set *aws_secretmanager_auth* to 'true'
+  - A new IAM profile (aka role and permissions) is created with permissions to list secrets (see iam.tf)
+  - If *aws_secretmanager_auth* is 'true', then 'f5_password' should be the ARN of the AWS Secrets Manager secret. The secret needs to contain ONLY the password as 'plain text' type.
 - This templates deploys into an *EXISTING* networking stack. You are required to have an existing VPC network, subnets, and security groups.
   - A NAT gateway or public IP is also required for outbound Internet traffic
   - If you require a new network first, see the [Infrastructure Only folder](../Infrastructure-only) to get started
@@ -54,17 +56,15 @@ The BIG-IP's configuration, now defined in a single convenient YAML or JSON [F5 
 
 - Variables are configured in variables.tf
 - Sensitive variables like AWS SSH keys are configured in terraform.tfvars or AWS Secrets Manager
-  - ***Note***: Passwords and secrets will be moved to AWS Secrets Manager in the future
-  - (TBD) The BIG-IP instance will query AWS Metadata API to retrieve the service account's token for authentication
-  - (TBD) The BIG-IP instance will then use the secret name and the service account's token to query AWS Metadata API and dynamically retrieve the password for device onboarding
-- This template uses Declarative Onboarding (DO), Application Services 3 (AS3), and Cloud Failover Extension packages for the initial configuration. As part of the onboarding script, it will download the RPMs automatically. See the [AS3 documentation](http://f5.com/AS3Docs) and [DO documentation](http://f5.com/DODocs) for details on how to use AS3 and Declarative Onboarding on your BIG-IP VE(s). The [Telemetry Streaming](http://f5.com/TSDocs) extension is also downloaded and can be configured to point to AWS Cloud Watch. The [Cloud Failover Extension](http://f5.com/CFEDocs) documentation is also available.
+  - ***Note***: Other items like BIG-IP password can be stored in AWS Secrets Manager. Refer to the [Prerequisites](#prerequisites).
+  - The BIG-IP instance will query AWS Metadata API to retrieve the service account's token for authentication
+  - The BIG-IP instance will then use the secret name and the service account's token to query AWS Metadata API and dynamically retrieve the password for device onboarding
+- This template uses BIG-IP Runtime Init for the initial configuration. As part of the onboarding script, it will download the F5 Toolchain RPMs automatically. See the [AS3 documentation](http://f5.com/AS3Docs) and [DO documentation](http://f5.com/DODocs) for details on how to use AS3 and Declarative Onboarding on your BIG-IP VE(s). The [Telemetry Streaming](http://f5.com/TSDocs) extension is also downloaded and can be configured to point to AWS Cloud Watch. The [Cloud Failover Extension](http://f5.com/CFEDocs) documentation is also available.
 
 - Files
   - bigip.tf - resources for BIG-IP, NICs, public IPs
-  - main.tf - resources for provider, versions, storage buckets
-  - network.tf - data for existing subnets
-  - iam.tf - resources for IAM roles
-  - bigip.tf - resources for BIG-IP, security groups, route table
+  - iam.tf - resources to create IAM roles and permissions
+  - main.tf - resources for provider, versions
   - f5_onboard.tmpl - onboarding script which is run by user-data. This script is responsible for downloading the neccessary F5 Automation Toolchain RPM files, installing them, and then executing the onboarding REST calls via the [BIG-IP Runtime Init tool](https://github.com/F5Networks/f5-bigip-runtime-init).
 
 ## BYOL Licensing
@@ -73,19 +73,19 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
   ```
           aws ec2 describe-images \
             --region us-west-2 \
-            --filters "Name=name,Values=*BIGIP*16.1.2.1*BYOL*" \
+            --filters "Name=name,Values=*BIGIP*16.1.3.1*BYOL*" \
             --query 'Images[*].[ImageId,Name]'
 
           #Output similar to this...
           [
-              "ami-0b58fbcc973de5e3b",
-              "F5 BIGIP-16.1.2.1-0.0.10 BYOL-All Modules 2Boot Loc-211222202511-5f5a1994-65df-4235-b79c-a3ea049dc1db"
+              "ami-089182acbfc02e3bf",
+              "F5 BIGIP-16.1.3.1-0.0.11 BYOL-All Modules 2Boot Loc-220721050816-5f5a1994-65df-4235-b79c-a3ea049dc1db"
           ],
   ```
 2. In the "variables.tf", modify *f5_ami_search_name* with a value from previous output
   ```
           # BIGIP Image
-          variable "f5_ami_search_name" { default = "F5 BIGIP-16.1.2.1* BYOL-All* 2Boot*" }
+          variable "f5_ami_search_name" { default = "F5 BIGIP-16.1.3.1* BYOL-All* 2Boot*" }
   ```
 3. In the "variables.tf", modify *license1* and *license2* with valid regkeys
   ```
@@ -103,13 +103,10 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 
 ## BIG-IQ License Manager
 This template uses PayGo BIG-IP image for the deployment (as default). If you would like to use BYOL/ELA/Subscription licenses from [BIG-IQ License Manager (LM)](https://community.f5.com/t5/technical-articles/managing-big-ip-licensing-with-big-iq/ta-p/279797), then these following steps are needed:
-1. In the "variables.tf", modify *f5_ami_search_name* value with a BYOL filter in the name. Example below...
-  ```
-          # BIGIP Image
-          variable "f5_ami_search_name" { default = "F5 BIGIP-16.1.2.1* BYOL-All* 2Boot*" }
-  ```
+1. Find BYOL image. Reference [BYOL Licensing](#byol-licensing) step #1.
+2. Replace BIG-IP *f5_ami_search_name* in "variables.tf". Reference [BYOL Licensing](#byol-licensing) step #2.
 2. In the "variables.tf", modify the BIG-IQ license section to match your environment
-3. In the "f5_onboard.tmpl", add the "myLicense" block under the "Common" declaration ([example here](https://github.com/F5Networks/f5-aws-cloudformation-v2/blob/main/examples/autoscale/bigip-configurations/runtime-init-conf-bigiq.yaml))
+3. In the "f5_onboard.tmpl", add the "myLicense" block under the "Common" declaration ([example here](https://github.com/F5Networks/f5-aws-cloudformation-v2/blob/main/examples/autoscale/bigip-configurations/runtime-init-conf-bigiq-with-app.yaml))
   ```
           myLicense:
             class: License
@@ -228,16 +225,25 @@ No modules.
 | Name | Description |
 |------|-------------|
 | <a name="output_f5vm01_ext_private_ip"></a> [f5vm01\_ext\_private\_ip](#output\_f5vm01\_ext\_private\_ip) | f5vm01 external primary IP address (self IP) |
+| <a name="output_f5vm01_ext_public_ip"></a> [f5vm01\_ext\_public\_ip](#output\_f5vm01\_ext\_public\_ip) | f5vm01 external public IP address (self IP) |
 | <a name="output_f5vm01_ext_secondary_ip"></a> [f5vm01\_ext\_secondary\_ip](#output\_f5vm01\_ext\_secondary\_ip) | f5vm01 external secondary IP address (VIP) |
+| <a name="output_f5vm01_instance_ids"></a> [f5vm01\_instance\_ids](#output\_f5vm01\_instance\_ids) | f5vm01 management device name |
 | <a name="output_f5vm01_int_private_ip"></a> [f5vm01\_int\_private\_ip](#output\_f5vm01\_int\_private\_ip) | f5vm01 internal primary IP address |
+| <a name="output_f5vm01_mgmt_pip_url"></a> [f5vm01\_mgmt\_pip\_url](#output\_f5vm01\_mgmt\_pip\_url) | f5vm01 management public URL |
 | <a name="output_f5vm01_mgmt_private_ip"></a> [f5vm01\_mgmt\_private\_ip](#output\_f5vm01\_mgmt\_private\_ip) | f5vm01 management private IP address |
 | <a name="output_f5vm01_mgmt_public_ip"></a> [f5vm01\_mgmt\_public\_ip](#output\_f5vm01\_mgmt\_public\_ip) | f5vm01 management public IP address |
 | <a name="output_f5vm02_ext_private_ip"></a> [f5vm02\_ext\_private\_ip](#output\_f5vm02\_ext\_private\_ip) | f5vm02 external primary IP address (self IP) |
+| <a name="output_f5vm02_ext_public_ip"></a> [f5vm02\_ext\_public\_ip](#output\_f5vm02\_ext\_public\_ip) | f5vm02 external public IP address (self IP) |
 | <a name="output_f5vm02_ext_secondary_ip"></a> [f5vm02\_ext\_secondary\_ip](#output\_f5vm02\_ext\_secondary\_ip) | f5vm02 external secondary IP address (VIP) |
-| <a name="output_f5vm02_int_private_ip"></a> [f5vm02\_int\_private\_ip](#output\_f5vm02\_int\_private\_ip) | f5vm02 internal primary IP address |
+| <a name="output_f5vm02_instance_ids"></a> [f5vm02\_instance\_ids](#output\_f5vm02\_instance\_ids) | f5vm02 management device name |
+| <a name="output_f5vm02_int_private_ip"></a> [f5vm02\_int\_private\_ip](#output\_f5vm02\_int\_private\_ip) | f5vm01 internal primary IP address |
+| <a name="output_f5vm02_mgmt_pip_url"></a> [f5vm02\_mgmt\_pip\_url](#output\_f5vm02\_mgmt\_pip\_url) | f5vm02 management public URL |
 | <a name="output_f5vm02_mgmt_private_ip"></a> [f5vm02\_mgmt\_private\_ip](#output\_f5vm02\_mgmt\_private\_ip) | f5vm02 management private IP address |
 | <a name="output_f5vm02_mgmt_public_ip"></a> [f5vm02\_mgmt\_public\_ip](#output\_f5vm02\_mgmt\_public\_ip) | f5vm02 management public IP address |
-| <a name="output_public_vip_pip"></a> [public\_vip\_pip](#output\_public\_vip\_pip) | Public IP for the BIG-IP listener (VIP) |
+| <a name="output_public_vip"></a> [public\_vip](#output\_public\_vip) | Public IP for the BIG-IP listener (VIP) |
+| <a name="output_public_vip_2"></a> [public\_vip\_2](#output\_public\_vip\_2) | Public IP for the BIG-IP listener (VIP) #2 |
+| <a name="output_public_vip_url"></a> [public\_vip\_url](#output\_public\_vip\_url) | public URL for application |
+| <a name="output_public_vip_url_2"></a> [public\_vip\_url\_2](#output\_public\_vip\_url\_2) | public URL for application #2 |
 | <a name="output_route_table"></a> [route\_table](#output\_route\_table) | Route table ID |
 | <a name="output_storage_bucket"></a> [storage\_bucket](#output\_storage\_bucket) | AWS storage bucket ARN |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
@@ -306,14 +312,34 @@ In order to pass traffic from your clients to the servers through the BIG-IP sys
 2. Click **Local Traffic > Virtual Servers**
 3. Click the **Create** button
 4. Type a name in the **Name** field
-4. Type an address (ex. x.x.x.x/x) in the **Destination/Mask** field
-5. Type a port (ex. 443) in the **Service Port**
+4. Type an address (ex. 0.0.0.0/0) in the **Destination/Mask** field
+5. Type a port (ex. 80) in the **Service Port**
 6. Configure the rest of the virtual server as appropriate
 7. Select a pool name from the **Default Pool** list
 8. Click the **Finished** button
 9. Repeat as necessary for other applications
 
+## Redeploy BIG-IP for Replacement or Upgrade
+This example illustrates how to replace or upgrade the BIG-IP VE.
+  1. Change the *f5_ami_search_name* variable to the desired release
+  2. Revoke the problematic BIG-IP VE's license (if BYOL)
+  3. Run command
+```
+terraform taint module.bigip.aws_instance.f5_bigip
+terraform taint module.bigip2.aws_instance.f5_bigip
+```
+  3. Run command
+```
+terraform apply
+```
+
 ## Troubleshooting
+
+### Serial Logs
+Review the serial logs for the Google virtual machine. Login to the AWS portal, open "EC2", then locate your instance...click it. Hit Actions > Monitor and Troubleshoot > Get stem log. Then review the serial logs for errors.
+
+### Onboard Logs
+Depending on where onboard fails, you can attempt SSH login and try to troubleshoot further. Inspect the /config/cloud directory for correct runtime init YAML files. Inspec the /var/log/cloud location for error logs.
 
 ### F5 Automation Toolchain Components
 F5 BIG-IP Runtime Init uses the F5 Automation Toolchain for configuration of BIG-IP instances.  Any errors thrown from these components will be surfaced in the bigIpRuntimeInit.log (or a custom log location as specified below).

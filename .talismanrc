@@ -55,8 +55,6 @@ fileignoreconfig:
   checksum: aa6e19dae19f0f9dec93ae320d20129510f8bb888eebe91a7d53d3543ad1aebe
 - filename: AWS/Autoscale_via_lb/2nic/README.md
   checksum: dd5a0e8d463722a8a960aad23c57ad25a41628e08a30d33e943545804792dc4e
-- filename: AWS/HA_via_api/README.md
-  checksum: f6058047b5006464dff2433b35f54ecbe07b7b2a6677ec0f745eb9a18d54ba1e
 - filename: AWS/Autoscale_via_lb/1nic/terraform.tfvars.example
   checksum: 7c4260a9f830faef736e223920c48c20491ac52a9681bf97f06c5eacbe01d239
 - filename: AWS/Autoscale_via_lb/1nic/bigip.tf
@@ -123,3 +121,5 @@ fileignoreconfig:
   checksum: 317a45c84597dc4c936d628cca86bb1bd8fa47016850b14f526e5d2024afbd4c
 - filename: AWS/Standalone/README.md
   checksum: 55209d1648ff79184137d921564ae288eab6cc1d76dffcc57b3542488e26e163
+- filename: AWS/HA_via_api/README.md
+  checksum: df09c83a411fe406c40a81561fef5db284a8de0ddf7517a4fd15805366cf7e49
