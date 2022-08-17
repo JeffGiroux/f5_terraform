@@ -125,3 +125,5 @@ fileignoreconfig:
   checksum: 963a08b04930c5a28e2c778c80a5c1938b13050e6e4a4d9edfb1717d360ca6ff
 - filename: AWS/HA_via_api/README.md
   checksum: c2d01fb35ef99d9caa2dbd3c1b6e72b3d20a72da61644ff92c0abe8ce15ade6f
+- filename: AWS/HA_via_api/f5_onboard.tmpl
+  checksum: 1670abbdb18345df1298b13a6d1940ecccf8226d496a551556fb00bf8fe94698
