@@ -103,7 +103,6 @@ locals {
     # cluster info
     host1                   = module.bigip.private_addresses["mgmt_private"]["private_ip"][0]
     host2                   = module.bigip2.private_addresses["mgmt_private"]["private_ip"][0]
-    remote_host             = module.bigip2.private_addresses["internal_private"]["private_ip"][0]
     remote_selfip_ext       = module.bigip2.private_addresses["public_private"]["private_ip"][0]
     vip_az1                 = local.vm01_vip_ips.app1.ip
     vip_az2                 = local.vm02_vip_ips.app1.ip
@@ -143,7 +142,6 @@ locals {
     # cluster info
     host1                   = module.bigip.private_addresses["mgmt_private"]["private_ip"][0]
     host2                   = module.bigip2.private_addresses["mgmt_private"]["private_ip"][0]
-    remote_host             = module.bigip.private_addresses["internal_private"]["private_ip"][0]
     remote_selfip_ext       = module.bigip.private_addresses["public_private"]["private_ip"][0]
     vip_az1                 = local.vm01_vip_ips.app1.ip
     vip_az2                 = local.vm02_vip_ips.app1.ip
@@ -195,7 +193,14 @@ module "bigip2" {
 
 ############################ Collect Network Info ############################
 
-# BIG-IP 1 external NIC info
+# JeffGiroux  Needed as workaround.
+#             Currenly the BIG-IP module does not support
+#             tagging of NICs. Cloud Failover Extension for
+#             AWS has pre-reqs and some items need tagging.
+#
+#             https://github.com/F5Networks/terraform-aws-bigip-module/issues/22
+
+# BIG-IP 1 NIC info
 data "aws_network_interface" "bigip_ext" {
   filter {
     name   = "attachment.instance-id"
@@ -206,8 +211,6 @@ data "aws_network_interface" "bigip_ext" {
     values = ["BIGIP-External-Public-Interface-0"]
   }
 }
-
-# BIG-IP 1 internal NIC info
 data "aws_network_interface" "bigip_int" {
   filter {
     name   = "attachment.instance-id"
@@ -219,7 +222,7 @@ data "aws_network_interface" "bigip_int" {
   }
 }
 
-# BIG-IP 2 external NIC info
+# BIG-IP 2 NIC info
 data "aws_network_interface" "bigip2_ext" {
   filter {
     name   = "attachment.instance-id"
@@ -230,8 +233,6 @@ data "aws_network_interface" "bigip2_ext" {
     values = ["BIGIP-External-Public-Interface-0"]
   }
 }
-
-# BIG-IP 2 internal NIC info
 data "aws_network_interface" "bigip2_int" {
   filter {
     name   = "attachment.instance-id"
@@ -243,12 +244,10 @@ data "aws_network_interface" "bigip2_int" {
   }
 }
 
-# BIG-IP 1 Public VIP info
+# Public VIP info
 data "aws_eip" "bigip_vip" {
   public_ip = module.bigip.public_addresses["external_secondary_public"][0]
 }
-
-# BIG-IP 2 Public VIP info
 data "aws_eip" "bigip2_vip" {
   public_ip = module.bigip2.public_addresses["external_secondary_public"][0]
 }
@@ -299,7 +298,7 @@ resource "aws_ec2_tag" "bigip2_int_nicmap" {
   value       = "internal"
 }
 
-# Add Cloud Failover tags to BIG-IP 1 VIP (public IP)
+# Add Cloud Failover tags to VIPs (public IP)
 resource "aws_ec2_tag" "bigip_vip_label" {
   resource_id = data.aws_eip.bigip_vip.id
   key         = "f5_cloud_failover_label"
@@ -310,8 +309,6 @@ resource "aws_ec2_tag" "bigip_vip_ips" {
   key         = "f5_cloud_failover_vips"
   value       = "${local.vm01_vip_ips.app1.ip},${local.vm02_vip_ips.app1.ip}"
 }
-
-# Add Cloud Failover tags to BIG-IP 2 VIP (public IP)
 resource "aws_ec2_tag" "bigip2_vip_label" {
   resource_id = data.aws_network_interface.bigip2_int.id
   key         = "f5_cloud_failover_label"
@@ -322,7 +319,6 @@ resource "aws_ec2_tag" "bigip2_vip_ips" {
   key         = "f5_cloud_failover_vips"
   value       = "${local.vm01_vip_ips.app1.ip},${local.vm02_vip_ips.app1.ip}"
 }
-
 
 ############################ Route Tables ############################
 
