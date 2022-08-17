@@ -121,5 +121,7 @@ fileignoreconfig:
   checksum: 317a45c84597dc4c936d628cca86bb1bd8fa47016850b14f526e5d2024afbd4c
 - filename: AWS/Standalone/README.md
   checksum: 55209d1648ff79184137d921564ae288eab6cc1d76dffcc57b3542488e26e163
+- filename: AWS/HA_via_api/iam.tf
+  checksum: 963a08b04930c5a28e2c778c80a5c1938b13050e6e4a4d9edfb1717d360ca6ff
 - filename: AWS/HA_via_api/README.md
-  checksum: df09c83a411fe406c40a81561fef5db284a8de0ddf7517a4fd15805366cf7e49
+  checksum: c2d01fb35ef99d9caa2dbd3c1b6e72b3d20a72da61644ff92c0abe8ce15ade6f

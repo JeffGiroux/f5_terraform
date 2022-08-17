@@ -17,6 +17,17 @@ data "aws_iam_policy_document" "bigip_policy" {
   version = "2012-10-17"
   statement {
     actions = [
+      "secretsmanager:GetResourcePolicy",
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:ListSecretVersionIds",
+      "secretsmanager:ListSecrets"
+    ]
+    resources = ["*"]
+    effect    = "Allow"
+  }
+  statement {
+    actions = [
       "ec2:DescribeInstances",
       "ec2:DescribeInstanceStatus",
       "ec2:DescribeAddresses",
