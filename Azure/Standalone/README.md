@@ -62,13 +62,12 @@ The BIG-IP's configuration, now defined in a single convenient YAML or JSON [F5 
 - Variables are configured in variables.tf
 - Sensitive variables like Azure SSH keys are configured in terraform.tfvars or Azure Key Vault
   - ***Note***: Other items like BIG-IP password can be stored in Azure Key Vault. Refer to the [Prerequisites](#prerequisites).
-  - The BIG-IP instance will query Azure Metadata API to retrieve the service account's token for authentication
-  - The BIG-IP instance will then use the secret name and the service account's token to query Azure Metadata API and dynamically retrieve the password for device onboarding
+  - The BIG-IP instance will then use the managed user-identity to query Azure Metadata API and dynamically retrieve the password for device onboarding
 - This template uses BIG-IP Runtime Init for the initial configuration. As part of the onboarding script, it will download the F5 Toolchain RPMs automatically. See the [AS3 documentation](http://f5.com/AS3Docs) and [DO documentation](http://f5.com/DODocs) for details on how to use AS3 and Declarative Onboarding on your BIG-IP VE(s). The [Telemetry Streaming](http://f5.com/TSDocs) extension is also downloaded and can be configured to point to [F5 Beacon](https://f5.com/beacon-get-started), Azure Log Analytics, or many other consumers.
 - Files
   - bigip.tf - resources for BIG-IP, NICs, public IPs
   - main.tf - resources for provider, versions, resource group
-  - network.tf - data for existing subnets
+  - network.tf - data for existing subnets and existing network security groups
   - f5_onboard.tmpl - onboarding script which is run by commandToExecute (user data). It will be copied to /var/lib/waagent/CustomData upon bootup. This script is responsible for downloading the neccessary F5 Automation Toolchain RPM files, installing them, and then executing the onboarding REST calls via the [BIG-IP Runtime Init tool](https://github.com/F5Networks/f5-bigip-runtime-init).
 
 ## BYOL Licensing
@@ -356,7 +355,7 @@ az account set -s <subscriptionId>
 ## Troubleshooting
 
 ### Serial Logs
-TBD
+Review the serial logs for the Azure virtual machine. Login to the Azure portal, open "Virtual Machines", then locate your instance...click it. Hit Serial Console. Then review the serial logs for errors.
 
 ### Onboard Logs
 Depending on where onboard fails, you can attempt SSH login and try to troubleshoot further. Inspect the /config/cloud directory for correct runtime init YAML files. Inspect the /var/log/cloud location for error logs.
