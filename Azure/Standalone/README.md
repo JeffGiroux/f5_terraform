@@ -39,10 +39,10 @@ The BIG-IP's configuration, now defined in a single convenient YAML or JSON [F5 
   - Permissions will depend on the objects you are creating
   - ***Note***: Make sure to [practice least privilege](https://docs.microsoft.com/en-us/azure/security/fundamentals/identity-management-best-practices#lower-exposure-of-privileged-accounts)
 - Passwords and secrets can be located in [Azure Key Vault](https://docs.microsoft.com/en-us/azure/key-vault/general/overview).
-  - Set *az_key_vault_authentication* to 'true'
-  - Set *azure_keyvault_rg* to the Azure Resource Group containingg the Key Vault
-  - Set *azure_keyvault_name* to the Azure Key Vault name
-  - If *az_key_vault_authentication* is 'true', then 'f5_password' should be the Key Vault secret name. The secret contents should contain ONLY the password as plain text.
+  - Set *keyvault_authentication* to 'true'
+  - Set *keyvault_rg* to the Azure Resource Group containing the Key Vault
+  - Set *keyvault_url* to the Azure Key Vault URL
+  - If *keyvault_authentication* is 'true', then 'f5_password' should be the Key Vault secret name. The secret contents should contain ONLY the password as plain text.
 - This templates deploys into an *EXISTING* networking stack. You are required to have an existing VNet, subnets, and security groups.
   - You must have a VNET with three (3) subnets: management, external, internal
   - Firewall rules are required to pass traffic to the application
@@ -176,9 +176,7 @@ No modules.
 | <a name="input_FAST_URL"></a> [FAST\_URL](#input\_FAST\_URL) | URL to download the BIG-IP FAST module | `string` | `"https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.19.0/f5-appsvcs-templates-1.19.0-1.noarch.rpm"` | no |
 | <a name="input_INIT_URL"></a> [INIT\_URL](#input\_INIT\_URL) | URL to download the BIG-IP runtime init | `string` | `"https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.5.1/dist/f5-bigip-runtime-init-1.5.1-1.gz.run"` | no |
 | <a name="input_TS_URL"></a> [TS\_URL](#input\_TS\_URL) | URL to download the BIG-IP Telemetry Streaming module | `string` | `"https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.30.0/f5-telemetry-1.30.0-1.noarch.rpm"` | no |
-| <a name="input_az_key_vault_authentication"></a> [az\_key\_vault\_authentication](#input\_az\_key\_vault\_authentication) | Whether to use key vault to pass authentication | `bool` | `false` | no |
-| <a name="input_azure_keyvault_name"></a> [azure\_keyvault\_name](#input\_azure\_keyvault\_name) | The name of the Azure Key Vault to use | `string` | `""` | no |
-| <a name="input_azure_keyvault_rg"></a> [azure\_keyvault\_rg](#input\_azure\_keyvault\_rg) | The name of the resource group in which the Azure Key Vault exists | `string` | `""` | no |
+| <a name="input_az_keyvault_authentication"></a> [az\_keyvault\_authentication](#input\_az\_keyvault\_authentication) | Whether to use key vault to pass authentication | `bool` | `false` | no |
 | <a name="input_bigIqHost"></a> [bigIqHost](#input\_bigIqHost) | This is the BIG-IQ License Manager host name or IP address | `string` | `""` | no |
 | <a name="input_bigIqHypervisor"></a> [bigIqHypervisor](#input\_bigIqHypervisor) | BIG-IQ hypervisor | `string` | `"azure"` | no |
 | <a name="input_bigIqLicensePool"></a> [bigIqLicensePool](#input\_bigIqLicensePool) | BIG-IQ license pool name | `string` | `""` | no |
@@ -196,6 +194,8 @@ No modules.
 | <a name="input_image_name"></a> [image\_name](#input\_image\_name) | F5 SKU (image) to deploy. Note: The disk size of the VM will be determined based on the option you select.  **Important**: If intending to provision multiple modules, ensure the appropriate value is selected, such as ****AllTwoBootLocations or AllOneBootLocation****. | `string` | `"f5-big-best-plus-hourly-200mbps"` | no |
 | <a name="input_instance_type"></a> [instance\_type](#input\_instance\_type) | Azure instance type to be used for the BIG-IP VE | `string` | `"Standard_DS4_v2"` | no |
 | <a name="input_intSubnet"></a> [intSubnet](#input\_intSubnet) | Name of internal subnet | `string` | `null` | no |
+| <a name="input_keyvault_rg"></a> [keyvault\_rg](#input\_keyvault\_rg) | The name of the resource group in which the Azure Key Vault exists | `string` | `""` | no |
+| <a name="input_keyvault_url"></a> [keyvault\_url](#input\_keyvault\_url) | The URL of the Azure Key Vault to use (ex. https://myKeyVault123.vault.azure.net) | `string` | `""` | no |
 | <a name="input_libs_dir"></a> [libs\_dir](#input\_libs\_dir) | Directory on the BIG-IP to download the A&O Toolchain into | `string` | `"/config/cloud/azure/node_modules"` | no |
 | <a name="input_license1"></a> [license1](#input\_license1) | The license token for the 1st F5 BIG-IP VE (BYOL) | `string` | `""` | no |
 | <a name="input_location"></a> [location](#input\_location) | Azure Location of the deployment | `string` | `"westus2"` | no |

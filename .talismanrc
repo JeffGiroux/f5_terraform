@@ -121,9 +121,9 @@ fileignoreconfig:
 - filename: Azure/Standalone/terraform.tfvars.example
   checksum: 6bc16fbe3aa786a6590f29a94356deb18fcc0758dff6e1a73539f14f3e3b4edb
 - filename: Azure/Standalone/variables.tf
-  checksum: efdab1ef063de9f30a77bb21820649cd909cc0ff7d83a775d77922f5409738d7
+  checksum: adf8c59c3e80b01a5ba7a0b53073dd5a5378cc335a681841bd4a72cafcd01c74
 - filename: Azure/Standalone/README.md
-  checksum: 6de9962c87e4278b18da4572724b937f3adc7e5ac1ef1090c73198b9c4f3f9a1
+  checksum: 1fe1106d1cea84c79335d2d1139de949dcdf9f85de572dc3cd4f74afbbc96792
 - filename: Azure/Standalone/f5_onboard.tmpl
   checksum: 24ae7bfa5dba46b78bcda6b839e80be7afd104444061a4f9cb06c2112f981e04
 - filename: Azure/Standalone/bigip.tf

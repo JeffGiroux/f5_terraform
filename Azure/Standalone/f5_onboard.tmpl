@@ -30,7 +30,7 @@ runtime_parameters:
     value: ${ssh_keypair}
 EOF
 
-if ${az_key_vault_authentication}; then
+if ${az_keyvault_authentication}; then
    cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
   - name: ADMIN_PASS
     type: secret

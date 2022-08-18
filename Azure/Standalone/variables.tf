@@ -65,17 +65,17 @@ variable "f5_password" {
   default     = "Default12345!"
   description = "BIG-IP Password or Key Vault secret name (value should be Key Vault secret name when az_key_vault_authentication = true, ex. my-bigip-secret)"
 }
-variable "az_key_vault_authentication" {
+variable "az_keyvault_authentication" {
   description = "Whether to use key vault to pass authentication"
   type        = bool
   default     = false
 }
-variable "azure_keyvault_name" {
-  description = "The name of the Azure Key Vault to use"
+variable "keyvault_url" {
+  description = "The URL of the Azure Key Vault to use (ex. https://myKeyVault123.vault.azure.net)"
   type        = string
   default     = ""
 }
-variable "azure_keyvault_rg" {
+variable "keyvault_rg" {
   description = "The name of the resource group in which the Azure Key Vault exists"
   type        = string
   default     = ""
