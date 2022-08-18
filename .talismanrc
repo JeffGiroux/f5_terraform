@@ -19,10 +19,6 @@ fileignoreconfig:
   checksum: 256d71ef902b939820d527ce15980f417be3b64aba4e36de2cc824681c8a391b
 - filename: GCP/HA_via_api/terraform.tfvars.example
   checksum: f6ea35c21254781aa3bf2add99848730d6898ce9a4e3c44f4e072b5e1a458f71
-- filename: Azure/Standalone/bigip.tf
-  checksum: 4888f366e13206b6da23835700eb8de02fdde2f5f6235f5cd6f048d2988f7e0b
-- filename: Azure/Standalone/f5_onboard.tmpl
-  checksum: a29a3f5849bb8c656e88b208dda8371a49cb6175a5681bee422c3b4bfcb66641
 - filename: Azure/Secure_Enclave_Public_DMZ/README.md
   checksum: 0d6df57c347f4f1e327f564eb5acb1e4d4cb7fc79d641850c0bb536161578692
 - filename: Azure/Route_Server/admin.auto.tfvars.example
@@ -52,8 +48,6 @@ fileignoreconfig:
   checksum: e13909723e31c2c9f6c9a9b681d6e22bc45e3ea95e06676271492f2c6c55fcc0
 - filename: Azure/HA_via_api/README.md
   checksum: c303e945b2cf32edbf52a0aa94db450cb05d225a993ddf8a10e33e3ec41251cb
-- filename: Azure/Standalone/README.md
-  checksum: 092f6b1c8cd3c1f94115ac6c6d330e53ac07eb0043168165e2130900cd895349
 - filename: Azure/HA_via_lb/README.md
   checksum: ee5190df812f75cfdb25b6d74e542f8ac3d4e7827830785c3b835b275a10c877
 - filename: GCP/HA_via_lb/bigip.tf
@@ -129,4 +123,8 @@ fileignoreconfig:
 - filename: Azure/Standalone/variables.tf
   checksum: efdab1ef063de9f30a77bb21820649cd909cc0ff7d83a775d77922f5409738d7
 - filename: Azure/Standalone/README.md
-  checksum: 9f6f891692839a0ffdfe4e44a537935d7f96e1651bc0116ac23114469027e6cc
+  checksum: 3caae939d3598c26c6bab8c3a7f421868016640282e7443213af27312f40be07
+- filename: Azure/Standalone/f5_onboard.tmpl
+  checksum: 24ae7bfa5dba46b78bcda6b839e80be7afd104444061a4f9cb06c2112f981e04
+- filename: Azure/Standalone/bigip.tf
+  checksum: 30954064a4b61814c428320ed1da63154dad74a5175f3ae5ca59fed1fcf7e100
