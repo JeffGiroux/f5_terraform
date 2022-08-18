@@ -1,20 +1,5 @@
 # BIG-IP
 
-############################ Key Vault ############################
-
-# Validate the secret exists
-data "azurerm_key_vault" "kv" {
-  count               = var.az_key_vault_authentication ? 1 : 0
-  name                = var.azure_keyvault_name
-  resource_group_name = var.azure_keyvault_rg
-}
-
-data "azurerm_key_vault_secret" "password" {
-  count        = var.az_key_vault_authentication ? 1 : 0
-  name         = var.f5_password
-  key_vault_id = data.azurerm_key_vault.kv[count.index].id
-}
-
 ############################ Public IPs ############################
 
 
@@ -137,35 +122,35 @@ resource "azurerm_network_interface" "vm01-int-nic" {
 # Setup Onboarding scripts
 locals {
   f5_onboard1 = templatefile("${path.module}/f5_onboard.tmpl", {
-    regKey                      = var.license1
-    f5_username                 = var.f5_username
-    f5_password                 = var.az_key_vault_authentication ? data.azurerm_key_vault_secret.password[0].id : var.f5_password
-    az_key_vault_authentication = var.az_key_vault_authentication
-    vault_url                   = var.az_key_vault_authentication ? data.azurerm_key_vault.kv[0].vault_uri : ""
-    ssh_keypair                 = var.ssh_key
-    INIT_URL                    = var.INIT_URL
-    DO_URL                      = var.DO_URL
-    AS3_URL                     = var.AS3_URL
-    TS_URL                      = var.TS_URL
-    FAST_URL                    = var.FAST_URL
-    DO_VER                      = split("/", var.DO_URL)[7]
-    AS3_VER                     = split("/", var.AS3_URL)[7]
-    TS_VER                      = split("/", var.TS_URL)[7]
-    FAST_VER                    = split("/", var.FAST_URL)[7]
-    dns_server                  = var.dns_server
-    ntp_server                  = var.ntp_server
-    timezone                    = var.timezone
-    law_id                      = azurerm_log_analytics_workspace.law.workspace_id
-    law_primkey                 = azurerm_log_analytics_workspace.law.primary_shared_key
-    bigIqLicenseType            = var.bigIqLicenseType
-    bigIqHost                   = var.bigIqHost
-    bigIqPassword               = var.bigIqPassword
-    bigIqUsername               = var.bigIqUsername
-    bigIqLicensePool            = var.bigIqLicensePool
-    bigIqSkuKeyword1            = var.bigIqSkuKeyword1
-    bigIqSkuKeyword2            = var.bigIqSkuKeyword2
-    bigIqUnitOfMeasure          = var.bigIqUnitOfMeasure
-    bigIqHypervisor             = var.bigIqHypervisor
+    regKey                     = var.license1
+    f5_username                = var.f5_username
+    f5_password                = var.f5_password
+    az_keyvault_authentication = var.az_keyvault_authentication
+    vault_url                  = var.az_keyvault_authentication ? var.keyvault_url : ""
+    ssh_keypair                = var.ssh_key
+    INIT_URL                   = var.INIT_URL
+    DO_URL                     = var.DO_URL
+    AS3_URL                    = var.AS3_URL
+    TS_URL                     = var.TS_URL
+    FAST_URL                   = var.FAST_URL
+    DO_VER                     = split("/", var.DO_URL)[7]
+    AS3_VER                    = split("/", var.AS3_URL)[7]
+    TS_VER                     = split("/", var.TS_URL)[7]
+    FAST_VER                   = split("/", var.FAST_URL)[7]
+    dns_server                 = var.dns_server
+    ntp_server                 = var.ntp_server
+    timezone                   = var.timezone
+    law_id                     = azurerm_log_analytics_workspace.law.workspace_id
+    law_primkey                = azurerm_log_analytics_workspace.law.primary_shared_key
+    bigIqLicenseType           = var.bigIqLicenseType
+    bigIqHost                  = var.bigIqHost
+    bigIqPassword              = var.bigIqPassword
+    bigIqUsername              = var.bigIqUsername
+    bigIqLicensePool           = var.bigIqLicensePool
+    bigIqSkuKeyword1           = var.bigIqSkuKeyword1
+    bigIqSkuKeyword2           = var.bigIqSkuKeyword2
+    bigIqUnitOfMeasure         = var.bigIqUnitOfMeasure
+    bigIqHypervisor            = var.bigIqHypervisor
   })
 }
 
@@ -173,16 +158,14 @@ locals {
 
 # Create F5 BIG-IP VMs
 resource "azurerm_linux_virtual_machine" "f5vm01" {
-  name                            = format("%s-f5vm01-%s", var.projectPrefix, random_id.buildSuffix.hex)
-  location                        = azurerm_resource_group.main.location
-  resource_group_name             = azurerm_resource_group.main.name
-  zone                            = 1
-  network_interface_ids           = [azurerm_network_interface.vm01-mgmt-nic.id, azurerm_network_interface.vm01-ext-nic.id, azurerm_network_interface.vm01-int-nic.id]
-  size                            = var.instance_type
-  admin_username                  = var.f5_username
-  admin_password                  = var.f5_password
-  disable_password_authentication = false
-  custom_data                     = base64encode(local.f5_onboard1)
+  name                  = format("%s-f5vm01-%s", var.projectPrefix, random_id.buildSuffix.hex)
+  location              = azurerm_resource_group.main.location
+  resource_group_name   = azurerm_resource_group.main.name
+  zone                  = 1
+  network_interface_ids = [azurerm_network_interface.vm01-mgmt-nic.id, azurerm_network_interface.vm01-ext-nic.id, azurerm_network_interface.vm01-int-nic.id]
+  size                  = var.instance_type
+  admin_username        = var.f5_username
+  custom_data           = base64encode(local.f5_onboard1)
 
   admin_ssh_key {
     username   = var.f5_username

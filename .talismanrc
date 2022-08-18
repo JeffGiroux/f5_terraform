@@ -127,4 +127,4 @@ fileignoreconfig:
 - filename: Azure/Standalone/f5_onboard.tmpl
   checksum: 24ae7bfa5dba46b78bcda6b839e80be7afd104444061a4f9cb06c2112f981e04
 - filename: Azure/Standalone/bigip.tf
-  checksum: 30954064a4b61814c428320ed1da63154dad74a5175f3ae5ca59fed1fcf7e100
+  checksum: 45664939c080d5aefe0fc0693fe4dc36b063fbe9b047a14ff2e7d83949214204
