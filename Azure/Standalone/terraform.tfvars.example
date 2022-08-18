@@ -7,6 +7,9 @@ vnet_name   = "myVnet123"
 mgmtSubnet  = "mgmt"
 extSubnet   = "external"
 intSubnet   = "internal"
+mgmtNsg     = "mgmtNsg"
+extNsg      = "extNsg"
+intNsg      = "intNsg"
 
 # Azure Environment
 location      = "westus2"

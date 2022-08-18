@@ -20,6 +20,11 @@ variable "vnet_name" {
   default     = null
   description = "Name of existing VNET"
 }
+variable "availability_zone" {
+  type        = number
+  description = "If you want the VM placed in an Azure Availability Zone, and the Azure region you are deploying to supports it, specify the numbers of the existing Availability Zone you want to use."
+  default     = 1
+}
 variable "mgmtSubnet" {
   type        = string
   default     = null
@@ -34,6 +39,21 @@ variable "intSubnet" {
   type        = string
   default     = null
   description = "Name of internal subnet"
+}
+variable "mgmtNsg" {
+  type        = string
+  default     = null
+  description = "Name of management network security group"
+}
+variable "extNsg" {
+  type        = string
+  default     = null
+  description = "Name of external network security group"
+}
+variable "intNsg" {
+  type        = string
+  default     = null
+  description = "Name of internal network security group"
 }
 variable "instance_type" {
   type        = string
