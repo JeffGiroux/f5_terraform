@@ -97,7 +97,7 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
           # BIGIP Setup
           variable license1 { default = "" }
   ```
-4. In the "f5_onboard.tmpl", add the "myLicense" block under the "Common" declaration ([example here](https://github.com/F5Networks/f5-aws-cloudformation-v2/blob/main/examples/failover/bigip-configurations/runtime-init-conf-3nic-byol-instance01.yaml))
+4. In the "f5_onboard.tmpl", add the "myLicense" block under the "Common" declaration ([example here](https://github.com/F5Networks/f5-azure-arm-templates-v2/blob/main/examples/quickstart/bigip-configurations/runtime-init-conf-3nic-byol.yaml))
   ```
           myLicense:
             class: License
@@ -110,7 +110,7 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 1. Find BYOL image. Reference [BYOL Licensing](#byol-licensing) step #1.
 2. Replace BIG-IP *image_name* and *product* in "variables.tf". Reference [BYOL Licensing](#byol-licensing) step #2.
 3. In the "variables.tf", modify the BIG-IQ license section to match your environment
-4. In the "f5_onboard.tmpl", add the "myLicense" block under the "Common" declaration ([example here](https://github.com/F5Networks/f5-aws-cloudformation-v2/blob/main/examples/autoscale/bigip-configurations/runtime-init-conf-bigiq-with-app.yaml))
+4. In the "f5_onboard.tmpl", add the "myLicense" block under the "Common" declaration ([example here](https://github.com/F5Networks/f5-azure-arm-templates-v2/blob/main/examples/autoscale/bigip-configurations/runtime-init-conf-bigiq-with-app.yaml))
   ```
           myLicense:
             class: License
