@@ -1,25 +1,5 @@
 # Variables
 
-variable "sp_subscription_id" {
-  type        = string
-  default     = ""
-  description = "This is the service principal subscription ID"
-}
-variable "sp_client_id" {
-  type        = string
-  default     = ""
-  description = "This is the service principal application/client ID"
-}
-variable "sp_client_secret" {
-  type        = string
-  default     = ""
-  description = "This is the service principal secret"
-}
-variable "sp_tenant_id" {
-  type        = string
-  default     = ""
-  description = "This is the service principal tenant ID"
-}
 variable "projectPrefix" {
   type        = string
   default     = "demo"
@@ -75,15 +55,30 @@ variable "bigip_version" {
   default     = "16.1.301000"
   description = "BIG-IP Version"
 }
-variable "uname" {
+variable "f5_username" {
   type        = string
   default     = "azureuser"
-  description = "User name for the Virtual Machine"
+  description = "User name for the BIG-IP"
 }
-variable "upassword" {
+variable "f5_password" {
   type        = string
   default     = "Default12345!"
-  description = "Password for the Virtual Machine"
+  description = "BIG-IP Password or Key Vault secret name (value should be Key Vault secret name when az_key_vault_authentication = true, ex. https://myKeyVault123.vault.azure.net/secrets/bigip-password/12345abcde)"
+}
+variable "az_key_vault_authentication" {
+  description = "Whether to use key vault to pass authentication"
+  type        = bool
+  default     = false
+}
+variable "azure_keyvault_name" {
+  description = "The name of the Azure Key Vault to use"
+  type        = string
+  default     = ""
+}
+variable "azure_keyvault_rg" {
+  description = "The name of the resource group in which the Azure Key Vault exists"
+  type        = string
+  default     = ""
 }
 variable "ssh_key" {
   type        = string
@@ -184,7 +179,7 @@ variable "bigIqHypervisor" {
   default     = "azure"
   description = "BIG-IQ hypervisor"
 }
-variable "owner" {
+variable "resourceOwner" {
   type        = string
   default     = null
   description = "This is a tag used for object creation. Example is last name."
