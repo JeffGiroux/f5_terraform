@@ -8,7 +8,7 @@ resource "azurerm_public_ip" "vm01mgmtpip" {
   resource_group_name = azurerm_resource_group.main.name
   allocation_method   = "Static"
   tags = {
-    owner = var.owner
+    owner = var.resourceOwner
   }
 }
 
@@ -19,7 +19,7 @@ resource "azurerm_public_ip" "vm02mgmtpip" {
   resource_group_name = azurerm_resource_group.main.name
   allocation_method   = "Static"
   tags = {
-    owner = var.owner
+    owner = var.resourceOwner
   }
 }
 
@@ -31,7 +31,7 @@ resource "azurerm_public_ip" "vm01selfpip" {
   resource_group_name = azurerm_resource_group.main.name
   allocation_method   = "Static"
   tags = {
-    owner = var.owner
+    owner = var.resourceOwner
   }
 }
 
@@ -42,7 +42,7 @@ resource "azurerm_public_ip" "vm02selfpip" {
   resource_group_name = azurerm_resource_group.main.name
   allocation_method   = "Static"
   tags = {
-    owner = var.owner
+    owner = var.resourceOwner
   }
 }
 
@@ -54,7 +54,7 @@ resource "azurerm_public_ip" "pubvippip" {
   resource_group_name = azurerm_resource_group.main.name
   allocation_method   = "Static"
   tags = {
-    owner = var.owner
+    owner = var.resourceOwner
   }
 }
 
@@ -72,7 +72,7 @@ resource "azurerm_network_interface" "vm01-mgmt-nic" {
   }
 
   tags = {
-    owner = var.owner
+    owner = var.resourceOwner
   }
 }
 
@@ -89,7 +89,7 @@ resource "azurerm_network_interface" "vm02-mgmt-nic" {
   }
 
   tags = {
-    owner = var.owner
+    owner = var.resourceOwner
   }
 }
 
@@ -115,9 +115,9 @@ resource "azurerm_network_interface" "vm01-ext-nic" {
   }
 
   tags = {
-    owner                     = var.owner
+    owner                     = var.resourceOwner
     f5_cloud_failover_label   = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
-    f5_cloud_failover_nic_map = var.f5_cloud_failover_nic_map
+    f5_cloud_failover_nic_map = "external"
   }
 }
 
@@ -136,9 +136,9 @@ resource "azurerm_network_interface" "vm02-ext-nic" {
   }
 
   tags = {
-    owner                     = var.owner
+    owner                     = var.resourceOwner
     f5_cloud_failover_label   = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
-    f5_cloud_failover_nic_map = var.f5_cloud_failover_nic_map
+    f5_cloud_failover_nic_map = "external"
   }
 }
 
@@ -157,7 +157,9 @@ resource "azurerm_network_interface" "vm01-int-nic" {
   }
 
   tags = {
-    owner = var.owner
+    owner                     = var.resourceOwner
+    f5_cloud_failover_label   = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
+    f5_cloud_failover_nic_map = "internal"
   }
 }
 
@@ -175,7 +177,9 @@ resource "azurerm_network_interface" "vm02-int-nic" {
   }
 
   tags = {
-    owner = var.owner
+    owner                     = var.resourceOwner
+    f5_cloud_failover_label   = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
+    f5_cloud_failover_nic_map = "internal"
   }
 }
 
@@ -183,8 +187,8 @@ resource "azurerm_network_interface" "vm02-int-nic" {
 locals {
   f5_onboard1 = templatefile("${path.module}/f5_onboard.tmpl", {
     regKey                  = var.license1
-    f5_username             = var.uname
-    f5_password             = var.upassword
+    f5_username             = var.f5_username
+    f5_password             = var.f5_password
     ssh_keypair             = var.ssh_key
     INIT_URL                = var.INIT_URL
     DO_URL                  = var.DO_URL
@@ -222,8 +226,8 @@ locals {
   })
   f5_onboard2 = templatefile("${path.module}/f5_onboard.tmpl", {
     regKey                  = var.license2
-    f5_username             = var.uname
-    f5_password             = var.upassword
+    f5_username             = var.f5_username
+    f5_password             = var.f5_password
     ssh_keypair             = var.ssh_key
     INIT_URL                = var.INIT_URL
     DO_URL                  = var.DO_URL
@@ -263,19 +267,17 @@ locals {
 
 # Create F5 BIG-IP VMs
 resource "azurerm_linux_virtual_machine" "f5vm01" {
-  name                            = format("%s-f5vm01-%s", var.projectPrefix, random_id.buildSuffix.hex)
-  location                        = azurerm_resource_group.main.location
-  resource_group_name             = azurerm_resource_group.main.name
-  zone                            = 1
-  network_interface_ids           = [azurerm_network_interface.vm01-mgmt-nic.id, azurerm_network_interface.vm01-ext-nic.id, azurerm_network_interface.vm01-int-nic.id]
-  size                            = var.instance_type
-  admin_username                  = var.uname
-  admin_password                  = var.upassword
-  disable_password_authentication = false
-  custom_data                     = base64encode(local.f5_onboard1)
+  name                  = format("%s-f5vm01-%s", var.projectPrefix, random_id.buildSuffix.hex)
+  location              = azurerm_resource_group.main.location
+  resource_group_name   = azurerm_resource_group.main.name
+  zone                  = 1
+  network_interface_ids = [azurerm_network_interface.vm01-mgmt-nic.id, azurerm_network_interface.vm01-ext-nic.id, azurerm_network_interface.vm01-int-nic.id]
+  size                  = var.instance_type
+  admin_username        = var.f5_username
+  custom_data           = base64encode(local.f5_onboard1)
 
   admin_ssh_key {
-    username   = var.uname
+    username   = var.f5_username
     public_key = var.ssh_key
   }
 
@@ -303,24 +305,22 @@ resource "azurerm_linux_virtual_machine" "f5vm01" {
   }
 
   tags = {
-    owner = var.owner
+    owner = var.resourceOwner
   }
 }
 
 resource "azurerm_linux_virtual_machine" "f5vm02" {
-  name                            = format("%s-f5vm02-%s", var.projectPrefix, random_id.buildSuffix.hex)
-  location                        = azurerm_resource_group.main.location
-  resource_group_name             = azurerm_resource_group.main.name
-  zone                            = 2
-  network_interface_ids           = [azurerm_network_interface.vm02-mgmt-nic.id, azurerm_network_interface.vm02-ext-nic.id, azurerm_network_interface.vm02-int-nic.id]
-  size                            = var.instance_type
-  admin_username                  = var.uname
-  admin_password                  = var.upassword
-  disable_password_authentication = false
-  custom_data                     = base64encode(local.f5_onboard2)
+  name                  = format("%s-f5vm02-%s", var.projectPrefix, random_id.buildSuffix.hex)
+  location              = azurerm_resource_group.main.location
+  resource_group_name   = azurerm_resource_group.main.name
+  zone                  = 2
+  network_interface_ids = [azurerm_network_interface.vm02-mgmt-nic.id, azurerm_network_interface.vm02-ext-nic.id, azurerm_network_interface.vm02-int-nic.id]
+  size                  = var.instance_type
+  admin_username        = var.f5_username
+  custom_data           = base64encode(local.f5_onboard2)
 
   admin_ssh_key {
-    username   = var.uname
+    username   = var.f5_username
     public_key = var.ssh_key
   }
 
@@ -348,7 +348,7 @@ resource "azurerm_linux_virtual_machine" "f5vm02" {
   }
 
   tags = {
-    owner = var.owner
+    owner = var.resourceOwner
   }
 }
 
@@ -380,7 +380,7 @@ resource "azurerm_virtual_machine_extension" "f5vm01-startup" {
   SETTINGS
 
   tags = {
-    owner = var.owner
+    owner = var.resourceOwner
   }
 }
 
@@ -398,7 +398,7 @@ resource "azurerm_virtual_machine_extension" "f5vm02-startup" {
   SETTINGS
 
   tags = {
-    owner = var.owner
+    owner = var.resourceOwner
   }
 }
 
@@ -417,8 +417,30 @@ resource "azurerm_route_table" "udr" {
   }
 
   tags = {
-    owner                   = var.owner
+    owner                   = var.resourceOwner
     f5_cloud_failover_label = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
     f5_self_ips             = "${azurerm_network_interface.vm01-ext-nic.private_ip_address},${azurerm_network_interface.vm02-ext-nic.private_ip_address}"
   }
 }
+
+# ## test
+
+# resource "null_resource" "cluster" {
+#   # Changes to any instance of the cluster requires re-provisioning
+#   triggers = {
+#     bigip_instance_ids = join(",", aws_instance.cluster.*.id)
+#   }
+
+#   # Bootstrap script can run on any instance of the cluster
+#   # So we just choose the first in this case
+#   connection {
+#     host = element(aws_instance.cluster.*.public_ip, 0)
+#   }
+
+#   provisioner "remote-exec" {
+#     # Bootstrap script called with private_ip of each node in the clutser
+#     inline = [
+#       "bootstrap-cluster.sh ${join(" ", aws_instance.cluster.*.private_ip)}",
+#     ]
+#   }
+# }

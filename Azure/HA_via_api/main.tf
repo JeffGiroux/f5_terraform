@@ -14,7 +14,7 @@ resource "azurerm_resource_group" "main" {
   name     = format("%s-rg-%s", var.projectPrefix, random_id.buildSuffix.hex)
   location = var.location
   tags = {
-    owner = var.owner
+    owner = var.resourceOwner
   }
 }
 
@@ -26,7 +26,7 @@ resource "azurerm_log_analytics_workspace" "law" {
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
   tags = {
-    owner = var.owner
+    owner = var.resourceOwner
   }
 }
 
@@ -38,7 +38,7 @@ resource "azurerm_storage_account" "main" {
   account_tier             = "Standard"
   account_replication_type = "LRS"
   tags = {
-    owner                   = var.owner
+    owner                   = var.resourceOwner
     f5_cloud_failover_label = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
   }
 }

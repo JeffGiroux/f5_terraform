@@ -46,8 +46,6 @@ fileignoreconfig:
   checksum: ddfa4b88d8a242ceb3d430ab65502ff1a95e84b1a9ea75ef648a99c578b2a888
 - filename: AWS/Standalone/README.md
   checksum: e13909723e31c2c9f6c9a9b681d6e22bc45e3ea95e06676271492f2c6c55fcc0
-- filename: Azure/HA_via_api/README.md
-  checksum: c303e945b2cf32edbf52a0aa94db450cb05d225a993ddf8a10e33e3ec41251cb
 - filename: Azure/HA_via_lb/README.md
   checksum: ee5190df812f75cfdb25b6d74e542f8ac3d4e7827830785c3b835b275a10c877
 - filename: GCP/HA_via_lb/bigip.tf
@@ -128,3 +126,11 @@ fileignoreconfig:
   checksum: 24ae7bfa5dba46b78bcda6b839e80be7afd104444061a4f9cb06c2112f981e04
 - filename: Azure/Standalone/bigip.tf
   checksum: 6fd7bac702ab0754e4098b18e86e4bae41d82774da47ed934338eee7410f7864
+- filename: Azure/HA_via_api/terraform.tfvars.example
+  checksum: 347b7270bfca96a173e2033bff8de65dd172d1678671582dd1e4bcbc10d66011
+- filename: Azure/HA_via_api/variables.tf
+  checksum: 6ee650cf46900cfe974b8c9eead31c67384c46460fcf755f56ffe6802f487ef6
+- filename: Azure/HA_via_api/bigip.tf
+  checksum: cb131118d22ef477cd3e81ad9cf5b239516321e1b6379bbd27cc8df1e2ac41e5
+- filename: Azure/HA_via_api/README.md
+  checksum: 349f3766c611806b6fa046f20773258e02b7965051fd13e53baddafdfadc73a2
