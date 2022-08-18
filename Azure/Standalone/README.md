@@ -3,6 +3,10 @@
 ## To Do
 - Community support only. Not F5 supported.
 - TS still not used and not installed
+- BIG-IP module automatically builds user-identity
+  - User-identity is tied to key vault policy
+  - User should be able to provide existing user-identity ID
+  - See https://github.com/F5Networks/terraform-azure-bigip-module/issues/34
 
 ## Issues
 - Find an issue? Fork, clone, create branch, fix and PR. I'll review and merge into the main branch. Or submit a GitHub issue with all necessary details and logs.
@@ -301,8 +305,7 @@ This example illustrates how to replace or upgrade the BIG-IP VE.
   2. Revoke the problematic BIG-IP VE's license (if BYOL)
   3. Run command
 ```
-#terraform taint module.bigip.azurerm_linux_virtual_machine.f5vm01
-terraform taint azurerm_linux_virtual_machine.f5vm01
+terraform taint module.bigip.azurerm_linux_virtual_machine.f5vm01
 ```
   3. Run command
 ```
