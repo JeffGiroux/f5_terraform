@@ -22,7 +22,7 @@ variable "vnet_name" {
 }
 variable "availability_zone" {
   type        = number
-  description = "If you want the VM placed in an Azure Availability Zone, and the Azure region you are deploying to supports it, specify the numbers of the existing Availability Zone you want to use."
+  description = "Azure Availability Zone for BIG-IP 1"
   default     = 1
 }
 variable "mgmtSubnet" {
