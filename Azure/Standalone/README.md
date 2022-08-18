@@ -40,9 +40,9 @@ The BIG-IP's configuration, now defined in a single convenient YAML or JSON [F5 
   - ***Note***: Make sure to [practice least privilege](https://docs.microsoft.com/en-us/azure/security/fundamentals/identity-management-best-practices#lower-exposure-of-privileged-accounts)
 - Passwords and secrets can be located in [Azure Key Vault](https://docs.microsoft.com/en-us/azure/key-vault/general/overview).
   - Set *az_key_vault_authentication* to 'true'
-  - Set *azure_secret_rg* to the Azure Resource Group containg the Key Vault
+  - Set *azure_keyvault_rg* to the Azure Resource Group containingg the Key Vault
   - Set *azure_keyvault_name* to the Azure Key Vault name
-  - If *az_key_vault_authentication* is 'true', then 'f5_password' should be the Key Vault secret name. The secret needs to contain ONLY the password as plain text.
+  - If *az_key_vault_authentication* is 'true', then 'f5_password' should be the Key Vault secret name. The secret contents should contain ONLY the password as plain text.
 - This templates deploys into an *EXISTING* networking stack. You are required to have an existing VNet, subnets, and security groups.
   - You must have a VNET with three (3) subnets: management, external, internal
   - Firewall rules are required to pass traffic to the application
@@ -191,7 +191,7 @@ No modules.
 | <a name="input_bigip_version"></a> [bigip\_version](#input\_bigip\_version) | BIG-IP Version | `string` | `"16.1.301000"` | no |
 | <a name="input_dns_server"></a> [dns\_server](#input\_dns\_server) | Leave the default DNS server the BIG-IP uses, or replace the default DNS server with the one you want to use | `string` | `"8.8.8.8"` | no |
 | <a name="input_extSubnet"></a> [extSubnet](#input\_extSubnet) | Name of external subnet | `string` | `null` | no |
-| <a name="input_f5_password"></a> [f5\_password](#input\_f5\_password) | BIG-IP Password or Key Vault secret name (value should be Key Vault secret name when az\_key\_vault\_authentication = true, ex. https://myKeyVault123.vault.azure.net/secrets/bigip-password/12345abcde) | `string` | `"Default12345!"` | no |
+| <a name="input_f5_password"></a> [f5\_password](#input\_f5\_password) | BIG-IP Password or Key Vault secret name (value should be Key Vault secret name when az\_key\_vault\_authentication = true, ex. my-bigip-secret) | `string` | `"Default12345!"` | no |
 | <a name="input_f5_username"></a> [f5\_username](#input\_f5\_username) | User name for the BIG-IP | `string` | `"azureuser"` | no |
 | <a name="input_image_name"></a> [image\_name](#input\_image\_name) | F5 SKU (image) to deploy. Note: The disk size of the VM will be determined based on the option you select.  **Important**: If intending to provision multiple modules, ensure the appropriate value is selected, such as ****AllTwoBootLocations or AllOneBootLocation****. | `string` | `"f5-big-best-plus-hourly-200mbps"` | no |
 | <a name="input_instance_type"></a> [instance\_type](#input\_instance\_type) | Azure instance type to be used for the BIG-IP VE | `string` | `"Standard_DS4_v2"` | no |

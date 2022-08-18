@@ -123,7 +123,7 @@ fileignoreconfig:
 - filename: Azure/Standalone/variables.tf
   checksum: efdab1ef063de9f30a77bb21820649cd909cc0ff7d83a775d77922f5409738d7
 - filename: Azure/Standalone/README.md
-  checksum: 3caae939d3598c26c6bab8c3a7f421868016640282e7443213af27312f40be07
+  checksum: 6de9962c87e4278b18da4572724b937f3adc7e5ac1ef1090c73198b9c4f3f9a1
 - filename: Azure/Standalone/f5_onboard.tmpl
   checksum: 24ae7bfa5dba46b78bcda6b839e80be7afd104444061a4f9cb06c2112f981e04
 - filename: Azure/Standalone/bigip.tf
