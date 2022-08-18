@@ -66,24 +66,24 @@ variable "f5_password" {
   description = "BIG-IP Password or Key Vault secret name (value should be Key Vault secret name when az_key_vault_authentication = true, ex. my-bigip-secret)"
 }
 variable "az_keyvault_authentication" {
-  description = "Whether to use key vault to pass authentication"
   type        = bool
   default     = false
+  description = "Whether to use key vault to pass authentication"
 }
 variable "keyvault_url" {
-  description = "The URL of the Azure Key Vault to use (ex. https://myKeyVault123.vault.azure.net)"
   type        = string
   default     = ""
+  description = "The URL of the Azure Key Vault to use (ex. https://myKeyVault123.vault.azure.net)"
 }
 variable "keyvault_rg" {
-  description = "The name of the resource group in which the Azure Key Vault exists"
   type        = string
   default     = ""
+  description = "The name of the resource group in which the Azure Key Vault exists"
 }
 variable "user_identity" {
-  description = "The ID of the managed user identity to assign to the BIG-IP instance"
   type        = string
-  default     = ""
+  default     = null
+  description = "The ID of the managed user identity to assign to the BIG-IP instance"
 }
 variable "ssh_key" {
   type        = string
@@ -125,19 +125,19 @@ variable "TS_URL" {
   description = "URL to download the BIG-IP Telemetry Streaming module"
 }
 variable "FAST_URL" {
-  description = "URL to download the BIG-IP FAST module"
   type        = string
   default     = "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.19.0/f5-appsvcs-templates-1.19.0-1.noarch.rpm"
+  description = "URL to download the BIG-IP FAST module"
 }
 variable "INIT_URL" {
-  description = "URL to download the BIG-IP runtime init"
   type        = string
   default     = "https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.5.1/dist/f5-bigip-runtime-init-1.5.1-1.gz.run"
+  description = "URL to download the BIG-IP runtime init"
 }
 variable "libs_dir" {
-  description = "Directory on the BIG-IP to download the A&O Toolchain into"
-  default     = "/config/cloud/azure/node_modules"
   type        = string
+  default     = "/config/cloud/azure/node_modules"
+  description = "Directory on the BIG-IP to download the A&O Toolchain into"
 }
 variable "bigIqHost" {
   type        = string

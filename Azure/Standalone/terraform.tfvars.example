@@ -12,3 +12,6 @@ intSubnet   = "internal"
 location      = "westus2"
 projectPrefix = "mydemo123"
 resourceOwner = "myLastName"
+
+# Auth
+user_identity = "/subscriptions/1234/resourceGroups/myRg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myIdentity1234"

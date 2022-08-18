@@ -32,7 +32,7 @@ The BIG-IP's configuration, now defined in a single convenient YAML or JSON [F5 
 
 - ***Important***: When you configure the admin password for the BIG-IP VE in the template, you cannot use the character **#**.  Additionally, there are a number of other special characters that you should avoid using for F5 product user accounts.  See [K2873](https://support.f5.com/csp/article/K2873) for details.
 - This template requires one or more service accounts for the BIG-IP instance to perform various tasks:
-  - Azure Key Vault secrets - requires identity based role [Provide Access to Key Vaults](https://docs.microsoft.com/en-us/azure/key-vault/general/rbac-guide?tabs=azure-cli))
+  - Azure Key Vault secrets - requires user identity with access to key vault [Provide Access to Key Vaults](https://docs.microsoft.com/en-us/azure/key-vault/general/rbac-guide?tabs=azure-cli))
     - Performed by VM instance during onboarding to retrieve passwords and private keys
   - Backend pool service discovery - requires "Reader"
     - Performed by F5 Application Services AS3
@@ -203,7 +203,7 @@ No modules.
 | <a name="input_projectPrefix"></a> [projectPrefix](#input\_projectPrefix) | This value is inserted at the beginning of each Azure object (alpha-numeric, no special character) | `string` | `"demo"` | no |
 | <a name="input_resourceOwner"></a> [resourceOwner](#input\_resourceOwner) | This is a tag used for object creation. Example is last name. | `string` | `null` | no |
 | <a name="input_timezone"></a> [timezone](#input\_timezone) | If you would like to change the time zone the BIG-IP uses, enter the time zone you want to use. This is based on the tz database found in /usr/share/zoneinfo (see the full list [here](https://github.com/F5Networks/f5-azure-arm-templates/blob/master/azure-timezone-list.md)). Example values: UTC, US/Pacific, US/Eastern, Europe/London or Asia/Singapore. | `string` | `"UTC"` | no |
-| <a name="input_user_identity"></a> [user\_identity](#input\_user\_identity) | The ID of the managed user identity to assign to the BIG-IP instance | `string` | `""` | no |
+| <a name="input_user_identity"></a> [user\_identity](#input\_user\_identity) | The ID of the managed user identity to assign to the BIG-IP instance | `string` | `null` | no |
 | <a name="input_vnet_name"></a> [vnet\_name](#input\_vnet\_name) | Name of existing VNET | `string` | `null` | no |
 | <a name="input_vnet_rg"></a> [vnet\_rg](#input\_vnet\_rg) | Resource group name for existing VNET | `string` | `null` | no |
 
@@ -239,6 +239,9 @@ To run this Terraform template, perform the following steps:
       location      = "westus2"
       projectPrefix = "mylab123"
       resourceOwner = "myLastName"
+
+      # Auth
+      user_identity = "/subscriptions/...REDACTED.../userAssignedIdentities/myIdentity1234"
   ```
   3. Initialize the directory
   ```
@@ -283,9 +286,22 @@ In order to pass traffic from your clients to the servers through the BIG-IP sys
 8. Click the **Finished** button
 9. Repeat as necessary for other applications
 
+## Redeploy BIG-IP for Replacement or Upgrade
+This example illustrates how to replace or upgrade the BIG-IP VE.
+  1. Change the *bigip_version* variable to the desired release
+  2. Revoke the problematic BIG-IP VE's license (if BYOL)
+  3. Run command
+```
+#terraform taint module.bigip.azurerm_linux_virtual_machine.f5vm01
+terraform taint azurerm_linux_virtual_machine.f5vm01
+```
+  3. Run command
+```
+terraform apply
+```
 
 ## Service Principal Authentication
-This solution might require access to the Azure API to query pool member key:value. If F5 AS3 is used with pool member dynamic service discovery, then you will need an SP. The current demo repo as-is does NOT need an SP. The following provides information/links on the options for configuring a service principal within Azure.
+This solution might require access to the Azure API to query pool member key:value. If F5 AS3 is used with pool member dynamic service discovery, then you will need an service principal (SP). The current demo repo as-is does NOT need an SP. The following provides information/links on the options for configuring a service principal within Azure.
 
 As another reference...head over to F5 CloudDocs to see an example in one of the awesome lab guides. Pay attention to the [Setting Up a Service Principal Account](https://clouddocs.f5.com/training/community/big-iq-cloud-edition/html/class2/module5/lab1.html#setting-up-a-service-principal-account) section and then head back over here!
 
@@ -331,7 +347,7 @@ az account set -s <subscriptionId>
 TBD
 
 ### Onboard Logs
-Depending on where onboard fails, you can attempt SSH login and try to troubleshoot further. Inspect the /config/cloud directory for correct runtime init YAML files. Inspec the /var/log/cloud location for error logs.
+Depending on where onboard fails, you can attempt SSH login and try to troubleshoot further. Inspect the /config/cloud directory for correct runtime init YAML files. Inspect the /var/log/cloud location for error logs.
 
 ### F5 Automation Toolchain Components
 F5 BIG-IP Runtime Init uses the F5 Automation Toolchain for configuration of BIG-IP instances.  Any errors thrown from these components will be surfaced in the bigIpRuntimeInit.log (or a custom log location as specified below).
