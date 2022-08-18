@@ -80,6 +80,11 @@ variable "azure_keyvault_rg" {
   type        = string
   default     = ""
 }
+variable "user_identity" {
+  description = "The ID of the managed user identity to assign to the BIG-IP instance"
+  type        = string
+  default     = ""
+}
 variable "ssh_key" {
   type        = string
   description = "public key used for authentication in ssh-rsa format"

@@ -209,7 +209,8 @@ resource "azurerm_linux_virtual_machine" "f5vm01" {
   }
 
   identity {
-    type = "SystemAssigned"
+    type         = "UserAssigned"
+    identity_ids = [var.user_identity]
   }
 
   tags = {
