@@ -102,7 +102,7 @@ variable "user_identity" {
 }
 variable "ssh_key" {
   type        = string
-  description = "public key used for authentication in ssh-rsa format"
+  description = "public key used for authentication in /path/file format (e.g. /.ssh/id_rsa.pub)"
 }
 variable "dns_server" {
   type        = string
