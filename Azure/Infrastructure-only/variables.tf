@@ -35,7 +35,7 @@ variable "int_address_prefix" {
   default     = "10.90.3.0/24"
   description = "Internal subnet address prefix"
 }
-variable "owner" {
+variable "resourceOwner" {
   type        = string
   default     = null
   description = "This is a tag used for object creation. Example is last name."

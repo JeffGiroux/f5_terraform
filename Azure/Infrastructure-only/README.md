@@ -11,22 +11,18 @@
 
 This solution uses a Terraform template to launch a new networking stack. It will create one VNET with three subnets: mgmt, external, internal. Use this Terraform template to create your Azure VNET infrastructure, and then head back to the [BIG-IP Azure Terraform folder](../) to get started!
 
-Terraform is beneficial as it allows composing resources a bit differently to account for dependencies into Immutable/Mutable elements. For example, mutable includes items you would typically frequently change/mutate, such as traditional configs on the BIG-IP. Once the template is deployed, there are certain resources (network infrastructure) that are fixed while others (BIG-IP VMs and configurations) can be changed.
-
 ## Prerequisites
 
 - This template requires a service account to deploy with the Terraform Azure provider and build out all the neccessary Azure objects
   - See the [Terraform Azure Provider "Authenticating Using a Service Principal"](https://www.terraform.io/docs/providers/azurerm/guides/service_principal_client_secret.html) for details. Also, review the [available Azure built-in roles](https://docs.microsoft.com/en-gb/azure/role-based-access-control/built-in-roles) too.
   - Permissions will depend on the objects you are creating
-  - My service account for Terraform deployments in Azure uses the following roles:
-    - Contributor
   - ***Note***: Make sure to [practice least privilege](https://docs.microsoft.com/en-us/azure/security/fundamentals/identity-management-best-practices#lower-exposure-of-privileged-accounts)
 
 ## Important Configuration Notes
 
 - Variables are configured in variables.tf
-- Sensitive variables like Azure SSH keys are configured in terraform.tfvars
-  - ***Note***: Other items like BIG-IP password are stored in Azure Key Vault. Refer to the [Prerequisites](#prerequisites).
+- Sensitive variables like Azure SSH keys are configured in terraform.tfvars or Azure Key Vault
+  - ***Note***: Other items like BIG-IP password can be stored in Azure Key Vault. Refer to the [Prerequisites](#prerequisites).
 - Files
   - main.tf - resources for provider, versions
   - network.tf - resources for VNET, subnets, security groups
@@ -45,7 +41,8 @@ Terraform is beneficial as it allows composing resources a bit differently to ac
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.18.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.19.1 |
+| <a name="provider_random"></a> [random](#provider\_random) | 3.3.2 |
 
 ## Modules
 
@@ -64,6 +61,7 @@ No modules.
 | [azurerm_subnet_network_security_group_association.external](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_network_security_group_association) | resource |
 | [azurerm_subnet_network_security_group_association.mgmt](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_network_security_group_association) | resource |
 | [azurerm_virtual_network.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) | resource |
+| [random_id.buildSuffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
 
 ## Inputs
 
@@ -75,17 +73,20 @@ No modules.
 | <a name="input_int_address_prefix"></a> [int\_address\_prefix](#input\_int\_address\_prefix) | Internal subnet address prefix | `string` | `"10.90.3.0/24"` | no |
 | <a name="input_location"></a> [location](#input\_location) | Azure Location of the deployment | `string` | `"westus2"` | no |
 | <a name="input_mgmt_address_prefix"></a> [mgmt\_address\_prefix](#input\_mgmt\_address\_prefix) | Management subnet address prefix | `string` | `"10.90.1.0/24"` | no |
-| <a name="input_owner"></a> [owner](#input\_owner) | This is a tag used for object creation. Example is last name. | `string` | `null` | no |
 | <a name="input_projectPrefix"></a> [projectPrefix](#input\_projectPrefix) | This value is inserted at the beginning of each Azure object (alpha-numeric, no special character) | `string` | `"demo"` | no |
+| <a name="input_resourceOwner"></a> [resourceOwner](#input\_resourceOwner) | This is a tag used for object creation. Example is last name. | `string` | `null` | no |
 | <a name="input_vnet_cidr"></a> [vnet\_cidr](#input\_vnet\_cidr) | CIDR IP Address range of the Virtual Network | `string` | `"10.90.0.0/16"` | no |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| <a name="output_external_subnet"></a> [external\_subnet](#output\_external\_subnet) | External subnet address prefix |
-| <a name="output_internal_subnet"></a> [internal\_subnet](#output\_internal\_subnet) | Internal subnet address prefix |
-| <a name="output_mgmt_subnet"></a> [mgmt\_subnet](#output\_mgmt\_subnet) | Management subnet address prefix |
+| <a name="output_external_subnet_addresses"></a> [external\_subnet\_addresses](#output\_external\_subnet\_addresses) | External subnet address prefix |
+| <a name="output_external_subnet_name"></a> [external\_subnet\_name](#output\_external\_subnet\_name) | External subnet name |
+| <a name="output_internal_subnet_addresses"></a> [internal\_subnet\_addresses](#output\_internal\_subnet\_addresses) | Internal subnet address prefix |
+| <a name="output_internal_subnet_name"></a> [internal\_subnet\_name](#output\_internal\_subnet\_name) | Internal subnet name |
+| <a name="output_mgmt_subnet_addresses"></a> [mgmt\_subnet\_addresses](#output\_mgmt\_subnet\_addresses) | Management subnet address prefix |
+| <a name="output_mgmt_subnet_name"></a> [mgmt\_subnet\_name](#output\_mgmt\_subnet\_name) | Management subnet name |
 | <a name="output_resource_group"></a> [resource\_group](#output\_resource\_group) | Resource group name |
 | <a name="output_vnet"></a> [vnet](#output\_vnet) | VNet name |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
@@ -98,11 +99,12 @@ To run this Terraform template, perform the following steps:
   2. Modify terraform.tfvars with the required information
   ```
       # Azure Environment
-      location     = "westus2"
-      adminSrcAddr = "0.0.0.0/0"
+      location      = "westus2"
+      adminSrcAddr  = "0.0.0.0/0"
+      resourceOwner = "fred"
 
       # Prefix for objects being created
-      prefix = "mydemo123"
+      projectPrefix = "mydemo123"
   ```
   3. Initialize the directory
   ```

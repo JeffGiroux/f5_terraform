@@ -1,11 +1,16 @@
 # Networking
 
+############################ VNet and Subnets ############################
+
 # Create a Virtual Network
 resource "azurerm_virtual_network" "main" {
-  name                = "${var.projectPrefix}-network"
+  name                = format("%s-vnet-%s", var.projectPrefix, random_id.buildSuffix.hex)
   address_space       = [var.vnet_cidr]
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
+  tags = {
+    owner = var.resourceOwner
+  }
 }
 
 # Create Management Subnet
@@ -32,9 +37,11 @@ resource "azurerm_subnet" "internal" {
   address_prefixes     = [var.int_address_prefix]
 }
 
+############################ Security Groups ############################
+
 # Create Network Security Group and rules
 resource "azurerm_network_security_group" "mgmt" {
-  name                = "${var.projectPrefix}-mgmt-nsg"
+  name                = format("%s-mgmt-nsg-%s", var.projectPrefix, random_id.buildSuffix.hex)
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
 
@@ -78,12 +85,12 @@ resource "azurerm_network_security_group" "mgmt" {
   }
 
   tags = {
-    owner = var.owner
+    owner = var.resourceOwner
   }
 }
 
 resource "azurerm_network_security_group" "external" {
-  name                = "${var.projectPrefix}-ext-nsg"
+  name                = format("%s-ext-nsg-%s", var.projectPrefix, random_id.buildSuffix.hex)
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
 
@@ -114,7 +121,7 @@ resource "azurerm_network_security_group" "external" {
   }
 
   tags = {
-    owner = var.owner
+    owner = var.resourceOwner
   }
 }
 
