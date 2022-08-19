@@ -25,9 +25,8 @@ This solution uses a Terraform template to launch a 3-NIC deployment of a cloud-
 
 The BIG-IP VEs have the [Local Traffic Manager (LTM)](https://f5.com/products/big-ip/local-traffic-manager-ltm) module enabled to provide advanced traffic management functionality. In addition, the [Application Security Module (ASM)](https://www.f5.com/pdf/products/big-ip-application-security-manager-overview.pdf) can be enabled to provide F5's L4/L7 security features for web application firewall (WAF) and bot protection.
 
-Terraform is beneficial as it allows composing resources a bit differently to account for dependencies into Immutable/Mutable elements. For example, mutable includes items you would typically frequently change/mutate, such as traditional configs on the BIG-IP. Once the template is deployed, there are certain resources (network infrastructure) that are fixed while others (BIG-IP VMs and configurations) can be changed.
+The BIG-IP's configuration, now defined in a single convenient YAML or JSON [F5 BIG-IP Runtime Init](https://github.com/F5Networks/f5-bigip-runtime-init) configuration file, leverages [F5 Automation Tool Chain](https://www.f5.com/pdf/products/automation-toolchain-overview.pdf) declarations which are easier to author, validate and maintain as code. For instance, if you need to change the configuration on the BIG-IPs in the deployment, you update the instance model by passing a new config file (which references the updated Automation Toolchain declarations) via template's runtimeConfig input parameter. New instances will be deployed with the updated configurations.
 
-**Networking Stack Type:** This solution deploys into an *EXISTING* networking stack. You are required to have existing VPC networks, firewall rules, and proper routing. Refer to the [Prerequisites](#prerequisites). Visit DevCentral to read [Service Discovery in Google Cloud with F5 BIG-IP](https://community.f5.com/t5/technical-articles/service-discovery-in-google-cloud-with-f5-big-ip/ta-p/284457) where I show you my basic VPC setup (networks, subnets) along with firewall rules.
 
 ## Prerequisites
 
@@ -40,30 +39,27 @@ Terraform is beneficial as it allows composing resources a bit differently to ac
     - Performed by F5 Application Services AS3
   - Google Cloud Monitoring (aka StackDriver) - requires "Monitoring Editor"
     - Performed by F5 Telemetry Streaming
+- This template requires a service account to deploy with the Terraform Google provider and build out all the neccessary Google objects
   - See the [Terraform Google Provider "Adding Credentials"](https://www.terraform.io/docs/providers/google/guides/getting_started.html#adding-credentials) for details. Also, review the [available Google GCP permission scopes](https://cloud.google.com/sdk/gcloud/reference/alpha/compute/instances/set-scopes#--scopes) too.
   - Permissions will depend on the objects you are creating
   - ***Note***: Make sure to [practice least privilege](https://cloud.google.com/iam/docs/understanding-service-accounts#granting_minimum)
-- ***Shared Service Accounts***: For lab purposes, you can create one service account and use it for everything. Alternatively, you can create a more secure environment with separate service accounts for various functions. Example...
-  - Service Account #1 - the svc-acct used for Terraform to deploy cloud objects
-  - Service Account #2 - the svc-acct assigned to BIG-IP instance during creation (ex. service discovery, query Pub/Sub, storage)
-  - Service Account #3 - the svc-acct used in F5 Telemetry Streaming referenced in [ts.json](./ts.json) (ex. analytics)
-- Passwords and secrets can be located in [Google Cloud Secret Manager](https://cloud.google.com/secret-manager/docs/quickstart#secretmanager-quickstart-web). Make sure you have an existing Google Cloud "secret" with the data containing the clear text passwords for each relevant item: BIG-IP password, service account credentials, BIG-IQ password, etc.
-  - 'f5_password' contains the value of the adminstrator password (ex. "Default12345!")
-  - If 'gcp_secret_manager_authentication' is TRUE, then 'f5_password' will be the name of the Google Cloud secret which contains the value of the password in clear text.
-  - 'telemetry_secret' Contains the value of the 'svc_acct' private key. Currently used for BIG-IP telemetry streaming to Google Cloud Monitoring (aka StackDriver). If you are not using this feature, you do not need this secret in Secret Manager.
-  - Refer to [Template Parameters](#template-parameters)
-- This template deploys into an existing network
+- Passwords and secrets can be located in [Google Cloud Secret Manager](https://cloud.google.com/secret-manager/docs/quickstart#secretmanager-quickstart-web).
+  - Set *gcp_secret_manager_authentication* to 'true'
+  - If *gcp_secret_manager_authentication* is 'true', then 'f5_password' should be the Google Cloud secret name. The secret contents should contain ONLY the password as plain text.
+- This templates deploys into an *EXISTING* networking stack
   - You must have three VPCs: a VPC for management, an external VPC, and an internal VPC. The management VPC will have one subnet for management traffic. The External VPC will have one subnet for data traffic. The Internal VPC will have one subnet as well.
   - Firewall rules are required to pass traffic to the application
     - BIG-IP will require tcp/22 and tcp/443 on the mgmt network
     - Application access will require tcp/80 and tcp/443 on the external network
     - Google Health Checks will require tcp/40000 on the external network. Refer to [Google Health Check Concepts](https://cloud.google.com/load-balancing/docs/health-check-concepts) to see source IP ranges for the Google probes. These IP ranges and ports (tcp/40000 in this example) need to be open in your firewall rules on the external network.
   - If you require a new network first, see the [Infrastructure Only folder](../Infrastructure-only) to get started.
+  - The parameter 'dns_suffix' must match the DNS suffix assigned by the GCP project. You can retrieve this value by logging into an existing VM in the same project and running 'uname -a' or reviewing the /etc/resolv.conf file. Failure to properly set 'dns_suffix' will result in failed hostname lookup during HA setup.
+
 
 ## Important Configuration Notes
 
 - Variables are configured in variables.tf
-- Sensitive variables like Google SSH keys are configured in terraform.tfvars
+- Sensitive variables like Google SSH keys are configured in terraform.tfvars.
   - ***Note***: Other items like BIG-IP password can be stored in Google Cloud Secret Manager. Refer to the [Prerequisites](#prerequisites).
   - The BIG-IP instance will query Google Metadata API to retrieve the service account's token for authentication.
   - The BIG-IP instance will then use the secret name and the service account's token to query Google Metadata API and dynamically retrieve the password for device onboarding.
@@ -83,20 +79,16 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
           # example output...
 
           --snippet--
-          f5-bigip-13-1-3-2-0-0-4-payg-best-1gbps-20191105210022
-          f5-bigip-13-1-3-2-0-0-4-payg-best-200mbps-20191105210022
-          f5-bigip-13-1-3-2-0-0-4-byol-all-modules-2slot-20191105200157
+          f5-bigip-15-1-6-1-0-0-10-payg-best-1gbps-220701174029
+          f5-bigip-15-1-6-1-0-0-10-payg-best-200mbps-220701173825
+          f5-bigip-15-1-6-1-0-0-10-byol-all-modules-2boot-loc-0701180815
+          f5-bigip-16-1-3-1-0-0-11-byol-all-modules-2boot-loc-0721055536
           ...and some more
-          f5-bigip-14-1-2-3-0-0-5-byol-ltm-1boot-loc-191218142225
-          f5-bigip-15-1-2-1-0-0-10-payg-best-1gbps-210115161130
-          f5-bigip-16-1-2-1-0-0-10-payg-best-10gbps-211222204606
-          f5-bigip-16-1-2-1-0-0-10-byol-all-modules-2boot-loc-1222211103
-          ...and more...
   ```
 2. In the "variables.tf", modify *image_name* with the image name from gcloud CLI results
   ```
           # BIGIP Image
-          variable image_name { default = "projects/f5-7626-networks-public/global/images/f5-bigip-16-1-2-1-0-0-10-byol-all-modules-2boot-loc-1222211103" }
+          variable image_name { default = "projects/f5-7626-networks-public/global/images/f5-bigip-16-1-3-1-0-0-11-byol-all-modules-2boot-loc-0721055536" }
   ```
 3. In the "variables.tf", modify *license1* with a valid regkey
   ```
@@ -116,7 +108,7 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 1. Find BYOL image. Reference [BYOL Licensing](#byol-licensing) step #1.
 2. Replace BIG-IP *image_name* in "variables.tf". Reference [BYOL Licensing](#byol-licensing) step #2.
 3. In the "variables.tf", modify the BIG-IQ license section to match your environment
-4. In the "f5_onboard.tmpl", add the "myLicense" block under the "Common" declaration ([example here](https://github.com/F5Networks/f5-google-gdm-templates-v2/blob/main/examples/autoscale/bigip-configurations/runtime-init-conf-bigiq.yaml))
+4. In the "f5_onboard.tmpl", add the "myLicense" block under the "Common" declaration ([example here](https://github.com/F5Networks/f5-google-gdm-templates-v2/blob/main/examples/autoscale/bigip-configurations/runtime-init-conf-bigiq-with-app.yaml))
   ```
           myLicense:
             class: License
@@ -146,7 +138,7 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 
 | Name | Version |
 |------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | 3.90.1 |
+| <a name="provider_google"></a> [google](#provider\_google) | 4.32.0 |
 | <a name="provider_random"></a> [random](#provider\_random) | 3.3.2 |
 
 ## Modules
@@ -183,12 +175,12 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_ssh_key"></a> [ssh\_key](#input\_ssh\_key) | public key used for authentication in /path/file format (e.g. /.ssh/id\_rsa.pub) | `string` | n/a | yes |
 | <a name="input_AS3_URL"></a> [AS3\_URL](#input\_AS3\_URL) | URL to download the BIG-IP Application Service Extension 3 (AS3) module | `string` | `"https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.38.0/f5-appsvcs-3.38.0-4.noarch.rpm"` | no |
 | <a name="input_DO_URL"></a> [DO\_URL](#input\_DO\_URL) | URL to download the BIG-IP Declarative Onboarding module | `string` | `"https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.31.0/f5-declarative-onboarding-1.31.0-6.noarch.rpm"` | no |
 | <a name="input_FAST_URL"></a> [FAST\_URL](#input\_FAST\_URL) | URL to download the BIG-IP FAST module | `string` | `"https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.19.0/f5-appsvcs-templates-1.19.0-1.noarch.rpm"` | no |
-| <a name="input_INIT_URL"></a> [INIT\_URL](#input\_INIT\_URL) | URL to download the BIG-IP runtime init | `string` | `"https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.5.0/dist/f5-bigip-runtime-init-1.5.0-1.gz.run"` | no |
+| <a name="input_INIT_URL"></a> [INIT\_URL](#input\_INIT\_URL) | URL to download the BIG-IP runtime init | `string` | `"https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.5.1/dist/f5-bigip-runtime-init-1.5.1-1.gz.run"` | no |
 | <a name="input_TS_URL"></a> [TS\_URL](#input\_TS\_URL) | URL to download the BIG-IP Telemetry Streaming module | `string` | `"https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.30.0/f5-telemetry-1.30.0-1.noarch.rpm"` | no |
-| <a name="input_adminSrcAddr"></a> [adminSrcAddr](#input\_adminSrcAddr) | Trusted source network for admin access | `string` | `"0.0.0.0/0"` | no |
 | <a name="input_bigIqHost"></a> [bigIqHost](#input\_bigIqHost) | This is the BIG-IQ License Manager host name or IP address | `string` | `""` | no |
 | <a name="input_bigIqHypervisor"></a> [bigIqHypervisor](#input\_bigIqHypervisor) | BIG-IQ hypervisor | `string` | `"gce"` | no |
 | <a name="input_bigIqLicensePool"></a> [bigIqLicensePool](#input\_bigIqLicensePool) | BIG-IQ license pool name | `string` | `""` | no |
@@ -204,8 +196,8 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | <a name="input_dns_suffix"></a> [dns\_suffix](#input\_dns\_suffix) | DNS suffix for your domain in the GCP project | `string` | `"example.com"` | no |
 | <a name="input_extSubnet"></a> [extSubnet](#input\_extSubnet) | External subnet | `string` | `null` | no |
 | <a name="input_extVpc"></a> [extVpc](#input\_extVpc) | External VPC network | `string` | `null` | no |
-| <a name="input_f5_password"></a> [f5\_password](#input\_f5\_password) | Password for the Virtual Machine | `string` | `null` | no |
-| <a name="input_f5_username"></a> [f5\_username](#input\_f5\_username) | User name for the Virtual Machine | `string` | `"admin"` | no |
+| <a name="input_f5_password"></a> [f5\_password](#input\_f5\_password) | BIG-IP Password or Google secret name (value should be Google secret name when gcp\_secret\_manager\_authentication = true, ex. my-bigip-secret) | `string` | `"Default12345!"` | no |
+| <a name="input_f5_username"></a> [f5\_username](#input\_f5\_username) | User name for the BIG-IP | `string` | `"admin"` | no |
 | <a name="input_gcp_project_id"></a> [gcp\_project\_id](#input\_gcp\_project\_id) | GCP Project ID for provider | `string` | `null` | no |
 | <a name="input_gcp_region"></a> [gcp\_region](#input\_gcp\_region) | GCP Region for provider | `string` | `"us-west1"` | no |
 | <a name="input_gcp_secret_manager_authentication"></a> [gcp\_secret\_manager\_authentication](#input\_gcp\_secret\_manager\_authentication) | Whether to use secret manager to pass authentication | `bool` | `false` | no |
@@ -214,15 +206,15 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | <a name="input_image_name"></a> [image\_name](#input\_image\_name) | F5 SKU (image) to deploy. Note: The disk size of the VM will be determined based on the option you select.  **Important**: If intending to provision multiple modules, ensure the appropriate value is selected, such as ****AllTwoBootLocations or AllOneBootLocation****. | `string` | `"projects/f5-7626-networks-public/global/images/f5-bigip-16-1-3-1-0-0-11-payg-best-plus-200mbps-220721054505"` | no |
 | <a name="input_intSubnet"></a> [intSubnet](#input\_intSubnet) | Internal subnet | `string` | `null` | no |
 | <a name="input_intVpc"></a> [intVpc](#input\_intVpc) | Internal VPC network | `string` | `null` | no |
-| <a name="input_license1"></a> [license1](#input\_license1) | The license token for the first F5 BIG-IP VE (BYOL) | `string` | `""` | no |
-| <a name="input_license2"></a> [license2](#input\_license2) | The license token for the second F5 BIG-IP VE (BYOL) | `string` | `""` | no |
+| <a name="input_libs_dir"></a> [libs\_dir](#input\_libs\_dir) | n/a | `string` | `"https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.5.0/dist/f5-bigip-runtime-init-1.5.0-1.gz.run"` | no |
+| <a name="input_license1"></a> [license1](#input\_license1) | The license token for the 1st F5 BIG-IP VE (BYOL) | `string` | `""` | no |
+| <a name="input_license2"></a> [license2](#input\_license2) | The license token for the 2nd F5 BIG-IP VE (BYOL) | `string` | `""` | no |
 | <a name="input_machine_type"></a> [machine\_type](#input\_machine\_type) | Google machine type to be used for the BIG-IP VE | `string` | `"n1-standard-8"` | no |
 | <a name="input_mgmtSubnet"></a> [mgmtSubnet](#input\_mgmtSubnet) | Management subnet | `string` | `null` | no |
 | <a name="input_mgmtVpc"></a> [mgmtVpc](#input\_mgmtVpc) | Management VPC network | `string` | `null` | no |
 | <a name="input_ntp_server"></a> [ntp\_server](#input\_ntp\_server) | Leave the default NTP server the BIG-IP uses, or replace the default NTP server with the one you want to use | `string` | `"0.us.pool.ntp.org"` | no |
-| <a name="input_owner"></a> [owner](#input\_owner) | This is a tag used for object creation. Example is last name. | `string` | `null` | no |
 | <a name="input_projectPrefix"></a> [projectPrefix](#input\_projectPrefix) | This value is inserted at the beginning of each Google object (alpha-numeric, no special character) | `string` | `"demo"` | no |
-| <a name="input_ssh_key"></a> [ssh\_key](#input\_ssh\_key) | Path to the public key to be used for ssh access to the VM.  Only used with non-Windows vms and can be left as-is even if using Windows vms. If specifying a path to a certification on a Windows machine to provision a linux vm use the / in the path versus backslash. e.g. c:/home/id\_rsa.pub | `string` | `null` | no |
+| <a name="input_resourceOwner"></a> [resourceOwner](#input\_resourceOwner) | This is a tag used for object creation. Example is last name. | `string` | `null` | no |
 | <a name="input_svc_acct"></a> [svc\_acct](#input\_svc\_acct) | Service Account for VM instance | `string` | `null` | no |
 | <a name="input_telemetry_privateKeyId"></a> [telemetry\_privateKeyId](#input\_telemetry\_privateKeyId) | ID of private key for the 'svc\_acct' used in Telemetry Streaming to Google Cloud Monitoring. If you are not using this feature, you do not need this secret in Secret Manager. | `string` | `""` | no |
 | <a name="input_telemetry_secret"></a> [telemetry\_secret](#input\_telemetry\_secret) | Contains the value of the 'svc\_acct' private key. Currently used for BIG-IP telemetry streaming to Google Cloud Monitoring (aka StackDriver). If you are not using this feature, you do not need this secret in Secret Manager. | `string` | `""` | no |
@@ -232,18 +224,18 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 
 | Name | Description |
 |------|-------------|
-| <a name="output_f5vm01_ext_selfip"></a> [f5vm01\_ext\_selfip](#output\_f5vm01\_ext\_selfip) | f5vm01 external self IP private address |
-| <a name="output_f5vm01_ext_selfip_pip"></a> [f5vm01\_ext\_selfip\_pip](#output\_f5vm01\_ext\_selfip\_pip) | f5vm01 external self IP public address |
-| <a name="output_f5vm01_mgmt_ip"></a> [f5vm01\_mgmt\_ip](#output\_f5vm01\_mgmt\_ip) | f5vm01 management private IP address |
+| <a name="output_f5vm01_ext_private_ip"></a> [f5vm01\_ext\_private\_ip](#output\_f5vm01\_ext\_private\_ip) | f5vm01 external primary IP address (self IP) |
+| <a name="output_f5vm01_ext_public_ip"></a> [f5vm01\_ext\_public\_ip](#output\_f5vm01\_ext\_public\_ip) | f5vm01 external public IP address (self IP) |
 | <a name="output_f5vm01_mgmt_name"></a> [f5vm01\_mgmt\_name](#output\_f5vm01\_mgmt\_name) | f5vm01 management device name |
-| <a name="output_f5vm01_mgmt_pip"></a> [f5vm01\_mgmt\_pip](#output\_f5vm01\_mgmt\_pip) | f5vm01 management public IP address |
 | <a name="output_f5vm01_mgmt_pip_url"></a> [f5vm01\_mgmt\_pip\_url](#output\_f5vm01\_mgmt\_pip\_url) | f5vm01 management public URL |
-| <a name="output_f5vm02_ext_selfip"></a> [f5vm02\_ext\_selfip](#output\_f5vm02\_ext\_selfip) | f5vm02 external self IP private address |
-| <a name="output_f5vm02_ext_selfip_pip"></a> [f5vm02\_ext\_selfip\_pip](#output\_f5vm02\_ext\_selfip\_pip) | f5vm02 external self IP public address |
-| <a name="output_f5vm02_mgmt_ip"></a> [f5vm02\_mgmt\_ip](#output\_f5vm02\_mgmt\_ip) | f5vm02 management private IP address |
+| <a name="output_f5vm01_mgmt_private_ip"></a> [f5vm01\_mgmt\_private\_ip](#output\_f5vm01\_mgmt\_private\_ip) | f5vm01 management private IP address |
+| <a name="output_f5vm01_mgmt_public_ip"></a> [f5vm01\_mgmt\_public\_ip](#output\_f5vm01\_mgmt\_public\_ip) | f5vm01 management public IP address |
+| <a name="output_f5vm02_ext_private_ip"></a> [f5vm02\_ext\_private\_ip](#output\_f5vm02\_ext\_private\_ip) | f5vm02 external primary IP address (self IP) |
+| <a name="output_f5vm02_ext_public_ip"></a> [f5vm02\_ext\_public\_ip](#output\_f5vm02\_ext\_public\_ip) | f5vm02 external public IP address (self IP) |
 | <a name="output_f5vm02_mgmt_name"></a> [f5vm02\_mgmt\_name](#output\_f5vm02\_mgmt\_name) | f5vm02 management device name |
-| <a name="output_f5vm02_mgmt_pip"></a> [f5vm02\_mgmt\_pip](#output\_f5vm02\_mgmt\_pip) | f5vm02 management public IP address |
 | <a name="output_f5vm02_mgmt_pip_url"></a> [f5vm02\_mgmt\_pip\_url](#output\_f5vm02\_mgmt\_pip\_url) | f5vm02 management public URL |
+| <a name="output_f5vm02_mgmt_private_ip"></a> [f5vm02\_mgmt\_private\_ip](#output\_f5vm02\_mgmt\_private\_ip) | f5vm02 management private IP address |
+| <a name="output_f5vm02_mgmt_public_ip"></a> [f5vm02\_mgmt\_public\_ip](#output\_f5vm02\_mgmt\_public\_ip) | f5vm02 management public IP address |
 | <a name="output_internal_vip"></a> [internal\_vip](#output\_internal\_vip) | private IP address for application |
 | <a name="output_internal_vip_url"></a> [internal\_vip\_url](#output\_internal\_vip\_url) | private URL for application |
 | <a name="output_public_vip"></a> [public\_vip](#output\_public\_vip) | public IP address for application |
@@ -258,18 +250,17 @@ To run this Terraform template, perform the following steps:
   2. Modify terraform.tfvars with the required information
   ```
       # BIG-IP Environment
-      f5_username    = "admin"
-      f5_password    = "Default12345!"
-      ssh_key        = "~/.ssh/id_rsa.pub"
-      projectPrefix  = "mydemo123"
-      adminSrcAddr   = "0.0.0.0/0"
-      mgmtVpc        = "xxxxx-net-mgmt"
-      extVpc         = "xxxxx-net-ext"
-      intVpc         = "xxxxx-net-int"
-      mgmtSubnet     = "xxxxx-subnet-mgmt"
-      extSubnet      = "xxxxx-subnet-ext"
-      intSubnet      = "xxxxx-subnet-int"
-      dns_suffix     = "example.com"
+      f5_username   = "admin"
+      f5_password   = "Default12345!"
+      ssh_key       = "~/.ssh/id_rsa.pub"
+      projectPrefix = "mydemo123"
+      mgmtVpc       = "xxxxx-net-mgmt"
+      extVpc        = "xxxxx-net-ext"
+      intVpc        = "xxxxx-net-int"
+      mgmtSubnet    = "xxxxx-subnet-mgmt"
+      extSubnet     = "xxxxx-subnet-ext"
+      intSubnet     = "xxxxx-subnet-int"
+      dns_suffix    = "example.com"
 
       # BIG-IQ Environment
       bigIqUsername = "admin"
@@ -281,6 +272,7 @@ To run this Terraform template, perform the following steps:
       gcp_zone_1     = "us-west1-a"
       gcp_zone_2     = "us-west1-b"
       svc_acct       = "xxxxx@xxxxx.iam.gserviceaccount.com"
+      resourceOwner  = "myLastName"
   ```
   3. Initialize the directory
   ```
@@ -355,7 +347,7 @@ terraform apply
 Review the serial logs for the Google virtual machine. Login to the Google Cloud console, open "Compute Engine", then locate your instance...click it. Then review the serial logs for errors.
 
 ### Onboard Logs
-Depending on where onboard fails, you can attempt SSH login and try to troubleshoot further. Inspect the /config/cloud directory for correct runtime init YAML files. Inspec the /var/log/cloud location for error logs.
+Depending on where onboard fails, you can attempt SSH login and try to troubleshoot further. Inspect the /config/cloud directory for correct runtime init YAML files. Inspect the /var/log/cloud location for error logs.
 
 ### F5 Automation Toolchain Components
 F5 BIG-IP Runtime Init uses the F5 Automation Toolchain for configuration of BIG-IP instances.  Any errors thrown from these components will be surfaced in the bigIpRuntimeInit.log (or a custom log location as specified below).
