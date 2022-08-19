@@ -33,7 +33,6 @@ fileignoreconfig:
   checksum: be22e7624dfa1ad0bbfe57a6205f22cbdafd198b6c4aa2403da0bc7366d4c4cf
 - filename: Azure/Route_Server/README.md
   checksum: 4999cb476a978a51f4cdbecd668f8c4b5d81e2e60e2991d5e56de99312359c25
-- filename: Azure/Autoscale_via_lb/terraform.tfvars.example
 - filename: AWS/Autoscale_via_lb/1nic/terraform.tfvars.example
   checksum: 7c4260a9f830faef736e223920c48c20491ac52a9681bf97f06c5eacbe01d239
 - filename: AWS/Standalone/terraform.tfvars.example
@@ -144,3 +143,7 @@ fileignoreconfig:
   checksum: 061fae589ce6854ca09f5c6dde00dcbadbcf16255bf74bcf09ee9316b6f80472
 - filename: Azure/HA_via_lb/README.md
   checksum: c90f64f5dae5bb7616412c8a4420e67f8241f27debf35fcc4e39235e2d21f551
+- filename: Azure/Autoscale_via_lb/variables.tf
+  checksum: 12b0919af82a9918840d755824b3d213fa0580c9027b3fc5d819f8dd121edaaf
+- filename: Azure/Autoscale_via_lb/README.md
+  checksum: d2c9bd6b4dd26634bdd56de666296de37ec5cc1889629e36021a207cbd1e2eb4
