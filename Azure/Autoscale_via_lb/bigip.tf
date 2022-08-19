@@ -36,6 +36,7 @@ locals {
   })
 }
 
+############################ Compute ############################
 
 # Create F5 BIG-IP VMs
 resource "azurerm_linux_virtual_machine_scale_set" "f5vmss" {
