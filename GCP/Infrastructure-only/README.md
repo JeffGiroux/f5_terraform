@@ -11,9 +11,6 @@
 
 This solution uses a Terraform template to launch a new networking stack. It will create three VPC networks with one subnet each: mgmt, external, internal. Use this terraform template to create your Google VPC infrastructure, and then head back to the [BIG-IP GCP Terraform folder](../) to get started!
 
-Terraform is beneficial as it allows composing resources a bit differently to account for dependencies into Immutable/Mutable elements. For example, mutable includes items you would typically frequently change/mutate, such as traditional configs on the BIG-IP. Once the template is deployed, there are certain resources (network infrastructure) that are fixed while others (BIG-IP VMs and configurations) can be changed.
-
-
 ## Prerequisites
 
 - This template requires a service account to deploy with the Terraform Google provider and build out all the neccessary Google objects
@@ -48,7 +45,7 @@ Terraform is beneficial as it allows composing resources a bit differently to ac
 
 | Name | Version |
 |------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | 4.31.0 |
+| <a name="provider_google"></a> [google](#provider\_google) | >= 4 |
 
 ## Modules
 
@@ -77,16 +74,16 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_adminSrcAddr"></a> [adminSrcAddr](#input\_adminSrcAddr) | Trusted source network for admin access | `string` | `"0.0.0.0/0"` | no |
-| <a name="input_cidr_range_ext"></a> [cidr\_range\_ext](#input\_cidr\_range\_ext) | IP CIDR range for external VPC network | `string` | `"10.1.10.0/24"` | no |
-| <a name="input_cidr_range_int"></a> [cidr\_range\_int](#input\_cidr\_range\_int) | IP CIDR range for internal VPC network | `string` | `"10.1.20.0/24"` | no |
-| <a name="input_cidr_range_mgmt"></a> [cidr\_range\_mgmt](#input\_cidr\_range\_mgmt) | IP CIDR range for management VPC network | `string` | `"10.1.1.0/24"` | no |
+| <a name="input_adminSrcAddr"></a> [adminSrcAddr](#input\_adminSrcAddr) | Allowed Admin source IP prefix | `string` | `"0.0.0.0/0"` | no |
+| <a name="input_ext_address_prefix"></a> [ext\_address\_prefix](#input\_ext\_address\_prefix) | External subnet address prefix | `string` | `"10.1.10.0/24"` | no |
 | <a name="input_f5_cloud_failover_label"></a> [f5\_cloud\_failover\_label](#input\_f5\_cloud\_failover\_label) | This is a tag used for F5 Cloud Failover Extension to identity which cloud objects to move during a failover event. | `string` | `"mydeployment"` | no |
 | <a name="input_gcp_project_id"></a> [gcp\_project\_id](#input\_gcp\_project\_id) | GCP Project ID for provider | `string` | `null` | no |
 | <a name="input_gcp_region"></a> [gcp\_region](#input\_gcp\_region) | GCP Region for provider | `string` | `"us-west1"` | no |
 | <a name="input_gcp_zone_1"></a> [gcp\_zone\_1](#input\_gcp\_zone\_1) | GCP Zone 1 for provider | `string` | `"us-west1-a"` | no |
-| <a name="input_owner"></a> [owner](#input\_owner) | This is a tag used for object creation. Example is last name. | `string` | `null` | no |
-| <a name="input_prefix"></a> [prefix](#input\_prefix) | This value is inserted at the beginning of each Google object (alpha-numeric, no special character) | `string` | `"demo"` | no |
+| <a name="input_int_address_prefix"></a> [int\_address\_prefix](#input\_int\_address\_prefix) | Internal subnet address prefix | `string` | `"10.1.20.0/24"` | no |
+| <a name="input_mgmt_address_prefix"></a> [mgmt\_address\_prefix](#input\_mgmt\_address\_prefix) | Management subnet address prefix | `string` | `"10.1.1.0/24"` | no |
+| <a name="input_projectPrefix"></a> [projectPrefix](#input\_projectPrefix) | This value is inserted at the beginning of each Google object (alpha-numeric, no special character) | `string` | `"demo"` | no |
+| <a name="input_resourceOwner"></a> [resourceOwner](#input\_resourceOwner) | This is a tag used for object creation. Example is last name. | `string` | `null` | no |
 
 ## Outputs
 
@@ -109,11 +106,12 @@ To run this Terraform template, perform the following steps:
   2. Modify terraform.tfvars with the required information
   ```
       # Google Environment
-      prefix         = "mydemo123"
+      projectPrefix  = "mydemo123"
       adminSrcAddr   = "0.0.0.0/0"
       gcp_project_id = "xxxxx"
       gcp_region     = "us-west1"
       gcp_zone_1     = "us-west1-a"
+      resourceOwner  = "mylastname"
   ```
   3. Initialize the directory
   ```

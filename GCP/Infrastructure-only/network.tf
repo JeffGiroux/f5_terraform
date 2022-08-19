@@ -2,48 +2,48 @@
 
 # VPC Mgmt
 resource "google_compute_network" "vpc_mgmt" {
-  name                    = "${var.prefix}-net-mgmt"
+  name                    = "${var.projectPrefix}-net-mgmt"
   auto_create_subnetworks = "false"
   routing_mode            = "REGIONAL"
 }
 resource "google_compute_subnetwork" "vpc_mgmt_sub" {
-  name          = "${var.prefix}-subnet-mgmt"
-  ip_cidr_range = var.cidr_range_mgmt
+  name          = "${var.projectPrefix}-subnet-mgmt"
+  ip_cidr_range = var.mgmt_address_prefix
   region        = var.gcp_region
   network       = google_compute_network.vpc_mgmt.id
 }
 
 # VPC External
 resource "google_compute_network" "vpc_ext" {
-  name                    = "${var.prefix}-net-ext"
+  name                    = "${var.projectPrefix}-net-ext"
   auto_create_subnetworks = "false"
   routing_mode            = "REGIONAL"
 }
 resource "google_compute_subnetwork" "vpc_ext_sub" {
-  name          = "${var.prefix}-subnet-ext"
-  ip_cidr_range = var.cidr_range_ext
+  name          = "${var.projectPrefix}-subnet-ext"
+  ip_cidr_range = var.ext_address_prefix
   region        = var.gcp_region
   network       = google_compute_network.vpc_ext.id
 }
 
 # VPC Internal
 resource "google_compute_network" "vpc_int" {
-  name                    = "${var.prefix}-net-int"
+  name                    = "${var.projectPrefix}-net-int"
   auto_create_subnetworks = "false"
   routing_mode            = "REGIONAL"
 }
 resource "google_compute_subnetwork" "vpc_int_sub" {
-  name          = "${var.prefix}-subnet-int"
-  ip_cidr_range = var.cidr_range_int
+  name          = "${var.projectPrefix}-subnet-int"
+  ip_cidr_range = var.int_address_prefix
   region        = var.gcp_region
   network       = google_compute_network.vpc_int.id
 }
 
 # Firewall Rules
 resource "google_compute_firewall" "default-allow-internal-mgmt" {
-  name          = "${var.prefix}-default-allow-internal-mgmt"
+  name          = "${var.projectPrefix}-default-allow-internal-mgmt"
   network       = google_compute_network.vpc_mgmt.name
-  source_ranges = [var.cidr_range_mgmt]
+  source_ranges = [var.mgmt_address_prefix]
   allow {
     protocol = "icmp"
   }
@@ -58,9 +58,9 @@ resource "google_compute_firewall" "default-allow-internal-mgmt" {
 }
 
 resource "google_compute_firewall" "default-allow-internal-ext" {
-  name          = "${var.prefix}-default-allow-internal-ext"
+  name          = "${var.projectPrefix}-default-allow-internal-ext"
   network       = google_compute_network.vpc_ext.name
-  source_ranges = [var.cidr_range_ext]
+  source_ranges = [var.ext_address_prefix]
   allow {
     protocol = "icmp"
   }
@@ -75,9 +75,9 @@ resource "google_compute_firewall" "default-allow-internal-ext" {
 }
 
 resource "google_compute_firewall" "default-allow-internal-int" {
-  name          = "${var.prefix}-default-allow-internal-int"
+  name          = "${var.projectPrefix}-default-allow-internal-int"
   network       = google_compute_network.vpc_int.name
-  source_ranges = [var.cidr_range_int]
+  source_ranges = [var.int_address_prefix]
   allow {
     protocol = "icmp"
   }
@@ -92,7 +92,7 @@ resource "google_compute_firewall" "default-allow-internal-int" {
 }
 
 resource "google_compute_firewall" "mgmt" {
-  name          = "${var.prefix}-allow-mgmt"
+  name          = "${var.projectPrefix}-allow-mgmt"
   network       = google_compute_network.vpc_mgmt.name
   source_ranges = [var.adminSrcAddr]
   allow {
@@ -105,7 +105,7 @@ resource "google_compute_firewall" "mgmt" {
 }
 
 resource "google_compute_firewall" "app" {
-  name          = "${var.prefix}-allow-app"
+  name          = "${var.projectPrefix}-allow-app"
   network       = google_compute_network.vpc_ext.name
   source_ranges = [var.adminSrcAddr]
   allow {
@@ -118,7 +118,7 @@ resource "google_compute_firewall" "app" {
 }
 
 resource "google_compute_firewall" "one_nic" {
-  name          = "${var.prefix}-allow-mgmt-1nic"
+  name          = "${var.projectPrefix}-allow-mgmt-1nic"
   network       = google_compute_network.vpc_ext.name
   source_ranges = [var.adminSrcAddr]
   allow {
@@ -131,7 +131,7 @@ resource "google_compute_firewall" "one_nic" {
 }
 
 resource "google_compute_firewall" "app-ilb-probe" {
-  name          = "${var.prefix}-allow-app-ilb-probe"
+  name          = "${var.projectPrefix}-allow-app-ilb-probe"
   network       = google_compute_network.vpc_ext.name
   source_ranges = ["35.191.0.0/16", "130.211.0.0/22"]
   allow {

@@ -1,5 +1,10 @@
 # Variables
 
+variable "projectPrefix" {
+  type        = string
+  default     = "demo"
+  description = "This value is inserted at the beginning of each Google object (alpha-numeric, no special character)"
+}
 variable "gcp_project_id" {
   type        = string
   default     = null
@@ -15,32 +20,27 @@ variable "gcp_zone_1" {
   default     = "us-west1-a"
   description = "GCP Zone 1 for provider"
 }
-variable "prefix" {
-  type        = string
-  default     = "demo"
-  description = "This value is inserted at the beginning of each Google object (alpha-numeric, no special character)"
-}
 variable "adminSrcAddr" {
   type        = string
+  description = "Allowed Admin source IP prefix"
   default     = "0.0.0.0/0"
-  description = "Trusted source network for admin access"
 }
-variable "cidr_range_mgmt" {
+variable "mgmt_address_prefix" {
   type        = string
   default     = "10.1.1.0/24"
-  description = "IP CIDR range for management VPC network"
+  description = "Management subnet address prefix"
 }
-variable "cidr_range_ext" {
+variable "ext_address_prefix" {
   type        = string
   default     = "10.1.10.0/24"
-  description = "IP CIDR range for external VPC network"
+  description = "External subnet address prefix"
 }
-variable "cidr_range_int" {
+variable "int_address_prefix" {
   type        = string
   default     = "10.1.20.0/24"
-  description = "IP CIDR range for internal VPC network"
+  description = "Internal subnet address prefix"
 }
-variable "owner" {
+variable "resourceOwner" {
   type        = string
   default     = null
   description = "This is a tag used for object creation. Example is last name."
