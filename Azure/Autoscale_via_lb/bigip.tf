@@ -1,51 +1,57 @@
 # BIG-IP Cluster
 
+############################ Onboard Scripts ############################
 
 # Setup Onboarding scripts
 locals {
   f5_onboard1 = templatefile("${path.module}/f5_onboard.tmpl", {
-    f5_username        = var.uname
-    f5_password        = var.upassword
-    ssh_keypair        = var.ssh_key
-    INIT_URL           = var.INIT_URL
-    DO_URL             = var.DO_URL
-    AS3_URL            = var.AS3_URL
-    TS_URL             = var.TS_URL
-    FAST_URL           = var.FAST_URL
-    DO_VER             = split("/", var.DO_URL)[7]
-    AS3_VER            = split("/", var.AS3_URL)[7]
-    TS_VER             = split("/", var.TS_URL)[7]
-    FAST_VER           = split("/", var.FAST_URL)[7]
-    dns_server         = var.dns_server
-    ntp_server         = var.ntp_server
-    timezone           = var.timezone
-    law_id             = azurerm_log_analytics_workspace.law.workspace_id
-    law_primkey        = azurerm_log_analytics_workspace.law.primary_shared_key
-    bigIqLicenseType   = var.bigIqLicenseType
-    bigIqHost          = var.bigIqHost
-    bigIqPassword      = var.bigIqPassword
-    bigIqUsername      = var.bigIqUsername
-    bigIqLicensePool   = var.bigIqLicensePool
-    bigIqSkuKeyword1   = var.bigIqSkuKeyword1
-    bigIqSkuKeyword2   = var.bigIqSkuKeyword2
-    bigIqUnitOfMeasure = var.bigIqUnitOfMeasure
-    bigIqHypervisor    = var.bigIqHypervisor
+    f5_username                = var.f5_username
+    f5_password                = var.f5_password
+    az_keyvault_authentication = var.az_keyvault_authentication
+    vault_url                  = var.az_keyvault_authentication ? var.keyvault_url : ""
+    ssh_keypair                = file(var.ssh_key)
+    INIT_URL                   = var.INIT_URL
+    DO_URL                     = var.DO_URL
+    AS3_URL                    = var.AS3_URL
+    TS_URL                     = var.TS_URL
+    FAST_URL                   = var.FAST_URL
+    DO_VER                     = split("/", var.DO_URL)[7]
+    AS3_VER                    = split("/", var.AS3_URL)[7]
+    TS_VER                     = split("/", var.TS_URL)[7]
+    FAST_VER                   = split("/", var.FAST_URL)[7]
+    dns_server                 = var.dns_server
+    ntp_server                 = var.ntp_server
+    timezone                   = var.timezone
+    law_id                     = azurerm_log_analytics_workspace.law.workspace_id
+    law_primkey                = azurerm_log_analytics_workspace.law.primary_shared_key
+    bigIqLicenseType           = var.bigIqLicenseType
+    bigIqHost                  = var.bigIqHost
+    bigIqPassword              = var.bigIqPassword
+    bigIqUsername              = var.bigIqUsername
+    bigIqLicensePool           = var.bigIqLicensePool
+    bigIqSkuKeyword1           = var.bigIqSkuKeyword1
+    bigIqSkuKeyword2           = var.bigIqSkuKeyword2
+    bigIqUnitOfMeasure         = var.bigIqUnitOfMeasure
+    bigIqHypervisor            = var.bigIqHypervisor
   })
 }
 
 
 # Create F5 BIG-IP VMs
 resource "azurerm_linux_virtual_machine_scale_set" "f5vmss" {
-  name                            = format("%s-f5vmss-%s", var.projectPrefix, random_id.buildSuffix.hex)
-  location                        = azurerm_resource_group.main.location
-  resource_group_name             = azurerm_resource_group.main.name
-  sku                             = var.instance_type
-  instances                       = 2
-  admin_username                  = var.uname
-  admin_password                  = var.upassword
-  disable_password_authentication = false
-  computer_name_prefix            = "${var.projectPrefix}f5vm"
-  custom_data                     = base64encode(local.f5_onboard1)
+  name                 = format("%s-f5vmss-%s", var.projectPrefix, random_id.buildSuffix.hex)
+  location             = azurerm_resource_group.main.location
+  resource_group_name  = azurerm_resource_group.main.name
+  sku                  = var.instance_type
+  instances            = 2
+  admin_username       = var.f5_username
+  computer_name_prefix = "${var.projectPrefix}f5vm"
+  custom_data          = base64encode(local.f5_onboard1)
+
+  admin_ssh_key {
+    public_key = file(var.ssh_key)
+    username   = var.f5_username
+  }
 
   os_disk {
     caching              = "ReadWrite"
@@ -114,6 +120,6 @@ resource "azurerm_linux_virtual_machine_scale_set" "f5vmss" {
   }
 
   tags = {
-    owner = var.owner
+    owner = var.resourceOwner
   }
 }

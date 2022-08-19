@@ -1,14 +1,20 @@
 # BIG-IP Environment
-uname      = "azureuser"
-upassword  = "Default12345!"
-ssh_key    = "ssh-rsa REDACTED me@my.email"
-vnet_rg    = "myVnetRg"
-vnet_name  = "myVnet123"
-mgmtSubnet = "mgmt"
-extSubnet  = "external"
-intSubnet  = "internal"
+f5_username = "azureuser"
+f5_password = "Default12345!"
+ssh_key     = "~/.ssh/id_rsa.pub"
+vnet_rg     = "myVnetRg"
+vnet_name   = "myVnet123"
+mgmtSubnet  = "mgmt"
+extSubnet   = "external"
+intSubnet   = "internal"
+mgmtNsg     = "mgmtNsg"
+extNsg      = "extNsg"
+intNsg      = "intNsg"
 
 # Azure Environment
 location      = "westus2"
 projectPrefix = "mydemo123"
-owner         = "myLastName"
+resourceOwner = "myLastName"
+
+# Auth
+user_identity = "/subscriptions/1234/resourceGroups/myRg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myIdentity1234"

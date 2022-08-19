@@ -1,46 +1,82 @@
 # Outputs
 
-output "bigip_resource_group" {
-  description = "Resource group name"
-  value       = azurerm_resource_group.main.name
-}
-output "storage_bucket" {
-  description = "Storage account name"
-  value       = azurerm_storage_account.main.name
-}
-output "Public_VIP_pip" {
-  description = "Public VIP IP for application"
-  value       = azurerm_public_ip.pubvippip.ip_address
-}
 output "f5vm01_mgmt_private_ip" {
-  description = "Management NIC private IP address for BIG-IP 1"
-  value       = azurerm_network_interface.vm01-mgmt-nic.private_ip_address
+  description = "f5vm01 management private IP address"
+  value       = module.bigip.private_addresses["mgmt_private"]["private_ip"][0]
 }
 output "f5vm01_mgmt_public_ip" {
-  description = "Management NIC public IP address for BIG-IP 1"
-  value       = azurerm_public_ip.vm01mgmtpip.ip_address
+  description = "f5vm01 management public IP address"
+  value       = module.bigip.mgmtPublicIP
+}
+output "f5vm01_mgmt_pip_url" {
+  description = "f5vm01 management public URL"
+  value       = "https://${module.bigip.mgmtPublicIP}"
 }
 output "f5vm01_ext_private_ip" {
-  description = "External NIC private IP address for BIG-IP 1"
-  value       = azurerm_network_interface.vm01-ext-nic.private_ip_address
+  description = "f5vm01 external primary IP address (self IP)"
+  value       = module.bigip.private_addresses["public_private"]["private_ip"][0]
+}
+output "f5vm01_ext_public_ip" {
+  description = "f5vm01 external public IP address (self IP)"
+  value       = module.bigip.public_addresses["external_primary_public"][0]
+}
+output "f5vm01_ext_secondary_ip" {
+  description = "f5vm01 external secondary IP address (VIP)"
+  value       = local.vm01_vip_ips.app1.ip
 }
 output "f5vm01_int_private_ip" {
-  description = "Internal NIC private IP address for BIG-IP 1"
-  value       = azurerm_network_interface.vm01-int-nic.private_ip_address
+  description = "f5vm01 internal primary IP address"
+  value       = module.bigip.private_addresses["internal_private"]["private_ip"][0]
+}
+output "f5vm01_instance_ids" {
+  description = "f5vm01 management device name"
+  value       = module.bigip.bigip_instance_ids
 }
 output "f5vm02_mgmt_private_ip" {
-  description = "Management NIC private IP address for BIG-IP 2"
-  value       = azurerm_network_interface.vm02-mgmt-nic.private_ip_address
+  description = "f5vm02 management private IP address"
+  value       = module.bigip2.private_addresses["mgmt_private"]["private_ip"][0]
 }
 output "f5vm02_mgmt_public_ip" {
-  description = "Management NIC public IP address for BIG-IP 2"
-  value       = azurerm_public_ip.vm02mgmtpip.ip_address
+  description = "f5vm02 management public IP address"
+  value       = module.bigip2.mgmtPublicIP
+}
+output "f5vm02_mgmt_pip_url" {
+  description = "f5vm02 management public URL"
+  value       = "https://${module.bigip2.mgmtPublicIP}"
 }
 output "f5vm02_ext_private_ip" {
-  description = "External NIC private IP address for BIG-IP 2"
-  value       = azurerm_network_interface.vm02-ext-nic.private_ip_address
+  description = "f5vm02 external primary IP address (self IP)"
+  value       = module.bigip2.private_addresses["public_private"]["private_ip"][0]
+}
+output "f5vm02_ext_public_ip" {
+  description = "f5vm02 external public IP address (self IP)"
+  value       = module.bigip2.public_addresses["external_primary_public"][0]
+}
+output "f5vm02_ext_secondary_ip" {
+  description = "f5vm02 external secondary IP address (VIP)"
+  value       = local.vm02_vip_ips.app1.ip
 }
 output "f5vm02_int_private_ip" {
-  description = "Internal NIC private IP address for BIG-IP 2"
-  value       = azurerm_network_interface.vm02-int-nic.private_ip_address
+  description = "f5vm01 internal primary IP address"
+  value       = module.bigip2.private_addresses["internal_private"]["private_ip"][0]
+}
+output "f5vm02_instance_ids" {
+  description = "f5vm02 management device name"
+  value       = module.bigip2.bigip_instance_ids
+}
+output "public_vip" {
+  description = "Public IP for the BIG-IP listener (VIP)"
+  value       = module.bigip.public_addresses["external_secondary_public"][0]
+}
+output "public_vip_2" {
+  description = "Public IP for the BIG-IP listener (VIP) #2"
+  value       = module.bigip2.public_addresses["external_secondary_public"][0]
+}
+output "public_vip_url" {
+  description = "public URL for application"
+  value       = "http://${module.bigip.public_addresses["external_secondary_public"][0]}"
+}
+output "public_vip_url_2" {
+  description = "public URL for application #2"
+  value       = "http://${module.bigip2.public_addresses["external_secondary_public"][0]}"
 }

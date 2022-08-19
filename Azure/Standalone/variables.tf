@@ -1,25 +1,5 @@
 # Variables
 
-variable "sp_subscription_id" {
-  type        = string
-  default     = ""
-  description = "This is the service principal subscription ID"
-}
-variable "sp_client_id" {
-  type        = string
-  default     = ""
-  description = "This is the service principal application/client ID"
-}
-variable "sp_client_secret" {
-  type        = string
-  default     = ""
-  description = "This is the service principal secret"
-}
-variable "sp_tenant_id" {
-  type        = string
-  default     = ""
-  description = "This is the service principal tenant ID"
-}
 variable "projectPrefix" {
   type        = string
   default     = "demo"
@@ -40,6 +20,11 @@ variable "vnet_name" {
   default     = null
   description = "Name of existing VNET"
 }
+variable "availability_zone" {
+  type        = number
+  description = "Azure Availability Zone for BIG-IP 1"
+  default     = 1
+}
 variable "mgmtSubnet" {
   type        = string
   default     = null
@@ -54,6 +39,21 @@ variable "intSubnet" {
   type        = string
   default     = null
   description = "Name of internal subnet"
+}
+variable "mgmtNsg" {
+  type        = string
+  default     = null
+  description = "Name of management network security group"
+}
+variable "extNsg" {
+  type        = string
+  default     = null
+  description = "Name of external network security group"
+}
+variable "intNsg" {
+  type        = string
+  default     = null
+  description = "Name of internal network security group"
 }
 variable "instance_type" {
   type        = string
@@ -75,19 +75,39 @@ variable "bigip_version" {
   default     = "16.1.301000"
   description = "BIG-IP Version"
 }
-variable "uname" {
+variable "f5_username" {
   type        = string
   default     = "azureuser"
-  description = "User name for the Virtual Machine"
+  description = "User name for the BIG-IP"
 }
-variable "upassword" {
+variable "f5_password" {
   type        = string
   default     = "Default12345!"
-  description = "Password for the Virtual Machine"
+  description = "BIG-IP Password or Key Vault secret name (value should be Key Vault secret name when az_key_vault_authentication = true, ex. my-bigip-secret)"
+}
+variable "az_keyvault_authentication" {
+  type        = bool
+  default     = false
+  description = "Whether to use key vault to pass authentication"
+}
+variable "keyvault_url" {
+  type        = string
+  default     = ""
+  description = "The URL of the Azure Key Vault to use (ex. https://myKeyVault123.vault.azure.net)"
+}
+variable "keyvault_rg" {
+  type        = string
+  default     = ""
+  description = "The name of the resource group in which the Azure Key Vault exists"
+}
+variable "user_identity" {
+  type        = string
+  default     = null
+  description = "The ID of the managed user identity to assign to the BIG-IP instance"
 }
 variable "ssh_key" {
   type        = string
-  description = "public key used for authentication in ssh-rsa format"
+  description = "public key used for authentication in /path/file format (e.g. /.ssh/id_rsa.pub)"
 }
 variable "license1" {
   type        = string
@@ -125,19 +145,19 @@ variable "TS_URL" {
   description = "URL to download the BIG-IP Telemetry Streaming module"
 }
 variable "FAST_URL" {
-  description = "URL to download the BIG-IP FAST module"
   type        = string
   default     = "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.19.0/f5-appsvcs-templates-1.19.0-1.noarch.rpm"
+  description = "URL to download the BIG-IP FAST module"
 }
 variable "INIT_URL" {
-  description = "URL to download the BIG-IP runtime init"
   type        = string
   default     = "https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.5.1/dist/f5-bigip-runtime-init-1.5.1-1.gz.run"
+  description = "URL to download the BIG-IP runtime init"
 }
 variable "libs_dir" {
-  description = "Directory on the BIG-IP to download the A&O Toolchain into"
-  default     = "/config/cloud/azure/node_modules"
   type        = string
+  default     = "/config/cloud/azure/node_modules"
+  description = "Directory on the BIG-IP to download the A&O Toolchain into"
 }
 variable "bigIqHost" {
   type        = string
@@ -184,7 +204,7 @@ variable "bigIqHypervisor" {
   default     = "azure"
   description = "BIG-IQ hypervisor"
 }
-variable "owner" {
+variable "resourceOwner" {
   type        = string
   default     = null
   description = "This is a tag used for object creation. Example is last name."

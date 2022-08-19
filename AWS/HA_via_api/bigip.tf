@@ -164,7 +164,6 @@ module "bigip" {
   ec2_key_name               = aws_key_pair.bigip.key_name
   f5_ami_search_name         = var.f5_ami_search_name
   f5_username                = var.f5_username
-  f5_password                = var.f5_password
   aws_iam_instance_profile   = aws_iam_instance_profile.bigip_profile.name
   mgmt_subnet_ids            = [{ "subnet_id" = var.mgmtSubnetAz1, "public_ip" = true, "private_ip_primary" = "" }]
   mgmt_securitygroup_ids     = [var.mgmtNsg]
@@ -184,7 +183,6 @@ module "bigip2" {
   ec2_key_name               = aws_key_pair.bigip.key_name
   f5_ami_search_name         = var.f5_ami_search_name
   f5_username                = var.f5_username
-  f5_password                = var.f5_password
   aws_iam_instance_profile   = aws_iam_instance_profile.bigip_profile.name
   mgmt_subnet_ids            = [{ "subnet_id" = var.mgmtSubnetAz1, "public_ip" = true, "private_ip_primary" = "" }]
   mgmt_securitygroup_ids     = [var.mgmtNsg]

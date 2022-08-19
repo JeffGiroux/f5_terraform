@@ -18,6 +18,10 @@ locals {
       ip = module.bigip.private_addresses["public_private"]["private_ip"][0] != local.vm01_ext_ips.0.ip ? local.vm01_ext_ips.0.ip : local.vm01_ext_ips.1.ip
     }
   }
+  # Custom tags
+  tags = {
+    Owner = var.resourceOwner
+  }
 }
 
 ############################ Secrets Manager ############################
@@ -108,4 +112,5 @@ module "bigip" {
   internal_securitygroup_ids = [var.intNsg]
   custom_user_data           = local.f5_onboard1
   sleep_time                 = "30s"
+  tags                       = local.tags
 }
