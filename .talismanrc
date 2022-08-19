@@ -135,7 +135,7 @@ fileignoreconfig:
 - filename: Azure/HA_via_api/bigip.tf
   checksum: 6a4f8ac56d0e95088bc2afb1334f9bf56c7ad9eb0000c605c42209b3de4f2d56
 - filename: Azure/HA_via_lb/f5_onboard.tmpl
-  checksum: 3c49a3711eab7fce192cad700642735f36fbbc10ede1a8e3e68af5beb31aeba5
+  checksum: cb0193f299feeb26ca3640977c457a5801e175c025158a8060d7fab8549abb4d
 - filename: Azure/HA_via_lb/bigip.tf
   checksum: b91ce8d5cc4495a7d19fe71a0bb92983f70b2ef6235ecce50a81b597c289839c
 - filename: Azure/HA_via_lb/terraform.tfvars.example
