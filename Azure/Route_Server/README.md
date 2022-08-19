@@ -222,6 +222,7 @@ Use the following command to destroy all of the resources
 |------|---------|
 | <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.19.1 |
 | <a name="provider_local"></a> [local](#provider\_local) | 2.2.3 |
+| <a name="provider_random"></a> [random](#provider\_random) | 3.3.2 |
 
 ## Modules
 
@@ -247,6 +248,7 @@ Use the following command to destroy all of the resources
 | [azurerm_virtual_hub_ip.routeServerIp](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_hub_ip) | resource |
 | [azurerm_virtual_network_peering.hubToSpoke](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network_peering) | resource |
 | [azurerm_virtual_network_peering.spokeToHub](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network_peering) | resource |
+| [random_id.buildSuffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
 | [azurerm_subnet.externalSubnetHub](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/subnet) | data source |
 | [azurerm_subnet.internalSubnetHub](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/subnet) | data source |
 | [azurerm_subnet.mgmtSubnetHub](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/subnet) | data source |
