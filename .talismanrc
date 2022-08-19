@@ -90,8 +90,10 @@ fileignoreconfig:
   checksum: 69b6921f46063b762a561f66d3cbbd351e9fe18574a488336807f7ad5cc48d22
 - filename: Azure/Virtual_WAN/main.tf
   checksum: 0250b35b25db6d2619b6dab4f0c25c41112fdb39392ebe495284c45e79703e9e
+- filename: Azure/Virtual_WAN/variables.tf
+  checksum: d015cede9acb8f845319b797dc2e173280d009a4662cc2114fdf1829c35de0c0
 - filename: Azure/Virtual_WAN/README.md
-  checksum: 408d2b0adc77d4f0108e9fb9397cc5c2a9f7826fcd5e60676eb1fd108ad7085d
+  checksum: 130ee32ade0abeaca9213a9e23164a4ae8ddb182af0cc7e3f00ed0f7b1366484
 - filename: AWS/Standalone/f5_onboard.tmpl
   checksum: 2bb1aaa30fdd1c71bf76f7ab8be762d3d8d0496f175e85eadafce2ede4b6d680
 - filename: AWS/Standalone/iam.tf
