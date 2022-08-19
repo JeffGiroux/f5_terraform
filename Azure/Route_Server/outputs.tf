@@ -1,3 +1,5 @@
+# Outputs
+
 output "vnetIdHub" {
   description = "Hub VNet ID"
   value       = module.network["hub"].vnet_id

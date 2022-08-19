@@ -29,8 +29,10 @@ fileignoreconfig:
   checksum: a52d02ea12d225954d242a3cfa72b5eb5b079e4c2ca90d60ea1cc42cf78546b2
 - filename: Azure/Route_Server/f5_onboard.tmpl
   checksum: ee89040f31adaf0fa9656cb7cb42cf38cb42bab6e083532d1dca706ebf0721e4
+- filename: Azure/Route_Server/variables.tf
+  checksum: be22e7624dfa1ad0bbfe57a6205f22cbdafd198b6c4aa2403da0bc7366d4c4cf
 - filename: Azure/Route_Server/README.md
-  checksum: f467ef023e7d47c4cb46337a911f97d8b51281876197275a40515b33bcf246c5
+  checksum: 4999cb476a978a51f4cdbecd668f8c4b5d81e2e60e2991d5e56de99312359c25
 - filename: Azure/HA_via_lb/f5_onboard.tmpl
   checksum: 3c49a3711eab7fce192cad700642735f36fbbc10ede1a8e3e68af5beb31aeba5
 - filename: Azure/HA_via_lb/bigip.tf

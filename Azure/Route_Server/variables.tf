@@ -1,8 +1,6 @@
-#Project info
-resource "random_id" "buildSuffix" {
-  byte_length = 2
-}
-variable "prefix" {
+# Variables
+
+variable "projectPrefix" {
   type        = string
   default     = "demo"
   description = "This value is inserted at the beginning of each Azure object (alpha-numeric, no special character)"
@@ -12,18 +10,14 @@ variable "location" {
   default     = "westus2"
   description = "Azure Location of the deployment"
 }
-variable "f5_ssh_publickey" {
-  type        = string
-  description = "instance key pair name (e.g. /.ssh/id_rsa.pub)"
-}
 variable "adminSrcAddr" {
   type        = string
   description = "Allowed Admin source IP prefix"
   default     = "0.0.0.0/0"
 }
 variable "availability_zone" {
-  type        = string
-  description = "If you want the VM placed in an Azure Availability Zone, and the Azure region you are deploying to supports it, specify the numbers of the existing Availability Zone you want to use."
+  type        = number
+  description = "Azure Availability Zone for BIG-IP 1"
   default     = 1
 }
 variable "instanceCountBigIp" {
@@ -31,24 +25,59 @@ variable "instanceCountBigIp" {
   description = "Number of BIG-IP instances to deploy"
   default     = 1
 }
-variable "f5_username" {
-  description = "The admin username of the F5 BIG-IP that will be deployed"
-  default     = "azureuser"
-}
-variable "f5_password" {
-  type        = string
-  default     = "Default12345!"
-  description = "Password for the Virtual Machine"
-}
-variable "f5_instance_type" {
+variable "instance_type" {
   type        = string
   default     = "Standard_DS4_v2"
   description = "Azure instance type to be used for the BIG-IP VE"
 }
-variable "f5_version" {
+variable "image_name" {
+  type        = string
+  default     = "f5-big-best-plus-hourly-200mbps"
+  description = "F5 SKU (image) to deploy. Note: The disk size of the VM will be determined based on the option you select.  **Important**: If intending to provision multiple modules, ensure the appropriate value is selected, such as ****AllTwoBootLocations or AllOneBootLocation****."
+}
+variable "product" {
+  type        = string
+  default     = "f5-big-ip-best"
+  description = "Azure BIG-IP VE Offer"
+}
+variable "bigip_version" {
   type        = string
   default     = "16.1.301000"
   description = "BIG-IP Version"
+}
+variable "f5_username" {
+  type        = string
+  default     = "azureuser"
+  description = "User name for the BIG-IP"
+}
+variable "f5_password" {
+  type        = string
+  default     = "Default12345!"
+  description = "BIG-IP Password or Key Vault secret name (value should be Key Vault secret name when az_key_vault_authentication = true, ex. my-bigip-secret)"
+}
+variable "az_keyvault_authentication" {
+  type        = bool
+  default     = false
+  description = "Whether to use key vault to pass authentication"
+}
+variable "keyvault_url" {
+  type        = string
+  default     = ""
+  description = "The URL of the Azure Key Vault to use (ex. https://myKeyVault123.vault.azure.net)"
+}
+variable "keyvault_rg" {
+  type        = string
+  default     = ""
+  description = "The name of the resource group in which the Azure Key Vault exists"
+}
+variable "user_identity" {
+  type        = string
+  default     = null
+  description = "The ID of the managed user identity to assign to the BIG-IP instance"
+}
+variable "ssh_key" {
+  type        = string
+  description = "public key used for authentication in /path/file format (e.g. /.ssh/id_rsa.pub)"
 }
 variable "dns_server" {
   type        = string
@@ -81,19 +110,19 @@ variable "TS_URL" {
   description = "URL to download the BIG-IP Telemetry Streaming module"
 }
 variable "FAST_URL" {
-  description = "URL to download the BIG-IP FAST module"
   type        = string
   default     = "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.19.0/f5-appsvcs-templates-1.19.0-1.noarch.rpm"
+  description = "URL to download the BIG-IP FAST module"
 }
 variable "INIT_URL" {
-  description = "URL to download the BIG-IP runtime init"
   type        = string
   default     = "https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.5.1/dist/f5-bigip-runtime-init-1.5.1-1.gz.run"
+  description = "URL to download the BIG-IP runtime init"
 }
 variable "libs_dir" {
-  description = "Directory on the BIG-IP to download the A&O Toolchain into"
-  default     = "/config/cloud/azure/node_modules"
   type        = string
+  default     = "/config/cloud/azure/node_modules"
+  description = "Directory on the BIG-IP to download the A&O Toolchain into"
 }
 variable "bigIqHost" {
   type        = string
@@ -140,7 +169,7 @@ variable "bigIqHypervisor" {
   default     = "azure"
   description = "BIG-IQ hypervisor"
 }
-variable "owner" {
+variable "resourceOwner" {
   type        = string
   default     = null
   description = "This is a tag used for object creation. Example is last name."
