@@ -201,7 +201,7 @@ No modules.
 | Name | Description |
 |------|-------------|
 | <a name="output_ALB_app1_pip"></a> [ALB\_app1\_pip](#output\_ALB\_app1\_pip) | Public VIP IP for application |
-| <a name="output_HTTPS_Link"></a> [HTTPS\_Link](#output\_HTTPS\_Link) | Public VIP URL for application |
+| <a name="output_HTTP_Link"></a> [HTTP\_Link](#output\_HTTP\_Link) | Public VIP URL for application |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 <!-- markdownlint-enable no-inline-html -->
 
