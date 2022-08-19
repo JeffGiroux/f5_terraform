@@ -37,103 +37,9 @@ locals {
   }
 }
 
-############################ Public IPs ############################
-
-# # Create Public IPs - mgmt
-# resource "azurerm_public_ip" "vm01mgmtpip" {
-#   name                = format("%s-vm01-mgmt-pip-%s", var.projectPrefix, random_id.buildSuffix.hex)
-#   location            = azurerm_resource_group.main.location
-#   sku                 = "Standard"
-#   resource_group_name = azurerm_resource_group.main.name
-#   allocation_method   = "Static"
-#   tags = {
-#     owner = var.resourceOwner
-#   }
-# }
-
-# resource "azurerm_public_ip" "vm02mgmtpip" {
-#   name                = format("%s-vm02-mgmt-pip-%s", var.projectPrefix, random_id.buildSuffix.hex)
-#   location            = azurerm_resource_group.main.location
-#   sku                 = "Standard"
-#   resource_group_name = azurerm_resource_group.main.name
-#   allocation_method   = "Static"
-#   tags = {
-#     owner = var.resourceOwner
-#   }
-# }
-
-# # Create Public IPs - external
-# resource "azurerm_public_ip" "vm01selfpip" {
-#   name                = format("%s-vm01-self-pip-%s", var.projectPrefix, random_id.buildSuffix.hex)
-#   location            = azurerm_resource_group.main.location
-#   sku                 = "Standard"
-#   resource_group_name = azurerm_resource_group.main.name
-#   allocation_method   = "Static"
-#   tags = {
-#     owner = var.resourceOwner
-#   }
-# }
-
-# resource "azurerm_public_ip" "vm02selfpip" {
-#   name                = format("%s-vm02-self-pip-%s", var.projectPrefix, random_id.buildSuffix.hex)
-#   location            = azurerm_resource_group.main.location
-#   sku                 = "Standard"
-#   resource_group_name = azurerm_resource_group.main.name
-#   allocation_method   = "Static"
-#   tags = {
-#     owner = var.resourceOwner
-#   }
-# }
-
-# # Create Public IPs - VIP
-# resource "azurerm_public_ip" "pubvippip" {
-#   name                = format("%s-pubvip-pip-%s", var.projectPrefix, random_id.buildSuffix.hex)
-#   location            = azurerm_resource_group.main.location
-#   sku                 = "Standard"
-#   resource_group_name = azurerm_resource_group.main.name
-#   allocation_method   = "Static"
-#   tags = {
-#     owner = var.resourceOwner
-#   }
-# }
-
 ############################ Network Interfaces ############################
-# # Create NIC for Management
-# resource "azurerm_network_interface" "vm01-mgmt-nic" {
-#   name                = format("%s-vm01-mgmt-%s", var.projectPrefix, random_id.buildSuffix.hex)
-#   location            = azurerm_resource_group.main.location
-#   resource_group_name = azurerm_resource_group.main.name
 
-#   ip_configuration {
-#     name                          = "primary"
-#     subnet_id                     = data.azurerm_subnet.mgmt.id
-#     private_ip_address_allocation = "Dynamic"
-#     public_ip_address_id          = azurerm_public_ip.vm01mgmtpip.id
-#   }
-
-#   tags = {
-#     owner = var.resourceOwner
-#   }
-# }
-
-# resource "azurerm_network_interface" "vm02-mgmt-nic" {
-#   name                = format("%s-vm02-mgmt-%s", var.projectPrefix, random_id.buildSuffix.hex)
-#   location            = azurerm_resource_group.main.location
-#   resource_group_name = azurerm_resource_group.main.name
-
-#   ip_configuration {
-#     name                          = "primary"
-#     subnet_id                     = data.azurerm_subnet.mgmt.id
-#     private_ip_address_allocation = "Dynamic"
-#     public_ip_address_id          = azurerm_public_ip.vm02mgmtpip.id
-#   }
-
-#   tags = {
-#     owner = var.resourceOwner
-#   }
-# }
-
-# # Create NIC for External
+# Create NIC for External
 # resource "azurerm_network_interface" "vm01-ext-nic" {
 #   name                 = format("%s-vm01-ext-%s", var.projectPrefix, random_id.buildSuffix.hex)
 #   location             = azurerm_resource_group.main.location
@@ -456,56 +362,27 @@ data "azurerm_virtual_machine" "f5vm02" {
   resource_group_name = azurerm_resource_group.main.name
 }
 
-# Configure VMs to use a system-assigned managed identity
-resource "azurerm_role_assignment" "f5vm01ra" {
-  scope                = data.azurerm_subscription.main.id
-  role_definition_name = "Contributor"
-  principal_id         = lookup(data.azurerm_virtual_machine.f5vm01.identity[0], "principal_id")
+# Retrieve user identity info
+data "azurerm_user_assigned_identity" "f5vm01" {
+  name                = element(split("/", element(flatten(lookup(data.azurerm_virtual_machine.f5vm01.identity[0], "identity_ids")), 0)), 8)
+  resource_group_name = azurerm_resource_group.main.name
 }
-resource "azurerm_role_assignment" "f5vm02ra" {
-  scope                = data.azurerm_subscription.main.id
-  role_definition_name = "Contributor"
-  principal_id         = lookup(data.azurerm_virtual_machine.f5vm02.identity[0], "principal_id")
+data "azurerm_user_assigned_identity" "f5vm02" {
+  name                = element(split("/", element(flatten(lookup(data.azurerm_virtual_machine.f5vm02.identity[0], "identity_ids")), 0)), 8)
+  resource_group_name = azurerm_resource_group.main.name
 }
 
-############################ Azure Extensions (onboarding) ############################
-
-# # Run Startup Script
-# resource "azurerm_virtual_machine_extension" "f5vm01-startup" {
-#   name                 = format("%s-f5vm01-startup-%s", var.projectPrefix, random_id.buildSuffix.hex)
-#   virtual_machine_id   = azurerm_linux_virtual_machine.f5vm01.id
-#   publisher            = "Microsoft.Azure.Extensions"
-#   type                 = "CustomScript"
-#   type_handler_version = "2.0"
-
-#   settings = <<SETTINGS
-#     {
-#         "commandToExecute": "bash /var/lib/waagent/CustomData; exit 0;"
-#     }
-#   SETTINGS
-
-#   tags = {
-#     owner = var.resourceOwner
-#   }
-# }
-
-# resource "azurerm_virtual_machine_extension" "f5vm02-startup" {
-#   name                 = format("%s-f5vm02-startup-%s", var.projectPrefix, random_id.buildSuffix.hex)
-#   virtual_machine_id   = azurerm_linux_virtual_machine.f5vm02.id
-#   publisher            = "Microsoft.Azure.Extensions"
-#   type                 = "CustomScript"
-#   type_handler_version = "2.0"
-
-#   settings = <<SETTINGS
-#     {
-#         "commandToExecute": "bash /var/lib/waagent/CustomData; exit 0;"
-#     }
-#   SETTINGS
-
-#   tags = {
-#     owner = var.resourceOwner
-#   }
-# }
+# Configure user-identity with Contributor role
+resource "azurerm_role_assignment" "f5vm01" {
+  scope                = data.azurerm_subscription.main.id
+  role_definition_name = "Contributor"
+  principal_id         = data.azurerm_user_assigned_identity.f5vm01.principal_id
+}
+resource "azurerm_role_assignment" "f5vm02" {
+  scope                = data.azurerm_subscription.main.id
+  role_definition_name = "Contributor"
+  principal_id         = data.azurerm_user_assigned_identity.f5vm02.principal_id
+}
 
 ############################ Route Tables ############################
 
