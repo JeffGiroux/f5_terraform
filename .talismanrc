@@ -22,7 +22,7 @@ fileignoreconfig:
 - filename: Azure/Secure_Enclave_Public_DMZ/README.md
   checksum: 0d6df57c347f4f1e327f564eb5acb1e4d4cb7fc79d641850c0bb536161578692
 - filename: Azure/Route_Server/admin.auto.tfvars.example
-  checksum: c8c6580605408e6483e7ae40916c0486dbc1d735b10821f8e64c1de8fc02334f
+  checksum: 74279fdc0873bb6dbe0d7209377935bdf22c96219d7e7eee1132346eada2bc2c
 - filename: Azure/Route_Server/bigip.tf
   checksum: 8fb40ee7b1916b4454472f4ea6ee2a875883dc94d74ebdcf4d848373d0a77ec0
 - filename: Azure/Route_Server/main.tf
