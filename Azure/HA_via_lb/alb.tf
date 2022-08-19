@@ -8,6 +8,9 @@ resource "azurerm_public_ip" "lbpip" {
   resource_group_name = azurerm_resource_group.main.name
   allocation_method   = "Static"
   domain_name_label   = "${var.projectPrefix}lbpip"
+  tags = {
+    owner = var.resourceOwner
+  }
 }
 
 # Create Azure LB
@@ -20,6 +23,9 @@ resource "azurerm_lb" "lb" {
   frontend_ip_configuration {
     name                 = "LoadBalancerFrontEnd"
     public_ip_address_id = azurerm_public_ip.lbpip.id
+  }
+  tags = {
+    owner = var.resourceOwner
   }
 }
 
