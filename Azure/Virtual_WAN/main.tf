@@ -1,5 +1,13 @@
+# Main
+
+# Azure Provider
 provider "azurerm" {
   features {}
+}
+
+# Create a random id
+resource "random_id" "buildSuffix" {
+  byte_length = 2
 }
 
 ############################ Locals ############################
@@ -39,11 +47,11 @@ locals {
 # Create Resource Groups
 resource "azurerm_resource_group" "rg" {
   for_each = local.vnets
-  name     = format("%s-rg-%s-%s", var.prefix, each.key, random_id.buildSuffix.hex)
+  name     = format("%s-rg-%s-%s", var.projectPrefix, each.key, random_id.buildSuffix.hex)
   location = each.value["location"]
 
   tags = {
-    Name      = format("%s-rg-%s-%s", var.owner, each.key, random_id.buildSuffix.hex)
+    Name      = format("%s-rg-%s-%s", var.resourceOwner, each.key, random_id.buildSuffix.hex)
     Terraform = "true"
   }
 }
@@ -53,13 +61,13 @@ resource "azurerm_resource_group" "rg" {
 # Create Route Tables
 resource "azurerm_route_table" "rt" {
   for_each                      = local.vnets
-  name                          = format("%s-rt-%s-%s", var.prefix, each.key, random_id.buildSuffix.hex)
+  name                          = format("%s-rt-%s-%s", var.projectPrefix, each.key, random_id.buildSuffix.hex)
   location                      = azurerm_resource_group.rg[each.key].location
   resource_group_name           = azurerm_resource_group.rg[each.key].name
   disable_bgp_route_propagation = false
 
   tags = {
-    Name      = format("%s-rt-%s-%s", var.owner, each.key, random_id.buildSuffix.hex)
+    Name      = format("%s-rt-%s-%s", var.resourceOwner, each.key, random_id.buildSuffix.hex)
     Terraform = "true"
   }
 }
@@ -72,7 +80,7 @@ module "nsg-mgmt" {
   source                = "Azure/network-security-group/azurerm"
   resource_group_name   = azurerm_resource_group.rg[each.key].name
   location              = azurerm_resource_group.rg[each.key].location
-  security_group_name   = format("%s-nsg-mgmt-%s-%s", var.prefix, each.key, random_id.buildSuffix.hex)
+  security_group_name   = format("%s-nsg-mgmt-%s-%s", var.projectPrefix, each.key, random_id.buildSuffix.hex)
   source_address_prefix = [var.adminSrcAddr]
 
   custom_rules = [
@@ -103,7 +111,7 @@ module "nsg-mgmt" {
   ]
 
   tags = {
-    Name      = format("%s-nsg-mgmt-%s-%s", var.owner, each.key, random_id.buildSuffix.hex)
+    Name      = format("%s-nsg-mgmt-%s-%s", var.resourceOwner, each.key, random_id.buildSuffix.hex)
     Terraform = "true"
   }
 }
@@ -114,7 +122,7 @@ module "nsg-external" {
   source                = "Azure/network-security-group/azurerm"
   resource_group_name   = azurerm_resource_group.rg[each.key].name
   location              = azurerm_resource_group.rg[each.key].location
-  security_group_name   = format("%s-nsg-external-%s-%s", var.prefix, each.key, random_id.buildSuffix.hex)
+  security_group_name   = format("%s-nsg-external-%s-%s", var.projectPrefix, each.key, random_id.buildSuffix.hex)
   source_address_prefix = ["*"]
 
   custom_rules = [
@@ -137,7 +145,7 @@ module "nsg-external" {
   ]
 
   tags = {
-    Name      = format("%s-nsg-external-%s-%s", var.owner, each.key, random_id.buildSuffix.hex)
+    Name      = format("%s-nsg-external-%s-%s", var.resourceOwner, each.key, random_id.buildSuffix.hex)
     Terraform = "true"
   }
 }
@@ -148,10 +156,10 @@ module "nsg-internal" {
   source              = "Azure/network-security-group/azurerm"
   resource_group_name = azurerm_resource_group.rg[each.key].name
   location            = azurerm_resource_group.rg[each.key].location
-  security_group_name = format("%s-nsg-internal-%s-%s", var.prefix, each.key, random_id.buildSuffix.hex)
+  security_group_name = format("%s-nsg-internal-%s-%s", var.projectPrefix, each.key, random_id.buildSuffix.hex)
 
   tags = {
-    Name      = format("%s-nsg-internal-%s-%s", var.owner, each.key, random_id.buildSuffix.hex)
+    Name      = format("%s-nsg-internal-%s-%s", var.resourceOwner, each.key, random_id.buildSuffix.hex)
     Terraform = "true"
   }
 }
@@ -163,7 +171,7 @@ module "network" {
   for_each            = local.vnets
   source              = "Azure/vnet/azurerm"
   resource_group_name = azurerm_resource_group.rg[each.key].name
-  vnet_name           = format("%s-vnet-%s-%s", var.prefix, each.key, random_id.buildSuffix.hex)
+  vnet_name           = format("%s-vnet-%s-%s", var.projectPrefix, each.key, random_id.buildSuffix.hex)
   address_space       = each.value["addressSpace"]
   subnet_prefixes     = each.value["subnetPrefixes"]
   subnet_names        = each.value["subnetNames"]
@@ -179,7 +187,7 @@ module "network" {
   }
 
   tags = {
-    Name      = format("%s-vnet-%s-%s", var.owner, each.key, random_id.buildSuffix.hex)
+    Name      = format("%s-vnet-%s-%s", var.resourceOwner, each.key, random_id.buildSuffix.hex)
     Terraform = "true"
   }
 }
@@ -232,19 +240,19 @@ resource "azurerm_virtual_network_peering" "spokeToNva" {
 
 # Create vWAN
 resource "azurerm_virtual_wan" "vWan" {
-  name                = format("%s-vWan-%s", var.prefix, random_id.buildSuffix.hex)
+  name                = format("%s-vWan-%s", var.projectPrefix, random_id.buildSuffix.hex)
   resource_group_name = azurerm_resource_group.rg["nva"].name
   location            = azurerm_resource_group.rg["nva"].location
 
   tags = {
-    Name      = format("%s-vWan-%s", var.owner, random_id.buildSuffix.hex)
+    Name      = format("%s-vWan-%s", var.resourceOwner, random_id.buildSuffix.hex)
     Terraform = "true"
   }
 }
 
 # Create vHub
 resource "azurerm_virtual_hub" "vHub" {
-  name                = format("%s-vHub-%s", var.prefix, random_id.buildSuffix.hex)
+  name                = format("%s-vHub-%s", var.projectPrefix, random_id.buildSuffix.hex)
   resource_group_name = azurerm_resource_group.rg["nva"].name
   location            = azurerm_resource_group.rg["nva"].location
   sku                 = "Standard"
@@ -252,14 +260,14 @@ resource "azurerm_virtual_hub" "vHub" {
   address_prefix      = "10.0.0.0/24"
 
   tags = {
-    Name      = format("%s-vHub-%s", var.owner, random_id.buildSuffix.hex)
+    Name      = format("%s-vHub-%s", var.resourceOwner, random_id.buildSuffix.hex)
     Terraform = "true"
   }
 }
 
 # Create vHub connection to NVA VNet
 resource "azurerm_virtual_hub_connection" "nva" {
-  name                      = format("%s-nva-%s", var.prefix, random_id.buildSuffix.hex)
+  name                      = format("%s-nva-%s", var.projectPrefix, random_id.buildSuffix.hex)
   virtual_hub_id            = azurerm_virtual_hub.vHub.id
   remote_virtual_network_id = module.network["nva"].vnet_id
 }
@@ -286,11 +294,11 @@ module "client" {
   vm_os_offer         = "0001-com-ubuntu-server-focal"
   vm_os_sku           = "20_04-lts"
   vnet_subnet_id      = module.network["spoke1"].vnet_subnets[0]
-  ssh_key             = var.f5_ssh_publickey
+  ssh_key             = var.ssh_key
   remote_port         = "22"
 
   tags = {
-    Name      = format("%s-client-%s", var.owner, random_id.buildSuffix.hex)
+    Name      = format("%s-client-%s", var.resourceOwner, random_id.buildSuffix.hex)
     Terraform = "true"
   }
 }
@@ -310,11 +318,11 @@ module "app" {
   vm_os_offer         = "0001-com-ubuntu-server-focal"
   vm_os_sku           = "20_04-lts"
   vnet_subnet_id      = module.network["spoke2"].vnet_subnets[2]
-  ssh_key             = var.f5_ssh_publickey
+  ssh_key             = var.ssh_key
   custom_data         = data.local_file.appOnboard.content_base64
 
   tags = {
-    Name      = format("%s-app-%s", var.owner, random_id.buildSuffix.hex)
+    Name      = format("%s-app-%s", var.resourceOwner, random_id.buildSuffix.hex)
     Terraform = "true"
   }
 }

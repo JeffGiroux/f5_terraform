@@ -89,7 +89,7 @@ fileignoreconfig:
 - filename: Azure/Virtual_WAN/f5_onboard.tmpl
   checksum: 69b6921f46063b762a561f66d3cbbd351e9fe18574a488336807f7ad5cc48d22
 - filename: Azure/Virtual_WAN/main.tf
-  checksum: 0250b35b25db6d2619b6dab4f0c25c41112fdb39392ebe495284c45e79703e9e
+  checksum: 77715c67eba3642043e05a1f439a186cd028f4d6e46ced7dbc9242a88894cec0
 - filename: Azure/Virtual_WAN/variables.tf
   checksum: d015cede9acb8f845319b797dc2e173280d009a4662cc2114fdf1829c35de0c0
 - filename: Azure/Virtual_WAN/README.md
