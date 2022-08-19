@@ -37,98 +37,6 @@ locals {
   }
 }
 
-############################ Network Interfaces ############################
-
-# Create NIC for External
-# resource "azurerm_network_interface" "vm01-ext-nic" {
-#   name                 = format("%s-vm01-ext-%s", var.projectPrefix, random_id.buildSuffix.hex)
-#   location             = azurerm_resource_group.main.location
-#   resource_group_name  = azurerm_resource_group.main.name
-#   enable_ip_forwarding = true
-
-#   ip_configuration {
-#     name                          = "primary"
-#     subnet_id                     = data.azurerm_subnet.external.id
-#     private_ip_address_allocation = "Dynamic"
-#     primary                       = true
-#     public_ip_address_id          = azurerm_public_ip.vm01selfpip.id
-#   }
-#   ip_configuration {
-#     name                          = "secondary"
-#     subnet_id                     = data.azurerm_subnet.external.id
-#     private_ip_address_allocation = "Dynamic"
-#     public_ip_address_id          = azurerm_public_ip.pubvippip.id
-#   }
-
-#   tags = {
-#     owner                     = var.resourceOwner
-#     f5_cloud_failover_label   = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
-#     f5_cloud_failover_nic_map = "external"
-#   }
-# }
-
-# resource "azurerm_network_interface" "vm02-ext-nic" {
-#   name                 = format("%s-vm02-ext-%s", var.projectPrefix, random_id.buildSuffix.hex)
-#   location             = azurerm_resource_group.main.location
-#   resource_group_name  = azurerm_resource_group.main.name
-#   enable_ip_forwarding = true
-
-#   ip_configuration {
-#     name                          = "primary"
-#     subnet_id                     = data.azurerm_subnet.external.id
-#     private_ip_address_allocation = "Dynamic"
-#     primary                       = true
-#     public_ip_address_id          = azurerm_public_ip.vm02selfpip.id
-#   }
-
-#   tags = {
-#     owner                     = var.resourceOwner
-#     f5_cloud_failover_label   = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
-#     f5_cloud_failover_nic_map = "external"
-#   }
-# }
-
-# # Create NIC for Internal
-# resource "azurerm_network_interface" "vm01-int-nic" {
-#   name                 = format("%s-vm01-int-%s", var.projectPrefix, random_id.buildSuffix.hex)
-#   location             = azurerm_resource_group.main.location
-#   resource_group_name  = azurerm_resource_group.main.name
-#   enable_ip_forwarding = true
-
-#   ip_configuration {
-#     name                          = "primary"
-#     subnet_id                     = data.azurerm_subnet.internal.id
-#     private_ip_address_allocation = "Dynamic"
-#     primary                       = true
-#   }
-
-#   tags = {
-#     owner                     = var.resourceOwner
-#     f5_cloud_failover_label   = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
-#     f5_cloud_failover_nic_map = "internal"
-#   }
-# }
-
-# resource "azurerm_network_interface" "vm02-int-nic" {
-#   name                 = format("%s-vm02-int-%s", var.projectPrefix, random_id.buildSuffix.hex)
-#   location             = azurerm_resource_group.main.location
-#   resource_group_name  = azurerm_resource_group.main.name
-#   enable_ip_forwarding = true
-
-#   ip_configuration {
-#     name                          = "primary"
-#     subnet_id                     = data.azurerm_subnet.internal.id
-#     private_ip_address_allocation = "Dynamic"
-#     primary                       = true
-#   }
-
-#   tags = {
-#     owner                     = var.resourceOwner
-#     f5_cloud_failover_label   = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
-#     f5_cloud_failover_nic_map = "internal"
-#   }
-# }
-
 ############################ Onboard Scripts ############################
 
 # Setup Onboarding scripts
@@ -262,94 +170,6 @@ module "bigip2" {
   #az_user_identity           = var.user_identity
 }
 
-
-# # Create F5 BIG-IP VMs
-# resource "azurerm_linux_virtual_machine" "f5vm01" {
-#   name                  = format("%s-f5vm01-%s", var.projectPrefix, random_id.buildSuffix.hex)
-#   location              = azurerm_resource_group.main.location
-#   resource_group_name   = azurerm_resource_group.main.name
-#   zone                  = 1
-#   network_interface_ids = [azurerm_network_interface.vm01-mgmt-nic.id, azurerm_network_interface.vm01-ext-nic.id, azurerm_network_interface.vm01-int-nic.id]
-#   size                  = var.instance_type
-#   admin_username        = var.f5_username
-#   custom_data           = base64encode(local.f5_onboard1)
-
-#   admin_ssh_key {
-#     username   = var.f5_username
-#     public_key = var.ssh_key
-#   }
-
-#   os_disk {
-#     name                 = format("%s-vm01-osdisk-%s", var.projectPrefix, random_id.buildSuffix.hex)
-#     caching              = "ReadWrite"
-#     storage_account_type = "Standard_LRS"
-#   }
-
-#   source_image_reference {
-#     publisher = "f5-networks"
-#     offer     = var.product
-#     sku       = var.image_name
-#     version   = var.bigip_version
-#   }
-
-#   plan {
-#     name      = var.image_name
-#     publisher = "f5-networks"
-#     product   = var.product
-#   }
-
-#   identity {
-#     type = "SystemAssigned"
-#   }
-
-#   tags = {
-#     owner = var.resourceOwner
-#   }
-# }
-
-# resource "azurerm_linux_virtual_machine" "f5vm02" {
-#   name                  = format("%s-f5vm02-%s", var.projectPrefix, random_id.buildSuffix.hex)
-#   location              = azurerm_resource_group.main.location
-#   resource_group_name   = azurerm_resource_group.main.name
-#   zone                  = 2
-#   network_interface_ids = [azurerm_network_interface.vm02-mgmt-nic.id, azurerm_network_interface.vm02-ext-nic.id, azurerm_network_interface.vm02-int-nic.id]
-#   size                  = var.instance_type
-#   admin_username        = var.f5_username
-#   custom_data           = base64encode(local.f5_onboard2)
-
-#   admin_ssh_key {
-#     username   = var.f5_username
-#     public_key = var.ssh_key
-#   }
-
-#   os_disk {
-#     name                 = format("%s-vm02-osdisk-%s", var.projectPrefix, random_id.buildSuffix.hex)
-#     caching              = "ReadWrite"
-#     storage_account_type = "Standard_LRS"
-#   }
-
-#   source_image_reference {
-#     publisher = "f5-networks"
-#     offer     = var.product
-#     sku       = var.image_name
-#     version   = var.bigip_version
-#   }
-
-#   plan {
-#     name      = var.image_name
-#     publisher = "f5-networks"
-#     product   = var.product
-#   }
-
-#   identity {
-#     type = "SystemAssigned"
-#   }
-
-#   tags = {
-#     owner = var.resourceOwner
-#   }
-# }
-
 ############################ Assign Managed Identity to VMs ############################
 
 # Retrieve VM info
@@ -386,45 +206,80 @@ resource "azurerm_role_assignment" "f5vm02" {
 
 ############################ Route Tables ############################
 
-# # Create Route Table
-# resource "azurerm_route_table" "udr" {
-#   name                          = format("%s-udr-%s", var.projectPrefix, random_id.buildSuffix.hex)
-#   location                      = azurerm_resource_group.main.location
-#   resource_group_name           = azurerm_resource_group.main.name
-#   disable_bgp_route_propagation = false
+# Create Route Table
+resource "azurerm_route_table" "udr" {
+  name                          = format("%s-udr-%s", var.projectPrefix, random_id.buildSuffix.hex)
+  location                      = azurerm_resource_group.main.location
+  resource_group_name           = azurerm_resource_group.main.name
+  disable_bgp_route_propagation = false
 
-#   route {
-#     name                   = "route1"
-#     address_prefix         = var.cfe_managed_route
-#     next_hop_type          = "VirtualAppliance"
-#     next_hop_in_ip_address = azurerm_network_interface.vm02-ext-nic.private_ip_address
-#   }
+  route {
+    name                   = "route1"
+    address_prefix         = var.cfe_managed_route
+    next_hop_type          = "VirtualAppliance"
+    next_hop_in_ip_address = module.bigip2.private_addresses["public_private"]["private_ip"][0]
+  }
 
-#   tags = {
-#     owner                   = var.resourceOwner
-#     f5_cloud_failover_label = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
-#     f5_self_ips             = "${azurerm_network_interface.vm01-ext-nic.private_ip_address},${azurerm_network_interface.vm02-ext-nic.private_ip_address}"
-#   }
-# }
+  tags = {
+    owner                   = var.resourceOwner
+    f5_cloud_failover_label = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
+    f5_self_ips             = "${module.bigip.private_addresses["public_private"]["private_ip"][0]},${module.bigip2.private_addresses["public_private"]["private_ip"][0]}"
+  }
+}
+
+############################ Collect Network Info ############################
+
+# JeffGiroux  Needed as workaround.
+#             Currenly the BIG-IP module does not support
+#             tagging of NICs. Cloud Failover Extension for
+#             Azure has pre-reqs and some items need tagging.
+#
+#             https://github.com/F5Networks/terraform-azure-bigip-module/issues/33
+
+# BIG-IP 1 NIC info
+data "azurerm_network_interface" "bigip_ext" {
+  name                = format("%s-ext-nic-public-0", element(split("-f5vm01", element(split("/", module.bigip.bigip_instance_ids), 8)), 0))
+  resource_group_name = azurerm_resource_group.main.name
+}
+data "azurerm_network_interface" "bigip_int" {
+  name                = format("%s-int-nic0", element(split("-f5vm01", element(split("/", module.bigip.bigip_instance_ids), 8)), 0))
+  resource_group_name = azurerm_resource_group.main.name
+}
+
+# BIG-IP 2 NIC info
+data "azurerm_network_interface" "bigip2_ext" {
+  name                = format("%s-ext-nic-public-0", element(split("-f5vm01", element(split("/", module.bigip2.bigip_instance_ids), 8)), 0))
+  resource_group_name = azurerm_resource_group.main.name
+}
+data "azurerm_network_interface" "bigip2_int" {
+  name                = format("%s-int-nic0", element(split("-f5vm01", element(split("/", module.bigip2.bigip_instance_ids), 8)), 0))
+  resource_group_name = azurerm_resource_group.main.name
+}
 
 ############################ Tagging ############################
 
-# resource "null_resource" "cluster" {
-#   # Changes to any instance of the cluster requires re-provisioning
-#   triggers = {
-#     bigip_instance_ids = join(",", aws_instance.cluster.*.id)
-#   }
+# Add Cloud Failover tags to BIG-IP 1 NICs
+resource "null_resource" "f5vm01_nic_tags" {
+  depends_on = [module.bigip]
+  # Running AZ CLI to add tags
+  provisioner "local-exec" {
+    command = <<-EOF
+      #!/bin/bash
+      az network nic update -g ${azurerm_resource_group.main.name} -n ${data.azurerm_network_interface.bigip_ext.name} --set tags.f5_cloud_failover_label=${format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)} tags.f5_cloud_failover_nic_map=external
+      az network nic update -g ${azurerm_resource_group.main.name} -n ${data.azurerm_network_interface.bigip_int.name} --set tags.f5_cloud_failover_label=${format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)} tags.f5_cloud_failover_nic_map=internal
+    EOF
+  }
+}
 
-#   # Bootstrap script can run on any instance of the cluster
-#   # So we just choose the first in this case
-#   connection {
-#     host = element(aws_instance.cluster.*.public_ip, 0)
-#   }
-
-#   provisioner "remote-exec" {
-#     # Bootstrap script called with private_ip of each node in the clutser
-#     inline = [
-#       "bootstrap-cluster.sh ${join(" ", aws_instance.cluster.*.private_ip)}",
-#     ]
-#   }
-# }
+# Add Cloud Failover tags to BIG-IP 2 NICs
+resource "null_resource" "f5vm02_nic_tags" {
+  depends_on = [module.bigip2]
+  # Running AZ CLI to add tags
+  provisioner "local-exec" {
+    command = <<-EOF
+      #!/bin/bash
+      az network nic update -g ${azurerm_resource_group.main.name} -n ${data.azurerm_network_interface.bigip2_ext.name} --set tags.f5_cloud_failover_label=${format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)} tags.f5_cloud_failover_nic_map=external
+      az network nic update -g ${azurerm_resource_group.main.name} -n ${data.azurerm_network_interface.bigip2_int.name} --set tags.f5_cloud_failover_label=${format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)} tags.f5_cloud_failover_nic_map=internal
+    EOF
+  }
+}
