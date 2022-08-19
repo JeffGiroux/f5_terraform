@@ -147,3 +147,5 @@ fileignoreconfig:
   checksum: 12b0919af82a9918840d755824b3d213fa0580c9027b3fc5d819f8dd121edaaf
 - filename: Azure/Autoscale_via_lb/README.md
   checksum: d2c9bd6b4dd26634bdd56de666296de37ec5cc1889629e36021a207cbd1e2eb4
+- filename: Azure/Autoscale_via_lb/terraform.tfvars.example
+  checksum: d289fe503d2cade83916cc872f62f13d4871f6751526d244106525287fff6320
