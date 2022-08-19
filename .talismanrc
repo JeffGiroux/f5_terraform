@@ -1,12 +1,12 @@
 fileignoreconfig:
+- filename: GCP/Standalone/bigip.tf
+  checksum: 7e79f9c83e46f2674f60a6981daba66b37e3b6e46b032c81e27c1e38e5518611
 - filename: GCP/Standalone/terraform.tfvars.example
-  checksum: c22be6470b040de169e95e88cf724b275d4154dcb1540831087eec19c55bb77e
+  checksum: 5b9e46504e0ba2f79e20862171d28cb32b79e956eca027461a7da25c23c94a9c
+- filename: GCP/Standalone/README.md
+  checksum: a31cf38a2b48d74e4881c877c5f49ed477ed16d5caf33692ece86c668fc06620
 - filename: GCP/Standalone/variables.tf
   checksum: 38814d0c8930fae605aa798d4b4c408d5519bc8c19f33e11d578eb9864d0c970
-- filename: GCP/Standalone/bigip.tf
-  checksum: d0bd7db45911680d47965e63b182bdba74c9dae552a3eb7b9a9455b1467d6c1e
-- filename: GCP/Standalone/README.md
-  checksum: b68b73aafa82d66475ae4fb25a91b087a0a8423872e38a1dbfd41fdeeba345b6
 - filename: GCP/Standalone/f5_onboard.tmpl
   checksum: 2183ee764c7691a2748947ad2b9a3249fabde9c526e54cd35a60dd95af00bd1f
 - filename: GCP/Standalone/examples/f5_onboard_with_ts.tmpl
