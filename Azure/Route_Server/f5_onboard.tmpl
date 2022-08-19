@@ -1,12 +1,10 @@
-#!/bin/bash -x
+#!/bin/bash
 
 # NOTE: Startup Script is run once / initialization only (Cloud-Init behavior vs. typical re-entrant for Azure Custom Script Extension )
 # For 15.1+ and above, Cloud-Init will run the script directly and can remove Azure Custom Script Extension
 
 
 mkdir -p  /var/log/cloud /config/cloud /var/config/rest/downloads
-
-
 LOG_FILE=/var/log/cloud/startup-script.log
 [[ ! -f $LOG_FILE ]] && touch $LOG_FILE || { echo "Run Only Once. Exiting"; exit; }
 npipe=/tmp/$$.tmp
@@ -24,27 +22,34 @@ exec 2>&1
 cat << 'EOF' > /config/cloud/runtime-init-conf.yaml
 ---
 runtime_parameters:
-  - name: HOST_NAME
-    type: metadata
-    metadataProvider:
-      environment: azure
-      type: compute
-      field: name
-  - name: REGION
-    type: url
-    value: http://169.254.169.254/metadata/instance/compute/location?api-version=2021-05-01&format=text
-    headers:
-      - name: Metadata
-        value: true
   - name: USER_NAME
     type: static
     value: ${f5_username}
-  - name: ADMIN_PASS
-    type: static
-    value: ${f5_password}
   - name: SSH_KEYS
     type: static
     value: ${ssh_keypair}
+EOF
+
+if ${az_keyvault_authentication}; then
+   cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
+  - name: ADMIN_PASS
+    type: secret
+    secretProvider:
+      environment: azure
+      type: KeyVault
+      vaultUrl: ${vault_url}
+      secretId: ${f5_password}
+EOF
+else
+   cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
+  - name: ADMIN_PASS
+    type: static
+    value: ${f5_password}
+EOF
+fi
+
+# Add remaining runtime_parameters
+cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
   - name: GATEWAY_EXTERNAL
     type: metadata
     metadataProvider:
@@ -52,6 +57,14 @@ runtime_parameters:
       type: network
       field: ipv4
       index: 1
+      ipcalc: first
+  - name: GATEWAY_INTERNAL
+    type: metadata
+    metadataProvider:
+      environment: azure
+      type: network
+      field: ipv4
+      index: 2
       ipcalc: first
   - name: SELF_IP_EXTERNAL
     type: metadata
@@ -78,11 +91,23 @@ runtime_parameters:
   - name: TIMEZONE
     type: static
     value: ${timezone}
+  - name: HOST_NAME
+    type: metadata
+    metadataProvider:
+      environment: azure
+      type: compute
+      field: name
+  - name: REGION
+    type: url
+    value: http://169.254.169.254/metadata/instance/compute/location?api-version=2021-05-01&format=text
+    headers:
+      - name: Metadata
+        value: true
 pre_onboard_enabled:
   - name: provision_rest
     type: inline
     commands:
-      - /usr/bin/setdb provision.extramb 1000
+      - /usr/bin/setdb provision.extramb 1024
       - /usr/bin/setdb restjavad.useextramb true
       - /usr/bin/setdb setup.run false
       - /usr/bin/setdb tmrouted.tmos.routing enable
@@ -95,9 +120,6 @@ extension_packages:
     - extensionType: as3
       extensionVersion: ${AS3_VER}
       extensionUrl: ${AS3_URL}
-    - extensionType: ts
-      extensionVersion: ${TS_VER}
-      extensionUrl: ${TS_URL}
 extension_services:
   service_operations:
     - extensionType: do
@@ -106,13 +128,13 @@ extension_services:
         schemaVersion: 1.0.0
         class: Device
         async: true
-        label: Onboard BIG-IP standalone
+        label: Onboard BIG-IP
         Common:
           class: Tenant
           dbVars:
             class: DbVariables
             restjavad.useextramb: true
-            provision.extramb: 1000
+            provision.extramb: 1024
             config.allow.rfc3927: enable
             ui.advisory.enabled: true
             ui.advisory.color: blue
@@ -205,8 +227,8 @@ for i in {1..30}; do
 done
 
 # Remove comment to do silly debugging on BIG-IP Runtime init
-#export F5_BIGIP_RUNTIME_INIT_LOG_LEVEL=silly
-#export F5_BIGIP_RUNTIME_EXTENSION_INSTALL_DELAY_IN_MS=60000
+# export F5_BIGIP_RUNTIME_INIT_LOG_LEVEL=silly
+# export F5_BIGIP_RUNTIME_EXTENSION_INSTALL_DELAY_IN_MS=60000
 
 # Install BIG-IP Runtime Init
 bash /var/config/rest/downloads/f5-bigip-runtime.gz.run -- '--cloud azure'
