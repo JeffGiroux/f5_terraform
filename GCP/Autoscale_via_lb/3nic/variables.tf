@@ -1,19 +1,9 @@
 # Variables
 
-variable "svc_acct" {
+variable "projectPrefix" {
   type        = string
-  default     = null
-  description = "Service Account for VM instance"
-}
-variable "telemetry_secret" {
-  type        = string
-  default     = ""
-  description = "Contains the value of the 'svc_acct' private key. Currently used for BIG-IP telemetry streaming to Google Cloud Monitoring (aka StackDriver). If you are not using this feature, you do not need this secret in Secret Manager."
-}
-variable "telemetry_privateKeyId" {
-  type        = string
-  default     = ""
-  description = "ID of private key for the 'svc_acct' used in Telemetry Streaming to Google Cloud Monitoring. If you are not using this feature, you do not need this secret in Secret Manager."
+  default     = "demo"
+  description = "This value is inserted at the beginning of each Google object (alpha-numeric, no special character)"
 }
 variable "gcp_project_id" {
   type        = string
@@ -29,11 +19,6 @@ variable "gcp_zone_1" {
   type        = string
   default     = "us-west1-a"
   description = "GCP Zone 1 for provider"
-}
-variable "projectPrefix" {
-  type        = string
-  default     = "demo"
-  description = "This value is inserted at the beginning of each Google object (alpha-numeric, no special character)"
 }
 variable "extVpc" {
   type        = string
@@ -138,31 +123,40 @@ variable "customUserData" {
 variable "f5_username" {
   type        = string
   default     = "admin"
-  description = "User name for the Virtual Machine"
+  description = "User name for the BIG-IP"
 }
 variable "f5_password" {
   type        = string
-  default     = null
-  description = "Password for the Virtual Machine"
-}
-variable "gcp_secret_manager_authentication" {
-  description = "Whether to use secret manager to pass authentication"
-  type        = bool
-  default     = false
-}
-variable "adminSrcAddr" {
-  type        = string
-  default     = "0.0.0.0/0"
-  description = "Trusted source network for admin access"
+  default     = "Default12345!"
+  description = "BIG-IP Password or Google secret name (value should be Google secret name when gcp_secret_manager_authentication = true, ex. my-bigip-secret)"
 }
 variable "ssh_key" {
   type        = string
+  description = "public key used for authentication in /path/file format (e.g. /.ssh/id_rsa.pub)"
+}
+variable "gcp_secret_manager_authentication" {
+  type        = bool
+  default     = false
+  description = "Whether to use secret manager to pass authentication"
+}
+variable "svc_acct" {
+  type        = string
   default     = null
-  description = "Path to the public key to be used for ssh access to the VM.  Only used with non-Windows vms and can be left as-is even if using Windows vms. If specifying a path to a certification on a Windows machine to provision a linux vm use the / in the path versus backslash. e.g. c:/home/id_rsa.pub"
+  description = "Service Account for VM instance"
+}
+variable "telemetry_secret" {
+  type        = string
+  default     = ""
+  description = "Contains the value of the 'svc_acct' private key. Currently used for BIG-IP telemetry streaming to Google Cloud Monitoring (aka StackDriver). If you are not using this feature, you do not need this secret in Secret Manager."
+}
+variable "telemetry_privateKeyId" {
+  type        = string
+  default     = ""
+  description = "ID of private key for the 'svc_acct' used in Telemetry Streaming to Google Cloud Monitoring. If you are not using this feature, you do not need this secret in Secret Manager."
 }
 variable "dns_server" {
   type        = string
-  default     = "8.8.8.8"
+  default     = "169.254.169.254"
   description = "Leave the default DNS server the BIG-IP uses, or replace the default DNS server with the one you want to use"
 }
 variable "dns_suffix" {
@@ -196,14 +190,18 @@ variable "TS_URL" {
   description = "URL to download the BIG-IP Telemetry Streaming module"
 }
 variable "FAST_URL" {
-  description = "URL to download the BIG-IP FAST module"
   type        = string
   default     = "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.19.0/f5-appsvcs-templates-1.19.0-1.noarch.rpm"
+  description = "URL to download the BIG-IP FAST module"
 }
 variable "INIT_URL" {
-  description = "URL to download the BIG-IP runtime init"
   type        = string
-  default     = "https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.5.0/dist/f5-bigip-runtime-init-1.5.0-1.gz.run"
+  default     = "https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.5.1/dist/f5-bigip-runtime-init-1.5.1-1.gz.run"
+  description = "URL to download the BIG-IP runtime init"
+}
+variable "libs_dir" {
+  type    = string
+  default = "https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.5.0/dist/f5-bigip-runtime-init-1.5.0-1.gz.run"
 }
 variable "bigIqHost" {
   type        = string
@@ -250,7 +248,7 @@ variable "bigIqHypervisor" {
   default     = "gce"
   description = "BIG-IQ hypervisor"
 }
-variable "owner" {
+variable "resourceOwner" {
   type        = string
   default     = null
   description = "This is a tag used for object creation. Example is last name."
