@@ -135,4 +135,4 @@ fileignoreconfig:
 - filename: Azure/HA_via_api/README.md
   checksum: 9b16846c840c40bf56332e81f895af12bde47900784babcc1a2ed73e6c93ba65
 - filename: Azure/HA_via_api/bigip.tf
-  checksum: f12b79b959c70f83ae1197ac80226ebc5c5c48eb672611a1e95aeb6f0e238f62
+  checksum: 6a4f8ac56d0e95088bc2afb1334f9bf56c7ad9eb0000c605c42209b3de4f2d56
