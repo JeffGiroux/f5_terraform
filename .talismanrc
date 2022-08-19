@@ -84,10 +84,10 @@ fileignoreconfig:
   checksum: e871e6e0c54e3dffc5d1c050fc32366f2cd2b8fca58f951e3343035b3102ae39
 - filename: Azure/Virtual_WAN/admin.auto.tfvars.example
   checksum: 272c0d4e5e09b5e93c8da3d5d47edbcda67022f4cc706ca3fe5f4ccca75d04d3
-- filename: Azure/Virtual_WAN/bigip.tf
-  checksum: 730ca9b5db7f2bd617ec24454a2c4bde03f215b6689b2e0ca3579b3447af65e6
 - filename: Azure/Virtual_WAN/f5_onboard.tmpl
-  checksum: 69b6921f46063b762a561f66d3cbbd351e9fe18574a488336807f7ad5cc48d22
+  checksum: 502be391eefbb1274db8de0563dcd668ad743e96b9279151c7044bfdb0f8f39b
+- filename: Azure/Virtual_WAN/bigip.tf
+  checksum: a713f4cf238feb5fd484c02badf9cb7dbe4dd1e7908b3547c78da4a58d1214a5
 - filename: Azure/Virtual_WAN/main.tf
   checksum: 77715c67eba3642043e05a1f439a186cd028f4d6e46ced7dbc9242a88894cec0
 - filename: Azure/Virtual_WAN/variables.tf
