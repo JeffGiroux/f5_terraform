@@ -332,8 +332,8 @@ extension_services:
               serviceMain:
                 class: Service_HTTP
                 virtualAddresses:
-                  - use: /Sample_01/Shared/ILB_serviceAddress
-                  - use: /Sample_01/Shared/GLB_serviceAddress
+                  - use: /Tenant_1/Shared/ILB_serviceAddress
+                  - use: /Tenant_1/Shared/GLB_serviceAddress
                 pool: web_pool
               web_pool:
                 class: Pool
@@ -351,7 +351,7 @@ extension_services:
                 remark: Health check listener for external GLB
                 virtualPort: 40000
                 virtualAddresses:
-                  - use: /Sample_01/Shared/GLB_serviceAddress
+                  - use: /Tenant_1/Shared/GLB_serviceAddress
                 iRules:
                   - monitor_respond_200
               monitor_respond_200:
@@ -364,7 +364,7 @@ extension_services:
                 remark: Health check listener for internal ILB
                 virtualPort: 40000
                 virtualAddresses:
-                  - use: /Sample_01/Shared/ILB_serviceAddress
+                  - use: /Tenant_1/Shared/ILB_serviceAddress
 post_onboard_enabled:
   - name: misc
     type: inline
