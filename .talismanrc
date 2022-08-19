@@ -153,3 +153,5 @@ fileignoreconfig:
   checksum: 70d747c3af894ca966951c35c992efad92761168454be9c2e55db1454a523b22
 - filename: GCP/HA_via_api/f5_onboard.tmpl
   checksum: ebabb91a8bad370778d6ae50f8a73aebc1defc7832772769f053d1298854b442
+- filename: GCP/HA_via_api/terraform.tfvars.example
+  checksum: 70d9b5d9460624ad223e4f6ee97ccc1060e4a05ed34649780f260ae0cf4f7b24
