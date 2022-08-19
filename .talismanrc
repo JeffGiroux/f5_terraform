@@ -49,14 +49,6 @@ fileignoreconfig:
   checksum: 08965ffcc489eea51c1beed3248845cf9f4ca4339a5aba279647fe10ac3c097a
 - filename: GCP/HA_via_lb/examples/f5_onboard_with_ts.tmpl
   checksum: 43b67531bdd14504532ad714fc459a70ba5004e68322cf0e1dc785bbfcb45e17
-- filename: GCP/HA_via_api/variables.tf
-  checksum: 241b3fac37b35ee35d3c17cd28af7bdf0cfd15a9120388700774a6e0b6a2dd3a
-- filename: GCP/HA_via_api/README.md
-  checksum: f935851a13ce7cdfb4b7fcb4b906f65178a04727a6460fc2cdf8c97b9ec87748
-- filename: GCP/HA_via_api/bigip.tf
-  checksum: 70d747c3af894ca966951c35c992efad92761168454be9c2e55db1454a523b22
-- filename: GCP/HA_via_api/f5_onboard.tmpl
-  checksum: ebabb91a8bad370778d6ae50f8a73aebc1defc7832772769f053d1298854b442
 - filename: GCP/Autoscale_via_lb/1nic/variables.tf
   checksum: 13eeeff7122ec254c26b4cd5cd225c01b90ac5437d233160ed5751fb09c59f60
 - filename: GCP/Autoscale_via_lb/1nic/README.md
@@ -153,3 +145,11 @@ fileignoreconfig:
   checksum: eb2042c0950dd3b84fce8c20ddcaee8a0dc4c7e3984545eb230eab08c8d3092b
 - filename: Azure/HA_via_lb/README.md
   checksum: 08fba57f9131339723abe3a8dfd4eea379501074fd18e5df9f8c0d79ca3c3a36
+- filename: GCP/HA_via_api/variables.tf
+  checksum: 241b3fac37b35ee35d3c17cd28af7bdf0cfd15a9120388700774a6e0b6a2dd3a
+- filename: GCP/HA_via_api/README.md
+  checksum: 794185fbcbcf60256f06ab91be3fe259f92bbf291ebe816cd6c054af91fd5928
+- filename: GCP/HA_via_api/bigip.tf
+  checksum: 70d747c3af894ca966951c35c992efad92761168454be9c2e55db1454a523b22
+- filename: GCP/HA_via_api/f5_onboard.tmpl
+  checksum: ebabb91a8bad370778d6ae50f8a73aebc1defc7832772769f053d1298854b442
