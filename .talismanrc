@@ -151,3 +151,5 @@ fileignoreconfig:
   checksum: d289fe503d2cade83916cc872f62f13d4871f6751526d244106525287fff6320
 - filename: Azure/Autoscale_via_lb/f5_onboard.tmpl
   checksum: 7161c71c4a8d5debd77a79a85b36066c4a0c1d25509ea18ac97951dded582683
+- filename: Azure/Autoscale_via_lb/bigip.tf
+  checksum: 94c284a6014a05539476cc5aef45bb4641bb553e8e20f30ad70cd6540c2796b8
