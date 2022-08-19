@@ -237,7 +237,7 @@ To run this Terraform template, perform the following steps:
       # BIG-IP Environment
       f5_username = "azureuser"
       f5_password = "Default12345!"
-      ssh_key     = "ssh-rsa REDACTED me@my.email"
+      ssh_key     = "~/.ssh/id_rsa.pub"
       vnet_rg     = "myVnetRg"
       vnet_name   = "myVnet123"
       mgmtSubnet  = "mgmt"

@@ -121,22 +121,22 @@ fileignoreconfig:
 - filename: AWS/Autoscale_via_lb/1nic/README.md
   checksum: d618e9950f03d65992d8e60a8409837bcd9d7d02a948427cc5a7144d0f81e5a5
 - filename: Azure/Standalone/terraform.tfvars.example
-  checksum: 6bc16fbe3aa786a6590f29a94356deb18fcc0758dff6e1a73539f14f3e3b4edb
+  checksum: 90c9e8606de019f6fc555a5a7acdf3110323ad8239340204b01be2b0a0538c0c
 - filename: Azure/Standalone/variables.tf
   checksum: 83b44e6b0cd5b9daf99ebab6850fe5932a72836f55834d0363257bba28a5bbd3
 - filename: Azure/Standalone/README.md
-  checksum: 74f54b6b3f318b3a1221cb9ae5dc729a2e59e71db86509d94d41eee652ff033f
+  checksum: 684c15675d5940bca687762302e06aea1551919abb5008eba56edde4c2ee3fde
 - filename: Azure/Standalone/f5_onboard.tmpl
   checksum: 24ae7bfa5dba46b78bcda6b839e80be7afd104444061a4f9cb06c2112f981e04
 - filename: Azure/Standalone/bigip.tf
   checksum: 6fd7bac702ab0754e4098b18e86e4bae41d82774da47ed934338eee7410f7864
-- filename: Azure/HA_via_api/terraform.tfvars.example
-  checksum: 347b7270bfca96a173e2033bff8de65dd172d1678671582dd1e4bcbc10d66011
 - filename: Azure/HA_via_api/variables.tf
   checksum: 6ee650cf46900cfe974b8c9eead31c67384c46460fcf755f56ffe6802f487ef6
 - filename: Azure/HA_via_api/f5_onboard.tmpl
   checksum: 5c1d0effa267028dcd2f8dee22671ed1eb9b9c72c97e7e6b42a3ebef059cea08
+- filename: Azure/HA_via_api/terraform.tfvars.example
+  checksum: 70a5a21a11d1757557426b7f9d9323ffca19cac2e4562301ab08a734c653bbdb
 - filename: Azure/HA_via_api/README.md
-  checksum: 9b16846c840c40bf56332e81f895af12bde47900784babcc1a2ed73e6c93ba65
+  checksum: f4b368720055bff162b49017d3f54e2d21c7e1cbe173038e69ee549ffa4ab31d
 - filename: Azure/HA_via_api/bigip.tf
   checksum: 6a4f8ac56d0e95088bc2afb1334f9bf56c7ad9eb0000c605c42209b3de4f2d56
