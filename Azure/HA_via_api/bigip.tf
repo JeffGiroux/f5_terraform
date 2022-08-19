@@ -117,7 +117,7 @@ locals {
     # cluster info
     host1                   = module.bigip.private_addresses["mgmt_private"]["private_ip"][0]
     host2                   = module.bigip2.private_addresses["mgmt_private"]["private_ip"][0]
-    remote_selfip_ext       = module.bigip2.private_addresses["public_private"]["private_ip"][0]
+    remote_selfip_ext       = module.bigip.private_addresses["public_private"]["private_ip"][0]
     vip_az1                 = local.vm01_vip_ips.app1.ip
     vip_az2                 = local.vm02_vip_ips.app1.ip
     f5_cloud_failover_label = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
