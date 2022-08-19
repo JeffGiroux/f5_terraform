@@ -60,7 +60,7 @@ The BIG-IP's configuration, now defined in a single convenient YAML or JSON [F5 
 ## Important Configuration Notes
 
 - Variables are configured in variables.tf
-- Sensitive variables like Google SSH keys are configured in terraform.tfvars.
+- Sensitive variables like Google SSH keys are configured in terraform.tfvars
   - ***Note***: Other items like BIG-IP password can be stored in Google Cloud Secret Manager. Refer to the [Prerequisites](#prerequisites).
   - The BIG-IP instance will query Google Metadata API to retrieve the service account's token for authentication.
   - The BIG-IP instance will then use the secret name and the service account's token to query Google Metadata API and dynamically retrieve the password for device onboarding.
