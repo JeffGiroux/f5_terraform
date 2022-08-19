@@ -1,4 +1,5 @@
 #!/bin/bash
+
 # Setup console and startup-script logging
 LOG_FILE=/var/log/cloud/startup-script.log
 [[ -f $LOG_FILE ]] || /usr/bin/touch $LOG_FILE
@@ -18,6 +19,9 @@ fi
 
 mkdir -p  /var/log/cloud /config/cloud /var/config/rest/downloads /var/lib/cloud/icontrollx_installs
 
+### write_files:
+# Download or Render BIG-IP Runtime Init Config
+
 
 # Create runtime configuration on first boot
 if [[ ! -f /config/nicswap_finished ]]; then
@@ -29,7 +33,7 @@ runtime_parameters:
     value: ${f5_username}
   - name: SSH_KEYS
     type: static
-    value: "${ssh_keypair}"
+    value: ${ssh_keypair}
 EOF
 
 if ${gcp_secret_manager_authentication}; then
@@ -50,7 +54,7 @@ else
 EOF
 fi
 
-
+# Add remaining runtime_parameters
 cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
   - name: GATEWAY_EXTERNAL
     type: metadata
@@ -156,12 +160,6 @@ cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
   - name: HOST2
     type: static
     value: ${host2}
-  - name: PUBLIC_VIP
-    type: static
-    value: ${public_vip}
-  - name: PRIVATE_VIP
-    type: static
-    value: ${private_vip}
   - name: FAILOVER_LABEL
     type: static
     value: ${f5_cloud_failover_label}
@@ -171,12 +169,19 @@ cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
   - name: REMOTE_SELF_IP_EXTERNAL
     type: static
     value: ${remote_selfip_ext}
+  - name: PUBLIC_VIP
+    type: static
+    value: ${public_vip}
+  - name: PRIVATE_VIP
+    type: static
+    value: ${private_vip}
 pre_onboard_enabled:
   - name: provision_rest
     type: inline
     commands:
       - /usr/bin/setdb provision.extramb 1024
       - /usr/bin/setdb restjavad.useextramb true
+      - /usr/bin/setdb setup.run false
 extension_packages:
   install_operations:
     - extensionType: do
@@ -347,8 +352,8 @@ extension_services:
           class: ADC
           schemaVersion: 3.0.0
           label: Sample 1
-          remark: An HTTP sample application
-          Sample_01:
+          remark: A HTTP sample application
+          Tenant_1:
             class: Tenant
             A1:
               class: Application
@@ -369,9 +374,11 @@ extension_services:
                     autoPopulate: true
                     hostname: httpbin.org
 post_onboard_enabled:
-  - name: misc
+  - name: trigger_failover
     type: inline
     commands:
+    - $(nohup bash /config/failover/tgactive &>/dev/null &)
+    - $(nohup tmsh modify cm device-group failoverGroup devices modify { '{{{ HOST2 }}}' { set-sync-leader } } &>/dev/null &)
     - tmsh save sys config
 EOF
 fi

@@ -1,21 +1,16 @@
 fileignoreconfig:
+- filename: GCP/Standalone/bigip.tf
+  checksum: 7e79f9c83e46f2674f60a6981daba66b37e3b6e46b032c81e27c1e38e5518611
 - filename: GCP/Standalone/terraform.tfvars.example
-  checksum: c22be6470b040de169e95e88cf724b275d4154dcb1540831087eec19c55bb77e
+  checksum: 5b9e46504e0ba2f79e20862171d28cb32b79e956eca027461a7da25c23c94a9c
+- filename: GCP/Standalone/README.md
+  checksum: a31cf38a2b48d74e4881c877c5f49ed477ed16d5caf33692ece86c668fc06620
 - filename: GCP/Standalone/variables.tf
   checksum: 38814d0c8930fae605aa798d4b4c408d5519bc8c19f33e11d578eb9864d0c970
-- filename: GCP/Standalone/bigip.tf
-  checksum: d0bd7db45911680d47965e63b182bdba74c9dae552a3eb7b9a9455b1467d6c1e
-- filename: GCP/Standalone/README.md
-  checksum: b68b73aafa82d66475ae4fb25a91b087a0a8423872e38a1dbfd41fdeeba345b6
 - filename: GCP/Standalone/f5_onboard.tmpl
   checksum: 2183ee764c7691a2748947ad2b9a3249fabde9c526e54cd35a60dd95af00bd1f
 - filename: GCP/Standalone/examples/f5_onboard_with_ts.tmpl
   checksum: 98ff92b95be5cc20170aa6f254196f08e08411861eff298fba7e5053adef63a2
-- filename: GCP/HA_via_lb/variables.tf
-  checksum: c8cd97c66f74f4dc9cfe29fedb007b982bc3876586648104badce67ebca6db1f
-- filename: GCP/HA_via_lb/terraform.tfvars.example
-  checksum: 8b82a38ba39debf0b8ce79388f554853affe3595016e777bd494049d449d0bb5
-- filename: GCP/HA_via_lb/README.md
   checksum: 256d71ef902b939820d527ce15980f417be3b64aba4e36de2cc824681c8a391b
 - filename: GCP/HA_via_api/terraform.tfvars.example
   checksum: f6ea35c21254781aa3bf2add99848730d6898ce9a4e3c44f4e072b5e1a458f71
@@ -43,40 +38,16 @@ fileignoreconfig:
   checksum: e13909723e31c2c9f6c9a9b681d6e22bc45e3ea95e06676271492f2c6c55fcc0
 - filename: Azure/HA_via_lb/README.md
   checksum: ee5190df812f75cfdb25b6d74e542f8ac3d4e7827830785c3b835b275a10c877
-- filename: GCP/HA_via_lb/bigip.tf
-  checksum: dd41614fb55fb82182518a62708c30b97323fd1a4c0c7da9a36bef376eec6d72
-- filename: GCP/HA_via_lb/f5_onboard.tmpl
-  checksum: 08965ffcc489eea51c1beed3248845cf9f4ca4339a5aba279647fe10ac3c097a
-- filename: GCP/HA_via_lb/examples/f5_onboard_with_ts.tmpl
-  checksum: 43b67531bdd14504532ad714fc459a70ba5004e68322cf0e1dc785bbfcb45e17
-- filename: GCP/HA_via_api/variables.tf
-  checksum: 241b3fac37b35ee35d3c17cd28af7bdf0cfd15a9120388700774a6e0b6a2dd3a
-- filename: GCP/HA_via_api/README.md
-  checksum: f935851a13ce7cdfb4b7fcb4b906f65178a04727a6460fc2cdf8c97b9ec87748
-- filename: GCP/HA_via_api/bigip.tf
-  checksum: 70d747c3af894ca966951c35c992efad92761168454be9c2e55db1454a523b22
-- filename: GCP/HA_via_api/f5_onboard.tmpl
-  checksum: ebabb91a8bad370778d6ae50f8a73aebc1defc7832772769f053d1298854b442
 - filename: GCP/Autoscale_via_lb/1nic/variables.tf
   checksum: 13eeeff7122ec254c26b4cd5cd225c01b90ac5437d233160ed5751fb09c59f60
 - filename: GCP/Autoscale_via_lb/1nic/README.md
-  checksum: 2114b3aeab499d1764c22d1fafa95093f396976ec6da476ce9b88b4c865180d1
+  checksum: 6f95989a90b5083c59ede4f3deb7f131e2701e8f7415b5f7ac3f941c2a77d48a
 - filename: GCP/Autoscale_via_lb/1nic/terraform.tfvars.example
-  checksum: fabd3e55dbd08266ec7df65213c8b8e7803e9a1edd4a1e943ba15a2f6c72d48e
+  checksum: f02c69332da41bfced23babca7269fd63944c4cd2972ffbd90c0d293ef8ae0ed
 - filename: GCP/Autoscale_via_lb/1nic/bigip.tf
-  checksum: 693d7bb2f6f0c721eacdf2d112fbece97bec76435bd7e502fd5fbfd85a922153
+  checksum: ccaa2c0e2a0233f174397604127df64a9eb36527538a107433f77c274991de5c
 - filename: GCP/Autoscale_via_lb/1nic/f5_onboard.tmpl
   checksum: 7b332ae1f15b9542c197ec2d4af8231fbc7ef7f64de2e4ce7e4310e16e3e6261
-- filename: GCP/Autoscale_via_lb/3nic/terraform.tfvars.example
-  checksum: 30b37ca5f811352fa4306611cee8c4bce14927f2946a5f244cc940c486ccd733
-- filename: GCP/Autoscale_via_lb/3nic/f5_onboard.tmpl
-  checksum: 0af4696712ac5ef0b8fe0ef8cf883b8eec36f8308a0487d395e7e643c21a8726
-- filename: GCP/Autoscale_via_lb/3nic/bigip.tf
-  checksum: deacc4c7791ee7efcd5eae25ec667b713d9780dcf6d9bb899eaf8a1442e995a1
-- filename: GCP/Autoscale_via_lb/3nic/variables.tf
-  checksum: 8688e82c29f35a3b64a5fde443f25af495e9a7eca1556ca67896560193a3642c
-- filename: GCP/Autoscale_via_lb/3nic/README.md
-  checksum: e871e6e0c54e3dffc5d1c050fc32366f2cd2b8fca58f951e3343035b3102ae39
 - filename: Azure/Virtual_WAN/admin.auto.tfvars.example
   checksum: 76faabc636c27b3a5169b7a7ae014c2800b8106fb339a6c84bcede44618f1034
 - filename: Azure/Virtual_WAN/f5_onboard.tmpl
@@ -129,8 +100,6 @@ fileignoreconfig:
   checksum: 5c1d0effa267028dcd2f8dee22671ed1eb9b9c72c97e7e6b42a3ebef059cea08
 - filename: Azure/HA_via_api/terraform.tfvars.example
   checksum: 70a5a21a11d1757557426b7f9d9323ffca19cac2e4562301ab08a734c653bbdb
-- filename: Azure/HA_via_api/README.md
-  checksum: f4b368720055bff162b49017d3f54e2d21c7e1cbe173038e69ee549ffa4ab31d
 - filename: Azure/HA_via_api/bigip.tf
   checksum: 6a4f8ac56d0e95088bc2afb1334f9bf56c7ad9eb0000c605c42209b3de4f2d56
 - filename: Azure/HA_via_lb/f5_onboard.tmpl
@@ -141,15 +110,49 @@ fileignoreconfig:
   checksum: 0d6d45c85b8f72a258bafa22f9f37056103f4f36ba015ebf6499288c1431aca6
 - filename: Azure/HA_via_lb/variables.tf
   checksum: 061fae589ce6854ca09f5c6dde00dcbadbcf16255bf74bcf09ee9316b6f80472
-- filename: Azure/HA_via_lb/README.md
-  checksum: c90f64f5dae5bb7616412c8a4420e67f8241f27debf35fcc4e39235e2d21f551
 - filename: Azure/Autoscale_via_lb/variables.tf
   checksum: 12b0919af82a9918840d755824b3d213fa0580c9027b3fc5d819f8dd121edaaf
-- filename: Azure/Autoscale_via_lb/README.md
-  checksum: d2c9bd6b4dd26634bdd56de666296de37ec5cc1889629e36021a207cbd1e2eb4
 - filename: Azure/Autoscale_via_lb/terraform.tfvars.example
   checksum: d289fe503d2cade83916cc872f62f13d4871f6751526d244106525287fff6320
 - filename: Azure/Autoscale_via_lb/f5_onboard.tmpl
   checksum: 7161c71c4a8d5debd77a79a85b36066c4a0c1d25509ea18ac97951dded582683
 - filename: Azure/Autoscale_via_lb/bigip.tf
   checksum: 94c284a6014a05539476cc5aef45bb4641bb553e8e20f30ad70cd6540c2796b8
+- filename: Azure/Autoscale_via_lb/README.md
+  checksum: 72f7f0b4e1570e7c86aa72f2b719c8cdecff01d3a427837fa5a771dbf768990f
+- filename: Azure/HA_via_api/README.md
+  checksum: eb2042c0950dd3b84fce8c20ddcaee8a0dc4c7e3984545eb230eab08c8d3092b
+- filename: Azure/HA_via_lb/README.md
+  checksum: 08fba57f9131339723abe3a8dfd4eea379501074fd18e5df9f8c0d79ca3c3a36
+- filename: GCP/HA_via_api/variables.tf
+  checksum: 241b3fac37b35ee35d3c17cd28af7bdf0cfd15a9120388700774a6e0b6a2dd3a
+- filename: GCP/HA_via_api/README.md
+  checksum: 794185fbcbcf60256f06ab91be3fe259f92bbf291ebe816cd6c054af91fd5928
+- filename: GCP/HA_via_api/bigip.tf
+  checksum: 37bcd8b3b9db7e298280e068f0587c4d904855b1a73dc3562ffb2c20c8da7946
+- filename: GCP/HA_via_api/f5_onboard.tmpl
+  checksum: ebabb91a8bad370778d6ae50f8a73aebc1defc7832772769f053d1298854b442
+- filename: GCP/HA_via_api/terraform.tfvars.example
+  checksum: 70d9b5d9460624ad223e4f6ee97ccc1060e4a05ed34649780f260ae0cf4f7b24
+- filename: GCP/HA_via_lb/variables.tf
+  checksum: c8cd97c66f74f4dc9cfe29fedb007b982bc3876586648104badce67ebca6db1f
+- filename: GCP/HA_via_lb/f5_onboard.tmpl
+  checksum: 08965ffcc489eea51c1beed3248845cf9f4ca4339a5aba279647fe10ac3c097a
+- filename: GCP/HA_via_lb/examples/f5_onboard_with_ts.tmpl
+  checksum: 43b67531bdd14504532ad714fc459a70ba5004e68322cf0e1dc785bbfcb45e17
+- filename: GCP/HA_via_lb/terraform.tfvars.example
+  checksum: d24ce9d6d04e698db731aee0c4b634fc2d4faa82c99e0fd4600dd5462abfcf24
+- filename: GCP/HA_via_lb/bigip.tf
+  checksum: 0a5cb82444ba8a264b23f2dc96ae671bbc671e5e27f040447c5a4131226b18f2
+- filename: GCP/HA_via_lb/README.md
+  checksum: ca5545a319c35c2c8f080e80b54555db3fd70398f82695b6ec615e84ef813147
+- filename: GCP/Autoscale_via_lb/3nic/terraform.tfvars.example
+  checksum: 4c4399f5e1f42b64301f72f1c9b0aabdc1c61f3313ff93b420d07ff16ac0e235
+- filename: GCP/Autoscale_via_lb/3nic/bigip.tf
+  checksum: 2eead7bd29245d22838dbcd467d508dc9b3a8e1ac644cc55e8f23566ea23ab54
+- filename: GCP/Autoscale_via_lb/3nic/README.md
+  checksum: 2d44c76a220006bb57079099c35e7922a5c6a7480d725ed22a6dd76e3a65b520
+- filename: GCP/Autoscale_via_lb/3nic/f5_onboard.tmpl
+  checksum: 0af4696712ac5ef0b8fe0ef8cf883b8eec36f8308a0487d395e7e643c21a8726
+- filename: GCP/Autoscale_via_lb/3nic/variables.tf
+  checksum: 8688e82c29f35a3b64a5fde443f25af495e9a7eca1556ca67896560193a3642c

@@ -1,4 +1,5 @@
 #!/bin/bash
+
 # Setup console and startup-script logging
 LOG_FILE=/var/log/cloud/startup-script.log
 [[ -f $LOG_FILE ]] || /usr/bin/touch $LOG_FILE
@@ -27,6 +28,10 @@ echo "Provisioning extra restjavad memory"
 /usr/bin/setdb provision.extramb 1024
 /usr/bin/setdb restjavad.useextramb true
 
+### write_files:
+# Download or Render BIG-IP Runtime Init Config
+
+
 # Create runtime configuration on first boot
 if [[ ! -f /config/nicswap_finished ]]; then
 cat << 'EOF' > /config/cloud/runtime-init-conf.yaml
@@ -37,7 +42,7 @@ runtime_parameters:
     value: ${f5_username}
   - name: SSH_KEYS
     type: static
-    value: "${ssh_keypair}"
+    value: ${ssh_keypair}
 EOF
 
 if ${gcp_secret_manager_authentication}; then
@@ -58,7 +63,7 @@ else
 EOF
 fi
 
-
+# Add remaining runtime_parameters
 cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
   - name: GATEWAY_EXTERNAL
     type: metadata
@@ -121,7 +126,13 @@ cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
   - name: PUBLIC_VIP
     type: static
     value: ${public_vip}
-pre_onboard_enabled: []
+pre_onboard_enabled:
+  - name: provision_rest
+    type: inline
+    commands:
+      - /usr/bin/setdb provision.extramb 1024
+      - /usr/bin/setdb restjavad.useextramb true
+      - /usr/bin/setdb setup.run false
 extension_packages:
   install_operations:
     - extensionType: do
@@ -167,7 +178,6 @@ extension_services:
             class: DNS
             nameServers:
               - '{{{ DNS_SERVER }}}'
-              - 2001:4860:4860::8844
             search:
               - '{{{ DNS_SUFFIX }}}'
               - f5.com
@@ -191,7 +201,7 @@ extension_services:
           class: ADC
           schemaVersion: 3.0.0
           label: Sample 1
-          remark: An HTTP sample application
+          remark: A HTTP sample application
           Common:
             class: Tenant
             Shared:
@@ -209,7 +219,7 @@ extension_services:
                   - '{{{ SELF_IP_EXTERNAL }}}'
                 iRules:
                   - mig_healthCheck_rule
-          Sample_01:
+          Tenant_1:
             class: Tenant
             Shared:
               class: Application
@@ -223,7 +233,7 @@ extension_services:
               serviceMain:
                 class: Service_HTTP
                 virtualAddresses:
-                  - use: /Sample_01/Shared/GLB_serviceAddress
+                  - use: /Tenant_1/Shared/GLB_serviceAddress
                 pool: web_pool
               web_pool:
                 class: Pool
@@ -241,7 +251,7 @@ extension_services:
                 remark: Health check listener for external GLB
                 virtualPort: 40000
                 virtualAddresses:
-                  - use: /Sample_01/Shared/GLB_serviceAddress
+                  - use: /Tenant_1/Shared/GLB_serviceAddress
                 iRules:
                   - monitor_respond_200
               monitor_respond_200:

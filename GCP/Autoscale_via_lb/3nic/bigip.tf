@@ -7,10 +7,11 @@ locals {
   f5_onboard1 = templatefile("${path.module}/f5_onboard.tmpl", {
     f5_username                       = var.f5_username
     f5_password                       = var.f5_password
+    gcp_secret_manager_authentication = var.gcp_secret_manager_authentication
+    ssh_keypair                       = file(var.ssh_key)
     svc_acct                          = var.svc_acct
     telemetry_secret                  = var.telemetry_secret
     telemetry_privateKeyId            = var.telemetry_privateKeyId
-    ssh_keypair                       = file(var.ssh_key)
     gcp_project_id                    = var.gcp_project_id
     INIT_URL                          = var.INIT_URL
     DO_URL                            = var.DO_URL
@@ -35,7 +36,6 @@ locals {
     bigIqUnitOfMeasure                = var.bigIqUnitOfMeasure
     bigIqHypervisor                   = var.bigIqHypervisor
     NIC_COUNT                         = true
-    gcp_secret_manager_authentication = var.gcp_secret_manager_authentication
     public_vip                        = google_compute_address.vip1.address
   })
 }
@@ -74,7 +74,7 @@ resource "google_compute_instance_template" "bigip" {
   }
 
   metadata = {
-    ssh-keys               = "${var.f5_username}:${var.ssh_key}"
+    ssh-keys               = "${var.f5_username}:${file(var.ssh_key)}"
     block-project-ssh-keys = true
     startup-script         = var.customImage != "" ? var.customUserData : local.f5_onboard1
   }
@@ -88,6 +88,8 @@ resource "google_compute_instance_template" "bigip" {
     create_before_destroy = true
   }
 }
+
+############################ Autoscaling ############################
 
 # Health Check for BIG-IP instance group for auto healing
 resource "google_compute_health_check" "bigip" {
@@ -107,7 +109,7 @@ resource "google_compute_region_instance_group_manager" "bigip" {
   name               = format("%s-igm-%s", var.projectPrefix, random_id.buildSuffix.hex)
   base_instance_name = format("%s-bigip", var.projectPrefix)
   region             = var.gcp_region
-  target_pools       = [google_compute_target_pool.bigip.id]
+  target_pools       = [google_compute_target_pool.f5vm.id]
   wait_for_instances = false
 
   version {
