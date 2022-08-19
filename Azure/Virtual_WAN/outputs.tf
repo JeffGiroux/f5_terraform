@@ -1,3 +1,5 @@
+# Outputs
+
 output "vnetIdNva" {
   description = "NVA VNet ID"
   value       = module.network["nva"].vnet_id
