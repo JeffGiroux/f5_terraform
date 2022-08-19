@@ -90,6 +90,10 @@ variable "f5_password" {
   default     = "Default12345!"
   description = "BIG-IP Password or Google secret name (value should be Google secret name when gcp_secret_manager_authentication = true, ex. my-bigip-secret)"
 }
+variable "ssh_key" {
+  type        = string
+  description = "public key used for authentication in /path/file format (e.g. /.ssh/id_rsa.pub)"
+}
 variable "gcp_secret_manager_authentication" {
   type        = bool
   default     = false
@@ -109,11 +113,6 @@ variable "telemetry_privateKeyId" {
   type        = string
   default     = ""
   description = "ID of private key for the 'svc_acct' used in Telemetry Streaming to Google Cloud Monitoring. If you are not using this feature, you do not need this secret in Secret Manager."
-}
-
-variable "ssh_key" {
-  type        = string
-  description = "public key used for authentication in /path/file format (e.g. /.ssh/id_rsa.pub)"
 }
 variable "license1" {
   type        = string
