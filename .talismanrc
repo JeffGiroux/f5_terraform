@@ -41,11 +41,11 @@ fileignoreconfig:
 - filename: GCP/Autoscale_via_lb/1nic/variables.tf
   checksum: 13eeeff7122ec254c26b4cd5cd225c01b90ac5437d233160ed5751fb09c59f60
 - filename: GCP/Autoscale_via_lb/1nic/README.md
-  checksum: 2114b3aeab499d1764c22d1fafa95093f396976ec6da476ce9b88b4c865180d1
+  checksum: 6f95989a90b5083c59ede4f3deb7f131e2701e8f7415b5f7ac3f941c2a77d48a
 - filename: GCP/Autoscale_via_lb/1nic/terraform.tfvars.example
-  checksum: fabd3e55dbd08266ec7df65213c8b8e7803e9a1edd4a1e943ba15a2f6c72d48e
+  checksum: f02c69332da41bfced23babca7269fd63944c4cd2972ffbd90c0d293ef8ae0ed
 - filename: GCP/Autoscale_via_lb/1nic/bigip.tf
-  checksum: 693d7bb2f6f0c721eacdf2d112fbece97bec76435bd7e502fd5fbfd85a922153
+  checksum: ccaa2c0e2a0233f174397604127df64a9eb36527538a107433f77c274991de5c
 - filename: GCP/Autoscale_via_lb/1nic/f5_onboard.tmpl
   checksum: 7b332ae1f15b9542c197ec2d4af8231fbc7ef7f64de2e4ce7e4310e16e3e6261
 - filename: GCP/Autoscale_via_lb/3nic/terraform.tfvars.example

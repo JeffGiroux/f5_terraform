@@ -11,14 +11,14 @@ resource "google_compute_address" "vip1" {
 resource "google_compute_forwarding_rule" "vip1" {
   name                  = format("%s-forwarding-rule-%s", var.projectPrefix, random_id.buildSuffix.hex)
   load_balancing_scheme = "EXTERNAL"
-  target                = google_compute_target_pool.bigip.id
+  target                = google_compute_target_pool.f5vm.id
   ip_address            = google_compute_address.vip1.address
   ip_protocol           = "TCP"
   port_range            = "1-65535"
 }
 
 # Target Pool for External LB
-resource "google_compute_target_pool" "bigip" {
+resource "google_compute_target_pool" "f5vm" {
   name = format("%s-target-pool-%s", var.projectPrefix, random_id.buildSuffix.hex)
   health_checks = [
     google_compute_http_health_check.hc-ext.name,
