@@ -61,6 +61,7 @@ module "bigip" {
   f5_ssh_publickey           = file(var.ssh_key)
   f5_username                = var.f5_username
   f5_instance_type           = var.instance_type
+  f5_image_name              = var.image_name
   f5_version                 = var.bigip_version
   custom_user_data           = local.f5_onboard1
   sleep_time                 = "30s"
