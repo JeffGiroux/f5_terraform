@@ -70,6 +70,7 @@ module "bigip" {
   resource_group_name        = azurerm_resource_group.main.name
   f5_instance_type           = var.instance_type
   f5_image_name              = var.image_name
+  f5_product_name            = var.product
   f5_version                 = var.bigip_version
   f5_username                = var.f5_username
   f5_ssh_publickey           = file(var.ssh_key)
