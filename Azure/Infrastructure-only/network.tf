@@ -130,19 +130,6 @@ resource "azurerm_network_security_group" "internal" {
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
 
-  security_rule {
-    name                       = "allow_internal"
-    description                = "Allow Internal to Internal"
-    priority                   = 110
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "*"
-    source_port_range          = "*"
-    destination_port_range     = "*"
-    source_address_prefix      = var.vnet_cidr
-    destination_address_prefix = var.vnet_cidr
-  }
-
   tags = {
     owner = var.resourceOwner
   }
