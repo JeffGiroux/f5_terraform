@@ -125,6 +125,29 @@ resource "azurerm_network_security_group" "external" {
   }
 }
 
+resource "azurerm_network_security_group" "internal" {
+  name                = format("%s-int-nsg-%s", var.projectPrefix, random_id.buildSuffix.hex)
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+
+  security_rule {
+    name                       = "allow_internal"
+    description                = "Allow Internal to Internal"
+    priority                   = 110
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = var.vnet_cidr
+    destination_address_prefix = var.vnet_cidr
+  }
+
+  tags = {
+    owner = var.resourceOwner
+  }
+}
+
 # Associate network security groups with subnets
 resource "azurerm_subnet_network_security_group_association" "mgmt" {
   subnet_id                 = azurerm_subnet.mgmt.id
@@ -134,4 +157,9 @@ resource "azurerm_subnet_network_security_group_association" "mgmt" {
 resource "azurerm_subnet_network_security_group_association" "external" {
   subnet_id                 = azurerm_subnet.external.id
   network_security_group_id = azurerm_network_security_group.external.id
+}
+
+resource "azurerm_subnet_network_security_group_association" "internal" {
+  subnet_id                 = azurerm_subnet.internal.id
+  network_security_group_id = azurerm_network_security_group.internal.id
 }

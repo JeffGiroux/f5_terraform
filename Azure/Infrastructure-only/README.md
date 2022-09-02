@@ -41,8 +41,8 @@ This solution uses a Terraform template to launch a new networking stack. It wil
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.19.1 |
-| <a name="provider_random"></a> [random](#provider\_random) | 3.3.2 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.21.1 |
+| <a name="provider_random"></a> [random](#provider\_random) | 3.4.2 |
 
 ## Modules
 
@@ -53,12 +53,14 @@ No modules.
 | Name | Type |
 |------|------|
 | [azurerm_network_security_group.external](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_group) | resource |
+| [azurerm_network_security_group.internal](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_group) | resource |
 | [azurerm_network_security_group.mgmt](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_group) | resource |
 | [azurerm_resource_group.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) | resource |
 | [azurerm_subnet.external](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
 | [azurerm_subnet.internal](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
 | [azurerm_subnet.mgmt](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
 | [azurerm_subnet_network_security_group_association.external](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_network_security_group_association) | resource |
+| [azurerm_subnet_network_security_group_association.internal](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_network_security_group_association) | resource |
 | [azurerm_subnet_network_security_group_association.mgmt](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_network_security_group_association) | resource |
 | [azurerm_virtual_network.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) | resource |
 | [random_id.buildSuffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
@@ -81,10 +83,13 @@ No modules.
 
 | Name | Description |
 |------|-------------|
+| <a name="output_external_security_group_name"></a> [external\_security\_group\_name](#output\_external\_security\_group\_name) | External security group name |
 | <a name="output_external_subnet_addresses"></a> [external\_subnet\_addresses](#output\_external\_subnet\_addresses) | External subnet address prefix |
 | <a name="output_external_subnet_name"></a> [external\_subnet\_name](#output\_external\_subnet\_name) | External subnet name |
+| <a name="output_internal_security_group_name"></a> [internal\_security\_group\_name](#output\_internal\_security\_group\_name) | Internal security group name |
 | <a name="output_internal_subnet_addresses"></a> [internal\_subnet\_addresses](#output\_internal\_subnet\_addresses) | Internal subnet address prefix |
 | <a name="output_internal_subnet_name"></a> [internal\_subnet\_name](#output\_internal\_subnet\_name) | Internal subnet name |
+| <a name="output_mgmt_security_group_name"></a> [mgmt\_security\_group\_name](#output\_mgmt\_security\_group\_name) | Management security group name |
 | <a name="output_mgmt_subnet_addresses"></a> [mgmt\_subnet\_addresses](#output\_mgmt\_subnet\_addresses) | Management subnet address prefix |
 | <a name="output_mgmt_subnet_name"></a> [mgmt\_subnet\_name](#output\_mgmt\_subnet\_name) | Management subnet name |
 | <a name="output_resource_group"></a> [resource\_group](#output\_resource\_group) | Resource group name |
