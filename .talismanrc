@@ -156,3 +156,7 @@ fileignoreconfig:
   checksum: 0af4696712ac5ef0b8fe0ef8cf883b8eec36f8308a0487d395e7e643c21a8726
 - filename: GCP/Autoscale_via_lb/3nic/variables.tf
   checksum: 8688e82c29f35a3b64a5fde443f25af495e9a7eca1556ca67896560193a3642c
+- filename: AWS/SSLO_GWLB/terraform.tfvars.example
+  checksum: d937a5175f8eae713f0d405a62c205f3709e98fe630131d75aaf3bdae9882fd9
+- filename: AWS/SSLO_GWLB/README.md
+  checksum: e08a70b8098bb7f9611e829cc0d217463fea9dcc521e07b43c0d01e74722da82
