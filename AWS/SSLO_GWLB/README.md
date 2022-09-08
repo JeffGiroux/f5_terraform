@@ -25,7 +25,7 @@ Note: There are many types of security inspection devices. This demo uses a seco
 The resulting deployment will consist of the following:
 
 - Security VPC and subnets
-  - 1x [BIG-IP SSL Orchestrator](https://www.f5.com/solutions/service-providers/big-ip-afm-ips-solution-overview)
+  - 1x BIG-IP SSL Orchestrator
   - 1x Inspection device running IPS (part of [BIG-IP Advanced Firewall Manager module](https://www.f5.com/solutions/service-providers/big-ip-afm-ips-solution-overview))
   - AWS GWLB
 - Application VPC and subnets
