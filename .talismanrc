@@ -158,5 +158,9 @@ fileignoreconfig:
   checksum: 8688e82c29f35a3b64a5fde443f25af495e9a7eca1556ca67896560193a3642c
 - filename: AWS/SSLO_GWLB/terraform.tfvars.example
   checksum: d937a5175f8eae713f0d405a62c205f3709e98fe630131d75aaf3bdae9882fd9
+- filename: AWS/SSLO_GWLB/bigip-sslo.tf
+  checksum: 109c8bc62d05c6758ce74aa6be03c7698520cafb47957c320f1b30c3e5d60804
+- filename: AWS/SSLO_GWLB/f5_onboard_sslo.tmpl
+  checksum: 5bafcd7bc7d8f619791ee7ada08ebbc6855a91991ce637a7139800d474621a26
 - filename: AWS/SSLO_GWLB/README.md
-  checksum: e08a70b8098bb7f9611e829cc0d217463fea9dcc521e07b43c0d01e74722da82
+  checksum: 3395648aca7c2f29cdedaed82578a0e81bfe7eb229293d51fdf9bb43a7be4003
