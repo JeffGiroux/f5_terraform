@@ -164,3 +164,5 @@ fileignoreconfig:
   checksum: 5bafcd7bc7d8f619791ee7ada08ebbc6855a91991ce637a7139800d474621a26
 - filename: AWS/SSLO_GWLB/README.md
   checksum: 3395648aca7c2f29cdedaed82578a0e81bfe7eb229293d51fdf9bb43a7be4003
+- filename: AWS/SSLO_GWLB/variables.tf
+  checksum: 83f6a8149c04d6dc260aa121f50e1f227041012cc7105140ca4a890b6f85b325
