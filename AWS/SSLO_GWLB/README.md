@@ -316,20 +316,16 @@ If the config fails, you should check where traffic is stopping. A good place to
 | Name | Description |
 |------|-------------|
 | <a name="output_sslo_dmz1"></a> [sslo\_dmz1](#output\_sslo\_dmz1) | f5vm01 dmz1 primary IP address (self IP) |
-| <a name="output_sslo_dmz1_nic_id"></a> [sslo\_dmz1\_nic\_id](#output\_sslo\_dmz1\_nic\_id) | f5vm01 dmz1 network interface ID |
 | <a name="output_sslo_dmz2"></a> [sslo\_dmz2](#output\_sslo\_dmz2) | f5vm01 dmz2 primary IP address (self IP) |
-| <a name="output_sslo_dmz2_nic_id"></a> [sslo\_dmz2\_nic\_id](#output\_sslo\_dmz2\_nic\_id) | f5vm01 dmz2 network interface ID |
 | <a name="output_sslo_dmz3"></a> [sslo\_dmz3](#output\_sslo\_dmz3) | f5vm01 dmz3 primary IP address (self IP) |
-| <a name="output_sslo_dmz3_nic_id"></a> [sslo\_dmz3\_nic\_id](#output\_sslo\_dmz3\_nic\_id) | f5vm01 dmz3 network interface ID |
 | <a name="output_sslo_dmz4"></a> [sslo\_dmz4](#output\_sslo\_dmz4) | f5vm01 dmz4 primary IP address (self IP) |
-| <a name="output_sslo_dmz4_nic_id"></a> [sslo\_dmz4\_nic\_id](#output\_sslo\_dmz4\_nic\_id) | f5vm01 dmz4 network interface ID |
 | <a name="output_sslo_external"></a> [sslo\_external](#output\_sslo\_external) | f5vm01 external primary IP address (self IP) |
-| <a name="output_sslo_external_nic_id"></a> [sslo\_external\_nic\_id](#output\_sslo\_external\_nic\_id) | f5vm01 external network interface ID |
 | <a name="output_sslo_internal"></a> [sslo\_internal](#output\_sslo\_internal) | f5vm01 internal primary IP address |
-| <a name="output_sslo_internal_nic_id"></a> [sslo\_internal\_nic\_id](#output\_sslo\_internal\_nic\_id) | f5vm01 internal network interface ID |
 | <a name="output_sslo_management"></a> [sslo\_management](#output\_sslo\_management) | f5vm01 management private IP address |
 | <a name="output_sslo_management_public_dns"></a> [sslo\_management\_public\_dns](#output\_sslo\_management\_public\_dns) | f5vm01 management public DNS |
 | <a name="output_sslo_management_public_ip"></a> [sslo\_management\_public\_ip](#output\_sslo\_management\_public\_ip) | f5vm01 management public IP address |
 | <a name="output_sslo_vip"></a> [sslo\_vip](#output\_sslo\_vip) | Public IP for the BIG-IP listener (VIP) |
+| <a name="output_webapp_private_ip"></a> [webapp\_private\_ip](#output\_webapp\_private\_ip) | Private IP address of the web app server |
+| <a name="output_webapp_public_ip"></a> [webapp\_public\_ip](#output\_webapp\_public\_ip) | Public IP address of the web app server |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 <!-- markdownlint-enable no-inline-html -->

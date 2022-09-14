@@ -40,34 +40,38 @@ output "sslo_vip" {
   description = "Public IP for the BIG-IP listener (VIP)"
   value       = module.bigipSslO.public_addresses["external_secondary_public"][0]
 }
-output "sslo_external_nic_id" {
-  description = "f5vm01 external network interface ID"
-  value       = module.bigipSslO.nic_ids["public_private"][0]
-}
-output "sslo_internal_nic_id" {
-  description = "f5vm01 internal network interface ID"
-  value       = module.bigipSslO.nic_ids["internal_private"][0]
-}
-output "sslo_dmz1_nic_id" {
-  description = "f5vm01 dmz1 network interface ID"
-  value       = module.bigipSslO.nic_ids["external_private"][0]
-}
-output "sslo_dmz2_nic_id" {
-  description = "f5vm01 dmz2 network interface ID"
-  value       = module.bigipSslO.nic_ids["external_private"][1]
-}
-output "sslo_dmz3_nic_id" {
-  description = "f5vm01 dmz3 network interface ID"
-  value       = module.bigipSslO.nic_ids["external_private"][2]
-}
-output "sslo_dmz4_nic_id" {
-  description = "f5vm01 dmz4 network interface ID"
-  value       = module.bigipSslO.nic_ids["external_private"][3]
-}
-# output "webapp_internal" {
-#   description = "Private IP address of the web app server"
-#   value       = module.webapp.private_ip
+# output "sslo_external_nic_id" {
+#   description = "f5vm01 external network interface ID"
+#   value       = module.bigipSslO.nic_ids["public_private"][0]
 # }
+# output "sslo_internal_nic_id" {
+#   description = "f5vm01 internal network interface ID"
+#   value       = module.bigipSslO.nic_ids["internal_private"][0]
+# }
+# output "sslo_dmz1_nic_id" {
+#   description = "f5vm01 dmz1 network interface ID"
+#   value       = module.bigipSslO.nic_ids["external_private"][0]
+# }
+# output "sslo_dmz2_nic_id" {
+#   description = "f5vm01 dmz2 network interface ID"
+#   value       = module.bigipSslO.nic_ids["external_private"][1]
+# }
+# output "sslo_dmz3_nic_id" {
+#   description = "f5vm01 dmz3 network interface ID"
+#   value       = module.bigipSslO.nic_ids["external_private"][2]
+# }
+# output "sslo_dmz4_nic_id" {
+#   description = "f5vm01 dmz4 network interface ID"
+#   value       = module.bigipSslO.nic_ids["external_private"][3]
+# }
+output "webapp_private_ip" {
+  description = "Private IP address of the web app server"
+  value       = module.webapp.private_ip
+}
+output "webapp_public_ip" {
+  description = "Public IP address of the web app server"
+  value       = module.webapp.public_ip
+}
 # output "inspection_service_ip_1" {
 #   description = "Private IP address of the Inspection Service #1"
 #   value       = aws_network_interface.inspection1["dmz1"].private_ip
