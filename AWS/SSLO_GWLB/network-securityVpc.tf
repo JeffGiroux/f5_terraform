@@ -10,19 +10,19 @@ module "securityVpc" {
   cidr                 = var.securityVpcCidr
   azs                  = [var.awsAz1, var.awsAz2]
   public_subnets       = var.securityExternalSubnets
-  intra_subnets        = var.securityInternalSubnets
+  private_subnets      = var.securityInternalSubnets
   enable_dns_hostnames = true
   public_subnet_tags = {
     Name = format("%s-securityVpc-external-%s", var.projectPrefix, random_id.buildSuffix.hex)
   }
   public_route_table_tags = {
-    Name = format("%s-securityVpc-external-%s", var.projectPrefix, random_id.buildSuffix.hex)
+    Name = format("%s-securityVpc-externalRtb-%s", var.projectPrefix, random_id.buildSuffix.hex)
   }
-  intra_subnet_tags = {
+  private_subnet_tags = {
     Name = format("%s-securityVpc-internal-%s", var.projectPrefix, random_id.buildSuffix.hex)
   }
-  intra_route_table_tags = {
-    Name = format("%s-securityVpc-internal-%s", var.projectPrefix, random_id.buildSuffix.hex)
+  private_route_table_tags = {
+    Name = format("%s-securityVpc-internalRtb-%s", var.projectPrefix, random_id.buildSuffix.hex)
   }
   tags = {
     Name  = format("%s-securityVpc-%s", var.projectPrefix, random_id.buildSuffix.hex)
@@ -135,7 +135,7 @@ resource "aws_subnet" "dmz4Az2" {
 ############################ Route Tables ############################
 
 # Create routes for dmz1
-resource "aws_route_table" "dmz1" {
+resource "aws_route_table" "dmz1Az1" {
   vpc_id = module.securityVpc.vpc_id
   route {
     cidr_block           = "0.0.0.0/0"
@@ -146,13 +146,28 @@ resource "aws_route_table" "dmz1" {
   #   network_interface_id = aws_network_interface.inspection1["dmz1"].id
   # }
   tags = {
-    Name  = format("%s-rt_inspection_device_1_dmz1-%s", var.projectPrefix, random_id.buildSuffix.hex)
+    Name  = format("%s-securityVpc-dmz1-inspection1Rtb-%s", var.projectPrefix, random_id.buildSuffix.hex)
+    Owner = var.resourceOwner
+  }
+}
+resource "aws_route_table" "dmz1Az2" {
+  vpc_id = module.securityVpc.vpc_id
+  route {
+    cidr_block           = "0.0.0.0/0"
+    network_interface_id = module.bigipSslO.nic_ids["external_private"][0]
+  }
+  # route {
+  #   cidr_block           = var.securityExternalSubnets[0]
+  #   network_interface_id = aws_network_interface.inspection1["dmz1"].id
+  # }
+  tags = {
+    Name  = format("%s-securityVpc-dmz1-inspection1Rtb-%s", var.projectPrefix, random_id.buildSuffix.hex)
     Owner = var.resourceOwner
   }
 }
 
 # Create routes for dmz2
-resource "aws_route_table" "dmz2" {
+resource "aws_route_table" "dmz2Az1" {
   vpc_id = module.securityVpc.vpc_id
   # route {
   #   cidr_block           = "0.0.0.0/0"
@@ -163,13 +178,28 @@ resource "aws_route_table" "dmz2" {
     network_interface_id = module.bigipSslO.nic_ids["external_private"][1]
   }
   tags = {
-    Name  = format("%s-rt_inspection_device_1_dmz2-%s", var.projectPrefix, random_id.buildSuffix.hex)
+    Name  = format("%s-securityVpc-dmz2-inspection1Rtb-%s", var.projectPrefix, random_id.buildSuffix.hex)
+    Owner = var.resourceOwner
+  }
+}
+resource "aws_route_table" "dmz2Az2" {
+  vpc_id = module.securityVpc.vpc_id
+  # route {
+  #   cidr_block           = "0.0.0.0/0"
+  #   network_interface_id = aws_network_interface.inspection1["dmz2"].id
+  # }
+  route {
+    cidr_block           = var.securityExternalSubnets[0]
+    network_interface_id = module.bigipSslO.nic_ids["external_private"][1]
+  }
+  tags = {
+    Name  = format("%s-securityVpc-dmz2-inspection1Rtb-%s", var.projectPrefix, random_id.buildSuffix.hex)
     Owner = var.resourceOwner
   }
 }
 
 # Create routes for dmz3
-resource "aws_route_table" "dmz3" {
+resource "aws_route_table" "dmz3Az1" {
   vpc_id = module.securityVpc.vpc_id
   route {
     cidr_block           = "0.0.0.0/0"
@@ -180,13 +210,28 @@ resource "aws_route_table" "dmz3" {
   #     network_interface_id = aws_network_interface.inspection2["dmz3"].id
   #   }
   tags = {
-    Name  = format("%s-rt_inspection_device_2_dmz3-%s", var.projectPrefix, random_id.buildSuffix.hex)
+    Name  = format("%s-securityVpc-dmz3-inspection2Rtb-%s", var.projectPrefix, random_id.buildSuffix.hex)
+    Owner = var.resourceOwner
+  }
+}
+resource "aws_route_table" "dmz3Az2" {
+  vpc_id = module.securityVpc.vpc_id
+  route {
+    cidr_block           = "0.0.0.0/0"
+    network_interface_id = module.bigipSslO.nic_ids["external_private"][2]
+  }
+  #   route {
+  #     cidr_block           = var.securityExternalSubnets[0]
+  #     network_interface_id = aws_network_interface.inspection2["dmz3"].id
+  #   }
+  tags = {
+    Name  = format("%s-securityVpc-dmz3-inspection2Rtb-%s", var.projectPrefix, random_id.buildSuffix.hex)
     Owner = var.resourceOwner
   }
 }
 
 # Create routes for dmz4
-resource "aws_route_table" "dmz4" {
+resource "aws_route_table" "dmz4Az1" {
   vpc_id = module.securityVpc.vpc_id
   #   route {
   #     cidr_block           = "0.0.0.0/0"
@@ -197,7 +242,22 @@ resource "aws_route_table" "dmz4" {
     network_interface_id = module.bigipSslO.nic_ids["external_private"][3]
   }
   tags = {
-    Name  = format("%s-rt_inspection_device_2_dmz4-%s", var.projectPrefix, random_id.buildSuffix.hex)
+    Name  = format("%s-securityVpc-dmz4-inspection2Rtb-%s", var.projectPrefix, random_id.buildSuffix.hex)
+    Owner = var.resourceOwner
+  }
+}
+resource "aws_route_table" "dmz4Az2" {
+  vpc_id = module.securityVpc.vpc_id
+  #   route {
+  #     cidr_block           = "0.0.0.0/0"
+  #     network_interface_id = aws_network_interface.inspection2["dmz4"].id
+  #   }
+  route {
+    cidr_block           = var.securityExternalSubnets[0]
+    network_interface_id = module.bigipSslO.nic_ids["external_private"][3]
+  }
+  tags = {
+    Name  = format("%s-securityVpc-dmz4-inspection2Rtb-%s", var.projectPrefix, random_id.buildSuffix.hex)
     Owner = var.resourceOwner
   }
 }
@@ -217,41 +277,41 @@ resource "aws_route_table_association" "mgmtAz2" {
 # Associate route table with dmz1
 resource "aws_route_table_association" "dmz1Az1" {
   subnet_id      = aws_subnet.dmz1Az1.id
-  route_table_id = aws_route_table.dmz1.id
+  route_table_id = aws_route_table.dmz1Az1.id
 }
 resource "aws_route_table_association" "dmz1Az2" {
   subnet_id      = aws_subnet.dmz1Az2.id
-  route_table_id = aws_route_table.dmz1.id
+  route_table_id = aws_route_table.dmz1Az2.id
 }
 
 # Associate route table with dmz2
 resource "aws_route_table_association" "dmz2Az1" {
   subnet_id      = aws_subnet.dmz2Az1.id
-  route_table_id = aws_route_table.dmz2.id
+  route_table_id = aws_route_table.dmz2Az1.id
 }
 resource "aws_route_table_association" "dmz2Az2" {
   subnet_id      = aws_subnet.dmz2Az2.id
-  route_table_id = aws_route_table.dmz2.id
+  route_table_id = aws_route_table.dmz2Az2.id
 }
 
 # Associate route table with dmz3
 resource "aws_route_table_association" "dmz3Az1" {
   subnet_id      = aws_subnet.dmz3Az1.id
-  route_table_id = aws_route_table.dmz3.id
+  route_table_id = aws_route_table.dmz3Az1.id
 }
 resource "aws_route_table_association" "dmz3Az2" {
   subnet_id      = aws_subnet.dmz3Az2.id
-  route_table_id = aws_route_table.dmz3.id
+  route_table_id = aws_route_table.dmz3Az2.id
 }
 
 # Associate route table with dmz4
 resource "aws_route_table_association" "dmz4Az1" {
   subnet_id      = aws_subnet.dmz4Az1.id
-  route_table_id = aws_route_table.dmz4.id
+  route_table_id = aws_route_table.dmz4Az1.id
 }
 resource "aws_route_table_association" "dmz4Az2" {
   subnet_id      = aws_subnet.dmz4Az2.id
-  route_table_id = aws_route_table.dmz4.id
+  route_table_id = aws_route_table.dmz4Az2.id
 }
 
 ############################ Security Groups ############################
@@ -307,6 +367,12 @@ resource "aws_security_group" "external" {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    from_port   = 6081
+    to_port     = 6081
+    protocol    = "udp"
     cidr_blocks = ["0.0.0.0/0"]
   }
   ingress {
