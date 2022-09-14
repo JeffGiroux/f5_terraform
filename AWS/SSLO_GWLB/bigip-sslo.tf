@@ -45,7 +45,7 @@ locals {
   }
   int_subnets = {
     internal = {
-      subnet_id          = module.securityVpc.intra_subnets[0]
+      subnet_id          = module.securityVpc.private_subnets[0]
       public_ip          = false
       private_ip_primary = "${cidrhost(var.securityInternalSubnets[0], 11)}"
     }
@@ -100,7 +100,7 @@ locals {
     f5_username            = var.f5_username
     f5_password            = var.aws_secretmanager_auth ? data.aws_secretsmanager_secret_version.current[0].secret_id : var.f5_password
     aws_secretmanager_auth = var.aws_secretmanager_auth
-    ssh_keypair            = aws_key_pair.bigip.key_name
+    ssh_keypair            = var.ssh_key
     INIT_URL               = var.INIT_URL
     DO_URL                 = var.DO_URL
     AS3_URL                = var.AS3_URL
@@ -110,7 +110,6 @@ locals {
     AS3_VER                = split("/", var.AS3_URL)[7]
     TS_VER                 = split("/", var.TS_URL)[7]
     FAST_VER               = split("/", var.FAST_URL)[7]
-    app_route_dest         = var.applicationVpcCidr
     sslo_pkg_name          = var.sslo_pkg_name
   })
 }
@@ -136,4 +135,11 @@ module "bigipSslO" {
   custom_user_data           = local.f5_onboard_sslo
   sleep_time                 = "30s"
   tags                       = local.tags
+}
+
+############################ GWLB Target Group Attachment ############################
+
+resource "aws_lb_target_group_attachment" "bigipSslO" {
+  target_group_arn = aws_lb_target_group.bigipSslO.arn
+  target_id        = local.ext_subnets.external.private_ip_primary
 }

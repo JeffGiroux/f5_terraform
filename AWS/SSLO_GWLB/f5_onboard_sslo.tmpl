@@ -171,7 +171,7 @@ extension_services:
           external:
             class: VLAN
             tag: 4094
-            mtu: 1500
+            mtu: 9001
             interfaces:
               - name: '1.1'
                 tagged: false
@@ -222,11 +222,18 @@ extension_services:
             interfaces:
               - name: '1.5'
                 tagged: false
-          app-route:
-            class: Route
-            gw: '{{{ GATEWAY_INTERNAL }}}'
-            network: ${app_route_dest}
-            mtu: 1500
+post_onboard_enabled:
+  - name: gwlb
+    type: inline
+    commands:
+      - tmsh create net tunnels tunnel geneve local-address '{{{ SELF_IP_EXTERNAL }}}' remote-address any profile geneve
+      - tmsh create net self geneve-tunnel address 10.131.0.1/24 vlan geneve allow-service all
+      - tmsh create net arp fake_arp_entry ip-address 10.131.0.2 mac-address ff:ff:ff:ff:ff:ff
+      - tmsh create ltm node geneve-tunnel address 10.131.0.2 monitor none
+      - tmsh create ltm pool geneve-tunnel members add { geneve-tunnel:0 } monitor none
+      - tmsh create ltm virtual forwarding_vs destination 0.0.0.0:any ip-protocol any vlans-enabled vlans add { geneve } translate-address disabled source-port preserve-strict pool geneve-tunnel mask any
+      - tmsh create ltm virtual health_check destination '{{{ SELF_IP_EXTERNAL }}}':80 ip-protocol tcp mask 255.255.255.255 profiles add { http tcp } vlans-enabled vlans add { external }
+      - tmsh save /sys config
 EOF
 
 # Download BIG-IP Runtime Init
