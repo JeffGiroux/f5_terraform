@@ -215,7 +215,7 @@ variable "resourceOwner" {
   description = "This is a tag used for object creation. Example is last name."
 }
 variable "keyvault_name" {
-  type = string
-  default = null
+  type        = string
+  default     = null
   description = "name of keyvault with big-ip password"
 }

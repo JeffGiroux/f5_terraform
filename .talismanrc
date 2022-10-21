@@ -156,3 +156,7 @@ fileignoreconfig:
   checksum: 0af4696712ac5ef0b8fe0ef8cf883b8eec36f8308a0487d395e7e643c21a8726
 - filename: GCP/Autoscale_via_lb/3nic/variables.tf
   checksum: 8688e82c29f35a3b64a5fde443f25af495e9a7eca1556ca67896560193a3642c
+- filename: Azure/HA_via_lb/main.tf
+  checksum: ab329d3e637cad741c47b00196020168196409b6349ddbe2e32d5606fa591728
+- filename: Azure/HA_via_lb/README.md
+  checksum: a41333a8f7f566a848b001a22b2e54bfd30008a061f0e8e0cc4b1e1a5cf47d72

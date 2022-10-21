@@ -136,7 +136,7 @@ module "bigip" {
   custom_user_data           = local.f5_onboard1
   sleep_time                 = "30s"
   tags                       = local.tags
-  user_identity           = var.user_identity != null ? data.azurerm_user_assigned_identity.main[0].id : null
+  user_identity              = var.user_identity != null ? data.azurerm_user_assigned_identity.main[0].id : null
 }
 
 module "bigip2" {
@@ -159,7 +159,7 @@ module "bigip2" {
   custom_user_data           = local.f5_onboard2
   sleep_time                 = "30s"
   tags                       = local.tags
-  user_identity           = var.user_identity != null ? data.azurerm_user_assigned_identity.main[0].id : null
+  user_identity              = var.user_identity != null ? data.azurerm_user_assigned_identity.main[0].id : null
 }
 
 ############################ ALB Backend Pool ############################
