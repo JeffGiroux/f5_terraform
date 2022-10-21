@@ -46,7 +46,7 @@ locals {
     f5_username                = var.f5_username
     f5_password                = var.f5_password
     az_keyvault_authentication = var.az_keyvault_authentication
-    vault_url                  = var.az_keyvault_authentication ? var.keyvault_url : ""
+    vault_url                  = var.az_keyvault_authentication ? data.azurerm_key_vault.main[0].vault_uri : ""
     ssh_keypair                = file(var.ssh_key)
     INIT_URL                   = var.INIT_URL
     DO_URL                     = var.DO_URL
@@ -81,7 +81,7 @@ locals {
     f5_username                = var.f5_username
     f5_password                = var.f5_password
     az_keyvault_authentication = var.az_keyvault_authentication
-    vault_url                  = var.az_keyvault_authentication ? var.keyvault_url : ""
+    vault_url                  = var.az_keyvault_authentication ? data.azurerm_key_vault.main[0].vault_uri : ""
     ssh_keypair                = file(var.ssh_key)
     INIT_URL                   = var.INIT_URL
     DO_URL                     = var.DO_URL
@@ -136,7 +136,7 @@ module "bigip" {
   custom_user_data           = local.f5_onboard1
   sleep_time                 = "30s"
   tags                       = local.tags
-  #az_user_identity           = var.user_identity
+  user_identity           = var.user_identity != null ? data.azurerm_user_assigned_identity.main[0].id : null
 }
 
 module "bigip2" {
@@ -159,7 +159,7 @@ module "bigip2" {
   custom_user_data           = local.f5_onboard2
   sleep_time                 = "30s"
   tags                       = local.tags
-  #az_user_identity           = var.user_identity
+  user_identity           = var.user_identity != null ? data.azurerm_user_assigned_identity.main[0].id : null
 }
 
 ############################ ALB Backend Pool ############################

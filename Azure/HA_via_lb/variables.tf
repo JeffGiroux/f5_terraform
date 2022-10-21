@@ -95,11 +95,6 @@ variable "az_keyvault_authentication" {
   default     = false
   description = "Whether to use key vault to pass authentication"
 }
-variable "keyvault_url" {
-  type        = string
-  default     = ""
-  description = "The URL of the Azure Key Vault to use (ex. https://myKeyVault123.vault.azure.net)"
-}
 variable "keyvault_rg" {
   type        = string
   default     = ""
@@ -218,4 +213,9 @@ variable "resourceOwner" {
   type        = string
   default     = null
   description = "This is a tag used for object creation. Example is last name."
+}
+variable "keyvault_name" {
+  type = string
+  default = null
+  description = "name of keyvault with big-ip password"
 }
