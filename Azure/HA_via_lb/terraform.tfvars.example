@@ -15,3 +15,9 @@ intNsg      = "intNsg"
 location      = "westus2"
 projectPrefix = "mydemo123"
 resourceOwner = "myLastName"
+
+# Keyvault integration. Comment out if not using
+az_keyvault_authentication = true
+keyvault_rg = "rmalloy-rg-f931"
+keyvault_name = "rmalloy-kv-f931"
+user_identity =  "bigipmanage"
