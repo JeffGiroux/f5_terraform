@@ -100,6 +100,11 @@ variable "keyvault_rg" {
   default     = ""
   description = "The name of the resource group in which the Azure Key Vault exists"
 }
+variable "keyvault_name" {
+  type        = string
+  default     = null
+  description = "Name of Key Vault with BIG-IP password"
+}
 variable "user_identity" {
   type        = string
   default     = null
@@ -213,9 +218,4 @@ variable "resourceOwner" {
   type        = string
   default     = null
   description = "This is a tag used for object creation. Example is last name."
-}
-variable "keyvault_name" {
-  type        = string
-  default     = null
-  description = "name of keyvault with big-ip password"
 }

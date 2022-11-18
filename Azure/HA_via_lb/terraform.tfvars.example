@@ -18,6 +18,6 @@ resourceOwner = "myLastName"
 
 # Keyvault integration. Comment out if not using
 az_keyvault_authentication = true
-keyvault_rg = "rmalloy-rg-f931"
-keyvault_name = "rmalloy-kv-f931"
-user_identity =  "bigipmanage"
+keyvault_rg = "myKv-rg-123"
+keyvault_name = "myKv-123"
+user_identity =  "myManagedId123"
