@@ -53,7 +53,7 @@ The BIG-IP's configuration, now defined in a single convenient YAML or JSON [F5 
   - If you require a new network first, see the [Infrastructure Only folder](../Infrastructure-only) to get started.
 - If this is the first time to deploy the F5 image, the subscription used in this deployment needs to be enabled to programatically deploy. For more information, please refer to [Configure Programatic Deployment](https://azure.microsoft.com/en-us/blog/working-with-marketplace-images-on-azure-resource-manager/)
 - You must accept the the legal terms of the F5 BIG-IP image in the Azure marketplace (see [az vm image accept-terms](https://docs.microsoft.com/en-us/cli/azure/vm/image?view=azure-cli-latest#az-vm-image-accept-terms))
-  - example = *az vm image accept-terms --urn f5-networks:f5-big-ip-best:f5-big-best-plus-hourly-200mbps:16.1.301000*
+  - example = *az vm image terms accept --urn f5-networks:f5-big-ip-best:f5-big-best-plus-hourly-200mbps:16.1.301000*
 
 ## Important Configuration Notes
 
