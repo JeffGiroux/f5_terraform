@@ -147,8 +147,8 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_bigip"></a> [bigip](#module\_bigip) | github.com/F5Networks/terraform-azure-bigip-module | n/a |
-| <a name="module_bigip2"></a> [bigip2](#module\_bigip2) | github.com/F5Networks/terraform-azure-bigip-module | n/a |
+| <a name="module_bigip"></a> [bigip](#module\_bigip) | github.com/F5Networks/terraform-azure-bigip-module | v1.2.5 |
+| <a name="module_bigip2"></a> [bigip2](#module\_bigip2) | github.com/F5Networks/terraform-azure-bigip-module | v1.2.5 |
 
 ## Resources
 

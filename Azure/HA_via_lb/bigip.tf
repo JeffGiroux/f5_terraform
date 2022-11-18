@@ -117,7 +117,7 @@ locals {
 
 # Create F5 BIG-IP VMs
 module "bigip" {
-  source                     = "github.com/F5Networks/terraform-azure-bigip-module"
+  source                     = "github.com/F5Networks/terraform-azure-bigip-module?ref=v1.2.5"
   prefix                     = var.projectPrefix
   resource_group_name        = azurerm_resource_group.main.name
   f5_instance_type           = var.instance_type
@@ -140,7 +140,7 @@ module "bigip" {
 }
 
 module "bigip2" {
-  source                     = "github.com/F5Networks/terraform-azure-bigip-module"
+  source                     = "github.com/F5Networks/terraform-azure-bigip-module?ref=v1.2.5"
   prefix                     = var.projectPrefix
   resource_group_name        = azurerm_resource_group.main.name
   f5_instance_type           = var.instance_type
