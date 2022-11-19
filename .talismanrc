@@ -107,7 +107,7 @@ fileignoreconfig:
 - filename: Azure/HA_via_lb/bigip.tf
   checksum: ca29f337fe94de85df675f2dd932aa457697a0f1f326cc9b3c8769a871f4f3e4
 - filename: Azure/HA_via_lb/terraform.tfvars.example
-  checksum: cf6a8ba3116c8ba7a9131f991fca0cda38583ada6e6dc947970fe58d1dd4a3e0
+  checksum: e5cccf46a78acdd923637fdc1f3e61c83ce43b17949ef40b23241742c2740399
 - filename: Azure/HA_via_lb/variables.tf
   checksum: 061fae589ce6854ca09f5c6dde00dcbadbcf16255bf74bcf09ee9316b6f80472
 - filename: Azure/Autoscale_via_lb/variables.tf
