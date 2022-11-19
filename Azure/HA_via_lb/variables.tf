@@ -77,7 +77,7 @@ variable "product" {
 }
 variable "bigip_version" {
   type        = string
-  default     = "16.1.301000"
+  default     = "16.1.302000"
   description = "BIG-IP Version"
 }
 variable "f5_username" {
