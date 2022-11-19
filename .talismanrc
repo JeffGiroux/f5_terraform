@@ -123,7 +123,7 @@ fileignoreconfig:
 - filename: Azure/HA_via_api/README.md
   checksum: eb2042c0950dd3b84fce8c20ddcaee8a0dc4c7e3984545eb230eab08c8d3092b
 - filename: Azure/HA_via_lb/README.md
-  checksum: 4b162d5b1f6b9f2af75ce4c0ddaf45fceee4917f1a0b4d6028d4bca3701281a8
+  checksum: 85a51e497f3a21ad5079342d8aa882793765be64b09e065a421b7b3ee8339d0d
 - filename: GCP/HA_via_api/variables.tf
   checksum: 241b3fac37b35ee35d3c17cd28af7bdf0cfd15a9120388700774a6e0b6a2dd3a
 - filename: GCP/HA_via_api/README.md
