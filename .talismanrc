@@ -75,7 +75,7 @@ fileignoreconfig:
 - filename: AWS/HA_via_api/variables.tf
   checksum: 979c385e3173d56e36f02cf05d8e66bfee4f4a20764368fe29ece85ca6cf49cb
 - filename: AWS/HA_via_api/README.md
-  checksum: d8e0c41bc1093631dd57eb33b23ff66802e5202367a04302e1949319a4933bd1
+  checksum: b063c7fdf70901964a1fb4b7877e1d74f30cce8bfcf7b663e84a8fd50d735c20
 - filename: AWS/Autoscale_via_lb/1nic/variables.tf
   checksum: b66042a0b339fd78deb79125c3ee6303fb0a743c121c3b44fb6c3255a00e1827
 - filename: AWS/Autoscale_via_lb/1nic/f5_onboard.tmpl

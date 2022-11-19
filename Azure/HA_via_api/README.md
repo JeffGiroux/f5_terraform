@@ -43,8 +43,8 @@ The BIG-IP's configuration, now defined in a single convenient YAML or JSON [F5 
 - Passwords and secrets can be located in [Azure Key Vault](https://docs.microsoft.com/en-us/azure/key-vault/general/overview).
   - Set *az_keyvault_authentication* to 'true'
   - Set *keyvault_rg* to the Azure Resource Group containing the Key Vault
-  - Set *keyvault_url* to the Azure Key Vault URL
-  - If *az_keyvault_authentication* is 'true', then 'f5_password' should be the Key Vault secret name. The secret contents should contain ONLY the password as plain text.
+  - Set *keyvault_name* to the Azure Key Vault name
+  - Set *keyvault_secret* to the Key Vault secret name. The secret contents should contain ONLY the password as plain text.
 - This templates deploys into an *EXISTING* networking stack. You are required to have an existing VNet, subnets, and security groups.
   - You must have a VNET with three (3) subnets: management, external, internal
   - Firewall rules are required to pass traffic to the application
@@ -279,6 +279,13 @@ To run this Terraform template, perform the following steps:
       location      = "westus2"
       projectPrefix = "mylab123"
       resourceOwner = "myLastName"
+
+      # Key Vault - Uncomment to use Key Vault integration
+      #az_keyvault_authentication = true
+      #keyvault_rg                = "myKv-rg-123"
+      #keyvault_name              = "myKv-123"
+      #user_identity              = "/subscriptions/xxxx/resourceGroups/myRg123/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myManagedId123"
+
   ```
   3. Initialize the directory
   ```
