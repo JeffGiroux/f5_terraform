@@ -60,8 +60,8 @@ locals {
     dns_server                 = var.dns_server
     ntp_server                 = var.ntp_server
     timezone                   = var.timezone
-    law_id                     = azurerm_log_analytics_workspace.law.workspace_id
-    law_primkey                = azurerm_log_analytics_workspace.law.primary_shared_key
+    law_id                     = azurerm_log_analytics_workspace.main.workspace_id
+    law_primkey                = azurerm_log_analytics_workspace.main.primary_shared_key
     bigIqLicenseType           = var.bigIqLicenseType
     bigIqHost                  = var.bigIqHost
     bigIqPassword              = var.bigIqPassword
@@ -95,8 +95,8 @@ locals {
     dns_server                 = var.dns_server
     ntp_server                 = var.ntp_server
     timezone                   = var.timezone
-    law_id                     = azurerm_log_analytics_workspace.law.workspace_id
-    law_primkey                = azurerm_log_analytics_workspace.law.primary_shared_key
+    law_id                     = azurerm_log_analytics_workspace.main.workspace_id
+    law_primkey                = azurerm_log_analytics_workspace.main.primary_shared_key
     bigIqLicenseType           = var.bigIqLicenseType
     bigIqHost                  = var.bigIqHost
     bigIqPassword              = var.bigIqPassword
