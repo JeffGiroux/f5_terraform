@@ -105,7 +105,7 @@ fileignoreconfig:
 - filename: Azure/HA_via_lb/f5_onboard.tmpl
   checksum: cb0193f299feeb26ca3640977c457a5801e175c025158a8060d7fab8549abb4d
 - filename: Azure/HA_via_lb/bigip.tf
-  checksum: a366bb35ef3426e59e2cc4edd1cbbda49f1c7281002ddda0496aeb34cd0c19fc
+  checksum: 7f7c217c07fafc2e65214476d49c3c6f84742ca13ff4ed3dcc438b2588df0c65
 - filename: Azure/HA_via_lb/terraform.tfvars.example
   checksum: cf6a8ba3116c8ba7a9131f991fca0cda38583ada6e6dc947970fe58d1dd4a3e0
 - filename: Azure/HA_via_lb/variables.tf
@@ -123,7 +123,7 @@ fileignoreconfig:
 - filename: Azure/HA_via_api/README.md
   checksum: eb2042c0950dd3b84fce8c20ddcaee8a0dc4c7e3984545eb230eab08c8d3092b
 - filename: Azure/HA_via_lb/README.md
-  checksum: 7c6ee63d9f94f4e454ac2b5a22f4922fe98256aa3553048475725a56a14f7e73
+  checksum: 4b162d5b1f6b9f2af75ce4c0ddaf45fceee4917f1a0b4d6028d4bca3701281a8
 - filename: GCP/HA_via_api/variables.tf
   checksum: 241b3fac37b35ee35d3c17cd28af7bdf0cfd15a9120388700774a6e0b6a2dd3a
 - filename: GCP/HA_via_api/README.md

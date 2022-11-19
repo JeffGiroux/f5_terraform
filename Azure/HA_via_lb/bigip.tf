@@ -137,6 +137,10 @@ module "bigip" {
   sleep_time                 = "30s"
   tags                       = local.tags
   user_identity              = var.user_identity != null ? data.azurerm_user_assigned_identity.main[0].id : null
+  az_keyvault_authentication = var.az_keyvault_authentication
+  azure_keyvault_name        = var.az_keyvault_authentication ? var.keyvault_name : ""
+  azure_keyvault_secret_name = var.az_keyvault_authentication ? var.f5_password : ""
+  azure_secret_rg            = var.az_keyvault_authentication ? var.keyvault_rg : ""
 }
 
 module "bigip2" {
@@ -160,6 +164,10 @@ module "bigip2" {
   sleep_time                 = "30s"
   tags                       = local.tags
   user_identity              = var.user_identity != null ? data.azurerm_user_assigned_identity.main[0].id : null
+  az_keyvault_authentication = var.az_keyvault_authentication
+  azure_keyvault_name        = var.az_keyvault_authentication ? var.keyvault_name : ""
+  azure_keyvault_secret_name = var.az_keyvault_authentication ? var.f5_password : ""
+  azure_secret_rg            = var.az_keyvault_authentication ? var.keyvault_rg : ""
 }
 
 ############################ ALB Backend Pool ############################

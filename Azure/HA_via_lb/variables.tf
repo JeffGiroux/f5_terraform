@@ -103,7 +103,12 @@ variable "keyvault_rg" {
 variable "keyvault_name" {
   type        = string
   default     = null
-  description = "Name of Key Vault with BIG-IP password"
+  description = "Name of Key Vault"
+}
+variable "keyvault_secret" {
+  type        = string
+  default     = null
+  description = "Name of Key Vault secret with BIG-IP password"
 }
 variable "user_identity" {
   type        = string
