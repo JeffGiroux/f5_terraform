@@ -141,7 +141,7 @@ fileignoreconfig:
 - filename: GCP/HA_via_lb/examples/f5_onboard_with_ts.tmpl
   checksum: 43b67531bdd14504532ad714fc459a70ba5004e68322cf0e1dc785bbfcb45e17
 - filename: GCP/HA_via_lb/terraform.tfvars.example
-  checksum: d24ce9d6d04e698db731aee0c4b634fc2d4faa82c99e0fd4600dd5462abfcf24
+  checksum: db69fd9e5a1d2f7f1691b7ca3b5c8730a21a5ae757aba08900c7d53af8f82e4c
 - filename: GCP/HA_via_lb/bigip.tf
   checksum: 0a5cb82444ba8a264b23f2dc96ae671bbc671e5e27f040447c5a4131226b18f2
 - filename: GCP/HA_via_lb/README.md
