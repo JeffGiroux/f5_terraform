@@ -15,3 +15,9 @@ intNsg      = "intNsg"
 location      = "westus2"
 projectPrefix = "mydemo123"
 resourceOwner = "myLastName"
+
+# Key Vault - Uncomment to use Key Vault integration
+#az_keyvault_authentication = true
+#keyvault_rg                = "myKv-rg-123"
+#keyvault_name              = "myKv-123"
+#user_identity              = "/subscriptions/xxxx/resourceGroups/myRg123/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myManagedId123"
