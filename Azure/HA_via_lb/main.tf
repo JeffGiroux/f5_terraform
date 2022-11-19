@@ -44,14 +44,14 @@ data "azurerm_subscription" "main" {
 
 # Managed Identity Info
 data "azurerm_user_assigned_identity" "main" {
-  count               = var.az_keyvault_authentication == true ? 1 : 0
+  count               = var.az_keyvault_authentication ? 1 : 0
   name                = split("/", var.user_identity)[8]
   resource_group_name = split("/", var.user_identity)[4]
 }
 
 # Key Vault info
 data "azurerm_key_vault" "main" {
-  count               = var.az_keyvault_authentication == true ? 1 : 0
+  count               = var.az_keyvault_authentication ? 1 : 0
   name                = var.keyvault_name
   resource_group_name = var.keyvault_rg
 }
