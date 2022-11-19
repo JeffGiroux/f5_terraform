@@ -136,11 +136,11 @@ module "bigip" {
   custom_user_data           = local.f5_onboard1
   sleep_time                 = "30s"
   tags                       = local.tags
-  user_identity              = var.user_identity != null ? data.azurerm_user_assigned_identity.main[0].id : null
   az_keyvault_authentication = var.az_keyvault_authentication
-  azure_keyvault_name        = var.az_keyvault_authentication ? var.keyvault_name : ""
-  azure_keyvault_secret_name = var.az_keyvault_authentication ? var.f5_password : ""
   azure_secret_rg            = var.az_keyvault_authentication ? var.keyvault_rg : ""
+  azure_keyvault_name        = var.az_keyvault_authentication ? var.keyvault_name : ""
+  azure_keyvault_secret_name = var.az_keyvault_authentication ? var.keyvault_secret : ""
+  user_identity              = var.az_keyvault_authentication ? data.azurerm_user_assigned_identity.main[0].id : null
 }
 
 module "bigip2" {
@@ -163,11 +163,11 @@ module "bigip2" {
   custom_user_data           = local.f5_onboard2
   sleep_time                 = "30s"
   tags                       = local.tags
-  user_identity              = var.user_identity != null ? data.azurerm_user_assigned_identity.main[0].id : null
   az_keyvault_authentication = var.az_keyvault_authentication
-  azure_keyvault_name        = var.az_keyvault_authentication ? var.keyvault_name : ""
-  azure_keyvault_secret_name = var.az_keyvault_authentication ? var.f5_password : ""
   azure_secret_rg            = var.az_keyvault_authentication ? var.keyvault_rg : ""
+  azure_keyvault_name        = var.az_keyvault_authentication ? var.keyvault_name : ""
+  azure_keyvault_secret_name = var.az_keyvault_authentication ? var.keyvault_secret : ""
+  user_identity              = var.az_keyvault_authentication ? data.azurerm_user_assigned_identity.main[0].id : null
 }
 
 ############################ ALB Backend Pool ############################
