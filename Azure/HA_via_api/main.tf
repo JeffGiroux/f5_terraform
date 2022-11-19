@@ -31,6 +31,19 @@ resource "azurerm_log_analytics_workspace" "main" {
   }
 }
 
+# Create the Storage Account
+resource "azurerm_storage_account" "main" {
+  name                     = format("%sstorage%s", var.projectPrefix, random_id.buildSuffix.hex)
+  resource_group_name      = azurerm_resource_group.main.name
+  location                 = azurerm_resource_group.main.location
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+  tags = {
+    owner                   = var.resourceOwner
+    f5_cloud_failover_label = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
+  }
+}
+
 # Subscription Info
 data "azurerm_subscription" "main" {
 }

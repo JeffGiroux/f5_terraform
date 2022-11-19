@@ -234,3 +234,19 @@ variable "resourceOwner" {
   default     = null
   description = "This is a tag used for object creation. Example is last name."
 }
+variable "externalnic_failover_tags" {
+  description = "key:value tags to apply to external nic resources built by the module"
+  type        = any
+  default = {
+    f5_cloud_failover_label   = "girouxfailover"
+    f5_cloud_failover_nic_map = "external"
+  }
+}
+variable "internalnic_failover_tags" {
+  description = "key:value tags to apply to external nic resources built by the module"
+  type        = any
+  default = {
+    f5_cloud_failover_label   = "girouxfailover"
+    f5_cloud_failover_nic_map = "internal"
+  }
+}

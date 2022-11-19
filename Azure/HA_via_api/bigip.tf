@@ -148,6 +148,8 @@ module "bigip" {
   custom_user_data           = local.f5_onboard1
   sleep_time                 = "30s"
   tags                       = local.tags
+  externalnic_failover_tags  = var.externalnic_failover_tags
+  internalnic_failover_tags  = var.internalnic_failover_tags
   az_keyvault_authentication = var.az_keyvault_authentication
   azure_secret_rg            = var.az_keyvault_authentication ? var.keyvault_rg : ""
   azure_keyvault_name        = var.az_keyvault_authentication ? var.keyvault_name : ""
@@ -175,6 +177,8 @@ module "bigip2" {
   custom_user_data           = local.f5_onboard2
   sleep_time                 = "30s"
   tags                       = local.tags
+  externalnic_failover_tags  = var.externalnic_failover_tags
+  internalnic_failover_tags  = var.internalnic_failover_tags
   az_keyvault_authentication = var.az_keyvault_authentication
   azure_secret_rg            = var.az_keyvault_authentication ? var.keyvault_rg : ""
   azure_keyvault_name        = var.az_keyvault_authentication ? var.keyvault_name : ""
@@ -236,62 +240,5 @@ resource "azurerm_route_table" "udr" {
     owner                   = var.resourceOwner
     f5_cloud_failover_label = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
     f5_self_ips             = "${module.bigip.private_addresses["public_private"]["private_ip"][0]},${module.bigip2.private_addresses["public_private"]["private_ip"][0]}"
-  }
-}
-
-############################ Collect Network Info ############################
-
-# JeffGiroux  Needed as workaround.
-#             Currenly the BIG-IP module does not support
-#             tagging of NICs. Cloud Failover Extension for
-#             Azure has pre-reqs and some items need tagging.
-#
-#             https://github.com/F5Networks/terraform-azure-bigip-module/issues/33
-
-# BIG-IP 1 NIC info
-data "azurerm_network_interface" "bigip_ext" {
-  name                = format("%s-ext-nic-public-0", element(split("-f5vm01", element(split("/", module.bigip.bigip_instance_ids), 8)), 0))
-  resource_group_name = azurerm_resource_group.main.name
-}
-data "azurerm_network_interface" "bigip_int" {
-  name                = format("%s-int-nic0", element(split("-f5vm01", element(split("/", module.bigip.bigip_instance_ids), 8)), 0))
-  resource_group_name = azurerm_resource_group.main.name
-}
-
-# BIG-IP 2 NIC info
-data "azurerm_network_interface" "bigip2_ext" {
-  name                = format("%s-ext-nic-public-0", element(split("-f5vm01", element(split("/", module.bigip2.bigip_instance_ids), 8)), 0))
-  resource_group_name = azurerm_resource_group.main.name
-}
-data "azurerm_network_interface" "bigip2_int" {
-  name                = format("%s-int-nic0", element(split("-f5vm01", element(split("/", module.bigip2.bigip_instance_ids), 8)), 0))
-  resource_group_name = azurerm_resource_group.main.name
-}
-
-############################ Tagging ############################
-
-# Add Cloud Failover tags to BIG-IP 1 NICs
-resource "null_resource" "f5vm01_nic_tags" {
-  depends_on = [module.bigip]
-  # Running AZ CLI to add tags
-  provisioner "local-exec" {
-    command = <<-EOF
-      #!/bin/bash
-      az network nic update -g ${azurerm_resource_group.main.name} -n ${data.azurerm_network_interface.bigip_ext.name} --set tags.f5_cloud_failover_label=${format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)} tags.f5_cloud_failover_nic_map=external
-      az network nic update -g ${azurerm_resource_group.main.name} -n ${data.azurerm_network_interface.bigip_int.name} --set tags.f5_cloud_failover_label=${format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)} tags.f5_cloud_failover_nic_map=internal
-    EOF
-  }
-}
-
-# Add Cloud Failover tags to BIG-IP 2 NICs
-resource "null_resource" "f5vm02_nic_tags" {
-  depends_on = [module.bigip2]
-  # Running AZ CLI to add tags
-  provisioner "local-exec" {
-    command = <<-EOF
-      #!/bin/bash
-      az network nic update -g ${azurerm_resource_group.main.name} -n ${data.azurerm_network_interface.bigip2_ext.name} --set tags.f5_cloud_failover_label=${format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)} tags.f5_cloud_failover_nic_map=external
-      az network nic update -g ${azurerm_resource_group.main.name} -n ${data.azurerm_network_interface.bigip2_int.name} --set tags.f5_cloud_failover_label=${format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)} tags.f5_cloud_failover_nic_map=internal
-    EOF
   }
 }
