@@ -85,7 +85,7 @@ fileignoreconfig:
 - filename: AWS/Autoscale_via_lb/1nic/README.md
   checksum: d618e9950f03d65992d8e60a8409837bcd9d7d02a948427cc5a7144d0f81e5a5
 - filename: Azure/Standalone/terraform.tfvars.example
-  checksum: 90c9e8606de019f6fc555a5a7acdf3110323ad8239340204b01be2b0a0538c0c
+  checksum: 30c74d5df038e79d8af2e55cc82c1445260a7df53d662c7f8b09b5e93e599900
 - filename: Azure/Standalone/variables.tf
   checksum: 83b44e6b0cd5b9daf99ebab6850fe5932a72836f55834d0363257bba28a5bbd3
 - filename: Azure/Standalone/README.md
@@ -93,7 +93,7 @@ fileignoreconfig:
 - filename: Azure/Standalone/f5_onboard.tmpl
   checksum: 24ae7bfa5dba46b78bcda6b839e80be7afd104444061a4f9cb06c2112f981e04
 - filename: Azure/Standalone/bigip.tf
-  checksum: 6fd7bac702ab0754e4098b18e86e4bae41d82774da47ed934338eee7410f7864
+  checksum: 93a2268f4b91a4f917689053a0d53a51966050f4ab0018a4a0bedde7ee2c2186
 - filename: Azure/HA_via_api/variables.tf
   checksum: b6db479be461eecb16f92a427bf671391f770276019967b12f38916ce024551d
 - filename: Azure/HA_via_api/f5_onboard.tmpl
