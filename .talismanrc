@@ -89,7 +89,7 @@ fileignoreconfig:
 - filename: Azure/Standalone/variables.tf
   checksum: 83b44e6b0cd5b9daf99ebab6850fe5932a72836f55834d0363257bba28a5bbd3
 - filename: Azure/Standalone/README.md
-  checksum: 684c15675d5940bca687762302e06aea1551919abb5008eba56edde4c2ee3fde
+  checksum: d0f0cfebdfa8c5de2af08f92540f8174bc212fb4baa716e9e0ad3aa162654fe8
 - filename: Azure/Standalone/f5_onboard.tmpl
   checksum: 24ae7bfa5dba46b78bcda6b839e80be7afd104444061a4f9cb06c2112f981e04
 - filename: Azure/Standalone/bigip.tf
@@ -162,3 +162,5 @@ fileignoreconfig:
   checksum: 0992b6e35279f722236498e9161ad2bd47c558ee902d5914df754412b968bf60
 - filename: Azure/HA_via_lb/README.md
   checksum: a41333a8f7f566a848b001a22b2e54bfd30008a061f0e8e0cc4b1e1a5cf47d72
+- filename: Azure/Standalone/main.tf
+  checksum: 8d06d59cfd9a54650d81efc21e941e8c4ee334dbc034489c9284c5597e25adbb
