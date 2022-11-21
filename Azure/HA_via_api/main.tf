@@ -40,7 +40,7 @@ resource "azurerm_storage_account" "main" {
   account_replication_type = "LRS"
   tags = {
     owner                   = var.resourceOwner
-    f5_cloud_failover_label = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
+    f5_cloud_failover_label = var.f5_cloud_failover_label
   }
 }
 
