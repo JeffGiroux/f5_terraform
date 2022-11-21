@@ -114,14 +114,16 @@ fileignoreconfig:
   checksum: 061fae589ce6854ca09f5c6dde00dcbadbcf16255bf74bcf09ee9316b6f80472
 - filename: Azure/Autoscale_via_lb/variables.tf
   checksum: 12b0919af82a9918840d755824b3d213fa0580c9027b3fc5d819f8dd121edaaf
-- filename: Azure/Autoscale_via_lb/terraform.tfvars.example
-  checksum: d289fe503d2cade83916cc872f62f13d4871f6751526d244106525287fff6320
 - filename: Azure/Autoscale_via_lb/f5_onboard.tmpl
   checksum: 7161c71c4a8d5debd77a79a85b36066c4a0c1d25509ea18ac97951dded582683
 - filename: Azure/Autoscale_via_lb/bigip.tf
-  checksum: 94c284a6014a05539476cc5aef45bb4641bb553e8e20f30ad70cd6540c2796b8
+  checksum: cf366463bfe0756f9fe8be78835bf9bbca0826ec1de813127eaa4f9da1a7c340
+- filename: Azure/Autoscale_via_lb/terraform.tfvars.example
+  checksum: b2bf7c4985643e048fee833cfa31d4e9be2fbe121eb0e8d3f17beecfd8f2e99f
+- filename: Azure/Autoscale_via_lb/main.tf
+  checksum: 0d799c754866bba5c35214bc509dd468880e595a7b81fa7d4dadfe191f1ea025
 - filename: Azure/Autoscale_via_lb/README.md
-  checksum: 72f7f0b4e1570e7c86aa72f2b719c8cdecff01d3a427837fa5a771dbf768990f
+  checksum: 56d140173706abdaf1318675205888d898b4154e54ddd8a6578fedfb0182d39c
 - filename: Azure/HA_via_api/README.md
   checksum: 51421bbdd57ec78b960ce2837b9eea2158514829ae8731687e152af2ba85e2f1
 - filename: Azure/HA_via_lb/README.md
