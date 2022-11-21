@@ -1,9 +1,7 @@
 # Deploying BIG-IP VEs in Azure - High Availability (Active/Standby): 3-NIC
 
 ## To Do
-- Community support only. Not F5 supported.
-- Document Azure Vault usage
-- Telemtry Streaming not used (see example folder)
+- Community support only. Template is not F5 supported.
 
 ## Issues
 - Find an issue? Fork, clone, create branch, fix and PR. I'll review and merge into the main branch. Or submit a GitHub issue with all necessary details and logs.
