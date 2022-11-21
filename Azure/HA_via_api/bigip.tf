@@ -79,7 +79,7 @@ locals {
     remote_selfip_ext       = module.bigip2.private_addresses["public_private"]["private_ip"][0]
     vip_az1                 = local.vm01_vip_ips.app1.ip
     vip_az2                 = local.vm02_vip_ips.app1.ip
-    f5_cloud_failover_label = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
+    f5_cloud_failover_label = var.f5_cloud_failover_label
     cfe_managed_route       = var.cfe_managed_route
   })
   f5_onboard2 = templatefile("${path.module}/f5_onboard.tmpl", {
@@ -120,7 +120,7 @@ locals {
     remote_selfip_ext       = module.bigip.private_addresses["public_private"]["private_ip"][0]
     vip_az1                 = local.vm01_vip_ips.app1.ip
     vip_az2                 = local.vm02_vip_ips.app1.ip
-    f5_cloud_failover_label = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
+    f5_cloud_failover_label = var.f5_cloud_failover_label
     cfe_managed_route       = var.cfe_managed_route
   })
 }
