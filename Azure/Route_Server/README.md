@@ -232,9 +232,9 @@ Use the following command to destroy all of the resources
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.32.0 |
-| <a name="provider_local"></a> [local](#provider\_local) | 2.2.3 |
-| <a name="provider_random"></a> [random](#provider\_random) | 3.4.3 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 3.32.0 |
+| <a name="provider_local"></a> [local](#provider\_local) | n/a |
+| <a name="provider_random"></a> [random](#provider\_random) | n/a |
 
 ## Modules
 

@@ -19,9 +19,9 @@ fileignoreconfig:
 - filename: Azure/Route_Server/admin.auto.tfvars.example
   checksum: 74279fdc0873bb6dbe0d7209377935bdf22c96219d7e7eee1132346eada2bc2c
 - filename: Azure/Route_Server/f5_onboard.tmpl
-  checksum: 85acd6830ca87fbf6856b309c2de80155513bea8bec7749cd0b763dfe1245fea
+  checksum: 7a2f76daa29c6f003eb7612ab4b5bd711bcf3f936e03f41aabebb1381c9c9415
 - filename: Azure/Route_Server/bigip.tf
-  checksum: bd27f9695972c8332a26c25d207a5aea364fa6a13371303f891aeeb292001b01
+  checksum: faeafa8ddd827c252ad5e177febb10286c699722f5eb2eff4777952d90a88693
 - filename: Azure/Route_Server/main.tf
   checksum: aa115b4e6c45dcea9fee08c2dfe52d9bf8678f19a6f889579becdb03e6b91cf4
 - filename: Azure/Route_Server/README.md
@@ -53,9 +53,9 @@ fileignoreconfig:
 - filename: Azure/Virtual_WAN/admin.auto.tfvars.example
   checksum: 84924c94605565e18f72fd5b70cfb72cc48fc58ca6d478fe52b2101fbfe5bc18
 - filename: Azure/Virtual_WAN/f5_onboard.tmpl
-  checksum: 502be391eefbb1274db8de0563dcd668ad743e96b9279151c7044bfdb0f8f39b
+  checksum: 0728fbac4410575b21947172e5d3464b3b368ee10b2ca268e00b250722cf754a
 - filename: Azure/Virtual_WAN/bigip.tf
-  checksum: 6d5848e74e5a709ced546f9157884631efd4fe287e3cb3abf11f657375b3be63
+  checksum: a9c6babf739d7419619a13940302f2f06839c7b4a94d8ade2f8a60d72f5dccb9
 - filename: Azure/Virtual_WAN/main.tf
   checksum: 29196d0e95c57b2b848c682d7326c8cd0cac9b701e9991885988196394bc8e73
 - filename: Azure/Virtual_WAN/variables.tf
@@ -93,23 +93,23 @@ fileignoreconfig:
 - filename: Azure/Standalone/README.md
   checksum: d0f0cfebdfa8c5de2af08f92540f8174bc212fb4baa716e9e0ad3aa162654fe8
 - filename: Azure/Standalone/f5_onboard.tmpl
-  checksum: 24ae7bfa5dba46b78bcda6b839e80be7afd104444061a4f9cb06c2112f981e04
+  checksum: 461b9db2b0bd95fc6116a5679607847faa88b2d30a24ed49d469b39571b0f488
 - filename: Azure/Standalone/bigip.tf
-  checksum: 93a2268f4b91a4f917689053a0d53a51966050f4ab0018a4a0bedde7ee2c2186
+  checksum: 7d36185221092fbdd0b6ddbbfda6736d77d8e4961bee864752e3533f54eb6121
 - filename: Azure/HA_via_api/variables.tf
   checksum: b6db479be461eecb16f92a427bf671391f770276019967b12f38916ce024551d
 - filename: Azure/HA_via_api/f5_onboard.tmpl
-  checksum: 5c1d0effa267028dcd2f8dee22671ed1eb9b9c72c97e7e6b42a3ebef059cea08
+  checksum: 7b99f5b8e8d23df7faabf58d965b72aa2ca26679650096098dbcad686e140543
 - filename: Azure/HA_via_api/terraform.tfvars.example
   checksum: 329c8f2cc424dd4fff1e258f89a59aba4b11f71759c0781dbf2de15ca160e09a
 - filename: Azure/HA_via_api/bigip.tf
-  checksum: 6d8dacb239d57e7bca400a1ab83269d2b662529522fe3e5278c080069320690e
+  checksum: 08291154423e2b56ceac6bd4babdc69682868cc78b086e59a61c3269696c2dfb
 - filename: Azure/HA_via_api/main.tf
   checksum: d7b2716e1d72811bbfebd3cee1eabff7385b2c056abe2babe451724507653bbe
 - filename: Azure/HA_via_lb/f5_onboard.tmpl
-  checksum: cb0193f299feeb26ca3640977c457a5801e175c025158a8060d7fab8549abb4d
+  checksum: 458a30bc27049215448ec52d37e500ab7dae93e8c4bfafe4aad5d0afb1ccb1e7
 - filename: Azure/HA_via_lb/bigip.tf
-  checksum: ca29f337fe94de85df675f2dd932aa457697a0f1f326cc9b3c8769a871f4f3e4
+  checksum: 1dc4afa381330b66c6a757c50ffa6418fd5de56f145e60f701dee820cefc19a2
 - filename: Azure/HA_via_lb/terraform.tfvars.example
   checksum: e5cccf46a78acdd923637fdc1f3e61c83ce43b17949ef40b23241742c2740399
 - filename: Azure/HA_via_lb/variables.tf
@@ -117,9 +117,9 @@ fileignoreconfig:
 - filename: Azure/Autoscale_via_lb/variables.tf
   checksum: 12b0919af82a9918840d755824b3d213fa0580c9027b3fc5d819f8dd121edaaf
 - filename: Azure/Autoscale_via_lb/f5_onboard.tmpl
-  checksum: 7161c71c4a8d5debd77a79a85b36066c4a0c1d25509ea18ac97951dded582683
+  checksum: 8f03e56e6e5df45cf64c66ce256e1f60a08adf35cb50bf44fb2be89681538580
 - filename: Azure/Autoscale_via_lb/bigip.tf
-  checksum: cf366463bfe0756f9fe8be78835bf9bbca0826ec1de813127eaa4f9da1a7c340
+  checksum: 235e182d24219f5189e6dadaa1982319b775791db266020f4fa9ac499008342f
 - filename: Azure/Autoscale_via_lb/terraform.tfvars.example
   checksum: b2bf7c4985643e048fee833cfa31d4e9be2fbe121eb0e8d3f17beecfd8f2e99f
 - filename: Azure/Autoscale_via_lb/main.tf
