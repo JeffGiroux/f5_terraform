@@ -22,7 +22,7 @@ output "f5vm01_ext_public_ip" {
 }
 output "f5vm01_ext_secondary_ip" {
   description = "f5vm01 external secondary IP address (VIP)"
-  value       = local.vm01_vip_ips.app1.ip
+  value       = element(flatten(module.bigip.private_addresses["public_private"]["private_ips"][0]), 1)
 }
 output "f5vm01_int_private_ip" {
   description = "f5vm01 internal primary IP address"
