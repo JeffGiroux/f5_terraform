@@ -86,7 +86,7 @@ variable "aws_secretmanager_secret_id" {
   default     = null
 }
 variable "aws_iam_instance_profile" {
-  description = "The ARN of the role instance profile to assign to the BIG-IP instance"
+  description = "Name of IAM role to assign to the BIG-IP instance"
   type        = string
   default     = null
 }
