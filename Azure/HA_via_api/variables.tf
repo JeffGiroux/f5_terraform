@@ -82,7 +82,7 @@ variable "product" {
 }
 variable "bigip_version" {
   type        = string
-  default     = "16.1.301000"
+  default     = "16.1.302000"
   description = "BIG-IP Version"
 }
 variable "f5_username" {
@@ -100,15 +100,20 @@ variable "az_keyvault_authentication" {
   default     = false
   description = "Whether to use key vault to pass authentication"
 }
-variable "keyvault_url" {
-  type        = string
-  default     = ""
-  description = "The URL of the Azure Key Vault to use (ex. https://myKeyVault123.vault.azure.net)"
-}
 variable "keyvault_rg" {
   type        = string
   default     = ""
   description = "The name of the resource group in which the Azure Key Vault exists"
+}
+variable "keyvault_name" {
+  type        = string
+  default     = null
+  description = "Name of Key Vault"
+}
+variable "keyvault_secret" {
+  type        = string
+  default     = null
+  description = "Name of Key Vault secret with BIG-IP password"
 }
 variable "user_identity" {
   type        = string
@@ -146,28 +151,28 @@ variable "timezone" {
 }
 variable "DO_URL" {
   type        = string
-  default     = "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.31.0/f5-declarative-onboarding-1.31.0-6.noarch.rpm"
+  default     = "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.34.0/f5-declarative-onboarding-1.34.0-5.noarch.rpm"
   description = "URL to download the BIG-IP Declarative Onboarding module"
 }
 variable "AS3_URL" {
   type        = string
-  default     = "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.38.0/f5-appsvcs-3.38.0-4.noarch.rpm"
+  default     = "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.41.0/f5-appsvcs-3.41.0-1.noarch.rpm"
   description = "URL to download the BIG-IP Application Service Extension 3 (AS3) module"
 }
 variable "TS_URL" {
   type        = string
-  default     = "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.30.0/f5-telemetry-1.30.0-1.noarch.rpm"
+  default     = "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.32.0/f5-telemetry-1.32.0-2.noarch.rpm"
   description = "URL to download the BIG-IP Telemetry Streaming module"
 }
 variable "FAST_URL" {
   type        = string
-  default     = "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.19.0/f5-appsvcs-templates-1.19.0-1.noarch.rpm"
+  default     = "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.22.0/f5-appsvcs-templates-1.22.0-1.noarch.rpm"
   description = "URL to download the BIG-IP FAST module"
 }
 variable "CFE_URL" {
   description = "URL to download the BIG-IP Cloud Failover Extension module"
   type        = string
-  default     = "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.12.0/f5-cloud-failover-1.12.0-0.noarch.rpm"
+  default     = "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.13.0/f5-cloud-failover-1.13.0-0.noarch.rpm"
 }
 variable "INIT_URL" {
   type        = string
@@ -228,4 +233,25 @@ variable "resourceOwner" {
   type        = string
   default     = null
   description = "This is a tag used for object creation. Example is last name."
+}
+variable "f5_cloud_failover_label" {
+  type        = string
+  default     = "myFailover"
+  description = "This is a tag used for F5 Cloud Failover extension. Must match value of 'f5_cloud_failover_label' in externalnic_failover_tags and internalnic_failover_tags."
+}
+variable "externalnic_failover_tags" {
+  description = "key:value tags to apply to external nic resources built by the module"
+  type        = any
+  default = {
+    f5_cloud_failover_label   = "myFailover"
+    f5_cloud_failover_nic_map = "external"
+  }
+}
+variable "internalnic_failover_tags" {
+  description = "key:value tags to apply to external nic resources built by the module"
+  type        = any
+  default = {
+    f5_cloud_failover_label   = "myFailover"
+    f5_cloud_failover_nic_map = "internal"
+  }
 }

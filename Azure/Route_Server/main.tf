@@ -172,6 +172,7 @@ module "network" {
   source              = "Azure/vnet/azurerm"
   resource_group_name = azurerm_resource_group.rg[each.key].name
   vnet_name           = format("%s-vnet-%s-%s", var.projectPrefix, each.key, random_id.buildSuffix.hex)
+  vnet_location       = each.value["location"]
   address_space       = each.value["addressSpace"]
   subnet_prefixes     = each.value["subnetPrefixes"]
   subnet_names        = each.value["subnetNames"]
@@ -187,8 +188,8 @@ module "network" {
   }
 
   tags = {
-    Name      = format("%s-vnet-%s-%s", var.resourceOwner, each.key, random_id.buildSuffix.hex)
-    Terraform = "true"
+    Name  = format("%s-vnet-%s-%s", var.resourceOwner, each.key, random_id.buildSuffix.hex)
+    owner = var.resourceOwner
   }
 }
 
@@ -257,8 +258,8 @@ resource "azurerm_virtual_hub" "routeServer" {
   depends_on          = [module.network["hub"].vnet_subnets]
 
   tags = {
-    Name      = format("%s-routeServer-%s", var.resourceOwner, random_id.buildSuffix.hex)
-    Terraform = "true"
+    Name  = format("%s-routeServer-%s", var.resourceOwner, random_id.buildSuffix.hex)
+    owner = var.resourceOwner
   }
 }
 
@@ -300,8 +301,8 @@ module "client" {
   remote_port         = "22"
 
   tags = {
-    Name      = format("%s-client-%s", var.resourceOwner, random_id.buildSuffix.hex)
-    Terraform = "true"
+    Name  = format("%s-client-%s", var.resourceOwner, random_id.buildSuffix.hex)
+    owner = var.resourceOwner
   }
 }
 
@@ -324,7 +325,49 @@ module "app" {
   custom_data         = data.local_file.appOnboard.content_base64
 
   tags = {
-    Name      = format("%s-app-%s", var.resourceOwner, random_id.buildSuffix.hex)
-    Terraform = "true"
+    Name  = format("%s-app-%s", var.resourceOwner, random_id.buildSuffix.hex)
+    owner = var.resourceOwner
   }
+}
+
+############################ Key Vault ############################
+
+# Subscription Info
+data "azurerm_subscription" "main" {
+}
+
+# Note: Jeff Giroux (REMOVE LATER)
+#       https://github.com/F5Networks/terraform-azure-bigip-module/issues/42
+#       The user_identity is not passed in BIG-IP module to the
+#       Key Vault policy. As a result, the Terraform auto created
+#       user identity is assigned the policy instead of the
+#       user-supplied managed identity.
+
+# Managed Identity Info
+data "azurerm_user_assigned_identity" "main" {
+  count               = var.az_keyvault_authentication ? 1 : 0
+  name                = split("/", var.user_identity)[8]
+  resource_group_name = split("/", var.user_identity)[4]
+}
+
+# Key Vault info
+data "azurerm_key_vault" "main" {
+  count               = var.az_keyvault_authentication ? 1 : 0
+  name                = var.keyvault_name
+  resource_group_name = var.keyvault_rg
+}
+
+# Create Key Vault policies
+resource "azurerm_key_vault_access_policy" "main" {
+  count        = var.az_keyvault_authentication ? 1 : 0
+  key_vault_id = data.azurerm_key_vault.main[0].id
+  tenant_id    = data.azurerm_subscription.main.tenant_id
+  object_id    = data.azurerm_user_assigned_identity.main[0].principal_id
+
+  key_permissions = [
+    "Get", "List", "Update", "Create", "Import", "Delete", "Recover", "Backup", "Restore",
+  ]
+  secret_permissions = [
+    "Get", "List", "Set", "Delete", "Recover", "Restore", "Backup", "Purge",
+  ]
 }

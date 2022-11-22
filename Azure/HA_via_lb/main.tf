@@ -20,7 +20,7 @@ resource "azurerm_resource_group" "main" {
 }
 
 # Create Log Analytic Workspace
-resource "azurerm_log_analytics_workspace" "law" {
+resource "azurerm_log_analytics_workspace" "main" {
   name                = format("%s-law-%s", var.projectPrefix, random_id.buildSuffix.hex)
   sku                 = "PerNode"
   retention_in_days   = 300
@@ -31,30 +31,42 @@ resource "azurerm_log_analytics_workspace" "law" {
   }
 }
 
-# Retrieve Subscription Info
+# Subscription Info
 data "azurerm_subscription" "main" {
 }
-data "azurerm_client_config" "current" {
+
+# Note: Jeff Giroux (REMOVE LATER)
+#       https://github.com/F5Networks/terraform-azure-bigip-module/issues/42
+#       The user_identity is not passed in BIG-IP module to the
+#       Key Vault policy. As a result, the Terraform auto created
+#       user identity is assigned the policy instead of the
+#       user-supplied managed identity.
+
+# Managed Identity Info
+data "azurerm_user_assigned_identity" "main" {
+  count               = var.az_keyvault_authentication ? 1 : 0
+  name                = split("/", var.user_identity)[8]
+  resource_group_name = split("/", var.user_identity)[4]
 }
+
+# Key Vault info
 data "azurerm_key_vault" "main" {
-  count               = var.az_keyvault_authentication == true ? 1 : 0
+  count               = var.az_keyvault_authentication ? 1 : 0
   name                = var.keyvault_name
   resource_group_name = var.keyvault_rg
 }
-data "azurerm_user_assigned_identity" "main" {
-  count               = var.az_keyvault_authentication == true ? 1 : 0
-  name                = var.user_identity
-  resource_group_name = var.keyvault_rg
-}
 
-
+# Create Key Vault policies
 resource "azurerm_key_vault_access_policy" "main" {
-  count        = var.az_keyvault_authentication == true ? 1 : 0
+  count        = var.az_keyvault_authentication ? 1 : 0
   key_vault_id = data.azurerm_key_vault.main[0].id
-  tenant_id    = data.azurerm_client_config.current.tenant_id
+  tenant_id    = data.azurerm_subscription.main.tenant_id
   object_id    = data.azurerm_user_assigned_identity.main[0].principal_id
 
+  key_permissions = [
+    "Get", "List", "Update", "Create", "Import", "Delete", "Recover", "Backup", "Restore",
+  ]
   secret_permissions = [
-    "Get",
+    "Get", "List", "Set", "Delete", "Recover", "Restore", "Backup", "Purge",
   ]
 }

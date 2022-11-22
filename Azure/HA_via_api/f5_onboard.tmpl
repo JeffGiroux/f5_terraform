@@ -274,6 +274,7 @@ extension_services:
                 class: Service_HTTP
                 virtualAddresses:
                   - '{{{ VIP_AZ1 }}}'
+                  - '{{{ VIP_AZ2 }}}'
                 pool: web_pool
               web_pool:
                 class: Pool

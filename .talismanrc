@@ -21,13 +21,15 @@ fileignoreconfig:
 - filename: Azure/Route_Server/f5_onboard.tmpl
   checksum: 85acd6830ca87fbf6856b309c2de80155513bea8bec7749cd0b763dfe1245fea
 - filename: Azure/Route_Server/bigip.tf
-  checksum: b2cb667e687c5e025b46c2406f5c687fc74cb33d0c8c604017e7cdb2fd6589ae
+  checksum: bd27f9695972c8332a26c25d207a5aea364fa6a13371303f891aeeb292001b01
 - filename: Azure/Route_Server/main.tf
-  checksum: be01e1c0aa02ce1b50ad528194761810e2548aab39126502c43a0c5a50b2d1fd
+  checksum: aa115b4e6c45dcea9fee08c2dfe52d9bf8678f19a6f889579becdb03e6b91cf4
+- filename: Azure/Route_Server/README.md
+  checksum: 2ab73034e4b674796881d362759e7fc70b89597e239396b19334be8ce31454ad
 - filename: Azure/Route_Server/variables.tf
   checksum: be22e7624dfa1ad0bbfe57a6205f22cbdafd198b6c4aa2403da0bc7366d4c4cf
-- filename: Azure/Route_Server/README.md
-  checksum: 4999cb476a978a51f4cdbecd668f8c4b5d81e2e60e2991d5e56de99312359c25
+- filename: Azure/Route_Server/admin.auto.tfvars.example
+  checksum: 50353e060f88bd8692d5b140ca44100dd6b8c90d0aea67fd38e5c64a89e5ddbe
 - filename: AWS/Autoscale_via_lb/1nic/terraform.tfvars.example
   checksum: 7c4260a9f830faef736e223920c48c20491ac52a9681bf97f06c5eacbe01d239
 - filename: AWS/Standalone/terraform.tfvars.example
@@ -49,17 +51,17 @@ fileignoreconfig:
 - filename: GCP/Autoscale_via_lb/1nic/f5_onboard.tmpl
   checksum: 7b332ae1f15b9542c197ec2d4af8231fbc7ef7f64de2e4ce7e4310e16e3e6261
 - filename: Azure/Virtual_WAN/admin.auto.tfvars.example
-  checksum: 76faabc636c27b3a5169b7a7ae014c2800b8106fb339a6c84bcede44618f1034
+  checksum: 84924c94605565e18f72fd5b70cfb72cc48fc58ca6d478fe52b2101fbfe5bc18
 - filename: Azure/Virtual_WAN/f5_onboard.tmpl
   checksum: 502be391eefbb1274db8de0563dcd668ad743e96b9279151c7044bfdb0f8f39b
 - filename: Azure/Virtual_WAN/bigip.tf
-  checksum: a713f4cf238feb5fd484c02badf9cb7dbe4dd1e7908b3547c78da4a58d1214a5
+  checksum: 6d5848e74e5a709ced546f9157884631efd4fe287e3cb3abf11f657375b3be63
 - filename: Azure/Virtual_WAN/main.tf
-  checksum: 77715c67eba3642043e05a1f439a186cd028f4d6e46ced7dbc9242a88894cec0
+  checksum: 29196d0e95c57b2b848c682d7326c8cd0cac9b701e9991885988196394bc8e73
 - filename: Azure/Virtual_WAN/variables.tf
   checksum: d015cede9acb8f845319b797dc2e173280d009a4662cc2114fdf1829c35de0c0
 - filename: Azure/Virtual_WAN/README.md
-  checksum: 130ee32ade0abeaca9213a9e23164a4ae8ddb182af0cc7e3f00ed0f7b1366484
+  checksum: d6a729e80ad1ca1346398af7245d7b6a8c4ea1eabe732a0c83c079fd2276f714
 - filename: AWS/Standalone/f5_onboard.tmpl
   checksum: 2bb1aaa30fdd1c71bf76f7ab8be762d3d8d0496f175e85eadafce2ede4b6d680
 - filename: AWS/Standalone/iam.tf
@@ -75,7 +77,7 @@ fileignoreconfig:
 - filename: AWS/HA_via_api/variables.tf
   checksum: 979c385e3173d56e36f02cf05d8e66bfee4f4a20764368fe29ece85ca6cf49cb
 - filename: AWS/HA_via_api/README.md
-  checksum: d8e0c41bc1093631dd57eb33b23ff66802e5202367a04302e1949319a4933bd1
+  checksum: b063c7fdf70901964a1fb4b7877e1d74f30cce8bfcf7b663e84a8fd50d735c20
 - filename: AWS/Autoscale_via_lb/1nic/variables.tf
   checksum: b66042a0b339fd78deb79125c3ee6303fb0a743c121c3b44fb6c3255a00e1827
 - filename: AWS/Autoscale_via_lb/1nic/f5_onboard.tmpl
@@ -85,45 +87,49 @@ fileignoreconfig:
 - filename: AWS/Autoscale_via_lb/1nic/README.md
   checksum: d618e9950f03d65992d8e60a8409837bcd9d7d02a948427cc5a7144d0f81e5a5
 - filename: Azure/Standalone/terraform.tfvars.example
-  checksum: 90c9e8606de019f6fc555a5a7acdf3110323ad8239340204b01be2b0a0538c0c
+  checksum: 30c74d5df038e79d8af2e55cc82c1445260a7df53d662c7f8b09b5e93e599900
 - filename: Azure/Standalone/variables.tf
   checksum: 83b44e6b0cd5b9daf99ebab6850fe5932a72836f55834d0363257bba28a5bbd3
 - filename: Azure/Standalone/README.md
-  checksum: 684c15675d5940bca687762302e06aea1551919abb5008eba56edde4c2ee3fde
+  checksum: d0f0cfebdfa8c5de2af08f92540f8174bc212fb4baa716e9e0ad3aa162654fe8
 - filename: Azure/Standalone/f5_onboard.tmpl
   checksum: 24ae7bfa5dba46b78bcda6b839e80be7afd104444061a4f9cb06c2112f981e04
 - filename: Azure/Standalone/bigip.tf
-  checksum: 6fd7bac702ab0754e4098b18e86e4bae41d82774da47ed934338eee7410f7864
+  checksum: 93a2268f4b91a4f917689053a0d53a51966050f4ab0018a4a0bedde7ee2c2186
 - filename: Azure/HA_via_api/variables.tf
-  checksum: 6ee650cf46900cfe974b8c9eead31c67384c46460fcf755f56ffe6802f487ef6
+  checksum: b6db479be461eecb16f92a427bf671391f770276019967b12f38916ce024551d
 - filename: Azure/HA_via_api/f5_onboard.tmpl
   checksum: 5c1d0effa267028dcd2f8dee22671ed1eb9b9c72c97e7e6b42a3ebef059cea08
 - filename: Azure/HA_via_api/terraform.tfvars.example
-  checksum: 70a5a21a11d1757557426b7f9d9323ffca19cac2e4562301ab08a734c653bbdb
+  checksum: 329c8f2cc424dd4fff1e258f89a59aba4b11f71759c0781dbf2de15ca160e09a
 - filename: Azure/HA_via_api/bigip.tf
-  checksum: 6a4f8ac56d0e95088bc2afb1334f9bf56c7ad9eb0000c605c42209b3de4f2d56
+  checksum: 6d8dacb239d57e7bca400a1ab83269d2b662529522fe3e5278c080069320690e
+- filename: Azure/HA_via_api/main.tf
+  checksum: d7b2716e1d72811bbfebd3cee1eabff7385b2c056abe2babe451724507653bbe
 - filename: Azure/HA_via_lb/f5_onboard.tmpl
   checksum: cb0193f299feeb26ca3640977c457a5801e175c025158a8060d7fab8549abb4d
 - filename: Azure/HA_via_lb/bigip.tf
-  checksum: caf460983268bfcfee3fb5ea9b28a05d25537bd9d8402bc320f9271b2a624da5
+  checksum: ca29f337fe94de85df675f2dd932aa457697a0f1f326cc9b3c8769a871f4f3e4
 - filename: Azure/HA_via_lb/terraform.tfvars.example
-  checksum: cf6a8ba3116c8ba7a9131f991fca0cda38583ada6e6dc947970fe58d1dd4a3e0
+  checksum: e5cccf46a78acdd923637fdc1f3e61c83ce43b17949ef40b23241742c2740399
 - filename: Azure/HA_via_lb/variables.tf
   checksum: 061fae589ce6854ca09f5c6dde00dcbadbcf16255bf74bcf09ee9316b6f80472
 - filename: Azure/Autoscale_via_lb/variables.tf
   checksum: 12b0919af82a9918840d755824b3d213fa0580c9027b3fc5d819f8dd121edaaf
-- filename: Azure/Autoscale_via_lb/terraform.tfvars.example
-  checksum: d289fe503d2cade83916cc872f62f13d4871f6751526d244106525287fff6320
 - filename: Azure/Autoscale_via_lb/f5_onboard.tmpl
   checksum: 7161c71c4a8d5debd77a79a85b36066c4a0c1d25509ea18ac97951dded582683
 - filename: Azure/Autoscale_via_lb/bigip.tf
-  checksum: 94c284a6014a05539476cc5aef45bb4641bb553e8e20f30ad70cd6540c2796b8
+  checksum: cf366463bfe0756f9fe8be78835bf9bbca0826ec1de813127eaa4f9da1a7c340
+- filename: Azure/Autoscale_via_lb/terraform.tfvars.example
+  checksum: b2bf7c4985643e048fee833cfa31d4e9be2fbe121eb0e8d3f17beecfd8f2e99f
+- filename: Azure/Autoscale_via_lb/main.tf
+  checksum: 0d799c754866bba5c35214bc509dd468880e595a7b81fa7d4dadfe191f1ea025
 - filename: Azure/Autoscale_via_lb/README.md
-  checksum: 72f7f0b4e1570e7c86aa72f2b719c8cdecff01d3a427837fa5a771dbf768990f
+  checksum: 56d140173706abdaf1318675205888d898b4154e54ddd8a6578fedfb0182d39c
 - filename: Azure/HA_via_api/README.md
-  checksum: eb2042c0950dd3b84fce8c20ddcaee8a0dc4c7e3984545eb230eab08c8d3092b
+  checksum: 51421bbdd57ec78b960ce2837b9eea2158514829ae8731687e152af2ba85e2f1
 - filename: Azure/HA_via_lb/README.md
-  checksum: 7c6ee63d9f94f4e454ac2b5a22f4922fe98256aa3553048475725a56a14f7e73
+  checksum: 85a51e497f3a21ad5079342d8aa882793765be64b09e065a421b7b3ee8339d0d
 - filename: GCP/HA_via_api/variables.tf
   checksum: 241b3fac37b35ee35d3c17cd28af7bdf0cfd15a9120388700774a6e0b6a2dd3a
 - filename: GCP/HA_via_api/README.md
@@ -141,7 +147,7 @@ fileignoreconfig:
 - filename: GCP/HA_via_lb/examples/f5_onboard_with_ts.tmpl
   checksum: 43b67531bdd14504532ad714fc459a70ba5004e68322cf0e1dc785bbfcb45e17
 - filename: GCP/HA_via_lb/terraform.tfvars.example
-  checksum: d24ce9d6d04e698db731aee0c4b634fc2d4faa82c99e0fd4600dd5462abfcf24
+  checksum: db69fd9e5a1d2f7f1691b7ca3b5c8730a21a5ae757aba08900c7d53af8f82e4c
 - filename: GCP/HA_via_lb/bigip.tf
   checksum: 0a5cb82444ba8a264b23f2dc96ae671bbc671e5e27f040447c5a4131226b18f2
 - filename: GCP/HA_via_lb/README.md
@@ -157,6 +163,8 @@ fileignoreconfig:
 - filename: GCP/Autoscale_via_lb/3nic/variables.tf
   checksum: 8688e82c29f35a3b64a5fde443f25af495e9a7eca1556ca67896560193a3642c
 - filename: Azure/HA_via_lb/main.tf
-  checksum: ab329d3e637cad741c47b00196020168196409b6349ddbe2e32d5606fa591728
+  checksum: 0992b6e35279f722236498e9161ad2bd47c558ee902d5914df754412b968bf60
 - filename: Azure/HA_via_lb/README.md
   checksum: a41333a8f7f566a848b001a22b2e54bfd30008a061f0e8e0cc4b1e1a5cf47d72
+- filename: Azure/Standalone/main.tf
+  checksum: 8d06d59cfd9a54650d81efc21e941e8c4ee334dbc034489c9284c5597e25adbb

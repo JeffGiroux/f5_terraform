@@ -1,9 +1,7 @@
 # Deploying BIG-IP VEs in Azure - High Availability (Active/Standby): 3-NIC
 
 ## To Do
-- Community support only. Not F5 supported.
-- Document Azure Vault usage
-- Telemtry Streaming not used (see example folder)
+- Community support only. Template is not F5 supported.
 
 ## Issues
 - Find an issue? Fork, clone, create branch, fix and PR. I'll review and merge into the main branch. Or submit a GitHub issue with all necessary details and logs.
@@ -43,8 +41,8 @@ The BIG-IP's configuration, now defined in a single convenient YAML or JSON [F5 
 - Passwords and secrets can be located in [Azure Key Vault](https://docs.microsoft.com/en-us/azure/key-vault/general/overview).
   - Set *az_keyvault_authentication* to 'true'
   - Set *keyvault_rg* to the Azure Resource Group containing the Key Vault
-  - Set *keyvault_url* to the Azure Key Vault URL
-  - If *az_keyvault_authentication* is 'true', then 'f5_password' should be the Key Vault secret name. The secret contents should contain ONLY the password as plain text.
+  - Set *keyvault_name* to the Azure Key Vault name
+  - Set *keyvault_secret* to the Key Vault secret name. The secret contents should contain ONLY the password as plain text.
 - This templates deploys into an *EXISTING* networking stack. You are required to have an existing VNet, subnets, and security groups.
   - You must have a VNET with three (3) subnets: management, external, internal
   - Firewall rules are required to pass traffic to the application
@@ -53,7 +51,7 @@ The BIG-IP's configuration, now defined in a single convenient YAML or JSON [F5 
   - If you require a new network first, see the [Infrastructure Only folder](../Infrastructure-only) to get started.
 - If this is the first time to deploy the F5 image, the subscription used in this deployment needs to be enabled to programatically deploy. For more information, please refer to [Configure Programatic Deployment](https://azure.microsoft.com/en-us/blog/working-with-marketplace-images-on-azure-resource-manager/)
 - You must accept the the legal terms of the F5 BIG-IP image in the Azure marketplace (see [az vm image accept-terms](https://docs.microsoft.com/en-us/cli/azure/vm/image?view=azure-cli-latest#az-vm-image-accept-terms))
-  - example = *az vm image accept-terms --urn f5-networks:f5-big-ip-best:f5-big-best-plus-hourly-200mbps:16.1.301000*
+  - example = *az vm image terms accept --urn f5-networks:f5-big-ip-best:f5-big-best-plus-hourly-200mbps:16.1.301000*
 
 ## Important Configuration Notes
 
@@ -133,22 +131,22 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.14.5 |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | >= 3 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.2.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | >= 3.32.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.27.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.32.0 |
 | <a name="provider_random"></a> [random](#provider\_random) | 3.4.3 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_bigip"></a> [bigip](#module\_bigip) | github.com/F5Networks/terraform-azure-bigip-module | n/a |
-| <a name="module_bigip2"></a> [bigip2](#module\_bigip2) | github.com/F5Networks/terraform-azure-bigip-module | n/a |
+| <a name="module_bigip"></a> [bigip](#module\_bigip) | github.com/F5Networks/terraform-azure-bigip-module | v1.2.5 |
+| <a name="module_bigip2"></a> [bigip2](#module\_bigip2) | github.com/F5Networks/terraform-azure-bigip-module | v1.2.5 |
 
 ## Resources
 
@@ -159,13 +157,12 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | [azurerm_lb_backend_address_pool.backend_pool](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/lb_backend_address_pool) | resource |
 | [azurerm_lb_probe.lb_probe](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/lb_probe) | resource |
 | [azurerm_lb_rule.lb_rule1](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/lb_rule) | resource |
-| [azurerm_log_analytics_workspace.law](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_workspace) | resource |
+| [azurerm_log_analytics_workspace.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_workspace) | resource |
 | [azurerm_network_interface_backend_address_pool_association.f5vm01](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_interface_backend_address_pool_association) | resource |
 | [azurerm_network_interface_backend_address_pool_association.f5vm02](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_interface_backend_address_pool_association) | resource |
 | [azurerm_public_ip.lbpip](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
 | [azurerm_resource_group.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) | resource |
 | [random_id.buildSuffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
-| [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) | data source |
 | [azurerm_key_vault.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault) | data source |
 | [azurerm_network_interface.bigip-ext](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/network_interface) | data source |
 | [azurerm_network_interface.bigip2-ext](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/network_interface) | data source |
@@ -183,11 +180,11 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_ssh_key"></a> [ssh\_key](#input\_ssh\_key) | public key used for authentication in /path/file format (e.g. /.ssh/id\_rsa.pub) | `string` | n/a | yes |
-| <a name="input_AS3_URL"></a> [AS3\_URL](#input\_AS3\_URL) | URL to download the BIG-IP Application Service Extension 3 (AS3) module | `string` | `"https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.38.0/f5-appsvcs-3.38.0-4.noarch.rpm"` | no |
-| <a name="input_DO_URL"></a> [DO\_URL](#input\_DO\_URL) | URL to download the BIG-IP Declarative Onboarding module | `string` | `"https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.31.0/f5-declarative-onboarding-1.31.0-6.noarch.rpm"` | no |
-| <a name="input_FAST_URL"></a> [FAST\_URL](#input\_FAST\_URL) | URL to download the BIG-IP FAST module | `string` | `"https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.19.0/f5-appsvcs-templates-1.19.0-1.noarch.rpm"` | no |
+| <a name="input_AS3_URL"></a> [AS3\_URL](#input\_AS3\_URL) | URL to download the BIG-IP Application Service Extension 3 (AS3) module | `string` | `"https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.41.0/f5-appsvcs-3.41.0-1.noarch.rpm"` | no |
+| <a name="input_DO_URL"></a> [DO\_URL](#input\_DO\_URL) | URL to download the BIG-IP Declarative Onboarding module | `string` | `"https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.34.0/f5-declarative-onboarding-1.34.0-5.noarch.rpm"` | no |
+| <a name="input_FAST_URL"></a> [FAST\_URL](#input\_FAST\_URL) | URL to download the BIG-IP FAST module | `string` | `"https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.22.0/f5-appsvcs-templates-1.22.0-1.noarch.rpm"` | no |
 | <a name="input_INIT_URL"></a> [INIT\_URL](#input\_INIT\_URL) | URL to download the BIG-IP runtime init | `string` | `"https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.5.1/dist/f5-bigip-runtime-init-1.5.1-1.gz.run"` | no |
-| <a name="input_TS_URL"></a> [TS\_URL](#input\_TS\_URL) | URL to download the BIG-IP Telemetry Streaming module | `string` | `"https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.30.0/f5-telemetry-1.30.0-1.noarch.rpm"` | no |
+| <a name="input_TS_URL"></a> [TS\_URL](#input\_TS\_URL) | URL to download the BIG-IP Telemetry Streaming module | `string` | `"https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.32.0/f5-telemetry-1.32.0-2.noarch.rpm"` | no |
 | <a name="input_availability_zone"></a> [availability\_zone](#input\_availability\_zone) | Azure Availability Zone for BIG-IP 1 | `number` | `1` | no |
 | <a name="input_availability_zone2"></a> [availability\_zone2](#input\_availability\_zone2) | Azure Availability Zone for BIG-IP 2 | `number` | `2` | no |
 | <a name="input_az_keyvault_authentication"></a> [az\_keyvault\_authentication](#input\_az\_keyvault\_authentication) | Whether to use key vault to pass authentication | `bool` | `false` | no |
@@ -200,7 +197,7 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | <a name="input_bigIqSkuKeyword2"></a> [bigIqSkuKeyword2](#input\_bigIqSkuKeyword2) | BIG-IQ license SKU keyword 2 | `string` | `"key2"` | no |
 | <a name="input_bigIqUnitOfMeasure"></a> [bigIqUnitOfMeasure](#input\_bigIqUnitOfMeasure) | BIG-IQ license unit of measure | `string` | `"hourly"` | no |
 | <a name="input_bigIqUsername"></a> [bigIqUsername](#input\_bigIqUsername) | Admin name for BIG-IQ | `string` | `"azureuser"` | no |
-| <a name="input_bigip_version"></a> [bigip\_version](#input\_bigip\_version) | BIG-IP Version | `string` | `"16.1.301000"` | no |
+| <a name="input_bigip_version"></a> [bigip\_version](#input\_bigip\_version) | BIG-IP Version | `string` | `"16.1.302000"` | no |
 | <a name="input_dns_server"></a> [dns\_server](#input\_dns\_server) | Leave the default DNS server the BIG-IP uses, or replace the default DNS server with the one you want to use | `string` | `"8.8.8.8"` | no |
 | <a name="input_extNsg"></a> [extNsg](#input\_extNsg) | Name of external network security group | `string` | `null` | no |
 | <a name="input_extSubnet"></a> [extSubnet](#input\_extSubnet) | Name of external subnet | `string` | `null` | no |
@@ -210,8 +207,9 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | <a name="input_instance_type"></a> [instance\_type](#input\_instance\_type) | Azure instance type to be used for the BIG-IP VE | `string` | `"Standard_DS4_v2"` | no |
 | <a name="input_intNsg"></a> [intNsg](#input\_intNsg) | Name of internal network security group | `string` | `null` | no |
 | <a name="input_intSubnet"></a> [intSubnet](#input\_intSubnet) | Name of internal subnet | `string` | `null` | no |
-| <a name="input_keyvault_name"></a> [keyvault\_name](#input\_keyvault\_name) | Name of Key Vault with BIG-IP password | `string` | `null` | no |
+| <a name="input_keyvault_name"></a> [keyvault\_name](#input\_keyvault\_name) | Name of Key Vault | `string` | `null` | no |
 | <a name="input_keyvault_rg"></a> [keyvault\_rg](#input\_keyvault\_rg) | The name of the resource group in which the Azure Key Vault exists | `string` | `""` | no |
+| <a name="input_keyvault_secret"></a> [keyvault\_secret](#input\_keyvault\_secret) | Name of Key Vault secret with BIG-IP password | `string` | `null` | no |
 | <a name="input_libs_dir"></a> [libs\_dir](#input\_libs\_dir) | Directory on the BIG-IP to download the A&O Toolchain into | `string` | `"/config/cloud/azure/node_modules"` | no |
 | <a name="input_license1"></a> [license1](#input\_license1) | The license token for the 1st F5 BIG-IP VE (BYOL) | `string` | `""` | no |
 | <a name="input_license2"></a> [license2](#input\_license2) | The license token for the 2nd F5 BIG-IP VE (BYOL) | `string` | `""` | no |
@@ -275,6 +273,13 @@ To run this Terraform template, perform the following steps:
       location      = "westus2"
       projectPrefix = "mylab123"
       resourceOwner = "myLastName"
+
+      # Key Vault - Uncomment to use Key Vault integration
+      #az_keyvault_authentication = true
+      #keyvault_rg                = "myKv-rg-123"
+      #keyvault_name              = "myKv-123"
+      #user_identity              = "/subscriptions/xxxx/resourceGroups/myRg123/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myManagedId123"
+
   ```
   3. Initialize the directory
   ```

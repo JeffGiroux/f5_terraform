@@ -33,7 +33,7 @@ locals {
     f5_username                = var.f5_username
     f5_password                = var.f5_password
     az_keyvault_authentication = var.az_keyvault_authentication
-    vault_url                  = var.az_keyvault_authentication ? var.keyvault_url : ""
+    vault_url                  = var.az_keyvault_authentication ? data.azurerm_key_vault.main[0].vault_uri : ""
     ssh_keypair                = file(var.ssh_key)
     INIT_URL                   = var.INIT_URL
     DO_URL                     = var.DO_URL
@@ -47,8 +47,8 @@ locals {
     dns_server                 = var.dns_server
     ntp_server                 = var.ntp_server
     timezone                   = var.timezone
-    law_id                     = azurerm_log_analytics_workspace.law.workspace_id
-    law_primkey                = azurerm_log_analytics_workspace.law.primary_shared_key
+    law_id                     = azurerm_log_analytics_workspace.main.workspace_id
+    law_primkey                = azurerm_log_analytics_workspace.main.primary_shared_key
     bigIqLicenseType           = var.bigIqLicenseType
     bigIqHost                  = var.bigIqHost
     bigIqPassword              = var.bigIqPassword
@@ -65,7 +65,7 @@ locals {
 
 # Create F5 BIG-IP VMs
 module "bigip" {
-  source                     = "github.com/F5Networks/terraform-azure-bigip-module"
+  source                     = "github.com/F5Networks/terraform-azure-bigip-module?ref=v1.2.5"
   prefix                     = var.projectPrefix
   resource_group_name        = azurerm_resource_group.main.name
   f5_instance_type           = var.instance_type
@@ -84,5 +84,9 @@ module "bigip" {
   custom_user_data           = local.f5_onboard1
   sleep_time                 = "30s"
   tags                       = local.tags
-  #az_user_identity           = var.user_identity
+  az_keyvault_authentication = var.az_keyvault_authentication
+  azure_secret_rg            = var.az_keyvault_authentication ? var.keyvault_rg : ""
+  azure_keyvault_name        = var.az_keyvault_authentication ? var.keyvault_name : ""
+  azure_keyvault_secret_name = var.az_keyvault_authentication ? var.keyvault_secret : ""
+  user_identity              = var.az_keyvault_authentication ? data.azurerm_user_assigned_identity.main[0].id : null
 }

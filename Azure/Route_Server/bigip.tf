@@ -17,7 +17,7 @@ locals {
     f5_username                = var.f5_username
     f5_password                = var.f5_password
     az_keyvault_authentication = var.az_keyvault_authentication
-    vault_url                  = var.az_keyvault_authentication ? var.keyvault_url : ""
+    vault_url                  = var.az_keyvault_authentication ? data.azurerm_key_vault.main[0].vault_uri : ""
     ssh_keypair                = file(var.ssh_key)
     INIT_URL                   = var.INIT_URL
     DO_URL                     = var.DO_URL
@@ -48,9 +48,15 @@ locals {
 # Create F5 BIG-IP VMs
 module "bigip" {
   count                      = var.instanceCountBigIp
-  source                     = "github.com/F5Networks/terraform-azure-bigip-module"
+  source                     = "github.com/F5Networks/terraform-azure-bigip-module?ref=v1.2.5"
   prefix                     = var.projectPrefix
   resource_group_name        = azurerm_resource_group.rg["hub"].name
+  f5_instance_type           = var.instance_type
+  f5_image_name              = var.image_name
+  f5_product_name            = var.product
+  f5_version                 = var.bigip_version
+  f5_username                = var.f5_username
+  f5_ssh_publickey           = file(var.ssh_key)
   mgmt_subnet_ids            = [{ "subnet_id" = data.azurerm_subnet.mgmtSubnetHub.id, "public_ip" = true, "private_ip_primary" = "" }]
   mgmt_securitygroup_ids     = [module.nsg-mgmt["hub"].network_security_group_id]
   external_subnet_ids        = [{ "subnet_id" = data.azurerm_subnet.externalSubnetHub.id, "public_ip" = true, "private_ip_primary" = "", "private_ip_secondary" = "" }]
@@ -58,14 +64,12 @@ module "bigip" {
   internal_subnet_ids        = [{ "subnet_id" = data.azurerm_subnet.internalSubnetHub.id, "public_ip" = false, "private_ip_primary" = "" }]
   internal_securitygroup_ids = [module.nsg-internal["hub"].network_security_group_id]
   availability_zone          = var.availability_zone
-  f5_ssh_publickey           = file(var.ssh_key)
-  f5_username                = var.f5_username
-  f5_instance_type           = var.instance_type
-  f5_image_name              = var.image_name
-  f5_product_name            = var.product
-  f5_version                 = var.bigip_version
   custom_user_data           = local.f5_onboard1
   sleep_time                 = "30s"
   tags                       = local.tags
-  #az_user_identity           = var.user_identity
+  az_keyvault_authentication = var.az_keyvault_authentication
+  azure_secret_rg            = var.az_keyvault_authentication ? var.keyvault_rg : ""
+  azure_keyvault_name        = var.az_keyvault_authentication ? var.keyvault_name : ""
+  azure_keyvault_secret_name = var.az_keyvault_authentication ? var.keyvault_secret : ""
+  user_identity              = var.az_keyvault_authentication ? data.azurerm_user_assigned_identity.main[0].id : null
 }
