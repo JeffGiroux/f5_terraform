@@ -159,11 +159,11 @@ module "bigip2" {
   f5_ami_search_name         = var.f5_ami_search_name
   f5_username                = var.f5_username
   aws_iam_instance_profile   = var.aws_iam_instance_profile == null ? aws_iam_instance_profile.bigip_profile[0].name : var.aws_iam_instance_profile
-  mgmt_subnet_ids            = [{ "subnet_id" = var.mgmtSubnetAz1, "public_ip" = true, "private_ip_primary" = "" }]
+  mgmt_subnet_ids            = [{ "subnet_id" = var.mgmtSubnetAz2, "public_ip" = true, "private_ip_primary" = "" }]
   mgmt_securitygroup_ids     = [var.mgmtNsg]
-  external_subnet_ids        = [{ "subnet_id" = var.extSubnetAz1, "public_ip" = true, "private_ip_primary" = "", "private_ip_secondary" = "" }]
+  external_subnet_ids        = [{ "subnet_id" = var.extSubnetAz2, "public_ip" = true, "private_ip_primary" = "", "private_ip_secondary" = "" }]
   external_securitygroup_ids = [var.extNsg]
-  internal_subnet_ids        = [{ "subnet_id" = var.intSubnetAz1, "public_ip" = false, "private_ip_primary" = "", "private_ip_secondary" = "" }]
+  internal_subnet_ids        = [{ "subnet_id" = var.intSubnetAz2, "public_ip" = false, "private_ip_primary" = "", "private_ip_secondary" = "" }]
   internal_securitygroup_ids = [var.intNsg]
   custom_user_data           = local.f5_onboard2
   sleep_time                 = "30s"
