@@ -238,6 +238,11 @@ To run this Terraform template, perform the following steps:
       awsRegion     = "us-west-2"
       projectPrefix = "mydemo"
       resourceOwner = "myname"
+
+      # Secrets Manager - Uncomment to use Secret Manager integration
+      #aws_secretmanager_auth      = true
+      #aws_secretmanager_secret_id = "arn:aws:secretsmanager:us-west-2:xxxx:secret:mySecret123"
+      #aws_iam_instance_profile    = "myRole123"
   ```
   3. Initialize the directory
   ```

@@ -37,7 +37,7 @@ fileignoreconfig:
 - filename: AWS/Standalone/variables.tf
   checksum: ddfa4b88d8a242ceb3d430ab65502ff1a95e84b1a9ea75ef648a99c578b2a888
 - filename: AWS/Standalone/README.md
-  checksum: 0286ae734afee15284e0fa17c0fd24121ade94d0393e9662014e2e4753da5b0e
+  checksum: dacead7b424d70a49e25c4ef2c54eded826070f0af0ccd983eff947bb1417bfc
 - filename: Azure/HA_via_lb/README.md
   checksum: ee5190df812f75cfdb25b6d74e542f8ac3d4e7827830785c3b835b275a10c877
 - filename: GCP/Autoscale_via_lb/1nic/variables.tf
