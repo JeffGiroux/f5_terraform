@@ -237,7 +237,7 @@ data "aws_eip" "bigip2_vip" {
 resource "aws_ec2_tag" "bigip_ext_label" {
   resource_id = data.aws_network_interface.bigip_ext.id
   key         = "f5_cloud_failover_label"
-  value       = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
+  value       = var.f5_cloud_failover_label
 }
 resource "aws_ec2_tag" "bigip_ext_nicmap" {
   resource_id = data.aws_network_interface.bigip_ext.id
@@ -247,7 +247,7 @@ resource "aws_ec2_tag" "bigip_ext_nicmap" {
 resource "aws_ec2_tag" "bigip_int_label" {
   resource_id = data.aws_network_interface.bigip_int.id
   key         = "f5_cloud_failover_label"
-  value       = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
+  value       = var.f5_cloud_failover_label
 }
 resource "aws_ec2_tag" "bigip_int_nicmap" {
   resource_id = data.aws_network_interface.bigip_int.id
@@ -259,7 +259,7 @@ resource "aws_ec2_tag" "bigip_int_nicmap" {
 resource "aws_ec2_tag" "bigip2_ext_label" {
   resource_id = data.aws_network_interface.bigip2_ext.id
   key         = "f5_cloud_failover_label"
-  value       = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
+  value       = var.f5_cloud_failover_label
 }
 resource "aws_ec2_tag" "bigip2_ext_nicmap" {
   resource_id = data.aws_network_interface.bigip2_ext.id
@@ -269,7 +269,7 @@ resource "aws_ec2_tag" "bigip2_ext_nicmap" {
 resource "aws_ec2_tag" "bigip2_int_label" {
   resource_id = data.aws_network_interface.bigip2_int.id
   key         = "f5_cloud_failover_label"
-  value       = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
+  value       = var.f5_cloud_failover_label
 }
 resource "aws_ec2_tag" "bigip2_int_nicmap" {
   resource_id = data.aws_network_interface.bigip2_int.id
@@ -281,7 +281,7 @@ resource "aws_ec2_tag" "bigip2_int_nicmap" {
 resource "aws_ec2_tag" "bigip_vip_label" {
   resource_id = data.aws_eip.bigip_vip.id
   key         = "f5_cloud_failover_label"
-  value       = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
+  value       = var.f5_cloud_failover_label
 }
 resource "aws_ec2_tag" "bigip_vip_ips" {
   resource_id = data.aws_eip.bigip_vip.id
@@ -291,7 +291,7 @@ resource "aws_ec2_tag" "bigip_vip_ips" {
 resource "aws_ec2_tag" "bigip2_vip_label" {
   resource_id = data.aws_network_interface.bigip2_int.id
   key         = "f5_cloud_failover_label"
-  value       = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
+  value       = var.f5_cloud_failover_label
 }
 resource "aws_ec2_tag" "bigip2_vip_ips" {
   resource_id = data.aws_eip.bigip2_vip.id
@@ -313,7 +313,7 @@ resource "aws_route_table" "main" {
   tags = {
     Name                    = format("%s-rt-%s", var.projectPrefix, random_id.buildSuffix.hex)
     Owner                   = var.resourceOwner
-    f5_cloud_failover_label = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
+    f5_cloud_failover_label = var.f5_cloud_failover_label
     f5_self_ips             = "${module.bigip.private_addresses["public_private"]["private_ip"][0]},${module.bigip2.private_addresses["public_private"]["private_ip"][0]}"
   }
 }
