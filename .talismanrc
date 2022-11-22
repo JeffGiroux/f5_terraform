@@ -168,3 +168,5 @@ fileignoreconfig:
   checksum: a41333a8f7f566a848b001a22b2e54bfd30008a061f0e8e0cc4b1e1a5cf47d72
 - filename: Azure/Standalone/main.tf
   checksum: 8d06d59cfd9a54650d81efc21e941e8c4ee334dbc034489c9284c5597e25adbb
+- filename: AWS/Infrastructure-only/README.md
+  checksum: 0f5cd6bc1471085e76ca168a6578776f4fc185895cc3cbaaf09526915a479d26
