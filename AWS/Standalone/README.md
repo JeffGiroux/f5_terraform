@@ -40,12 +40,12 @@ The BIG-IP's configuration, now defined in a single convenient YAML or JSON [F5 
   - ***Note***: Make sure to [practice least privilege](https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html)
 - Passwords and secrets can be located in [AWS Secrets Manager](https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html).
   - Set *aws_secretmanager_auth* to 'true'
-  - A new IAM profile (aka role and permissions) is created with permissions to list secrets (see iam.tf)
-  - If *aws_secretmanager_auth* is 'true', then 'f5_password' should be the ARN of the AWS Secrets Manager secret. The secret needs to contain ONLY the password as 'plain text' type.
+  - Set *aws_secretmanager_secret_id* to the AWS secret ID
+  - Set *aws_iam_instance_profile* to an existing IAM profile
+    - ***Note***: an IAM profile will be created if not supplied
 - This templates deploys into an *EXISTING* networking stack. You are required to have an existing VPC network, subnets, and security groups.
   - A NAT gateway or public IP is also required for outbound Internet traffic
   - If you require a new network first, see the [Infrastructure Only folder](../Infrastructure-only) to get started
-
 
 ## Important Configuration Notes
 
@@ -167,7 +167,9 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | <a name="input_adminSrcAddr"></a> [adminSrcAddr](#input\_adminSrcAddr) | Allowed Admin source IP prefix | `string` | `"0.0.0.0/0"` | no |
 | <a name="input_awsAz1"></a> [awsAz1](#input\_awsAz1) | Availability zone, will dynamically choose one if left empty | `string` | `"us-west-2a"` | no |
 | <a name="input_awsRegion"></a> [awsRegion](#input\_awsRegion) | aws region | `string` | `"us-west-2"` | no |
+| <a name="input_aws_iam_instance_profile"></a> [aws\_iam\_instance\_profile](#input\_aws\_iam\_instance\_profile) | The ARN of the role instance profile to assign to the BIG-IP instance | `string` | `null` | no |
 | <a name="input_aws_secretmanager_auth"></a> [aws\_secretmanager\_auth](#input\_aws\_secretmanager\_auth) | Whether to use secret manager to pass authentication | `bool` | `false` | no |
+| <a name="input_aws_secretmanager_secret_id"></a> [aws\_secretmanager\_secret\_id](#input\_aws\_secretmanager\_secret\_id) | The ARN of Secrets Manager secret with BIG-IP password | `string` | `null` | no |
 | <a name="input_bigIqHost"></a> [bigIqHost](#input\_bigIqHost) | This is the BIG-IQ License Manager host name or IP address | `string` | `""` | no |
 | <a name="input_bigIqHypervisor"></a> [bigIqHypervisor](#input\_bigIqHypervisor) | BIG-IQ hypervisor | `string` | `"aws"` | no |
 | <a name="input_bigIqLicensePool"></a> [bigIqLicensePool](#input\_bigIqLicensePool) | BIG-IQ license pool name | `string` | `""` | no |

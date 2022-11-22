@@ -15,3 +15,8 @@ f5_password   = "Default12345!"
 awsRegion     = "us-west-2"
 projectPrefix = "mydemo"
 resourceOwner = "myname"
+
+# Secrets Manager - Uncomment to use Secret Manager integration
+#aws_secretmanager_auth      = true
+#aws_secretmanager_secret_id = "arn:aws:secretsmanager:us-west-2:xxxx:secret:mySecret123"
+#aws_iam_instance_profile    = "arn:aws:iam::xxxx:instance-profile/myRole123"

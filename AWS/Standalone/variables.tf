@@ -80,6 +80,16 @@ variable "aws_secretmanager_auth" {
   type        = bool
   default     = false
 }
+variable "aws_secretmanager_secret_id" {
+  description = "The ARN of Secrets Manager secret with BIG-IP password"
+  type        = string
+  default     = null
+}
+variable "aws_iam_instance_profile" {
+  description = "The ARN of the role instance profile to assign to the BIG-IP instance"
+  type        = string
+  default     = null
+}
 variable "ssh_key" {
   type        = string
   description = "public key used for authentication in ssh-rsa format"

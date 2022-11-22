@@ -33,11 +33,11 @@ fileignoreconfig:
 - filename: AWS/Autoscale_via_lb/1nic/terraform.tfvars.example
   checksum: 7c4260a9f830faef736e223920c48c20491ac52a9681bf97f06c5eacbe01d239
 - filename: AWS/Standalone/terraform.tfvars.example
-  checksum: 30a19fbffa8fc521c773c47a73800aff9a79fa89a7b33764d3c46269671f6d7c
+  checksum: 55d1713ecbb90e617b23cc433be5aae7c41f5aa548c33dbb2d8a343e9534a36b
 - filename: AWS/Standalone/variables.tf
   checksum: ddfa4b88d8a242ceb3d430ab65502ff1a95e84b1a9ea75ef648a99c578b2a888
 - filename: AWS/Standalone/README.md
-  checksum: e13909723e31c2c9f6c9a9b681d6e22bc45e3ea95e06676271492f2c6c55fcc0
+  checksum: 0286ae734afee15284e0fa17c0fd24121ade94d0393e9662014e2e4753da5b0e
 - filename: Azure/HA_via_lb/README.md
   checksum: ee5190df812f75cfdb25b6d74e542f8ac3d4e7827830785c3b835b275a10c877
 - filename: GCP/Autoscale_via_lb/1nic/variables.tf
@@ -63,11 +63,11 @@ fileignoreconfig:
 - filename: Azure/Virtual_WAN/README.md
   checksum: d6a729e80ad1ca1346398af7245d7b6a8c4ea1eabe732a0c83c079fd2276f714
 - filename: AWS/Standalone/f5_onboard.tmpl
-  checksum: 2bb1aaa30fdd1c71bf76f7ab8be762d3d8d0496f175e85eadafce2ede4b6d680
+  checksum: 34555369c5d833eaeaba856f4e353660ea4219a3b627923aac7da3c73476cd82
 - filename: AWS/Standalone/iam.tf
   checksum: ceb0254163eb760b9d7b28cf041bf39a34cc6523f245e1459d9f52f74a47cad9
 - filename: AWS/Standalone/bigip.tf
-  checksum: 317a45c84597dc4c936d628cca86bb1bd8fa47016850b14f526e5d2024afbd4c
+  checksum: ce85e1256966b66da2a116b9d996874693b815beafd16a38c76d51ba9238dcab
 - filename: AWS/HA_via_api/iam.tf
   checksum: 963a08b04930c5a28e2c778c80a5c1938b13050e6e4a4d9edfb1717d360ca6ff
 - filename: AWS/HA_via_api/f5_onboard.tmpl
