@@ -51,17 +51,17 @@ fileignoreconfig:
 - filename: GCP/Autoscale_via_lb/1nic/f5_onboard.tmpl
   checksum: 7b332ae1f15b9542c197ec2d4af8231fbc7ef7f64de2e4ce7e4310e16e3e6261
 - filename: Azure/Virtual_WAN/admin.auto.tfvars.example
-  checksum: 76faabc636c27b3a5169b7a7ae014c2800b8106fb339a6c84bcede44618f1034
+  checksum: 84924c94605565e18f72fd5b70cfb72cc48fc58ca6d478fe52b2101fbfe5bc18
 - filename: Azure/Virtual_WAN/f5_onboard.tmpl
   checksum: 502be391eefbb1274db8de0563dcd668ad743e96b9279151c7044bfdb0f8f39b
 - filename: Azure/Virtual_WAN/bigip.tf
-  checksum: a713f4cf238feb5fd484c02badf9cb7dbe4dd1e7908b3547c78da4a58d1214a5
+  checksum: 6d5848e74e5a709ced546f9157884631efd4fe287e3cb3abf11f657375b3be63
 - filename: Azure/Virtual_WAN/main.tf
-  checksum: 77715c67eba3642043e05a1f439a186cd028f4d6e46ced7dbc9242a88894cec0
+  checksum: 29196d0e95c57b2b848c682d7326c8cd0cac9b701e9991885988196394bc8e73
 - filename: Azure/Virtual_WAN/variables.tf
   checksum: d015cede9acb8f845319b797dc2e173280d009a4662cc2114fdf1829c35de0c0
 - filename: Azure/Virtual_WAN/README.md
-  checksum: 130ee32ade0abeaca9213a9e23164a4ae8ddb182af0cc7e3f00ed0f7b1366484
+  checksum: d6a729e80ad1ca1346398af7245d7b6a8c4ea1eabe732a0c83c079fd2276f714
 - filename: AWS/Standalone/f5_onboard.tmpl
   checksum: 2bb1aaa30fdd1c71bf76f7ab8be762d3d8d0496f175e85eadafce2ede4b6d680
 - filename: AWS/Standalone/iam.tf
