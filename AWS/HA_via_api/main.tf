@@ -17,7 +17,7 @@ resource "aws_s3_bucket" "main" {
   tags = {
     Name                    = format("%sstorage%s", var.projectPrefix, random_id.buildSuffix.hex)
     Owner                   = var.resourceOwner
-    f5_cloud_failover_label = format("%s-%s", var.projectPrefix, random_id.buildSuffix.hex)
+    f5_cloud_failover_label = var.f5_cloud_failover_label
   }
 }
 

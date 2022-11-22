@@ -71,13 +71,13 @@ fileignoreconfig:
 - filename: AWS/HA_via_api/iam.tf
   checksum: 963a08b04930c5a28e2c778c80a5c1938b13050e6e4a4d9edfb1717d360ca6ff
 - filename: AWS/HA_via_api/f5_onboard.tmpl
-  checksum: 1670abbdb18345df1298b13a6d1940ecccf8226d496a551556fb00bf8fe94698
+  checksum: 6ea386ef1c8950e0cae32025b35d31d2ed501213447fb9372bbe9f5ea713a01a
 - filename: AWS/HA_via_api/bigip.tf
-  checksum: 56d853f7d772b6fe5d0e128252f8bb07f8bdaf097f074bcb178603a29c6f6fe0
+  checksum: 5498a3445b7662fb6bad8935fc0d7afdc63d11630ad86faee390bd41ba2543fe
 - filename: AWS/HA_via_api/variables.tf
   checksum: 979c385e3173d56e36f02cf05d8e66bfee4f4a20764368fe29ece85ca6cf49cb
 - filename: AWS/HA_via_api/README.md
-  checksum: b063c7fdf70901964a1fb4b7877e1d74f30cce8bfcf7b663e84a8fd50d735c20
+  checksum: 00d44dadc9d6068feb21c23c009077472de83f9e6a8c64e630f02a3762ad3cc3
 - filename: AWS/Autoscale_via_lb/1nic/variables.tf
   checksum: b66042a0b339fd78deb79125c3ee6303fb0a743c121c3b44fb6c3255a00e1827
 - filename: AWS/Autoscale_via_lb/1nic/f5_onboard.tmpl
@@ -170,3 +170,5 @@ fileignoreconfig:
   checksum: 8d06d59cfd9a54650d81efc21e941e8c4ee334dbc034489c9284c5597e25adbb
 - filename: AWS/Infrastructure-only/README.md
   checksum: 0f5cd6bc1471085e76ca168a6578776f4fc185895cc3cbaaf09526915a479d26
+- filename: AWS/HA_via_api/terraform.tfvars.example
+  checksum: 1a18d2c20fccabe21e464db6145d71fc72f8a3500741af4a38e9ed6a07afe6e6
