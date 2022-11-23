@@ -3,6 +3,35 @@
 ############################ Locals ############################
 
 locals {
+  # Retrieve all BIG-IP secondary IPs
+  vm01_ext_ips = {
+    0 = {
+      ip = element(flatten(module.bigip.private_addresses["public_private"]["private_ips"][0]), 0)
+    }
+    1 = {
+      ip = element(flatten(module.bigip.private_addresses["public_private"]["private_ips"][0]), 1)
+    }
+  }
+  vm02_ext_ips = {
+    0 = {
+      ip = element(flatten(module.bigip2.private_addresses["public_private"]["private_ips"][0]), 0)
+    }
+    1 = {
+      ip = element(flatten(module.bigip2.private_addresses["public_private"]["private_ips"][0]), 1)
+    }
+  }
+  # Determine BIG-IP secondary IPs to be used for VIP
+  vm01_vip_ips = {
+    app1 = {
+      ip = module.bigip.private_addresses["public_private"]["private_ip"][0] != local.vm01_ext_ips.0.ip ? local.vm01_ext_ips.0.ip : local.vm01_ext_ips.1.ip
+    }
+  }
+  vm02_vip_ips = {
+    app1 = {
+      ip = module.bigip2.private_addresses["public_private"]["private_ip"][0] != local.vm02_ext_ips.0.ip ? local.vm02_ext_ips.0.ip : local.vm02_ext_ips.1.ip
+    }
+  }
+  # Custom tags
   tags = {
     Owner = var.resourceOwner
   }
@@ -80,8 +109,8 @@ locals {
     host1                   = module.bigip.private_addresses["mgmt_private"]["private_ip"][0]
     host2                   = module.bigip2.private_addresses["mgmt_private"]["private_ip"][0]
     remote_selfip_ext       = module.bigip2.private_addresses["public_private"]["private_ip"][0]
-    vip_az1                 = element(flatten(module.bigip.private_addresses["public_private"]["private_ips"][0]), 1)
-    vip_az2                 = element(flatten(module.bigip2.private_addresses["public_private"]["private_ips"][0]), 1)
+    vip_az1                 = local.vm01_vip_ips.app1.ip
+    vip_az2                 = local.vm02_vip_ips.app1.ip
     f5_cloud_failover_label = var.f5_cloud_failover_label
     cfe_managed_route       = var.cfe_managed_route
   })
@@ -120,8 +149,8 @@ locals {
     host1                   = module.bigip.private_addresses["mgmt_private"]["private_ip"][0]
     host2                   = module.bigip2.private_addresses["mgmt_private"]["private_ip"][0]
     remote_selfip_ext       = module.bigip.private_addresses["public_private"]["private_ip"][0]
-    vip_az1                 = element(flatten(module.bigip.private_addresses["public_private"]["private_ips"][0]), 1)
-    vip_az2                 = element(flatten(module.bigip2.private_addresses["public_private"]["private_ips"][0]), 1)
+    vip_az1                 = local.vm01_vip_ips.app1.ip
+    vip_az2                 = local.vm02_vip_ips.app1.ip
     f5_cloud_failover_label = var.f5_cloud_failover_label
     cfe_managed_route       = var.cfe_managed_route
   })
@@ -240,7 +269,7 @@ resource "aws_ec2_tag" "bigip_vip_label" {
 resource "aws_ec2_tag" "bigip_vip_ips" {
   resource_id = data.aws_eip.bigip_vip.id
   key         = "f5_cloud_failover_vips"
-  value       = "${element(flatten(module.bigip.private_addresses["public_private"]["private_ips"][0]), 1)},${element(flatten(module.bigip2.private_addresses["public_private"]["private_ips"][0]), 1)}"
+  value       = "${local.vm01_vip_ips.app1.ip},${local.vm02_vip_ips.app1.ip}"
 }
 resource "aws_ec2_tag" "bigip2_vip_label" {
   resource_id = data.aws_eip.bigip2_vip.id
@@ -250,7 +279,7 @@ resource "aws_ec2_tag" "bigip2_vip_label" {
 resource "aws_ec2_tag" "bigip2_vip_ips" {
   resource_id = data.aws_eip.bigip2_vip.id
   key         = "f5_cloud_failover_vips"
-  value       = "${element(flatten(module.bigip.private_addresses["public_private"]["private_ips"][0]), 1)},${element(flatten(module.bigip2.private_addresses["public_private"]["private_ips"][0]), 1)}"
+  value       = "${local.vm01_vip_ips.app1.ip},${local.vm02_vip_ips.app1.ip}"
 }
 
 ############################ Route Tables ############################
