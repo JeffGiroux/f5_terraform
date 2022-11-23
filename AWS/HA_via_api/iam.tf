@@ -156,7 +156,7 @@ data "aws_iam_policy_document" "bigip_policy" {
       "s3:PutObject"
     ]
     effect    = "Deny"
-    resources = ["${aws_s3_bucket.main.arn}/*"]
+    resources = ["arn:*:s3:::${aws_s3_bucket.main.id}/*"]
     condition {
       test     = "StringNotEquals"
       variable = "s3:x-amz-server-side-encryption"
