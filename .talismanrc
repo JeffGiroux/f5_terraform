@@ -69,7 +69,7 @@ fileignoreconfig:
 - filename: AWS/Standalone/bigip.tf
   checksum: ce85e1256966b66da2a116b9d996874693b815beafd16a38c76d51ba9238dcab
 - filename: AWS/HA_via_api/iam.tf
-  checksum: 12d2857e49dfa6fea3959291993533c4dca4b4f49c3480192425f19e1248ef38
+  checksum: ccaf58cadd2be0b108f0fd193ac1a122cbaa0b6d1af01def88c29fd06e191795
 - filename: AWS/HA_via_api/f5_onboard.tmpl
   checksum: 6ea386ef1c8950e0cae32025b35d31d2ed501213447fb9372bbe9f5ea713a01a
 - filename: AWS/HA_via_api/bigip.tf

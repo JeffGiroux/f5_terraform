@@ -40,7 +40,7 @@ data "aws_iam_policy_document" "bigip_policy" {
       "secretsmanager:ListSecretVersionIds",
     ]
     effect    = "Allow"
-    resources = [var.aws_secretmanager_secret_id == null ? "arn:aws::::mySecret123" : var.aws_secretmanager_secret_id]
+    resources = [var.aws_secretmanager_secret_id == null ? "arn:aws:secretsmanager:::secret:mySecret123" : var.aws_secretmanager_secret_id]
   }
   statement {
     sid = "cfeGetDeviceInfo"
@@ -125,7 +125,7 @@ data "aws_iam_policy_document" "bigip_policy" {
       "s3:GetBucketTagging"
     ]
     effect    = "Allow"
-    resources = [aws_s3_bucket.main.arn]
+    resources = ["arn:*:s3:::${aws_s3_bucket.main.id}"]
   }
   statement {
     sid = "cfeUpdateBucketInfo"
@@ -135,7 +135,7 @@ data "aws_iam_policy_document" "bigip_policy" {
       "s3:DeleteObject"
     ]
     effect    = "Allow"
-    resources = ["${aws_s3_bucket.main.arn}/*"]
+    resources = ["arn:*:s3:::${aws_s3_bucket.main.id}/*"]
   }
   statement {
     sid = "cfeBucketDenyPublishingUnencryptedResources"
@@ -143,7 +143,7 @@ data "aws_iam_policy_document" "bigip_policy" {
       "s3:PutObject"
     ]
     effect    = "Deny"
-    resources = ["${aws_s3_bucket.main.arn}/*"]
+    resources = ["arn:*:s3:::${aws_s3_bucket.main.id}/*"]
     condition {
       test     = "Null"
       variable = "s3:x-amz-server-side-encryption"
