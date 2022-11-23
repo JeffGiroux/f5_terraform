@@ -1,9 +1,12 @@
-# Create IAM Role
+# IAM Role
 
 # Note: Only created if variable 'aws_iam_instance_profile' is not
-#       supplied by user. If you have your own IAM role, make sure
-#       the policy includes access to AWS Secrets Managers.
+#       supplied by user.
 
+# Retrieve account info
+data "aws_caller_identity" "main" {}
+
+# Create IAM role
 data "aws_iam_policy_document" "bigip_role" {
   version = "2012-10-17"
   statement {
@@ -17,62 +20,148 @@ data "aws_iam_policy_document" "bigip_role" {
   }
 }
 
+# Create IAM policy
 data "aws_iam_policy_document" "bigip_policy" {
   version = "2012-10-17"
   statement {
+    sid = "secretsListAll"
+    actions = [
+      "secretsmanager:ListSecrets"
+    ]
+    effect    = "Allow"
+    resources = ["*"]
+  }
+  statement {
+    sid = "secretsGetValue"
     actions = [
       "secretsmanager:GetResourcePolicy",
       "secretsmanager:GetSecretValue",
       "secretsmanager:DescribeSecret",
       "secretsmanager:ListSecretVersionIds",
-      "secretsmanager:ListSecrets"
     ]
-    resources = ["*"]
     effect    = "Allow"
+    resources = [var.aws_secretmanager_secret_id == null ? "arn:aws:s3:::examplebucket" : var.aws_secretmanager_secret_id]
   }
   statement {
+    sid = "cfeGetDeviceInfo"
     actions = [
+      "ec2:DescribeAddresses",
       "ec2:DescribeInstances",
       "ec2:DescribeInstanceStatus",
-      "ec2:DescribeAddresses",
       "ec2:DescribeNetworkInterfaces",
       "ec2:DescribeNetworkInterfaceAttribute",
-      "ec2:DescribeRouteTables",
-      "s3:ListAllMyBuckets",
-      "s3:GetBucketLocation",
+      "ec2:DescribeTags"
+    ]
+    effect    = "Allow"
+    resources = ["*"]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:RequestedRegion"
+      values   = [var.awsRegion]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "aws:PrincipalAccount"
+      values   = [data.aws_caller_identity.main.account_id]
+    }
+  }
+  statement {
+    sid = "cfeGetNetworkInfo"
+    actions = [
+      "ec2:DescribeSubnets",
+      "ec2:DescribeRouteTables"
+    ]
+    effect    = "Allow"
+    resources = ["*"]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:RequestedRegion"
+      values   = [var.awsRegion]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "aws:PrincipalAccount"
+      values   = [data.aws_caller_identity.main.account_id]
+    }
+  }
+  statement {
+    sid = "cfeUpdateObjects"
+    actions = [
       "ec2:AssociateAddress",
       "ec2:DisassociateAddress",
       "ec2:AssignPrivateIpAddresses",
-      "ec2:UnassignPrivateIpAddresses"
-    ]
-    resources = ["*"]
-    effect    = "Allow"
-  }
-  statement {
-    actions = [
+      "ec2:UnassignPrivateIpAddresses",
+      "ec2:AssignIpv6Addresses",
+      "ec2:UnassignIpv6Addresses",
       "ec2:CreateRoute",
       "ec2:ReplaceRoute"
     ]
-    resources = ["*"]
     effect    = "Allow"
+    resources = ["*"]
+    condition {
+      test     = "StringLike"
+      variable = "aws:ResourceTag/f5_cloud_failover_label"
+      values   = [var.f5_cloud_failover_label]
+    }
   }
   statement {
+    sid = "cfeListAllBuckets"
+    actions = [
+      "s3:ListAllMyBuckets"
+    ]
+    effect    = "Allow"
+    resources = ["*"]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:PrincipalAccount"
+      values   = [data.aws_caller_identity.main.account_id]
+    }
+  }
+  statement {
+    sid = "cfeGetBucketInfo"
     actions = [
       "s3:ListBucket",
       "s3:GetBucketLocation",
       "s3:GetBucketTagging"
     ]
-    resources = [aws_s3_bucket.main.arn]
     effect    = "Allow"
+    resources = [aws_s3_bucket.main.arn]
   }
   statement {
+    sid = "cfeUpdateBucketInfo"
     actions = [
       "s3:PutObject",
       "s3:GetObject",
       "s3:DeleteObject"
     ]
-    resources = ["${aws_s3_bucket.main.arn}/*"]
     effect    = "Allow"
+    resources = ["${aws_s3_bucket.main.arn}/*"]
+  }
+  statement {
+    sid = "cfeBucketDenyPublishingUnencryptedResources"
+    actions = [
+      "s3:PutObject"
+    ]
+    effect    = "Deny"
+    resources = ["${aws_s3_bucket.main.arn}/*"]
+    condition {
+      test     = "Null"
+      variable = "s3:x-amz-server-side-encryption"
+      values   = ["true"]
+    }
+  }
+  statement {
+    sid = "cfeBucketDenyIncorrectEncryptionHeader"
+    actions = [
+      "s3:PutObject"
+    ]
+    effect    = "Deny"
+    resources = ["${aws_s3_bucket.main.arn}/*"]
+    condition {
+      test     = "StringNotEquals"
+      variable = "s3:x-amz-server-side-encryption"
+      values   = ["AES256"]
+    }
   }
 }
 
