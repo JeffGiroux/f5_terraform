@@ -40,7 +40,7 @@ data "aws_iam_policy_document" "bigip_policy" {
       "secretsmanager:ListSecretVersionIds",
     ]
     effect    = "Allow"
-    resources = [var.aws_secretmanager_secret_id == null ? "arn:aws:s3:::examplebucket" : var.aws_secretmanager_secret_id]
+    resources = [var.aws_secretmanager_secret_id == null ? "arn:aws::::mySecret123" : var.aws_secretmanager_secret_id]
   }
   statement {
     sid = "cfeGetDeviceInfo"
