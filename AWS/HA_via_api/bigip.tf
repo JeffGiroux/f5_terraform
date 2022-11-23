@@ -170,7 +170,7 @@ module "bigip2" {
   tags                       = local.tags
 }
 
-############################ Collect Network Info ############################
+############################ Tagging ############################
 
 # JeffGiroux  Needed as workaround.
 #             Currenly the BIG-IP module does not support
@@ -178,50 +178,6 @@ module "bigip2" {
 #             AWS has pre-reqs and some items need tagging.
 #
 #             https://github.com/F5Networks/terraform-aws-bigip-module/issues/22
-
-# BIG-IP 1 NIC info
-data "aws_network_interface" "bigip_ext" {
-  filter {
-    name   = "attachment.instance-id"
-    values = [module.bigip.bigip_instance_ids]
-  }
-  filter {
-    name   = "tag:Name"
-    values = ["BIGIP-External-Public-Interface-0"]
-  }
-}
-data "aws_network_interface" "bigip_int" {
-  filter {
-    name   = "attachment.instance-id"
-    values = [module.bigip.bigip_instance_ids]
-  }
-  filter {
-    name   = "tag:Name"
-    values = ["BIGIP-Internal-Interface-0"]
-  }
-}
-
-# BIG-IP 2 NIC info
-data "aws_network_interface" "bigip2_ext" {
-  filter {
-    name   = "attachment.instance-id"
-    values = [module.bigip2.bigip_instance_ids]
-  }
-  filter {
-    name   = "tag:Name"
-    values = ["BIGIP-External-Public-Interface-0"]
-  }
-}
-data "aws_network_interface" "bigip2_int" {
-  filter {
-    name   = "attachment.instance-id"
-    values = [module.bigip2.bigip_instance_ids]
-  }
-  filter {
-    name   = "tag:Name"
-    values = ["BIGIP-Internal-Interface-0"]
-  }
-}
 
 # Public VIP info
 data "aws_eip" "bigip_vip" {
@@ -231,48 +187,46 @@ data "aws_eip" "bigip2_vip" {
   public_ip = module.bigip2.public_addresses["external_secondary_public"][0]
 }
 
-############################ Tagging ############################
-
 # Add Cloud Failover tags to BIG-IP 1 NICs
 resource "aws_ec2_tag" "bigip_ext_label" {
-  resource_id = data.aws_network_interface.bigip_ext.id
+  resource_id = element(flatten(module.bigip.bigip_nic_ids["public_private"]), 0)
   key         = "f5_cloud_failover_label"
   value       = var.f5_cloud_failover_label
 }
 resource "aws_ec2_tag" "bigip_ext_nicmap" {
-  resource_id = data.aws_network_interface.bigip_ext.id
+  resource_id = element(flatten(module.bigip.bigip_nic_ids["public_private"]), 0)
   key         = "f5_cloud_failover_nic_map"
   value       = "external"
 }
 resource "aws_ec2_tag" "bigip_int_label" {
-  resource_id = data.aws_network_interface.bigip_int.id
+  resource_id = element(flatten(module.bigip.bigip_nic_ids["internal_private"]), 0)
   key         = "f5_cloud_failover_label"
   value       = var.f5_cloud_failover_label
 }
 resource "aws_ec2_tag" "bigip_int_nicmap" {
-  resource_id = data.aws_network_interface.bigip_int.id
+  resource_id = element(flatten(module.bigip.bigip_nic_ids["internal_private"]), 0)
   key         = "f5_cloud_failover_nic_map"
   value       = "internal"
 }
 
 # Add Cloud Failover tags to BIG-IP 2 NICs
 resource "aws_ec2_tag" "bigip2_ext_label" {
-  resource_id = data.aws_network_interface.bigip2_ext.id
+  resource_id = element(flatten(module.bigip2.bigip_nic_ids["public_private"]), 0)
   key         = "f5_cloud_failover_label"
   value       = var.f5_cloud_failover_label
 }
 resource "aws_ec2_tag" "bigip2_ext_nicmap" {
-  resource_id = data.aws_network_interface.bigip2_ext.id
+  resource_id = element(flatten(module.bigip2.bigip_nic_ids["public_private"]), 0)
   key         = "f5_cloud_failover_nic_map"
   value       = "external"
 }
 resource "aws_ec2_tag" "bigip2_int_label" {
-  resource_id = data.aws_network_interface.bigip2_int.id
+  resource_id = element(flatten(module.bigip2.bigip_nic_ids["internal_private"]), 0)
   key         = "f5_cloud_failover_label"
   value       = var.f5_cloud_failover_label
 }
 resource "aws_ec2_tag" "bigip2_int_nicmap" {
-  resource_id = data.aws_network_interface.bigip2_int.id
+  resource_id = element(flatten(module.bigip2.bigip_nic_ids["internal_private"]), 0)
   key         = "f5_cloud_failover_nic_map"
   value       = "internal"
 }
@@ -289,7 +243,7 @@ resource "aws_ec2_tag" "bigip_vip_ips" {
   value       = "${element(flatten(module.bigip.private_addresses["public_private"]["private_ips"][0]), 1)},${element(flatten(module.bigip2.private_addresses["public_private"]["private_ips"][0]), 1)}"
 }
 resource "aws_ec2_tag" "bigip2_vip_label" {
-  resource_id = data.aws_network_interface.bigip2_int.id
+  resource_id = data.aws_eip.bigip2_vip.id
   key         = "f5_cloud_failover_label"
   value       = var.f5_cloud_failover_label
 }
@@ -307,7 +261,7 @@ resource "aws_route_table" "main" {
 
   route {
     cidr_block           = var.cfe_managed_route
-    network_interface_id = data.aws_network_interface.bigip2_ext.id
+    network_interface_id = element(flatten(module.bigip2.bigip_nic_ids["public_private"]), 0)
   }
 
   tags = {
