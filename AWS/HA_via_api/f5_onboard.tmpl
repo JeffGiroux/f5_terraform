@@ -318,7 +318,14 @@ extension_services:
       value:
         class: Cloud_Failover
         environment: aws
+        controls:
+          class: Controls
+          logLevel: silly
         externalStorage:
+          encryption:
+            serverSide:
+              enabled: true
+              algorithm: AES256
           scopingTags:
             f5_cloud_failover_label: '{{{ FAILOVER_LABEL }}}'
         failoverAddresses:
