@@ -47,6 +47,6 @@ variable "int_address_prefixes" {
 }
 variable "resourceOwner" {
   type        = string
-  description = "owner of the deployment, for tagging purposes"
-  default     = "myName"
+  default     = null
+  description = "This is a tag used for object creation. Example is last name."
 }

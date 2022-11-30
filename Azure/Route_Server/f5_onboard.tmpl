@@ -38,7 +38,7 @@ if ${az_keyvault_authentication}; then
       environment: azure
       type: KeyVault
       vaultUrl: ${vault_url}
-      secretId: ${f5_password}
+      secretId: ${keyvault_secret}
 EOF
 else
    cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml

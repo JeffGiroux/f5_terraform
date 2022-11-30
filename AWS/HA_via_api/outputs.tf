@@ -74,17 +74,9 @@ output "f5vm02_instance_ids" {
 }
 output "public_vip" {
   description = "Public IP for the BIG-IP listener (VIP)"
-  value       = module.bigip.public_addresses["external_secondary_public"][0]
-}
-output "public_vip_2" {
-  description = "Public IP for the BIG-IP listener (VIP) #2"
   value       = module.bigip2.public_addresses["external_secondary_public"][0]
 }
 output "public_vip_url" {
   description = "public URL for application"
-  value       = "http://${module.bigip.public_addresses["external_secondary_public"][0]}"
-}
-output "public_vip_url_2" {
-  description = "public URL for application #2"
   value       = "http://${module.bigip2.public_addresses["external_secondary_public"][0]}"
 }

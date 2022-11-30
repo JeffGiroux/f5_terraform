@@ -1,7 +1,7 @@
 # Set minimum Terraform version and Terraform Cloud backend
 terraform {
-  required_version = ">= 0.14"
+  required_version = "~> 1.0"
   required_providers {
-    aws = ">= 4"
+    aws = "~> 4.0"
   }
 }

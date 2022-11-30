@@ -35,7 +35,7 @@ if ${aws_secretmanager_auth}; then
       environment: aws
       type: SecretsManager
       version: AWSCURRENT
-      secretId: ${f5_password}
+      secretId: ${aws_secretmanager_secret_id}
 EOF
 else
    cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
@@ -127,7 +127,7 @@ extension_services:
               serviceMain:
                 class: Service_HTTP
                 virtualAddresses:
-                  - 0.0.0.0/0
+                  - '0.0.0.0/0'
                 pool: web_pool
               web_pool:
                 class: Pool
