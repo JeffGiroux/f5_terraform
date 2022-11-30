@@ -159,8 +159,6 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | [aws_ec2_tag.bigip_ext_nicmap](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_tag) | resource |
 | [aws_ec2_tag.bigip_int_label](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_tag) | resource |
 | [aws_ec2_tag.bigip_int_nicmap](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_tag) | resource |
-| [aws_ec2_tag.bigip_vip_ips](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_tag) | resource |
-| [aws_ec2_tag.bigip_vip_label](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_tag) | resource |
 | [aws_iam_instance_profile.bigip_profile](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_instance_profile) | resource |
 | [aws_iam_role.bigip_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_key_pair.bigip](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/key_pair) | resource |
@@ -171,7 +169,6 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | [aws_ami.f5_ami](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami) | data source |
 | [aws_caller_identity.main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 | [aws_eip.bigip2_vip](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/eip) | data source |
-| [aws_eip.bigip_vip](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/eip) | data source |
 | [aws_iam_policy_document.bigip_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.bigip_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_secretsmanager_secret.password](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/secretsmanager_secret) | data source |
@@ -251,9 +248,7 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | <a name="output_f5vm02_mgmt_private_ip"></a> [f5vm02\_mgmt\_private\_ip](#output\_f5vm02\_mgmt\_private\_ip) | f5vm02 management private IP address |
 | <a name="output_f5vm02_mgmt_public_ip"></a> [f5vm02\_mgmt\_public\_ip](#output\_f5vm02\_mgmt\_public\_ip) | f5vm02 management public IP address |
 | <a name="output_public_vip"></a> [public\_vip](#output\_public\_vip) | Public IP for the BIG-IP listener (VIP) |
-| <a name="output_public_vip_2"></a> [public\_vip\_2](#output\_public\_vip\_2) | Public IP for the BIG-IP listener (VIP) #2 |
 | <a name="output_public_vip_url"></a> [public\_vip\_url](#output\_public\_vip\_url) | public URL for application |
-| <a name="output_public_vip_url_2"></a> [public\_vip\_url\_2](#output\_public\_vip\_url\_2) | public URL for application #2 |
 | <a name="output_route_table"></a> [route\_table](#output\_route\_table) | Route table ID |
 | <a name="output_storage_bucket"></a> [storage\_bucket](#output\_storage\_bucket) | AWS storage bucket ARN |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

@@ -208,14 +208,6 @@ module "bigip2" {
 #
 #             https://github.com/F5Networks/terraform-aws-bigip-module/issues/22
 
-# Public VIP info
-data "aws_eip" "bigip_vip" {
-  public_ip = module.bigip.public_addresses["external_secondary_public"][0]
-}
-data "aws_eip" "bigip2_vip" {
-  public_ip = module.bigip2.public_addresses["external_secondary_public"][0]
-}
-
 # Add Cloud Failover tags to BIG-IP 1 NICs
 resource "aws_ec2_tag" "bigip_ext_label" {
   resource_id = element(flatten(module.bigip.bigip_nic_ids["public_private"]), 0)
@@ -260,17 +252,12 @@ resource "aws_ec2_tag" "bigip2_int_nicmap" {
   value       = "internal"
 }
 
-# Add Cloud Failover tags to VIPs (public IP)
-resource "aws_ec2_tag" "bigip_vip_label" {
-  resource_id = data.aws_eip.bigip_vip.id
-  key         = "f5_cloud_failover_label"
-  value       = var.f5_cloud_failover_label
+# Public VIP info
+data "aws_eip" "bigip2_vip" {
+  public_ip = module.bigip2.public_addresses["external_secondary_public"][0]
 }
-resource "aws_ec2_tag" "bigip_vip_ips" {
-  resource_id = data.aws_eip.bigip_vip.id
-  key         = "f5_cloud_failover_vips"
-  value       = "${local.vm01_vip_ips.app1.ip},${local.vm02_vip_ips.app1.ip}"
-}
+
+# Add Cloud Failover tags to public VIP
 resource "aws_ec2_tag" "bigip2_vip_label" {
   resource_id = data.aws_eip.bigip2_vip.id
   key         = "f5_cloud_failover_label"
