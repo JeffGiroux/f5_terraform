@@ -90,6 +90,11 @@ variable "ec2_instance_type" {
   description = "AWS instance type for the BIG-IP"
   default     = "m5n.xlarge"
 }
+variable "ec2_key_name" {
+  type        = string
+  description = "AWS EC2 Key name for SSH access"
+  default     = null
+}
 variable "f5_username" {
   type        = string
   description = "User name for the BIG-IP (Note: currenlty not used. Defaults to 'admin' based on AMI"
@@ -114,10 +119,6 @@ variable "aws_iam_instance_profile" {
   description = "Name of IAM role to assign to the BIG-IP instance"
   type        = string
   default     = null
-}
-variable "ssh_key" {
-  type        = string
-  description = "public key used for authentication in ssh-rsa format"
 }
 variable "license1" {
   type        = string

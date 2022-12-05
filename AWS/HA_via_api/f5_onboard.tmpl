@@ -12,6 +12,13 @@ exec 1>&-
 exec 1>$npipe
 exec 2>&1
 
+# Run Immediately Before MCPD starts
+/usr/bin/setdb provision.extramb 1000
+/usr/bin/setdb restjavad.useextramb true
+
+# save config
+tmsh save sys config
+ssh_keypair2=$(cat /home/admin/.ssh/authorized_keys)
 
 ### write_files:
 # Download or Render BIG-IP Runtime Init Config
@@ -24,8 +31,8 @@ runtime_parameters:
     value: ${f5_username}
   - name: SSH_KEYS
     type: static
-    value: ${ssh_keypair}
 EOF
+echo "    value: $ssh_keypair2" >> /config/cloud/runtime-init-conf.yaml
 
 if ${aws_secretmanager_auth}; then
    cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
@@ -354,7 +361,7 @@ EOF
 
 # Download BIG-IP Runtime Init
 for i in {1..30}; do
-    curl -fv --retry 1 --connect-timeout 5 -L ${INIT_URL} -o "/var/config/rest/downloads/f5-bigip-runtime.gz.run" && break || sleep 10
+    curl -fv --retry 1 --connect-timeout 5 -L ${INIT_URL} -o "/var/config/rest/downloads/f5-bigip-runtime-init.gz.run" && break || sleep 10
 done
 
 # Remove comment to do silly debugging on BIG-IP Runtime init
@@ -362,7 +369,7 @@ done
 # export F5_BIGIP_RUNTIME_EXTENSION_INSTALL_DELAY_IN_MS=60000
 
 # Install BIG-IP Runtime Init
-bash /var/config/rest/downloads/f5-bigip-runtime.gz.run -- '--cloud aws'
+bash /var/config/rest/downloads/f5-bigip-runtime-init.gz.run -- '--cloud aws'
 
 # Run BIG-IP Runtime Init and Process YAML
 f5-bigip-runtime-init --config-file /config/cloud/runtime-init-conf.yaml
