@@ -49,14 +49,6 @@ data "aws_ami" "f5_ami" {
   }
 }
 
-############################ SSH Key pair ############################
-
-# Create SSH Key Pair
-resource "aws_key_pair" "bigip" {
-  key_name   = format("%s-key-%s", var.projectPrefix, random_id.buildSuffix.hex)
-  public_key = var.ssh_key
-}
-
 ############################ Onboard Scripts ############################
 
 # Setup Onboarding scripts
@@ -67,7 +59,6 @@ locals {
     f5_password                 = var.aws_secretmanager_auth ? "" : var.f5_password
     aws_secretmanager_auth      = var.aws_secretmanager_auth
     aws_secretmanager_secret_id = var.aws_secretmanager_auth ? data.aws_secretsmanager_secret_version.current[0].secret_id : ""
-    ssh_keypair                 = var.ssh_key
     INIT_URL                    = var.INIT_URL
     DO_URL                      = var.DO_URL
     AS3_URL                     = var.AS3_URL
@@ -101,7 +92,7 @@ module "bigip" {
   version                    = "1.1.8"
   prefix                     = format("%s-3nic", var.projectPrefix)
   ec2_instance_type          = var.ec2_instance_type
-  ec2_key_name               = aws_key_pair.bigip.key_name
+  ec2_key_name               = var.ec2_key_name
   f5_ami_search_name         = var.f5_ami_search_name
   f5_username                = var.f5_username
   aws_iam_instance_profile   = var.aws_iam_instance_profile == null ? aws_iam_instance_profile.bigip_profile[0].name : var.aws_iam_instance_profile
