@@ -10,7 +10,7 @@ intSubnetAz2  = "subnet-6666"
 mgmtNsg       = "sg-1111"
 extNsg        = "sg-3333"
 intNsg        = "sg-5555"
-ssh_key       = "ssh-rsa AAABC123....."
+ec2_key_name  = "mySshKey123"
 f5_username   = "admin"
 f5_password   = "Default12345!"
 
