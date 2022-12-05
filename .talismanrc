@@ -30,8 +30,6 @@ fileignoreconfig:
   checksum: be22e7624dfa1ad0bbfe57a6205f22cbdafd198b6c4aa2403da0bc7366d4c4cf
 - filename: Azure/Route_Server/admin.auto.tfvars.example
   checksum: 50353e060f88bd8692d5b140ca44100dd6b8c90d0aea67fd38e5c64a89e5ddbe
-- filename: AWS/Autoscale_via_lb/1nic/terraform.tfvars.example
-  checksum: 28ed16029e72f2a7dad510f71bb60cb70d6f0d7468f8c7127546bb8d82c3bfe7
 - filename: AWS/Standalone/terraform.tfvars.example
   checksum: 051def664f2f08f74c399b8ed06a03c4d2d8c83950ebed82bf13c05e89a240ba
 - filename: AWS/Standalone/variables.tf
@@ -74,12 +72,6 @@ fileignoreconfig:
   checksum: 979c385e3173d56e36f02cf05d8e66bfee4f4a20764368fe29ece85ca6cf49cb
 - filename: AWS/Autoscale_via_lb/1nic/variables.tf
   checksum: b66042a0b339fd78deb79125c3ee6303fb0a743c121c3b44fb6c3255a00e1827
-- filename: AWS/Autoscale_via_lb/1nic/f5_onboard.tmpl
-  checksum: ed86217289aa6845640bbcbc94587d3d888fa8a7c603830b1a6b34789ca7598e
-- filename: AWS/Autoscale_via_lb/1nic/bigip.tf
-  checksum: e2c7c4a0403dc529ba8fe55dd9acb0af7ffa58d2c95bc795229d87fbf89f8ada
-- filename: AWS/Autoscale_via_lb/1nic/README.md
-  checksum: 2580803f30ee385df7960cd4bdadf763e20f088c010ca9d66e1f890783529b20
 - filename: Azure/Standalone/terraform.tfvars.example
   checksum: 30c74d5df038e79d8af2e55cc82c1445260a7df53d662c7f8b09b5e93e599900
 - filename: Azure/Standalone/variables.tf
@@ -172,3 +164,11 @@ fileignoreconfig:
   checksum: 764c63eee4f812c34d7df8187bdaaf55c344c5c201cc1baab91b9f90fa05c5bd
 - filename: AWS/HA_via_api/bigip.tf
   checksum: 7481950795c707d4b63ecf9832945525819126811d8fdad87bf72e584a028420
+- filename: AWS/Autoscale_via_lb/1nic/terraform.tfvars.example
+  checksum: bcba5d4c20bb108627c14dc1a278ba4002eb21f34418af2215b0924b0848d340
+- filename: AWS/Autoscale_via_lb/1nic/bigip.tf
+  checksum: ad9c40c31a8ea1eea490b12f6afe99ff586c74a923cb396fbc03adee2016ab1a
+- filename: AWS/Autoscale_via_lb/1nic/README.md
+  checksum: d98712b39cb70a45b460d064e4b601ea28a45569ca6c798b75895c4b0261d6ae
+- filename: AWS/Autoscale_via_lb/1nic/f5_onboard.tmpl
+  checksum: eaa5eae691d0f725f22b149751bf45f611fce6570040048afce4eb76894649bd
