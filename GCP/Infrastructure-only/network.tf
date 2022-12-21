@@ -1,13 +1,15 @@
 # Networking
 
+############################ VPC and Subnets ############################
+
 # VPC Mgmt
 resource "google_compute_network" "vpc_mgmt" {
-  name                    = "${var.projectPrefix}-net-mgmt"
+  name                    = format("%s-net-mgmt-%s", var.projectPrefix, random_id.buildSuffix.hex)
   auto_create_subnetworks = "false"
   routing_mode            = "REGIONAL"
 }
 resource "google_compute_subnetwork" "vpc_mgmt_sub" {
-  name          = "${var.projectPrefix}-subnet-mgmt"
+  name          = format("%s-subnet-mgmt-%s", var.projectPrefix, random_id.buildSuffix.hex)
   ip_cidr_range = var.mgmt_address_prefix
   region        = var.gcp_region
   network       = google_compute_network.vpc_mgmt.id
@@ -15,12 +17,12 @@ resource "google_compute_subnetwork" "vpc_mgmt_sub" {
 
 # VPC External
 resource "google_compute_network" "vpc_ext" {
-  name                    = "${var.projectPrefix}-net-ext"
+  name                    = format("%s-net-ext-%s", var.projectPrefix, random_id.buildSuffix.hex)
   auto_create_subnetworks = "false"
   routing_mode            = "REGIONAL"
 }
 resource "google_compute_subnetwork" "vpc_ext_sub" {
-  name          = "${var.projectPrefix}-subnet-ext"
+  name          = format("%s-subnet-ext-%s", var.projectPrefix, random_id.buildSuffix.hex)
   ip_cidr_range = var.ext_address_prefix
   region        = var.gcp_region
   network       = google_compute_network.vpc_ext.id
@@ -28,20 +30,22 @@ resource "google_compute_subnetwork" "vpc_ext_sub" {
 
 # VPC Internal
 resource "google_compute_network" "vpc_int" {
-  name                    = "${var.projectPrefix}-net-int"
+  name                    = format("%s-net-int-%s", var.projectPrefix, random_id.buildSuffix.hex)
   auto_create_subnetworks = "false"
   routing_mode            = "REGIONAL"
 }
 resource "google_compute_subnetwork" "vpc_int_sub" {
-  name          = "${var.projectPrefix}-subnet-int"
+  name          = format("%s-subnet-int-%s", var.projectPrefix, random_id.buildSuffix.hex)
   ip_cidr_range = var.int_address_prefix
   region        = var.gcp_region
   network       = google_compute_network.vpc_int.id
 }
 
+############################ Firewall Rules ############################
+
 # Firewall Rules
 resource "google_compute_firewall" "default-allow-internal-mgmt" {
-  name          = "${var.projectPrefix}-default-allow-internal-mgmt"
+  name          = format("%s-default-allow-internal-mgmt-%s", var.projectPrefix, random_id.buildSuffix.hex)
   network       = google_compute_network.vpc_mgmt.name
   source_ranges = [var.mgmt_address_prefix]
   allow {
@@ -58,7 +62,7 @@ resource "google_compute_firewall" "default-allow-internal-mgmt" {
 }
 
 resource "google_compute_firewall" "default-allow-internal-ext" {
-  name          = "${var.projectPrefix}-default-allow-internal-ext"
+  name          = format("%s-default-allow-internal-ext-%s", var.projectPrefix, random_id.buildSuffix.hex)
   network       = google_compute_network.vpc_ext.name
   source_ranges = [var.ext_address_prefix]
   allow {
@@ -75,7 +79,7 @@ resource "google_compute_firewall" "default-allow-internal-ext" {
 }
 
 resource "google_compute_firewall" "default-allow-internal-int" {
-  name          = "${var.projectPrefix}-default-allow-internal-int"
+  name          = format("%s-default-allow-internal-int-%s", var.projectPrefix, random_id.buildSuffix.hex)
   network       = google_compute_network.vpc_int.name
   source_ranges = [var.int_address_prefix]
   allow {
@@ -92,7 +96,7 @@ resource "google_compute_firewall" "default-allow-internal-int" {
 }
 
 resource "google_compute_firewall" "mgmt" {
-  name          = "${var.projectPrefix}-allow-mgmt"
+  name          = format("%s-allow-mgmt-%s", var.projectPrefix, random_id.buildSuffix.hex)
   network       = google_compute_network.vpc_mgmt.name
   source_ranges = [var.adminSrcAddr]
   allow {
@@ -105,7 +109,7 @@ resource "google_compute_firewall" "mgmt" {
 }
 
 resource "google_compute_firewall" "app" {
-  name          = "${var.projectPrefix}-allow-app"
+  name          = format("%s-allow-app-%s", var.projectPrefix, random_id.buildSuffix.hex)
   network       = google_compute_network.vpc_ext.name
   source_ranges = [var.adminSrcAddr]
   allow {
@@ -118,7 +122,7 @@ resource "google_compute_firewall" "app" {
 }
 
 resource "google_compute_firewall" "one_nic" {
-  name          = "${var.projectPrefix}-allow-mgmt-1nic"
+  name          = format("%s-allow-mgmt-1nic-%s", var.projectPrefix, random_id.buildSuffix.hex)
   network       = google_compute_network.vpc_ext.name
   source_ranges = [var.adminSrcAddr]
   allow {
@@ -131,7 +135,7 @@ resource "google_compute_firewall" "one_nic" {
 }
 
 resource "google_compute_firewall" "app-ilb-probe" {
-  name          = "${var.projectPrefix}-allow-app-ilb-probe"
+  name          = format("%s-allow-app-ilb-probe-%s", var.projectPrefix, random_id.buildSuffix.hex)
   network       = google_compute_network.vpc_ext.name
   source_ranges = ["35.191.0.0/16", "130.211.0.0/22"]
   allow {

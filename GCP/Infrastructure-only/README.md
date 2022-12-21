@@ -38,14 +38,15 @@ This solution uses a Terraform template to launch a new networking stack. It wil
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.14.5 |
-| <a name="requirement_google"></a> [google](#requirement\_google) | >= 4 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.2.0 |
+| <a name="requirement_google"></a> [google](#requirement\_google) | >= 4.46.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | >= 4 |
+| <a name="provider_google"></a> [google](#provider\_google) | 4.46.0 |
+| <a name="provider_random"></a> [random](#provider\_random) | 3.4.3 |
 
 ## Modules
 
@@ -68,7 +69,7 @@ No modules.
 | [google_compute_subnetwork.vpc_ext_sub](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_subnetwork) | resource |
 | [google_compute_subnetwork.vpc_int_sub](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_subnetwork) | resource |
 | [google_compute_subnetwork.vpc_mgmt_sub](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_subnetwork) | resource |
-| [google_storage_bucket.main](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket) | resource |
+| [random_id.buildSuffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
 
 ## Inputs
 
@@ -76,7 +77,7 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_adminSrcAddr"></a> [adminSrcAddr](#input\_adminSrcAddr) | Allowed Admin source IP prefix | `string` | `"0.0.0.0/0"` | no |
 | <a name="input_ext_address_prefix"></a> [ext\_address\_prefix](#input\_ext\_address\_prefix) | External subnet address prefix | `string` | `"10.1.10.0/24"` | no |
-| <a name="input_f5_cloud_failover_label"></a> [f5\_cloud\_failover\_label](#input\_f5\_cloud\_failover\_label) | This is a tag used for F5 Cloud Failover Extension to identity which cloud objects to move during a failover event. | `string` | `"mydeployment"` | no |
+| <a name="input_f5_cloud_failover_label"></a> [f5\_cloud\_failover\_label](#input\_f5\_cloud\_failover\_label) | This is a tag used for F5 Cloud Failover Extension to identity which cloud objects to move during a failover event. | `string` | `"myFailover"` | no |
 | <a name="input_gcp_project_id"></a> [gcp\_project\_id](#input\_gcp\_project\_id) | GCP Project ID for provider | `string` | `null` | no |
 | <a name="input_gcp_region"></a> [gcp\_region](#input\_gcp\_region) | GCP Region for provider | `string` | `"us-west1"` | no |
 | <a name="input_gcp_zone_1"></a> [gcp\_zone\_1](#input\_gcp\_zone\_1) | GCP Zone 1 for provider | `string` | `"us-west1-a"` | no |
@@ -89,13 +90,12 @@ No modules.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_external_subnet"></a> [external\_subnet](#output\_external\_subnet) | External subnet name |
+| <a name="output_external_subnet_name"></a> [external\_subnet\_name](#output\_external\_subnet\_name) | External subnet name |
 | <a name="output_external_vpc"></a> [external\_vpc](#output\_external\_vpc) | External VPC name |
-| <a name="output_internal_subnet"></a> [internal\_subnet](#output\_internal\_subnet) | Internal subnet name |
+| <a name="output_internal_subnet_name"></a> [internal\_subnet\_name](#output\_internal\_subnet\_name) | Internal subnet name |
 | <a name="output_internal_vpc"></a> [internal\_vpc](#output\_internal\_vpc) | Internal VPC name |
-| <a name="output_mgmt_subnet"></a> [mgmt\_subnet](#output\_mgmt\_subnet) | Management subnet name |
+| <a name="output_mgmt_subnet_name"></a> [mgmt\_subnet\_name](#output\_mgmt\_subnet\_name) | Management subnet name |
 | <a name="output_mgmt_vpc"></a> [mgmt\_vpc](#output\_mgmt\_vpc) | Management VPC name |
-| <a name="output_storage_bucket"></a> [storage\_bucket](#output\_storage\_bucket) | Storage bucket name |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 <!-- markdownlint-enable no-inline-html -->
 

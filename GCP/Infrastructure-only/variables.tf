@@ -47,6 +47,6 @@ variable "resourceOwner" {
 }
 variable "f5_cloud_failover_label" {
   type        = string
-  default     = "mydeployment"
+  default     = "myFailover"
   description = "This is a tag used for F5 Cloud Failover Extension to identity which cloud objects to move during a failover event."
 }
