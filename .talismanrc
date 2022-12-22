@@ -4,8 +4,6 @@ fileignoreconfig:
 - filename: GCP/Standalone/examples/f5_onboard_with_ts.tmpl
   checksum: 98ff92b95be5cc20170aa6f254196f08e08411861eff298fba7e5053adef63a2
   checksum: 256d71ef902b939820d527ce15980f417be3b64aba4e36de2cc824681c8a391b
-- filename: GCP/HA_via_api/terraform.tfvars.example
-  checksum: f6ea35c21254781aa3bf2add99848730d6898ce9a4e3c44f4e072b5e1a458f71
 - filename: Azure/Secure_Enclave_Public_DMZ/README.md
   checksum: 0d6df57c347f4f1e327f564eb5acb1e4d4cb7fc79d641850c0bb536161578692
 - filename: Azure/Route_Server/admin.auto.tfvars.example
@@ -110,14 +108,6 @@ fileignoreconfig:
   checksum: 85a51e497f3a21ad5079342d8aa882793765be64b09e065a421b7b3ee8339d0d
 - filename: GCP/HA_via_api/variables.tf
   checksum: 241b3fac37b35ee35d3c17cd28af7bdf0cfd15a9120388700774a6e0b6a2dd3a
-- filename: GCP/HA_via_api/README.md
-  checksum: 794185fbcbcf60256f06ab91be3fe259f92bbf291ebe816cd6c054af91fd5928
-- filename: GCP/HA_via_api/bigip.tf
-  checksum: 37bcd8b3b9db7e298280e068f0587c4d904855b1a73dc3562ffb2c20c8da7946
-- filename: GCP/HA_via_api/f5_onboard.tmpl
-  checksum: ebabb91a8bad370778d6ae50f8a73aebc1defc7832772769f053d1298854b442
-- filename: GCP/HA_via_api/terraform.tfvars.example
-  checksum: 70d9b5d9460624ad223e4f6ee97ccc1060e4a05ed34649780f260ae0cf4f7b24
 - filename: GCP/HA_via_lb/variables.tf
   checksum: c8cd97c66f74f4dc9cfe29fedb007b982bc3876586648104badce67ebca6db1f
 - filename: GCP/HA_via_lb/f5_onboard.tmpl
@@ -172,3 +162,11 @@ fileignoreconfig:
   checksum: 583ceaa819d2686e1f89ee569050736e850531e7f806d6874279f0010cac3cb7
 - filename: GCP/Standalone/README.md
   checksum: af4bd5ac41d855b2debfe1d252f3c25fd4c04a113e23a1fb881c4d10ca7b4311
+- filename: GCP/HA_via_api/f5_onboard.tmpl
+  checksum: a23c7c787625b7c07c0968a6cf426cee5f4a4918e8574ffaf2a3b2376ba65124
+- filename: GCP/HA_via_api/README.md
+  checksum: 3dab17f70b8035918d6ab71c3e0148b5d336c3d0b18face9dce4d3992160f660
+- filename: GCP/HA_via_api/terraform.tfvars.example
+  checksum: 1a4bd655114c3281c505d5b2f7b9793f256f25d33879cea9e04d6094cb70f9d0
+- filename: GCP/HA_via_api/bigip.tf
+  checksum: 92f87f2743a0241e9fc3aea0bc96a76dffbaf21efb2ce76c4bc162b768498064
