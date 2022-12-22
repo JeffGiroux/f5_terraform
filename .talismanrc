@@ -1,14 +1,6 @@
 fileignoreconfig:
-- filename: GCP/Standalone/bigip.tf
-  checksum: 7e79f9c83e46f2674f60a6981daba66b37e3b6e46b032c81e27c1e38e5518611
-- filename: GCP/Standalone/terraform.tfvars.example
-  checksum: 5b9e46504e0ba2f79e20862171d28cb32b79e956eca027461a7da25c23c94a9c
-- filename: GCP/Standalone/README.md
-  checksum: a31cf38a2b48d74e4881c877c5f49ed477ed16d5caf33692ece86c668fc06620
 - filename: GCP/Standalone/variables.tf
   checksum: 38814d0c8930fae605aa798d4b4c408d5519bc8c19f33e11d578eb9864d0c970
-- filename: GCP/Standalone/f5_onboard.tmpl
-  checksum: 2183ee764c7691a2748947ad2b9a3249fabde9c526e54cd35a60dd95af00bd1f
 - filename: GCP/Standalone/examples/f5_onboard_with_ts.tmpl
   checksum: 98ff92b95be5cc20170aa6f254196f08e08411861eff298fba7e5053adef63a2
   checksum: 256d71ef902b939820d527ce15980f417be3b64aba4e36de2cc824681c8a391b
@@ -172,3 +164,11 @@ fileignoreconfig:
   checksum: d98712b39cb70a45b460d064e4b601ea28a45569ca6c798b75895c4b0261d6ae
 - filename: AWS/Autoscale_via_lb/1nic/f5_onboard.tmpl
   checksum: eaa5eae691d0f725f22b149751bf45f611fce6570040048afce4eb76894649bd
+- filename: GCP/Standalone/f5_onboard.tmpl
+  checksum: a857e4466988f2572c1e705f576796d1e7a8d6e9a2df1c8124c78eebf1944af4
+- filename: GCP/Standalone/terraform.tfvars.example
+  checksum: 52b13f01a02ddd9099cbe95ba58552f8206e9648f5b35ae0d0dc3c4571e92a9b
+- filename: GCP/Standalone/bigip.tf
+  checksum: 583ceaa819d2686e1f89ee569050736e850531e7f806d6874279f0010cac3cb7
+- filename: GCP/Standalone/README.md
+  checksum: af4bd5ac41d855b2debfe1d252f3c25fd4c04a113e23a1fb881c4d10ca7b4311
