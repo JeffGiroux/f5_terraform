@@ -1,24 +1,29 @@
 # BIG-IP Environment
-f5_username   = "admin"
-f5_password   = "Default12345!"
-ssh_key       = "~/.ssh/id_rsa.pub"
-projectPrefix = "mydemo123"
-mgmtVpc       = "xxxxx-net-mgmt"
-extVpc        = "xxxxx-net-ext"
-intVpc        = "xxxxx-net-int"
-mgmtSubnet    = "xxxxx-subnet-mgmt"
-extSubnet     = "xxxxx-subnet-ext"
-intSubnet     = "xxxxx-subnet-int"
-dns_suffix    = "example.com"
+f5_username = "admin"
+f5_password = "Default12345!"
+ssh_key     = "~/.ssh/id_rsa.pub"
+mgmtVpc     = "xxxxx-net-mgmt"
+extVpc      = "xxxxx-net-ext"
+intVpc      = "xxxxx-net-int"
+mgmtSubnet  = "xxxxx-subnet-mgmt"
+extSubnet   = "xxxxx-subnet-ext"
+intSubnet   = "xxxxx-subnet-int"
+dns_suffix  = "example.com"
 
 # BIG-IQ Environment
 bigIqUsername = "admin"
 bigIqPassword = "Default12345!"
 
 # Google Environment
+projectPrefix  = "mydemo123"
 gcp_project_id = "xxxxx"
 gcp_region     = "us-west1"
 gcp_zone_1     = "us-west1-a"
 gcp_zone_2     = "us-west1-b"
 svc_acct       = "xxxxx@xxxxx.iam.gserviceaccount.com"
-resourceOwner  = "myLastName"
+resourceOwner  = "mylastname"
+
+# Secret Manager - Uncomment to use Secret Manager integration
+#gcp_secret_manager_authentication = true
+#gcp_secret_name                   = "mySecret123"
+#gcp_secret_version                = "latest"

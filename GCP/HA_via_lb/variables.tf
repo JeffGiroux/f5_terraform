@@ -94,6 +94,16 @@ variable "gcp_secret_manager_authentication" {
   default     = false
   description = "Whether to use secret manager to pass authentication"
 }
+variable "gcp_secret_name" {
+  type        = string
+  default     = null
+  description = "The Secret Manager secret name"
+}
+variable "gcp_secret_version" {
+  type        = string
+  default     = "latest"
+  description = "The version of the secret to get. If it is not provided, the latest version is retrieved."
+}
 variable "svc_acct" {
   type        = string
   default     = null
@@ -141,22 +151,22 @@ variable "timezone" {
 }
 variable "DO_URL" {
   type        = string
-  default     = "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.31.0/f5-declarative-onboarding-1.31.0-6.noarch.rpm"
+  default     = "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.34.0/f5-declarative-onboarding-1.34.0-5.noarch.rpm"
   description = "URL to download the BIG-IP Declarative Onboarding module"
 }
 variable "AS3_URL" {
   type        = string
-  default     = "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.38.0/f5-appsvcs-3.38.0-4.noarch.rpm"
+  default     = "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.41.0/f5-appsvcs-3.41.0-1.noarch.rpm"
   description = "URL to download the BIG-IP Application Service Extension 3 (AS3) module"
 }
 variable "TS_URL" {
   type        = string
-  default     = "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.30.0/f5-telemetry-1.30.0-1.noarch.rpm"
+  default     = "https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.32.0/f5-telemetry-1.32.0-2.noarch.rpm"
   description = "URL to download the BIG-IP Telemetry Streaming module"
 }
 variable "FAST_URL" {
   type        = string
-  default     = "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.19.0/f5-appsvcs-templates-1.19.0-1.noarch.rpm"
+  default     = "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.22.0/f5-appsvcs-templates-1.22.0-1.noarch.rpm"
   description = "URL to download the BIG-IP FAST module"
 }
 variable "INIT_URL" {
@@ -165,8 +175,9 @@ variable "INIT_URL" {
   description = "URL to download the BIG-IP runtime init"
 }
 variable "libs_dir" {
-  type    = string
-  default = "https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.5.0/dist/f5-bigip-runtime-init-1.5.0-1.gz.run"
+  type        = string
+  default     = "/config/cloud/gcp/node_modules"
+  description = "Directory on the BIG-IP to download the A&O Toolchain into"
 }
 variable "bigIqHost" {
   type        = string
