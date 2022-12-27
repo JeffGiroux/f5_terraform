@@ -207,7 +207,7 @@ module "bigip" {
   gcp_secret_manager_authentication = var.gcp_secret_manager_authentication
   gcp_secret_name                   = var.gcp_secret_name
   gcp_secret_version                = var.gcp_secret_version
-  labels                            = { "f5_cloud_failover_label" : var.projectPrefix }
+  labels                            = { "f5_cloud_failover_label" : var.f5_cloud_failover_label }
 }
 
 module "bigip2" {
@@ -230,5 +230,5 @@ module "bigip2" {
   gcp_secret_manager_authentication = var.gcp_secret_manager_authentication
   gcp_secret_name                   = var.gcp_secret_name
   gcp_secret_version                = var.gcp_secret_version
-  labels                            = { "f5_cloud_failover_label" : var.projectPrefix }
+  labels                            = { "f5_cloud_failover_label" : var.f5_cloud_failover_label }
 }
