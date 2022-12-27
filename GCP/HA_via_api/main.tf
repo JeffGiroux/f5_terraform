@@ -13,7 +13,7 @@ resource "random_id" "buildSuffix" {
 
 # Storage Bucket
 resource "google_storage_bucket" "main" {
-  name          = "${var.projectPrefix}-storage"
+  name          = format("%s-storage-%s", var.projectPrefix, random_id.buildSuffix.hex)
   location      = "US"
   force_destroy = true
   labels = {

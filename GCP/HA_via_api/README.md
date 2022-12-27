@@ -192,7 +192,7 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | <a name="input_dns_suffix"></a> [dns\_suffix](#input\_dns\_suffix) | DNS suffix for your domain in the GCP project | `string` | `"example.com"` | no |
 | <a name="input_extSubnet"></a> [extSubnet](#input\_extSubnet) | External subnet | `string` | `null` | no |
 | <a name="input_extVpc"></a> [extVpc](#input\_extVpc) | External VPC network | `string` | `null` | no |
-| <a name="input_f5_cloud_failover_label"></a> [f5\_cloud\_failover\_label](#input\_f5\_cloud\_failover\_label) | This is a tag used for F5 Cloud Failover extension | `string` | `"myFailover"` | no |
+| <a name="input_f5_cloud_failover_label"></a> [f5\_cloud\_failover\_label](#input\_f5\_cloud\_failover\_label) | This is a tag used for F5 Cloud Failover extension | `string` | `"myfailover"` | no |
 | <a name="input_f5_password"></a> [f5\_password](#input\_f5\_password) | BIG-IP Password or Google secret name (value should be Google secret name when gcp\_secret\_manager\_authentication = true, ex. my-bigip-secret) | `string` | `"Default12345!"` | no |
 | <a name="input_f5_username"></a> [f5\_username](#input\_f5\_username) | User name for the BIG-IP | `string` | `"admin"` | no |
 | <a name="input_gcp_project_id"></a> [gcp\_project\_id](#input\_gcp\_project\_id) | GCP Project ID for provider | `string` | `null` | no |
