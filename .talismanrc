@@ -30,14 +30,6 @@ fileignoreconfig:
   checksum: ee5190df812f75cfdb25b6d74e542f8ac3d4e7827830785c3b835b275a10c877
 - filename: GCP/Autoscale_via_lb/1nic/variables.tf
   checksum: 13eeeff7122ec254c26b4cd5cd225c01b90ac5437d233160ed5751fb09c59f60
-- filename: GCP/Autoscale_via_lb/1nic/README.md
-  checksum: 6f95989a90b5083c59ede4f3deb7f131e2701e8f7415b5f7ac3f941c2a77d48a
-- filename: GCP/Autoscale_via_lb/1nic/terraform.tfvars.example
-  checksum: f02c69332da41bfced23babca7269fd63944c4cd2972ffbd90c0d293ef8ae0ed
-- filename: GCP/Autoscale_via_lb/1nic/bigip.tf
-  checksum: ccaa2c0e2a0233f174397604127df64a9eb36527538a107433f77c274991de5c
-- filename: GCP/Autoscale_via_lb/1nic/f5_onboard.tmpl
-  checksum: 7b332ae1f15b9542c197ec2d4af8231fbc7ef7f64de2e4ce7e4310e16e3e6261
 - filename: Azure/Virtual_WAN/admin.auto.tfvars.example
   checksum: 84924c94605565e18f72fd5b70cfb72cc48fc58ca6d478fe52b2101fbfe5bc18
 - filename: Azure/Virtual_WAN/f5_onboard.tmpl
@@ -170,3 +162,11 @@ fileignoreconfig:
   checksum: 81fcfc2128ef03394629968120eaa05b6d0216cc640d477dc92f5251524108b6
 - filename: GCP/HA_via_lb/bigip.tf
   checksum: 1c7f859531206ab7ae371a79392f952b15bb2e855caeb3b6f84adf782fc8ea41
+- filename: GCP/Autoscale_via_lb/1nic/f5_onboard.tmpl
+  checksum: 5571160f919fe4b121e6ea6b5a160bd782403316899685a78404b27df385f64e
+- filename: GCP/Autoscale_via_lb/1nic/bigip.tf
+  checksum: ab757c8afed4231e72e56124a5700827f780bef1e037d82d2b9e24aafb5b3000
+- filename: GCP/Autoscale_via_lb/1nic/terraform.tfvars.example
+  checksum: e8ccf9e5308be93d69f01ab692e14eabbb59609403a0b6c600f5c8d4db9caf93
+- filename: GCP/Autoscale_via_lb/1nic/README.md
+  checksum: 5c50fcfbffa47be1e3c714ce8a7f268c83e8f3cad690e2dcc6f334494665fc8b
