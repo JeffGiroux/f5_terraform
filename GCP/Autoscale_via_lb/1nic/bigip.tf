@@ -6,12 +6,11 @@
 locals {
   f5_onboard1 = templatefile("${path.module}/f5_onboard.tmpl", {
     f5_username                       = var.f5_username
-    f5_password                       = var.f5_password
+    f5_password                       = var.gcp_secret_manager_authentication ? "" : var.f5_password
     gcp_secret_manager_authentication = var.gcp_secret_manager_authentication
+    gcp_secret_name                   = var.gcp_secret_manager_authentication ? var.gcp_secret_name : ""
+    gcp_secret_version                = var.gcp_secret_manager_authentication ? var.gcp_secret_version : ""
     ssh_keypair                       = file(var.ssh_key)
-    svc_acct                          = var.svc_acct
-    telemetry_secret                  = var.telemetry_secret
-    telemetry_privateKeyId            = var.telemetry_privateKeyId
     gcp_project_id                    = var.gcp_project_id
     INIT_URL                          = var.INIT_URL
     DO_URL                            = var.DO_URL

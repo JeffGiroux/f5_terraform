@@ -100,12 +100,11 @@ locals {
   f5_onboard1 = templatefile("${path.module}/f5_onboard.tmpl", {
     regKey                            = var.license1
     f5_username                       = var.f5_username
-    f5_password                       = var.f5_password
+    f5_password                       = var.gcp_secret_manager_authentication ? "" : var.f5_password
     gcp_secret_manager_authentication = var.gcp_secret_manager_authentication
+    gcp_secret_name                   = var.gcp_secret_manager_authentication ? var.gcp_secret_name : ""
+    gcp_secret_version                = var.gcp_secret_manager_authentication ? var.gcp_secret_version : ""
     ssh_keypair                       = file(var.ssh_key)
-    svc_acct                          = var.svc_acct
-    telemetry_secret                  = var.telemetry_secret
-    telemetry_privateKeyId            = var.telemetry_privateKeyId
     gcp_project_id                    = var.gcp_project_id
     INIT_URL                          = var.INIT_URL
     DO_URL                            = var.DO_URL
@@ -136,7 +135,7 @@ locals {
     host1                   = google_compute_address.mgt.address
     host2                   = google_compute_address.mgt2.address
     remote_selfip_ext       = google_compute_address.ext2.address
-    f5_cloud_failover_label = var.projectPrefix
+    f5_cloud_failover_label = var.f5_cloud_failover_label
     managed_route           = var.managed_route
     public_vip              = google_compute_address.vip1.address
     private_vip             = google_compute_address.vip.address
@@ -144,12 +143,11 @@ locals {
   f5_onboard2 = templatefile("${path.module}/f5_onboard.tmpl", {
     regKey                            = var.license2
     f5_username                       = var.f5_username
-    f5_password                       = var.f5_password
+    f5_password                       = var.gcp_secret_manager_authentication ? "" : var.f5_password
     gcp_secret_manager_authentication = var.gcp_secret_manager_authentication
+    gcp_secret_name                   = var.gcp_secret_manager_authentication ? var.gcp_secret_name : ""
+    gcp_secret_version                = var.gcp_secret_manager_authentication ? var.gcp_secret_version : ""
     ssh_keypair                       = file(var.ssh_key)
-    svc_acct                          = var.svc_acct
-    telemetry_secret                  = var.telemetry_secret
-    telemetry_privateKeyId            = var.telemetry_privateKeyId
     gcp_project_id                    = var.gcp_project_id
     INIT_URL                          = var.INIT_URL
     DO_URL                            = var.DO_URL
@@ -180,7 +178,7 @@ locals {
     host1                   = google_compute_address.mgt.address
     host2                   = google_compute_address.mgt2.address
     remote_selfip_ext       = google_compute_address.ext.address
-    f5_cloud_failover_label = var.projectPrefix
+    f5_cloud_failover_label = var.f5_cloud_failover_label
     managed_route           = var.managed_route
     public_vip              = google_compute_address.vip1.address
     private_vip             = google_compute_address.vip.address
@@ -190,39 +188,47 @@ locals {
 ############################ Compute ############################
 
 module "bigip" {
-  source              = "F5Networks/bigip-module/gcp"
-  prefix              = var.projectPrefix
-  vm_name             = format("%s-bigip1-%s", var.projectPrefix, random_id.buildSuffix.hex)
-  project_id          = var.gcp_project_id
-  machine_type        = var.machine_type
-  image               = var.image_name
-  f5_username         = var.f5_username
-  f5_ssh_publickey    = var.ssh_key
-  service_account     = var.svc_acct
-  mgmt_subnet_ids     = [{ "subnet_id" = var.mgmtSubnet, "public_ip" = true, "private_ip_primary" = google_compute_address.mgt.address }]
-  external_subnet_ids = [{ "subnet_id" = var.extSubnet, "public_ip" = true, "private_ip_primary" = google_compute_address.ext.address, "private_ip_secondary" = google_compute_address.vip.address }]
-  internal_subnet_ids = [{ "subnet_id" = var.intSubnet, "public_ip" = false, "private_ip_primary" = google_compute_address.int.address, "private_ip_secondary" = "" }]
-  zone                = var.gcp_zone_1
-  custom_user_data    = local.f5_onboard1
-  sleep_time          = "30s"
-  labels              = { "f5_cloud_failover_label" : var.projectPrefix }
+  source                            = "F5Networks/bigip-module/gcp"
+  version                           = "1.1.9"
+  prefix                            = var.projectPrefix
+  vm_name                           = format("%s-bigip1-%s", var.projectPrefix, random_id.buildSuffix.hex)
+  project_id                        = var.gcp_project_id
+  machine_type                      = var.machine_type
+  image                             = var.image_name
+  f5_username                       = var.f5_username
+  f5_ssh_publickey                  = var.ssh_key
+  mgmt_subnet_ids                   = [{ "subnet_id" = var.mgmtSubnet, "public_ip" = true, "private_ip_primary" = google_compute_address.mgt.address }]
+  external_subnet_ids               = [{ "subnet_id" = var.extSubnet, "public_ip" = true, "private_ip_primary" = google_compute_address.ext.address, "private_ip_secondary" = google_compute_address.vip.address }]
+  internal_subnet_ids               = [{ "subnet_id" = var.intSubnet, "public_ip" = false, "private_ip_primary" = google_compute_address.int.address, "private_ip_secondary" = "" }]
+  zone                              = var.gcp_zone_1
+  custom_user_data                  = local.f5_onboard1
+  sleep_time                        = "30s"
+  service_account                   = var.svc_acct
+  gcp_secret_manager_authentication = var.gcp_secret_manager_authentication
+  gcp_secret_name                   = var.gcp_secret_name
+  gcp_secret_version                = var.gcp_secret_version
+  labels                            = { "f5_cloud_failover_label" : var.f5_cloud_failover_label }
 }
 
 module "bigip2" {
-  source              = "F5Networks/bigip-module/gcp"
-  prefix              = var.projectPrefix
-  vm_name             = format("%s-bigip2-%s", var.projectPrefix, random_id.buildSuffix.hex)
-  project_id          = var.gcp_project_id
-  machine_type        = var.machine_type
-  image               = var.image_name
-  f5_username         = var.f5_username
-  f5_ssh_publickey    = var.ssh_key
-  service_account     = var.svc_acct
-  mgmt_subnet_ids     = [{ "subnet_id" = var.mgmtSubnet, "public_ip" = true, "private_ip_primary" = google_compute_address.mgt2.address }]
-  external_subnet_ids = [{ "subnet_id" = var.extSubnet, "public_ip" = true, "private_ip_primary" = google_compute_address.ext2.address, "private_ip_secondary" = "" }]
-  internal_subnet_ids = [{ "subnet_id" = var.intSubnet, "public_ip" = false, "private_ip_primary" = google_compute_address.int2.address, "private_ip_secondary" = "" }]
-  zone                = var.gcp_zone_2
-  custom_user_data    = local.f5_onboard2
-  sleep_time          = "30s"
-  labels              = { "f5_cloud_failover_label" : var.projectPrefix }
+  source                            = "F5Networks/bigip-module/gcp"
+  version                           = "1.1.9"
+  prefix                            = var.projectPrefix
+  vm_name                           = format("%s-bigip2-%s", var.projectPrefix, random_id.buildSuffix.hex)
+  project_id                        = var.gcp_project_id
+  machine_type                      = var.machine_type
+  image                             = var.image_name
+  f5_username                       = var.f5_username
+  f5_ssh_publickey                  = var.ssh_key
+  mgmt_subnet_ids                   = [{ "subnet_id" = var.mgmtSubnet, "public_ip" = true, "private_ip_primary" = google_compute_address.mgt2.address }]
+  external_subnet_ids               = [{ "subnet_id" = var.extSubnet, "public_ip" = true, "private_ip_primary" = google_compute_address.ext2.address, "private_ip_secondary" = "" }]
+  internal_subnet_ids               = [{ "subnet_id" = var.intSubnet, "public_ip" = false, "private_ip_primary" = google_compute_address.int2.address, "private_ip_secondary" = "" }]
+  zone                              = var.gcp_zone_2
+  custom_user_data                  = local.f5_onboard2
+  sleep_time                        = "30s"
+  service_account                   = var.svc_acct
+  gcp_secret_manager_authentication = var.gcp_secret_manager_authentication
+  gcp_secret_name                   = var.gcp_secret_name
+  gcp_secret_version                = var.gcp_secret_version
+  labels                            = { "f5_cloud_failover_label" : var.f5_cloud_failover_label }
 }

@@ -56,3 +56,7 @@ output "public_vip_url" {
   description = "public URL for application"
   value       = "http://${google_compute_forwarding_rule.vip1.ip_address}"
 }
+output "storage_bucket" {
+  description = "Storage bucket name"
+  value       = google_storage_bucket.main.name
+}

@@ -1,8 +1,7 @@
 # Deploying BIG-IP VEs in Google - Auto Scale (Active/Active): 3-NIC
 
 ## To Do
-- Community support only. Not F5 supported.
-- Telemtry Streaming not used (see example folder)
+- Community support only. Template is not F5 supported.
 
 ## Issues
 - Find an issue? Fork, clone, create branch, fix and PR. I'll review and merge into the main branch. Or submit a GitHub issue with all necessary details and logs.
@@ -44,7 +43,8 @@ This template deploys each BIG-IP in an Google MIG as a standalone device and NO
   - ***Note***: Make sure to [practice least privilege](https://cloud.google.com/iam/docs/understanding-service-accounts#granting_minimum)
 - Passwords and secrets can be located in [Google Cloud Secret Manager](https://cloud.google.com/secret-manager/docs/quickstart#secretmanager-quickstart-web).
   - Set *gcp_secret_manager_authentication* to 'true'
-  - If *gcp_secret_manager_authentication* is 'true', then 'f5_password' should be the Google Cloud secret name. The secret contents should contain ONLY the password as plain text.
+  - Set *gcp_secret_name* to the Secret Manager secret name. The secret contents should contain ONLY the password as plain text.
+  - Set *gcp_secret_version* to the secret version. If it is not provided, the latest version is retrieved.
 - This templates deploys into an *EXISTING* networking stack
   - You must have three VPCs: a VPC for management, an external VPC, and an internal VPC. The management VPC will have one subnet for management traffic. The External VPC will have one subnet for data traffic. The Internal VPC will have one subnet as well.
   - Firewall rules are required to pass traffic to the application
@@ -58,7 +58,7 @@ This template deploys each BIG-IP in an Google MIG as a standalone device and NO
 ## Important Configuration Notes
 
 - Variables are configured in variables.tf
-- Sensitive variables like Google SSH keys are configured in terraform.tfvars
+- Sensitive variables like Google SSH keys are configured in terraform.tfvars or Google Cloud Secret Manager
   - ***Note***: Other items like BIG-IP password can be stored in Google Cloud Secret Manager. Refer to the [Prerequisites](#prerequisites).
   - The BIG-IP instance will query Google Metadata API to retrieve the service account's token for authentication.
   - The BIG-IP instance will then use the secret name and the service account's token to query Google Metadata API and dynamically retrieve the password for device onboarding.
@@ -113,15 +113,15 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.14.5 |
-| <a name="requirement_google"></a> [google](#requirement\_google) | >= 4 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.2.0 |
+| <a name="requirement_google"></a> [google](#requirement\_google) | >= 4.46.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | 4.32.0 |
-| <a name="provider_random"></a> [random](#provider\_random) | 3.3.2 |
+| <a name="provider_google"></a> [google](#provider\_google) | 4.47.0 |
+| <a name="provider_random"></a> [random](#provider\_random) | 3.4.3 |
 
 ## Modules
 
@@ -146,11 +146,11 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_ssh_key"></a> [ssh\_key](#input\_ssh\_key) | public key used for authentication in /path/file format (e.g. /.ssh/id\_rsa.pub) | `string` | n/a | yes |
-| <a name="input_AS3_URL"></a> [AS3\_URL](#input\_AS3\_URL) | URL to download the BIG-IP Application Service Extension 3 (AS3) module | `string` | `"https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.38.0/f5-appsvcs-3.38.0-4.noarch.rpm"` | no |
-| <a name="input_DO_URL"></a> [DO\_URL](#input\_DO\_URL) | URL to download the BIG-IP Declarative Onboarding module | `string` | `"https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.31.0/f5-declarative-onboarding-1.31.0-6.noarch.rpm"` | no |
-| <a name="input_FAST_URL"></a> [FAST\_URL](#input\_FAST\_URL) | URL to download the BIG-IP FAST module | `string` | `"https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.19.0/f5-appsvcs-templates-1.19.0-1.noarch.rpm"` | no |
+| <a name="input_AS3_URL"></a> [AS3\_URL](#input\_AS3\_URL) | URL to download the BIG-IP Application Service Extension 3 (AS3) module | `string` | `"https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.41.0/f5-appsvcs-3.41.0-1.noarch.rpm"` | no |
+| <a name="input_DO_URL"></a> [DO\_URL](#input\_DO\_URL) | URL to download the BIG-IP Declarative Onboarding module | `string` | `"https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.34.0/f5-declarative-onboarding-1.34.0-5.noarch.rpm"` | no |
+| <a name="input_FAST_URL"></a> [FAST\_URL](#input\_FAST\_URL) | URL to download the BIG-IP FAST module | `string` | `"https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.22.0/f5-appsvcs-templates-1.22.0-1.noarch.rpm"` | no |
 | <a name="input_INIT_URL"></a> [INIT\_URL](#input\_INIT\_URL) | URL to download the BIG-IP runtime init | `string` | `"https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.5.1/dist/f5-bigip-runtime-init-1.5.1-1.gz.run"` | no |
-| <a name="input_TS_URL"></a> [TS\_URL](#input\_TS\_URL) | URL to download the BIG-IP Telemetry Streaming module | `string` | `"https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.30.0/f5-telemetry-1.30.0-1.noarch.rpm"` | no |
+| <a name="input_TS_URL"></a> [TS\_URL](#input\_TS\_URL) | URL to download the BIG-IP Telemetry Streaming module | `string` | `"https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.32.0/f5-telemetry-1.32.0-2.noarch.rpm"` | no |
 | <a name="input_auto_healing_initial_delay_sec"></a> [auto\_healing\_initial\_delay\_sec](#input\_auto\_healing\_initial\_delay\_sec) | The number of seconds that the managed instance group waits before it applies autohealing policies to new instances or recently recreated instances | `number` | `900` | no |
 | <a name="input_autoscaling_cooldown_period"></a> [autoscaling\_cooldown\_period](#input\_autoscaling\_cooldown\_period) | The number of seconds that the autoscaler should wait before it starts collecting information from a new instance | `number` | `900` | no |
 | <a name="input_autoscaling_cpu_target"></a> [autoscaling\_cpu\_target](#input\_autoscaling\_cpu\_target) | The target CPU utilization that the autoscaler should maintain | `string` | `".7"` | no |
@@ -176,11 +176,13 @@ No modules.
 | <a name="input_gcp_project_id"></a> [gcp\_project\_id](#input\_gcp\_project\_id) | GCP Project ID for provider | `string` | `null` | no |
 | <a name="input_gcp_region"></a> [gcp\_region](#input\_gcp\_region) | GCP Region for provider | `string` | `"us-west1"` | no |
 | <a name="input_gcp_secret_manager_authentication"></a> [gcp\_secret\_manager\_authentication](#input\_gcp\_secret\_manager\_authentication) | Whether to use secret manager to pass authentication | `bool` | `false` | no |
+| <a name="input_gcp_secret_name"></a> [gcp\_secret\_name](#input\_gcp\_secret\_name) | The Secret Manager secret name | `string` | `null` | no |
+| <a name="input_gcp_secret_version"></a> [gcp\_secret\_version](#input\_gcp\_secret\_version) | The version of the secret to get. If it is not provided, the latest version is retrieved. | `string` | `"latest"` | no |
 | <a name="input_gcp_zone_1"></a> [gcp\_zone\_1](#input\_gcp\_zone\_1) | GCP Zone 1 for provider | `string` | `"us-west1-a"` | no |
 | <a name="input_image_name"></a> [image\_name](#input\_image\_name) | F5 SKU (image) to deploy. Note: The disk size of the VM will be determined based on the option you select.  **Important**: If intending to provision multiple modules, ensure the appropriate value is selected, such as ****AllTwoBootLocations or AllOneBootLocation****. | `string` | `"projects/f5-7626-networks-public/global/images/f5-bigip-16-1-3-1-0-0-11-payg-best-plus-200mbps-220721054505"` | no |
 | <a name="input_intSubnet"></a> [intSubnet](#input\_intSubnet) | Internal subnet | `string` | `null` | no |
 | <a name="input_intVpc"></a> [intVpc](#input\_intVpc) | Internal VPC network | `string` | `null` | no |
-| <a name="input_libs_dir"></a> [libs\_dir](#input\_libs\_dir) | n/a | `string` | `"https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.5.0/dist/f5-bigip-runtime-init-1.5.0-1.gz.run"` | no |
+| <a name="input_libs_dir"></a> [libs\_dir](#input\_libs\_dir) | Directory on the BIG-IP to download the A&O Toolchain into | `string` | `"/config/cloud/gcp/node_modules"` | no |
 | <a name="input_machine_type"></a> [machine\_type](#input\_machine\_type) | Google machine type to be used for the BIG-IP VE | `string` | `"n1-standard-8"` | no |
 | <a name="input_mgmtSubnet"></a> [mgmtSubnet](#input\_mgmtSubnet) | Management subnet | `string` | `null` | no |
 | <a name="input_mgmtVpc"></a> [mgmtVpc](#input\_mgmtVpc) | Management VPC network | `string` | `null` | no |
@@ -213,23 +215,23 @@ To run this Terraform template, perform the following steps:
   2. Modify terraform.tfvars with the required information
   ```
       # BIG-IP Environment
-      f5_username   = "admin"
-      f5_password   = "Default12345!"
-      ssh_key       = "~/.ssh/id_rsa.pub"
-      projectPrefix = "mydemo123"
-      mgmtVpc       = "xxxxx-net-mgmt"
-      extVpc        = "xxxxx-net-ext"
-      intVpc        = "xxxxx-net-int"
-      mgmtSubnet    = "xxxxx-subnet-mgmt"
-      extSubnet     = "xxxxx-subnet-ext"
-      intSubnet     = "xxxxx-subnet-int"
-      dns_suffix    = "example.com"
+      f5_username = "admin"
+      f5_password = "Default12345!"
+      ssh_key     = "~/.ssh/id_rsa.pub"
+      mgmtVpc     = "xxxxx-net-mgmt"
+      extVpc      = "xxxxx-net-ext"
+      intVpc      = "xxxxx-net-int"
+      mgmtSubnet  = "xxxxx-subnet-mgmt"
+      extSubnet   = "xxxxx-subnet-ext"
+      intSubnet   = "xxxxx-subnet-int"
+      dns_suffix  = "example.com"
 
       # BIG-IQ Environment
       bigIqUsername = "admin"
       bigIqPassword = "Default12345!"
 
       # Google Environment
+      projectPrefix  = "mydemo123"
       gcp_project_id = "xxxxx"
       gcp_region     = "us-west1"
       gcp_zone_1     = "us-west1-a"

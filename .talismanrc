@@ -1,19 +1,9 @@
 fileignoreconfig:
-- filename: GCP/Standalone/bigip.tf
-  checksum: 7e79f9c83e46f2674f60a6981daba66b37e3b6e46b032c81e27c1e38e5518611
-- filename: GCP/Standalone/terraform.tfvars.example
-  checksum: 5b9e46504e0ba2f79e20862171d28cb32b79e956eca027461a7da25c23c94a9c
-- filename: GCP/Standalone/README.md
-  checksum: a31cf38a2b48d74e4881c877c5f49ed477ed16d5caf33692ece86c668fc06620
 - filename: GCP/Standalone/variables.tf
   checksum: 38814d0c8930fae605aa798d4b4c408d5519bc8c19f33e11d578eb9864d0c970
-- filename: GCP/Standalone/f5_onboard.tmpl
-  checksum: 2183ee764c7691a2748947ad2b9a3249fabde9c526e54cd35a60dd95af00bd1f
 - filename: GCP/Standalone/examples/f5_onboard_with_ts.tmpl
   checksum: 98ff92b95be5cc20170aa6f254196f08e08411861eff298fba7e5053adef63a2
   checksum: 256d71ef902b939820d527ce15980f417be3b64aba4e36de2cc824681c8a391b
-- filename: GCP/HA_via_api/terraform.tfvars.example
-  checksum: f6ea35c21254781aa3bf2add99848730d6898ce9a4e3c44f4e072b5e1a458f71
 - filename: Azure/Secure_Enclave_Public_DMZ/README.md
   checksum: 0d6df57c347f4f1e327f564eb5acb1e4d4cb7fc79d641850c0bb536161578692
 - filename: Azure/Route_Server/admin.auto.tfvars.example
@@ -40,14 +30,6 @@ fileignoreconfig:
   checksum: ee5190df812f75cfdb25b6d74e542f8ac3d4e7827830785c3b835b275a10c877
 - filename: GCP/Autoscale_via_lb/1nic/variables.tf
   checksum: 13eeeff7122ec254c26b4cd5cd225c01b90ac5437d233160ed5751fb09c59f60
-- filename: GCP/Autoscale_via_lb/1nic/README.md
-  checksum: 6f95989a90b5083c59ede4f3deb7f131e2701e8f7415b5f7ac3f941c2a77d48a
-- filename: GCP/Autoscale_via_lb/1nic/terraform.tfvars.example
-  checksum: f02c69332da41bfced23babca7269fd63944c4cd2972ffbd90c0d293ef8ae0ed
-- filename: GCP/Autoscale_via_lb/1nic/bigip.tf
-  checksum: ccaa2c0e2a0233f174397604127df64a9eb36527538a107433f77c274991de5c
-- filename: GCP/Autoscale_via_lb/1nic/f5_onboard.tmpl
-  checksum: 7b332ae1f15b9542c197ec2d4af8231fbc7ef7f64de2e4ce7e4310e16e3e6261
 - filename: Azure/Virtual_WAN/admin.auto.tfvars.example
   checksum: 84924c94605565e18f72fd5b70cfb72cc48fc58ca6d478fe52b2101fbfe5bc18
 - filename: Azure/Virtual_WAN/f5_onboard.tmpl
@@ -118,34 +100,10 @@ fileignoreconfig:
   checksum: 85a51e497f3a21ad5079342d8aa882793765be64b09e065a421b7b3ee8339d0d
 - filename: GCP/HA_via_api/variables.tf
   checksum: 241b3fac37b35ee35d3c17cd28af7bdf0cfd15a9120388700774a6e0b6a2dd3a
-- filename: GCP/HA_via_api/README.md
-  checksum: 794185fbcbcf60256f06ab91be3fe259f92bbf291ebe816cd6c054af91fd5928
-- filename: GCP/HA_via_api/bigip.tf
-  checksum: 37bcd8b3b9db7e298280e068f0587c4d904855b1a73dc3562ffb2c20c8da7946
-- filename: GCP/HA_via_api/f5_onboard.tmpl
-  checksum: ebabb91a8bad370778d6ae50f8a73aebc1defc7832772769f053d1298854b442
-- filename: GCP/HA_via_api/terraform.tfvars.example
-  checksum: 70d9b5d9460624ad223e4f6ee97ccc1060e4a05ed34649780f260ae0cf4f7b24
 - filename: GCP/HA_via_lb/variables.tf
   checksum: c8cd97c66f74f4dc9cfe29fedb007b982bc3876586648104badce67ebca6db1f
-- filename: GCP/HA_via_lb/f5_onboard.tmpl
-  checksum: 08965ffcc489eea51c1beed3248845cf9f4ca4339a5aba279647fe10ac3c097a
 - filename: GCP/HA_via_lb/examples/f5_onboard_with_ts.tmpl
   checksum: 43b67531bdd14504532ad714fc459a70ba5004e68322cf0e1dc785bbfcb45e17
-- filename: GCP/HA_via_lb/terraform.tfvars.example
-  checksum: db69fd9e5a1d2f7f1691b7ca3b5c8730a21a5ae757aba08900c7d53af8f82e4c
-- filename: GCP/HA_via_lb/bigip.tf
-  checksum: 0a5cb82444ba8a264b23f2dc96ae671bbc671e5e27f040447c5a4131226b18f2
-- filename: GCP/HA_via_lb/README.md
-  checksum: ca5545a319c35c2c8f080e80b54555db3fd70398f82695b6ec615e84ef813147
-- filename: GCP/Autoscale_via_lb/3nic/terraform.tfvars.example
-  checksum: 4c4399f5e1f42b64301f72f1c9b0aabdc1c61f3313ff93b420d07ff16ac0e235
-- filename: GCP/Autoscale_via_lb/3nic/bigip.tf
-  checksum: 2eead7bd29245d22838dbcd467d508dc9b3a8e1ac644cc55e8f23566ea23ab54
-- filename: GCP/Autoscale_via_lb/3nic/README.md
-  checksum: 2d44c76a220006bb57079099c35e7922a5c6a7480d725ed22a6dd76e3a65b520
-- filename: GCP/Autoscale_via_lb/3nic/f5_onboard.tmpl
-  checksum: 0af4696712ac5ef0b8fe0ef8cf883b8eec36f8308a0487d395e7e643c21a8726
 - filename: GCP/Autoscale_via_lb/3nic/variables.tf
   checksum: 8688e82c29f35a3b64a5fde443f25af495e9a7eca1556ca67896560193a3642c
 - filename: Azure/HA_via_lb/main.tf
@@ -172,3 +130,43 @@ fileignoreconfig:
   checksum: d98712b39cb70a45b460d064e4b601ea28a45569ca6c798b75895c4b0261d6ae
 - filename: AWS/Autoscale_via_lb/1nic/f5_onboard.tmpl
   checksum: eaa5eae691d0f725f22b149751bf45f611fce6570040048afce4eb76894649bd
+- filename: GCP/Standalone/f5_onboard.tmpl
+  checksum: a857e4466988f2572c1e705f576796d1e7a8d6e9a2df1c8124c78eebf1944af4
+- filename: GCP/Standalone/terraform.tfvars.example
+  checksum: 52b13f01a02ddd9099cbe95ba58552f8206e9648f5b35ae0d0dc3c4571e92a9b
+- filename: GCP/Standalone/bigip.tf
+  checksum: 583ceaa819d2686e1f89ee569050736e850531e7f806d6874279f0010cac3cb7
+- filename: GCP/Standalone/README.md
+  checksum: af4bd5ac41d855b2debfe1d252f3c25fd4c04a113e23a1fb881c4d10ca7b4311
+- filename: GCP/HA_via_api/f5_onboard.tmpl
+  checksum: a23c7c787625b7c07c0968a6cf426cee5f4a4918e8574ffaf2a3b2376ba65124
+- filename: GCP/HA_via_api/README.md
+  checksum: 3dab17f70b8035918d6ab71c3e0148b5d336c3d0b18face9dce4d3992160f660
+- filename: GCP/HA_via_api/terraform.tfvars.example
+  checksum: 1a4bd655114c3281c505d5b2f7b9793f256f25d33879cea9e04d6094cb70f9d0
+- filename: GCP/HA_via_api/bigip.tf
+  checksum: 92f87f2743a0241e9fc3aea0bc96a76dffbaf21efb2ce76c4bc162b768498064
+- filename: GCP/HA_via_lb/f5_onboard.tmpl
+  checksum: 736839bf357219c7e15c685ec2cf677d5b17204b0883f7062ae8d47ef61aea53
+- filename: GCP/HA_via_lb/terraform.tfvars.example
+  checksum: 100798d945ab25e1a41cf904e13ac69a2fdbcb6b596f91ba6220a310afca8bc1
+- filename: GCP/HA_via_lb/README.md
+  checksum: 81fcfc2128ef03394629968120eaa05b6d0216cc640d477dc92f5251524108b6
+- filename: GCP/HA_via_lb/bigip.tf
+  checksum: 1c7f859531206ab7ae371a79392f952b15bb2e855caeb3b6f84adf782fc8ea41
+- filename: GCP/Autoscale_via_lb/1nic/f5_onboard.tmpl
+  checksum: 5571160f919fe4b121e6ea6b5a160bd782403316899685a78404b27df385f64e
+- filename: GCP/Autoscale_via_lb/1nic/bigip.tf
+  checksum: ab757c8afed4231e72e56124a5700827f780bef1e037d82d2b9e24aafb5b3000
+- filename: GCP/Autoscale_via_lb/1nic/terraform.tfvars.example
+  checksum: e8ccf9e5308be93d69f01ab692e14eabbb59609403a0b6c600f5c8d4db9caf93
+- filename: GCP/Autoscale_via_lb/1nic/README.md
+  checksum: 5c50fcfbffa47be1e3c714ce8a7f268c83e8f3cad690e2dcc6f334494665fc8b
+- filename: GCP/Autoscale_via_lb/3nic/f5_onboard.tmpl
+  checksum: bbc31b5a39c756a566cd5bc27daf62061f5d79e236d2b40442188c4cdb89d6da
+- filename: GCP/Autoscale_via_lb/3nic/terraform.tfvars.example
+  checksum: c42afb78afc0443dd1017103fdb5a445672941f405e481d22e455801477aa087
+- filename: GCP/Autoscale_via_lb/3nic/bigip.tf
+  checksum: e3678d0734c922e3a47b828f3658bbb9349b8305074dd9a46a495b75045769d5
+- filename: GCP/Autoscale_via_lb/3nic/README.md
+  checksum: 19189704bd25616daeeae74bb72fd5b68b5fc46eee30d50fba2d3c57aa855853

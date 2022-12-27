@@ -49,7 +49,7 @@ output "f5vm02_mgmt_name" {
   value       = module.bigip2.name
 }
 output "public_vip" {
-  description = "public IP address for application"
+  description = "Public IP for the BIG-IP listener (VIP)"
   value       = google_compute_forwarding_rule.vip1.ip_address
 }
 output "public_vip_url" {

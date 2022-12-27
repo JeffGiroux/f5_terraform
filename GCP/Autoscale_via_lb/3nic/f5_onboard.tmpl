@@ -53,7 +53,7 @@ if ${gcp_secret_manager_authentication}; then
       environment: gcp
       type: SecretsManager
       version: latest
-      secretId: ${f5_password}
+      secretId: ${gcp_secret_name}
 EOF
 else
    cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml

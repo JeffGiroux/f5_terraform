@@ -1,7 +1,7 @@
 # Set minimum Terraform version and Terraform Cloud backend
 terraform {
-  required_version = ">= 0.14.5"
+  required_version = ">= 1.2.0"
   required_providers {
-    google = ">= 3"
+    google = ">= 4.46.0"
   }
 }
