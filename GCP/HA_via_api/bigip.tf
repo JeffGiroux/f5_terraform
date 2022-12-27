@@ -135,7 +135,7 @@ locals {
     host1                   = google_compute_address.mgt.address
     host2                   = google_compute_address.mgt2.address
     remote_selfip_ext       = google_compute_address.ext2.address
-    f5_cloud_failover_label = var.projectPrefix
+    f5_cloud_failover_label = var.f5_cloud_failover_label
     managed_route           = var.managed_route
     public_vip              = google_compute_address.vip1.address
     private_vip             = google_compute_address.vip.address
@@ -178,7 +178,7 @@ locals {
     host1                   = google_compute_address.mgt.address
     host2                   = google_compute_address.mgt2.address
     remote_selfip_ext       = google_compute_address.ext.address
-    f5_cloud_failover_label = var.projectPrefix
+    f5_cloud_failover_label = var.f5_cloud_failover_label
     managed_route           = var.managed_route
     public_vip              = google_compute_address.vip1.address
     private_vip             = google_compute_address.vip.address
