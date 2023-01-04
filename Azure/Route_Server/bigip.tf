@@ -49,7 +49,8 @@ locals {
 # Create F5 BIG-IP VMs
 module "bigip" {
   count                      = var.instanceCountBigIp
-  source                     = "github.com/F5Networks/terraform-azure-bigip-module?ref=v1.2.5"
+  source                     = "F5Networks/bigip-module/azure"
+  version                    = "1.2.6"
   prefix                     = var.projectPrefix
   resource_group_name        = azurerm_resource_group.rg["hub"].name
   f5_instance_type           = var.instance_type
