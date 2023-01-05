@@ -289,6 +289,7 @@ resource "azurerm_virtual_hub_connection" "nva" {
 
 module "client" {
   source              = "Azure/compute/azurerm"
+  version             = "4.0"
   resource_group_name = azurerm_resource_group.rg["spoke1"].name
   vm_hostname         = "client"
   vm_os_publisher     = "Canonical"
@@ -313,6 +314,7 @@ data "local_file" "appOnboard" {
 
 module "app" {
   source              = "Azure/compute/azurerm"
+  version             = "4.0"
   resource_group_name = azurerm_resource_group.rg["spoke2"].name
   vm_hostname         = "app"
   vm_os_publisher     = "Canonical"

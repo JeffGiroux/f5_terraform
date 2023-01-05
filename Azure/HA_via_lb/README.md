@@ -138,15 +138,15 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 3.32.0 |
-| <a name="provider_random"></a> [random](#provider\_random) | n/a |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.37.0 |
+| <a name="provider_random"></a> [random](#provider\_random) | 3.4.3 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_bigip"></a> [bigip](#module\_bigip) | github.com/F5Networks/terraform-azure-bigip-module | v1.2.5 |
-| <a name="module_bigip2"></a> [bigip2](#module\_bigip2) | github.com/F5Networks/terraform-azure-bigip-module | v1.2.5 |
+| <a name="module_bigip"></a> [bigip](#module\_bigip) | F5Networks/bigip-module/azure | 1.2.6 |
+| <a name="module_bigip2"></a> [bigip2](#module\_bigip2) | F5Networks/bigip-module/azure | 1.2.6 |
 
 ## Resources
 
