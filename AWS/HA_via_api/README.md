@@ -345,7 +345,7 @@ terraform apply
 ## Troubleshooting
 
 ### Serial Logs
-Review the serial logs for the Google virtual machine. Login to the AWS portal, open "EC2", then locate your instance...click it. Hit Actions > Monitor and Troubleshoot > Get stem log. Then review the serial logs for errors.
+Review the serial logs for the AWS virtual machine. Login to the AWS portal, open "EC2", then locate your instance...click it. Hit Actions > Monitor and Troubleshoot > Get system log. Then review the serial logs for errors.
 
 ### Onboard Logs
 Depending on where onboard fails, you can attempt SSH login and try to troubleshoot further. Inspect the /config/cloud directory for correct runtime init YAML files. Inspec the /var/log/cloud location for error logs.
