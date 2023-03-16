@@ -67,7 +67,7 @@ variable "machine_type" {
 }
 variable "image_name" {
   type        = string
-  default     = "projects/f5-7626-networks-public/global/images/f5-bigip-16-1-3-0-0-12-payg-best-plus-25mbps-220607234435"
+  default     = "projects/f5-7626-networks-public/global/images/f5-bigip-16-1-3-3-0-0-3-payg-best-plus-25mbps-221222234728"
   description = "F5 SKU (image) to deploy. Note: The disk size of the VM will be determined based on the option you select.  **Important**: If intending to provision multiple modules, ensure the appropriate value is selected, such as ****AllTwoBootLocations or AllOneBootLocation****."
 }
 variable "customImage" {
@@ -184,7 +184,6 @@ variable "INIT_URL" {
   default     = "https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.6.0/dist/f5-bigip-runtime-init-1.6.0-1.gz.run"
   description = "URL to download the BIG-IP runtime init"
 }
-
 variable "libs_dir" {
   type        = string
   default     = "/config/cloud/gcp/node_modules"
