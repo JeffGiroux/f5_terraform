@@ -51,8 +51,6 @@ The BIG-IP's configuration, now defined in a single convenient YAML or JSON [F5 
     - BIG-IP will require tcp/22 and tcp/443 on the mgmt network
     - Application access will require tcp/80 and tcp/443 on the external network
   - If you require a new network first, see the [Infrastructure Only folder](../Infrastructure-only) to get started.
-  - The parameter 'dns_suffix' must match the DNS suffix assigned by the GCP project. You can retrieve this value by logging into an existing VM in the same project and running 'uname -a' or reviewing the /etc/resolv.conf file. Failure to properly set 'dns_suffix' will result in failed hostname lookup during HA setup.
-
 
 ## Important Configuration Notes
 
