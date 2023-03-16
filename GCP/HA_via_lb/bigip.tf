@@ -150,9 +150,9 @@ locals {
 
 module "bigip" {
   source                            = "F5Networks/bigip-module/gcp"
-  version                           = "1.1.9"
+  version                           = "1.1.11"
   prefix                            = var.projectPrefix
-  vm_name                           = format("%s-bigip1-%s", var.projectPrefix, random_id.buildSuffix.hex)
+  vm_name                           = var.vm_name == "" ? format("%s-bigip1-%s", var.projectPrefix, random_id.buildSuffix.hex) : var.vm_name
   project_id                        = var.gcp_project_id
   machine_type                      = var.machine_type
   image                             = var.image_name
@@ -172,9 +172,9 @@ module "bigip" {
 
 module "bigip2" {
   source                            = "F5Networks/bigip-module/gcp"
-  version                           = "1.1.9"
+  version                           = "1.1.11"
   prefix                            = var.projectPrefix
-  vm_name                           = format("%s-bigip2-%s", var.projectPrefix, random_id.buildSuffix.hex)
+  vm_name                           = var.vm2_name == "" ? format("%s-bigip2-%s", var.projectPrefix, random_id.buildSuffix.hex) : var.vm2_name
   project_id                        = var.gcp_project_id
   machine_type                      = var.machine_type
   image                             = var.image_name

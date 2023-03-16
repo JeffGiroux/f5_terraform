@@ -98,9 +98,9 @@ locals {
 
 module "bigip" {
   source                            = "F5Networks/bigip-module/gcp"
-  version                           = "1.1.9"
+  version                           = "1.1.11"
   prefix                            = var.projectPrefix
-  vm_name                           = format("%s-bigip1-%s", var.projectPrefix, random_id.buildSuffix.hex)
+  vm_name                           = var.vm_name == "" ? format("%s-bigip1-%s", var.projectPrefix, random_id.buildSuffix.hex) : var.vm_name
   project_id                        = var.gcp_project_id
   machine_type                      = var.machine_type
   image                             = var.image_name
