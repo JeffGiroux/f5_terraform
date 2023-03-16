@@ -150,7 +150,7 @@ cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
     value: ${timezone}
   - name: HOST_NAME
     type: url
-    value: http://169.254.169.254/computeMetadata/v1/instance/hostname
+    value: http://169.254.169.254/computeMetadata/v1/instance/name
     headers:
       - name: Metadata-Flavor
         value: Google
@@ -211,11 +211,11 @@ extension_services:
             config.allow.rfc3927: enable
             ui.advisory.enabled: true
             ui.advisory.color: blue
-            ui.advisory.text: '{{{ HOST_NAME }}}'
+            ui.advisory.text: '{{{ HOST_NAME }}}.${dns_suffix}'
           mySystem:
             autoPhonehome: true
             class: System
-            hostname: '{{{ HOST_NAME }}}'
+            hostname: '{{{ HOST_NAME }}}.${dns_suffix}'
           '{{{ USER_NAME }}}':
             class: User
             partitionAccess:
