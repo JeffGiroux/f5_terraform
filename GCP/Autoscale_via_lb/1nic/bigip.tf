@@ -94,7 +94,7 @@ resource "google_compute_health_check" "bigip" {
 # Managed Instance Group (auto healing, upgrades)
 resource "google_compute_region_instance_group_manager" "bigip" {
   name               = format("%s-igm-%s", var.projectPrefix, random_id.buildSuffix.hex)
-  base_instance_name = format("%s-bigip", var.projectPrefix)
+  base_instance_name = var.vm_name == "" ? format("%s-bigip", var.projectPrefix) : var.vm_name
   region             = var.gcp_region
   target_pools       = [google_compute_target_pool.f5vm.id]
   wait_for_instances = false

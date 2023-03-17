@@ -67,7 +67,7 @@ variable "machine_type" {
 }
 variable "image_name" {
   type        = string
-  default     = "projects/f5-7626-networks-public/global/images/f5-bigip-16-1-3-1-0-0-11-payg-best-plus-200mbps-220721054505"
+  default     = "projects/f5-7626-networks-public/global/images/f5-bigip-16-1-3-3-0-0-3-payg-best-plus-25mbps-221222234728"
   description = "F5 SKU (image) to deploy. Note: The disk size of the VM will be determined based on the option you select.  **Important**: If intending to provision multiple modules, ensure the appropriate value is selected, such as ****AllTwoBootLocations or AllOneBootLocation****."
 }
 variable "customImage" {
@@ -156,12 +156,12 @@ variable "timezone" {
 }
 variable "DO_URL" {
   type        = string
-  default     = "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.34.0/f5-declarative-onboarding-1.34.0-5.noarch.rpm"
+  default     = "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.36.1/f5-declarative-onboarding-1.36.1-1.noarch.rpm"
   description = "URL to download the BIG-IP Declarative Onboarding module"
 }
 variable "AS3_URL" {
   type        = string
-  default     = "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.41.0/f5-appsvcs-3.41.0-1.noarch.rpm"
+  default     = "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.43.0/f5-appsvcs-3.43.0-2.noarch.rpm"
   description = "URL to download the BIG-IP Application Service Extension 3 (AS3) module"
 }
 variable "TS_URL" {
@@ -171,17 +171,17 @@ variable "TS_URL" {
 }
 variable "FAST_URL" {
   type        = string
-  default     = "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.22.0/f5-appsvcs-templates-1.22.0-1.noarch.rpm"
+  default     = "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.24.0/f5-appsvcs-templates-1.24.0-1.noarch.rpm"
   description = "URL to download the BIG-IP FAST module"
 }
 variable "CFE_URL" {
   description = "URL to download the BIG-IP Cloud Failover Extension module"
   type        = string
-  default     = "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.13.0/f5-cloud-failover-1.13.0-0.noarch.rpm"
+  default     = "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.14.0/f5-cloud-failover-1.14.0-0.noarch.rpm"
 }
 variable "INIT_URL" {
   type        = string
-  default     = "https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.5.1/dist/f5-bigip-runtime-init-1.5.1-1.gz.run"
+  default     = "https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.6.0/dist/f5-bigip-runtime-init-1.6.0-1.gz.run"
   description = "URL to download the BIG-IP runtime init"
 }
 variable "libs_dir" {
@@ -238,6 +238,14 @@ variable "resourceOwner" {
   type        = string
   default     = null
   description = "This is a tag used for object creation. Example is last name."
+}
+variable "vm_name" {
+  description = "Name of 1st BIG-IP. If empty, default is 'bigip1' string + prefix + random_id"
+  default     = ""
+}
+variable "vm2_name" {
+  description = "Name of 2nd BIG-IP. If empty, default is 'bigip2' string + prefix + random_id"
+  default     = ""
 }
 variable "f5_cloud_failover_label" {
   type        = string

@@ -1,0 +1,10 @@
+# BIG-IP Environment
+adminSrcAddr  = "0.0.0.0/0"
+ssh_key       = "ssh-rsa AAABC123....."
+f5_username   = "admin"
+f5_password   = "Default12345!"
+
+# AWS Environment
+awsRegion     = "us-west-2"
+projectPrefix = "mydemo"
+resourceOwner = "myname"

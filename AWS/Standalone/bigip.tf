@@ -89,7 +89,7 @@ locals {
 # Create F5 BIG-IP VMs
 module "bigip" {
   source                     = "F5Networks/bigip-module/aws"
-  version                    = "1.1.8"
+  version                    = "1.1.11"
   prefix                     = format("%s-3nic", var.projectPrefix)
   ec2_instance_type          = var.ec2_instance_type
   ec2_key_name               = var.ec2_key_name

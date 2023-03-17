@@ -30,6 +30,7 @@ locals {
     TS_VER                     = split("/", var.TS_URL)[7]
     FAST_VER                   = split("/", var.FAST_URL)[7]
     dns_server                 = var.dns_server
+    dns_suffix                 = var.dns_suffix
     ntp_server                 = var.ntp_server
     timezone                   = var.timezone
     bigIqLicenseType           = var.bigIqLicenseType
@@ -50,8 +51,9 @@ locals {
 module "bigip" {
   count                      = var.instanceCountBigIp
   source                     = "F5Networks/bigip-module/azure"
-  version                    = "1.2.6"
+  version                    = "1.2.8"
   prefix                     = var.projectPrefix
+  vm_name                    = var.vm_name == "" ? format("%s-bigip", var.projectPrefix) : var.vm_name
   resource_group_name        = azurerm_resource_group.rg["hub"].name
   f5_instance_type           = var.instance_type
   f5_image_name              = var.image_name
