@@ -59,6 +59,7 @@ locals {
     TS_VER                     = split("/", var.TS_URL)[7]
     FAST_VER                   = split("/", var.FAST_URL)[7]
     dns_server                 = var.dns_server
+    dns_suffix                 = var.dns_suffix
     ntp_server                 = var.ntp_server
     timezone                   = var.timezone
     law_id                     = azurerm_log_analytics_workspace.main.workspace_id
@@ -95,6 +96,7 @@ locals {
     TS_VER                     = split("/", var.TS_URL)[7]
     FAST_VER                   = split("/", var.FAST_URL)[7]
     dns_server                 = var.dns_server
+    dns_suffix                 = var.dns_suffix
     ntp_server                 = var.ntp_server
     timezone                   = var.timezone
     law_id                     = azurerm_log_analytics_workspace.main.workspace_id
@@ -120,8 +122,9 @@ locals {
 # Create F5 BIG-IP VMs
 module "bigip" {
   source                     = "F5Networks/bigip-module/azure"
-  version                    = "1.2.6"
+  version                    = "1.2.8"
   prefix                     = var.projectPrefix
+  vm_name                    = var.vm_name == "" ? format("%s-bigip1-%s", var.projectPrefix, random_id.buildSuffix.hex) : var.vm_name
   resource_group_name        = azurerm_resource_group.main.name
   f5_instance_type           = var.instance_type
   f5_image_name              = var.image_name
@@ -148,8 +151,9 @@ module "bigip" {
 
 module "bigip2" {
   source                     = "F5Networks/bigip-module/azure"
-  version                    = "1.2.6"
+  version                    = "1.2.8"
   prefix                     = var.projectPrefix
+  vm_name                    = var.vm2_name == "" ? format("%s-bigip2-%s", var.projectPrefix, random_id.buildSuffix.hex) : var.vm2_name
   resource_group_name        = azurerm_resource_group.main.name
   f5_instance_type           = var.instance_type
   f5_image_name              = var.image_name
@@ -180,29 +184,29 @@ module "bigip2" {
 #       https://github.com/F5Networks/terraform-azure-bigip-module/issues/29
 #
 #       BIG-IP module currently does NOT export network interface ID.
-#       As a workaround, use the BIG-IP device ID to parse the name and
+#       As a workaround, use the BIG-IP public DNS value to parse the name and
 #       use that to query the data azurerm_network_interface.
 #       Once output in module is fixed, data resource can be deleted.
 
 # Retrieve NIC Info
 data "azurerm_network_interface" "bigip-ext" {
-  name                = format("%s-ext-nic-public-0", element(split("-f5vm01", element(split("/", module.bigip.bigip_instance_ids), 8)), 0))
+  name                = format("%s-ext-nic-public-0", element(split("-mgmt-0", element(split(".", module.bigip.mgmtPublicDNS), 0)), 0))
   resource_group_name = azurerm_resource_group.main.name
 }
 data "azurerm_network_interface" "bigip2-ext" {
-  name                = format("%s-ext-nic-public-0", element(split("-f5vm01", element(split("/", module.bigip2.bigip_instance_ids), 8)), 0))
+  name                = format("%s-ext-nic-public-0", element(split("-mgmt-0", element(split(".", module.bigip2.mgmtPublicDNS), 0)), 0))
   resource_group_name = azurerm_resource_group.main.name
 }
 
 # Associate the BIG-IP NIC to the ALB backend pool
 resource "azurerm_network_interface_backend_address_pool_association" "f5vm01" {
   network_interface_id    = data.azurerm_network_interface.bigip-ext.id
-  ip_configuration_name   = format("%s-secondary-ext-public-ip-0", element(split("-f5vm01", element(split("/", module.bigip.bigip_instance_ids), 8)), 0))
+  ip_configuration_name   = format("%s-secondary-ext-public-ip-0", element(split("-mgmt-0", element(split(".", module.bigip.mgmtPublicDNS), 0)), 0))
   backend_address_pool_id = azurerm_lb_backend_address_pool.backend_pool.id
 }
 
 resource "azurerm_network_interface_backend_address_pool_association" "f5vm02" {
   network_interface_id    = data.azurerm_network_interface.bigip2-ext.id
-  ip_configuration_name   = format("%s-secondary-ext-public-ip-0", element(split("-f5vm01", element(split("/", module.bigip2.bigip_instance_ids), 8)), 0))
+  ip_configuration_name   = format("%s-secondary-ext-public-ip-0", element(split("-mgmt-0", element(split(".", module.bigip2.mgmtPublicDNS), 0)), 0))
   backend_address_pool_id = azurerm_lb_backend_address_pool.backend_pool.id
 }

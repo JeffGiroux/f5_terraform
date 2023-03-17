@@ -46,6 +46,7 @@ locals {
     TS_VER                     = split("/", var.TS_URL)[7]
     FAST_VER                   = split("/", var.FAST_URL)[7]
     dns_server                 = var.dns_server
+    dns_suffix                 = var.dns_suffix
     ntp_server                 = var.ntp_server
     timezone                   = var.timezone
     law_id                     = azurerm_log_analytics_workspace.main.workspace_id
@@ -67,8 +68,9 @@ locals {
 # Create F5 BIG-IP VMs
 module "bigip" {
   source                     = "F5Networks/bigip-module/azure"
-  version                    = "1.2.6"
+  version                    = "1.2.8"
   prefix                     = var.projectPrefix
+  vm_name                    = var.vm_name == "" ? format("%s-bigip1-%s", var.projectPrefix, random_id.buildSuffix.hex) : var.vm_name
   resource_group_name        = azurerm_resource_group.main.name
   f5_instance_type           = var.instance_type
   f5_image_name              = var.image_name

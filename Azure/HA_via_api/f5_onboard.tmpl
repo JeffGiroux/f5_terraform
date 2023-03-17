@@ -85,6 +85,9 @@ cat << 'EOF' >> /config/cloud/runtime-init-conf.yaml
   - name: DNS_SERVER
     type: static
     value: ${dns_server}
+  - name: DNS_SUFFIX
+    type: static
+    value: ${dns_suffix}
   - name: NTP_SERVER
     type: static
     value: ${ntp_server}
@@ -166,11 +169,11 @@ extension_services:
             config.allow.rfc3927: enable
             ui.advisory.enabled: true
             ui.advisory.color: blue
-            ui.advisory.text: '{{{ HOST_NAME }}}.example.com'
+            ui.advisory.text: '{{{ HOST_NAME }}}.${dns_suffix}'
           mySystem:
             autoPhonehome: true
             class: System
-            hostname: '{{{ HOST_NAME }}}.example.com'
+            hostname: '{{{ HOST_NAME }}}.${dns_suffix}'
           '{{{ USER_NAME }}}':
             class: User
             partitionAccess:
@@ -274,7 +277,6 @@ extension_services:
                 class: Service_HTTP
                 virtualAddresses:
                   - '{{{ VIP_AZ1 }}}'
-                  - '{{{ VIP_AZ2 }}}'
                 pool: web_pool
               web_pool:
                 class: Pool
@@ -313,7 +315,7 @@ post_onboard_enabled:
     type: inline
     commands:
     - $(nohup bash /config/failover/tgactive &>/dev/null &)
-    - $(nohup tmsh modify cm device-group failoverGroup devices modify { '{{{ HOST2 }}}.example.com' { set-sync-leader } } &>/dev/null &)
+    - $(nohup tmsh modify cm device-group failoverGroup devices modify { '{{{ HOST1 }}}' { set-sync-leader } } &>/dev/null &)
     - tmsh save sys config
 EOF
 
