@@ -58,7 +58,7 @@ variable "intNsg" {
 variable "f5_ami_search_name" {
   type        = string
   description = "AWS AMI search filter to find correct BIG-IP VE for region"
-  default     = "F5 BIGIP-16.1.3.2* PAYG-Best Plus 200Mbps*"
+  default     = "F5 BIGIP-16.1.3.3* PAYG-Best Plus 25Mbps*"
 }
 variable "ec2_instance_type" {
   type        = string
@@ -117,12 +117,12 @@ variable "timezone" {
 }
 variable "DO_URL" {
   type        = string
-  default     = "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.34.0/f5-declarative-onboarding-1.34.0-5.noarch.rpm"
+  default     = "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.36.1/f5-declarative-onboarding-1.36.1-1.noarch.rpm"
   description = "URL to download the BIG-IP Declarative Onboarding module"
 }
 variable "AS3_URL" {
   type        = string
-  default     = "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.41.0/f5-appsvcs-3.41.0-1.noarch.rpm"
+  default     = "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.43.0/f5-appsvcs-3.43.0-2.noarch.rpm"
   description = "URL to download the BIG-IP Application Service Extension 3 (AS3) module"
 }
 variable "TS_URL" {
@@ -132,12 +132,12 @@ variable "TS_URL" {
 }
 variable "FAST_URL" {
   type        = string
-  default     = "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.22.0/f5-appsvcs-templates-1.22.0-1.noarch.rpm"
+  default     = "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.24.0/f5-appsvcs-templates-1.24.0-1.noarch.rpm"
   description = "URL to download the BIG-IP FAST module"
 }
 variable "INIT_URL" {
   type        = string
-  default     = "https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.5.1/dist/f5-bigip-runtime-init-1.5.1-1.gz.run"
+  default     = "https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.6.0/dist/f5-bigip-runtime-init-1.6.0-1.gz.run"
   description = "URL to download the BIG-IP runtime init"
 }
 variable "libs_dir" {
