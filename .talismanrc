@@ -170,3 +170,15 @@ fileignoreconfig:
   checksum: e3678d0734c922e3a47b828f3658bbb9349b8305074dd9a46a495b75045769d5
 - filename: GCP/Autoscale_via_lb/3nic/README.md
   checksum: 19189704bd25616daeeae74bb72fd5b68b5fc46eee30d50fba2d3c57aa855853
+- filename: AWS/SSLO_GWLB/terraform.tfvars.example
+  checksum: d937a5175f8eae713f0d405a62c205f3709e98fe630131d75aaf3bdae9882fd9
+- filename: AWS/SSLO_GWLB/webapp.tf
+  checksum: c21c7925b4043a5dd6035e80b60bea309d7368b2420db584e5d7b02439832071
+- filename: AWS/SSLO_GWLB/variables.tf
+  checksum: 4746fb3fd7ace095d25052cb525f927028ceb1bd6669aa79ed031889d67c0a14
+- filename: AWS/SSLO_GWLB/bigip-sslo.tf
+  checksum: f8166f9161607672389b6a4d701e574037dd88220012618c91635070d5b9af1c
+- filename: AWS/SSLO_GWLB/f5_onboard_sslo.tmpl
+  checksum: 3406bd5436f2ab0af6997249c13ddedc5724232dbd2b787bafe24c6a0e317fd6
+- filename: AWS/SSLO_GWLB/README.md
+  checksum: e658bbe36b77da633c7aff4fcc8965d18ec3ad03b152a9b5d4c8d2b37b3f1f4a
