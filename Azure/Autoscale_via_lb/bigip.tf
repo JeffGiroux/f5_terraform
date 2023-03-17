@@ -21,6 +21,7 @@ locals {
     TS_VER                     = split("/", var.TS_URL)[7]
     FAST_VER                   = split("/", var.FAST_URL)[7]
     dns_server                 = var.dns_server
+    dns_suffix                 = var.dns_suffix
     ntp_server                 = var.ntp_server
     timezone                   = var.timezone
     law_id                     = azurerm_log_analytics_workspace.main.workspace_id
@@ -47,7 +48,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "f5vmss" {
   sku                  = var.instance_type
   instances            = 2
   admin_username       = var.f5_username
-  computer_name_prefix = "${var.projectPrefix}f5vm"
+  computer_name_prefix = var.vm_name == "" ? "${var.projectPrefix}f5vm" : var.vm_name
   custom_data          = base64encode(local.f5_onboard1)
 
   admin_ssh_key {
