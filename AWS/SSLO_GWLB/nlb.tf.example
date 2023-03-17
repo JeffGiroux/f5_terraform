@@ -5,7 +5,7 @@
 # Create NLB for the webapp traffic
 module "nlb" {
   source             = "terraform-aws-modules/alb/aws"
-  version            = "~> 7.0"
+  version            = "8.4.0"
   name               = format("%s-nlb-%s", var.projectPrefix, random_id.buildSuffix.hex)
   load_balancer_type = "network"
   vpc_id             = module.applicationVpc.vpc_id
