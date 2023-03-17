@@ -16,7 +16,7 @@ data "aws_ami" "webapp" {
 
 module "webapp" {
   source                 = "terraform-aws-modules/ec2-instance/aws"
-  version                = "4.1.4"
+  version                = "4.3.0"
   ami                    = data.aws_ami.webapp.id
   instance_type          = "t3.small"
   key_name               = aws_key_pair.bigip.key_name

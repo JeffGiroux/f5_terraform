@@ -132,7 +132,7 @@ variable "sslo_pkg_name" {
 variable "webapp_ami_search_name" {
   type        = string
   description = "AWS AMI search filter to find correct web app (Wordpress) for region"
-  default     = "Wordpress With Ubuntu 20.04-2023*"
+  default     = "bitnami-wordpress-6.1.1-53-r54-linux-debian-11*"
 }
 variable "DO_URL" {
   type        = string

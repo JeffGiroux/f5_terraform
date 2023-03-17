@@ -219,7 +219,7 @@ If the config fails, you should check where traffic is stopping. A good place to
 | <a name="module_applicationVpc"></a> [applicationVpc](#module\_applicationVpc) | terraform-aws-modules/vpc/aws | 3.19.0 |
 | <a name="module_bigipSslO"></a> [bigipSslO](#module\_bigipSslO) | F5Networks/bigip-module/aws | 1.1.11 |
 | <a name="module_securityVpc"></a> [securityVpc](#module\_securityVpc) | terraform-aws-modules/vpc/aws | 3.19.0 |
-| <a name="module_webapp"></a> [webapp](#module\_webapp) | terraform-aws-modules/ec2-instance/aws | 4.1.4 |
+| <a name="module_webapp"></a> [webapp](#module\_webapp) | terraform-aws-modules/ec2-instance/aws | 4.3.0 |
 
 ## Resources
 
@@ -314,7 +314,7 @@ If the config fails, you should check where traffic is stopping. A good place to
 | <a name="input_securityMgmtSubnets"></a> [securityMgmtSubnets](#input\_securityMgmtSubnets) | Management subnet address prefixes | `list(any)` | <pre>[<br>  "10.0.1.0/24",<br>  "10.0.101.0/24"<br>]</pre> | no |
 | <a name="input_securityVpcCidr"></a> [securityVpcCidr](#input\_securityVpcCidr) | CIDR IP Address range of the security VPC | `string` | `"10.0.0.0/16"` | no |
 | <a name="input_sslo_pkg_name"></a> [sslo\_pkg\_name](#input\_sslo\_pkg\_name) | SSL Orchestrator built-in RPM package name (dependent on BIG-IP version) | `string` | `"f5-iappslx-ssl-orchestrator-16.1.3-9.3.41.noarch.rpm"` | no |
-| <a name="input_webapp_ami_search_name"></a> [webapp\_ami\_search\_name](#input\_webapp\_ami\_search\_name) | AWS AMI search filter to find correct web app (Wordpress) for region | `string` | `"Wordpress With Ubuntu 20.04-2023*"` | no |
+| <a name="input_webapp_ami_search_name"></a> [webapp\_ami\_search\_name](#input\_webapp\_ami\_search\_name) | AWS AMI search filter to find correct web app (Wordpress) for region | `string` | `"bitnami-wordpress-6.1.1-53-r54-linux-debian-11*"` | no |
 
 ## Outputs
 
