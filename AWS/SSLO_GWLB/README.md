@@ -217,7 +217,7 @@ If the config fails, you should check where traffic is stopping. A good place to
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_applicationVpc"></a> [applicationVpc](#module\_applicationVpc) | terraform-aws-modules/vpc/aws | 3.19.0 |
-| <a name="module_bigipSslO"></a> [bigipSslO](#module\_bigipSslO) | github.com/JeffGiroux/terraform-aws-bigip-module | n/a |
+| <a name="module_bigipSslO"></a> [bigipSslO](#module\_bigipSslO) | F5Networks/bigip-module/aws | 1.1.11 |
 | <a name="module_securityVpc"></a> [securityVpc](#module\_securityVpc) | terraform-aws-modules/vpc/aws | 3.19.0 |
 | <a name="module_webapp"></a> [webapp](#module\_webapp) | terraform-aws-modules/ec2-instance/aws | 4.1.4 |
 

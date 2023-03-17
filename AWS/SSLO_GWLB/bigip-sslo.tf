@@ -118,9 +118,8 @@ locals {
 
 # Create F5 BIG-IP VMs
 module "bigipSslO" {
-  #source                     = "F5Networks/bigip-module/aws"
-  #version                    = "v1.1.6"
-  source                     = "github.com/JeffGiroux/terraform-aws-bigip-module"
+  source                     = "F5Networks/bigip-module/aws"
+  version                    = "1.1.11"
   prefix                     = format("%s-sslo", var.projectPrefix)
   ec2_instance_type          = var.ec2_instance_type
   ec2_key_name               = aws_key_pair.bigip.key_name
