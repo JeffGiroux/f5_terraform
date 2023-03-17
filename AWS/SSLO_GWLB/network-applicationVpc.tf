@@ -5,7 +5,7 @@
 # Create resources for Application VPC
 module "applicationVpc" {
   source               = "terraform-aws-modules/vpc/aws"
-  version              = "~> 3.0"
+  version              = "3.19.0"
   name                 = format("%s-applicationVpc-%s", var.projectPrefix, random_id.buildSuffix.hex)
   cidr                 = var.applicationVpcCidr
   azs                  = [var.awsAz1, var.awsAz2]

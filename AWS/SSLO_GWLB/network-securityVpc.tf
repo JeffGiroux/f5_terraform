@@ -5,7 +5,7 @@
 # Create resources for Security VPC
 module "securityVpc" {
   source               = "terraform-aws-modules/vpc/aws"
-  version              = "~> 3.0"
+  version              = "3.19.0"
   name                 = format("%s-securityVpc-%s", var.projectPrefix, random_id.buildSuffix.hex)
   cidr                 = var.securityVpcCidr
   azs                  = [var.awsAz1, var.awsAz2]
@@ -139,7 +139,7 @@ resource "aws_route_table" "dmz1Az1" {
   vpc_id = module.securityVpc.vpc_id
   route {
     cidr_block           = "0.0.0.0/0"
-    network_interface_id = module.bigipSslO.nic_ids["external_private"][0]
+    network_interface_id = module.bigipSslO.bigip_nic_ids["external_private"][0]
   }
   # route {
   #   cidr_block           = var.securityExternalSubnets[0]
@@ -154,7 +154,7 @@ resource "aws_route_table" "dmz1Az2" {
   vpc_id = module.securityVpc.vpc_id
   route {
     cidr_block           = "0.0.0.0/0"
-    network_interface_id = module.bigipSslO.nic_ids["external_private"][0]
+    network_interface_id = module.bigipSslO.bigip_nic_ids["external_private"][0]
   }
   # route {
   #   cidr_block           = var.securityExternalSubnets[0]
@@ -175,7 +175,7 @@ resource "aws_route_table" "dmz2Az1" {
   # }
   route {
     cidr_block           = var.securityExternalSubnets[0]
-    network_interface_id = module.bigipSslO.nic_ids["external_private"][1]
+    network_interface_id = module.bigipSslO.bigip_nic_ids["external_private"][1]
   }
   tags = {
     Name  = format("%s-securityVpc-dmz2-inspection1Rtb-%s", var.projectPrefix, random_id.buildSuffix.hex)
@@ -190,7 +190,7 @@ resource "aws_route_table" "dmz2Az2" {
   # }
   route {
     cidr_block           = var.securityExternalSubnets[0]
-    network_interface_id = module.bigipSslO.nic_ids["external_private"][1]
+    network_interface_id = module.bigipSslO.bigip_nic_ids["external_private"][1]
   }
   tags = {
     Name  = format("%s-securityVpc-dmz2-inspection1Rtb-%s", var.projectPrefix, random_id.buildSuffix.hex)
@@ -203,7 +203,7 @@ resource "aws_route_table" "dmz3Az1" {
   vpc_id = module.securityVpc.vpc_id
   route {
     cidr_block           = "0.0.0.0/0"
-    network_interface_id = module.bigipSslO.nic_ids["external_private"][2]
+    network_interface_id = module.bigipSslO.bigip_nic_ids["external_private"][2]
   }
   #   route {
   #     cidr_block           = var.securityExternalSubnets[0]
@@ -218,7 +218,7 @@ resource "aws_route_table" "dmz3Az2" {
   vpc_id = module.securityVpc.vpc_id
   route {
     cidr_block           = "0.0.0.0/0"
-    network_interface_id = module.bigipSslO.nic_ids["external_private"][2]
+    network_interface_id = module.bigipSslO.bigip_nic_ids["external_private"][2]
   }
   #   route {
   #     cidr_block           = var.securityExternalSubnets[0]
@@ -239,7 +239,7 @@ resource "aws_route_table" "dmz4Az1" {
   #   }
   route {
     cidr_block           = var.securityExternalSubnets[0]
-    network_interface_id = module.bigipSslO.nic_ids["external_private"][3]
+    network_interface_id = module.bigipSslO.bigip_nic_ids["external_private"][3]
   }
   tags = {
     Name  = format("%s-securityVpc-dmz4-inspection2Rtb-%s", var.projectPrefix, random_id.buildSuffix.hex)
@@ -254,7 +254,7 @@ resource "aws_route_table" "dmz4Az2" {
   #   }
   route {
     cidr_block           = var.securityExternalSubnets[0]
-    network_interface_id = module.bigipSslO.nic_ids["external_private"][3]
+    network_interface_id = module.bigipSslO.bigip_nic_ids["external_private"][3]
   }
   tags = {
     Name  = format("%s-securityVpc-dmz4-inspection2Rtb-%s", var.projectPrefix, random_id.buildSuffix.hex)

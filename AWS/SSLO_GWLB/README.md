@@ -216,9 +216,9 @@ If the config fails, you should check where traffic is stopping. A good place to
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_applicationVpc"></a> [applicationVpc](#module\_applicationVpc) | terraform-aws-modules/vpc/aws | ~> 3.0 |
+| <a name="module_applicationVpc"></a> [applicationVpc](#module\_applicationVpc) | terraform-aws-modules/vpc/aws | 3.19.0 |
 | <a name="module_bigipSslO"></a> [bigipSslO](#module\_bigipSslO) | github.com/JeffGiroux/terraform-aws-bigip-module | n/a |
-| <a name="module_securityVpc"></a> [securityVpc](#module\_securityVpc) | terraform-aws-modules/vpc/aws | ~> 3.0 |
+| <a name="module_securityVpc"></a> [securityVpc](#module\_securityVpc) | terraform-aws-modules/vpc/aws | 3.19.0 |
 | <a name="module_webapp"></a> [webapp](#module\_webapp) | terraform-aws-modules/ec2-instance/aws | 4.1.4 |
 
 ## Resources
@@ -282,11 +282,11 @@ If the config fails, you should check where traffic is stopping. A good place to
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_ssh_key"></a> [ssh\_key](#input\_ssh\_key) | public key used for authentication in ssh-rsa format | `string` | n/a | yes |
-| <a name="input_AS3_URL"></a> [AS3\_URL](#input\_AS3\_URL) | URL to download the BIG-IP Application Service Extension 3 (AS3) module | `string` | `"https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.39.0/f5-appsvcs-3.39.0-7.noarch.rpm"` | no |
-| <a name="input_DO_URL"></a> [DO\_URL](#input\_DO\_URL) | URL to download the BIG-IP Declarative Onboarding module | `string` | `"https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.32.0/f5-declarative-onboarding-1.32.0-3.noarch.rpm"` | no |
-| <a name="input_FAST_URL"></a> [FAST\_URL](#input\_FAST\_URL) | URL to download the BIG-IP FAST module | `string` | `"https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.20.0/f5-appsvcs-templates-1.20.0-1.noarch.rpm"` | no |
-| <a name="input_INIT_URL"></a> [INIT\_URL](#input\_INIT\_URL) | URL to download the BIG-IP runtime init | `string` | `"https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.5.1/dist/f5-bigip-runtime-init-1.5.1-1.gz.run"` | no |
-| <a name="input_TS_URL"></a> [TS\_URL](#input\_TS\_URL) | URL to download the BIG-IP Telemetry Streaming module | `string` | `"https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.31.0/f5-telemetry-1.31.0-2.noarch.rpm"` | no |
+| <a name="input_AS3_URL"></a> [AS3\_URL](#input\_AS3\_URL) | URL to download the BIG-IP Application Service Extension 3 (AS3) module | `string` | `"https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.43.0/f5-appsvcs-3.43.0-2.noarch.rpm"` | no |
+| <a name="input_DO_URL"></a> [DO\_URL](#input\_DO\_URL) | URL to download the BIG-IP Declarative Onboarding module | `string` | `"https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.36.1/f5-declarative-onboarding-1.36.1-1.noarch.rpm"` | no |
+| <a name="input_FAST_URL"></a> [FAST\_URL](#input\_FAST\_URL) | URL to download the BIG-IP FAST module | `string` | `"https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.24.0/f5-appsvcs-templates-1.24.0-1.noarch.rpm"` | no |
+| <a name="input_INIT_URL"></a> [INIT\_URL](#input\_INIT\_URL) | URL to download the BIG-IP runtime init | `string` | `"https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.6.0/dist/f5-bigip-runtime-init-1.6.0-1.gz.run"` | no |
+| <a name="input_TS_URL"></a> [TS\_URL](#input\_TS\_URL) | URL to download the BIG-IP Telemetry Streaming module | `string` | `"https://github.com/F5Networks/f5-telemetry-streaming/releases/download/v1.32.0/f5-telemetry-1.32.0-2.noarch.rpm"` | no |
 | <a name="input_adminSrcAddr"></a> [adminSrcAddr](#input\_adminSrcAddr) | Allowed Admin source IP prefix | `string` | `"0.0.0.0/0"` | no |
 | <a name="input_applicationGwlbeSubnets"></a> [applicationGwlbeSubnets](#input\_applicationGwlbeSubnets) | GWLB endpoint subnet address prefixes | `list(any)` | <pre>[<br>  "192.168.2.0/25",<br>  "192.168.2.128/25"<br>]</pre> | no |
 | <a name="input_applicationPrivateSubnets"></a> [applicationPrivateSubnets](#input\_applicationPrivateSubnets) | Private subnet address prefixes | `list(any)` | <pre>[<br>  "192.168.1.0/24",<br>  "192.168.101.0/24"<br>]</pre> | no |
@@ -296,7 +296,7 @@ If the config fails, you should check where traffic is stopping. A good place to
 | <a name="input_awsRegion"></a> [awsRegion](#input\_awsRegion) | aws region | `string` | `"us-west-2"` | no |
 | <a name="input_aws_secretmanager_auth"></a> [aws\_secretmanager\_auth](#input\_aws\_secretmanager\_auth) | Whether to use secret manager to pass authentication | `bool` | `false` | no |
 | <a name="input_ec2_instance_type"></a> [ec2\_instance\_type](#input\_ec2\_instance\_type) | AWS instance type for the BIG-IP. Ensure that you use an instance type that supports the 7 ENIs required for this deployment. This will usually be some variant of a **4xlarge** instance type. | `string` | `"m5.4xlarge"` | no |
-| <a name="input_f5_ami_search_name"></a> [f5\_ami\_search\_name](#input\_f5\_ami\_search\_name) | AWS AMI search filter to find correct BIG-IP VE for region | `string` | `"F5 BIGIP-16.1.3.1* BYOL-All* 2Boot*"` | no |
+| <a name="input_f5_ami_search_name"></a> [f5\_ami\_search\_name](#input\_f5\_ami\_search\_name) | AWS AMI search filter to find correct BIG-IP VE for region | `string` | `"F5 BIGIP-16.1.3.3* BYOL-All* 2Boot*"` | no |
 | <a name="input_f5_password"></a> [f5\_password](#input\_f5\_password) | BIG-IP Password or Secret ARN (value should be ARN of secret when aws\_secretmanager\_auth = true, ex. arn:aws:secretsmanager:us-west-2:1234:secret:bigip-secret-abcd) | `string` | `"Default12345!"` | no |
 | <a name="input_f5_username"></a> [f5\_username](#input\_f5\_username) | User name for the BIG-IP (Note: currenlty not used. Defaults to 'admin' based on AMI | `string` | `"admin"` | no |
 | <a name="input_libs_dir"></a> [libs\_dir](#input\_libs\_dir) | Directory on the BIG-IP to download the A&O Toolchain into | `string` | `"/config/cloud/aws/node_modules"` | no |
@@ -314,7 +314,7 @@ If the config fails, you should check where traffic is stopping. A good place to
 | <a name="input_securityMgmtSubnets"></a> [securityMgmtSubnets](#input\_securityMgmtSubnets) | Management subnet address prefixes | `list(any)` | <pre>[<br>  "10.0.1.0/24",<br>  "10.0.101.0/24"<br>]</pre> | no |
 | <a name="input_securityVpcCidr"></a> [securityVpcCidr](#input\_securityVpcCidr) | CIDR IP Address range of the security VPC | `string` | `"10.0.0.0/16"` | no |
 | <a name="input_sslo_pkg_name"></a> [sslo\_pkg\_name](#input\_sslo\_pkg\_name) | SSL Orchestrator built-in RPM package name (dependent on BIG-IP version) | `string` | `"f5-iappslx-ssl-orchestrator-16.1.3-9.3.41.noarch.rpm"` | no |
-| <a name="input_webapp_ami_search_name"></a> [webapp\_ami\_search\_name](#input\_webapp\_ami\_search\_name) | AWS AMI search filter to find correct web app (Wordpress) for region | `string` | `"bitnami-wordpresspro-6.0.1-9*nami-*"` | no |
+| <a name="input_webapp_ami_search_name"></a> [webapp\_ami\_search\_name](#input\_webapp\_ami\_search\_name) | AWS AMI search filter to find correct web app (Wordpress) for region | `string` | `"Wordpress With Ubuntu 20.04-2023*"` | no |
 
 ## Outputs
 
