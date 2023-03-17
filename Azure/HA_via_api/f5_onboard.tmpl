@@ -277,7 +277,6 @@ extension_services:
                 class: Service_HTTP
                 virtualAddresses:
                   - '{{{ VIP_AZ1 }}}'
-                  - '{{{ VIP_AZ2 }}}'
                 pool: web_pool
               web_pool:
                 class: Pool
@@ -316,7 +315,7 @@ post_onboard_enabled:
     type: inline
     commands:
     - $(nohup bash /config/failover/tgactive &>/dev/null &)
-    - $(nohup tmsh modify cm device-group failoverGroup devices modify { '{{{ HOST2 }}}.example.com' { set-sync-leader } } &>/dev/null &)
+    - $(nohup tmsh modify cm device-group failoverGroup devices modify { '{{{ HOST1 }}}' { set-sync-leader } } &>/dev/null &)
     - tmsh save sys config
 EOF
 

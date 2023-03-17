@@ -150,7 +150,7 @@ module "bigip" {
   external_securitygroup_ids = [data.azurerm_network_security_group.external.id]
   internal_subnet_ids        = [{ "subnet_id" = data.azurerm_subnet.internal.id, "public_ip" = false, "private_ip_primary" = "" }]
   internal_securitygroup_ids = [data.azurerm_network_security_group.internal.id]
-  cfe_secondary_vip_disable  = true
+  cfe_secondary_vip_disable  = false
   availability_zone          = var.availability_zone2
   custom_user_data           = local.f5_onboard1
   sleep_time                 = "30s"
@@ -182,7 +182,7 @@ module "bigip2" {
   external_securitygroup_ids = [data.azurerm_network_security_group.external.id]
   internal_subnet_ids        = [{ "subnet_id" = data.azurerm_subnet.internal.id, "public_ip" = false, "private_ip_primary" = "" }]
   internal_securitygroup_ids = [data.azurerm_network_security_group.internal.id]
-  cfe_secondary_vip_disable  = false
+  cfe_secondary_vip_disable  = true
   availability_zone          = var.availability_zone2
   custom_user_data           = local.f5_onboard2
   sleep_time                 = "30s"
@@ -243,7 +243,7 @@ resource "azurerm_route_table" "udr" {
     name                   = "route1"
     address_prefix         = var.cfe_managed_route
     next_hop_type          = "VirtualAppliance"
-    next_hop_in_ip_address = module.bigip2.private_addresses["public_private"]["private_ip"][0]
+    next_hop_in_ip_address = module.bigip.private_addresses["public_private"]["private_ip"][0]
   }
 
   tags = {
