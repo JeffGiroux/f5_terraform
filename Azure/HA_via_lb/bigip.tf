@@ -184,29 +184,29 @@ module "bigip2" {
 #       https://github.com/F5Networks/terraform-azure-bigip-module/issues/29
 #
 #       BIG-IP module currently does NOT export network interface ID.
-#       As a workaround, use the BIG-IP device ID to parse the name and
+#       As a workaround, use the BIG-IP public DNS value to parse the name and
 #       use that to query the data azurerm_network_interface.
 #       Once output in module is fixed, data resource can be deleted.
 
 # Retrieve NIC Info
 data "azurerm_network_interface" "bigip-ext" {
-  name                = format("%s-ext-nic-public-0", element(split("-f5vm01", element(split("/", module.bigip.bigip_instance_ids), 8)), 0))
+  name                = format("%s-ext-nic-public-0", element(split("-mgmt-0", element(split(".", module.bigip.mgmtPublicDNS), 0)), 0))
   resource_group_name = azurerm_resource_group.main.name
 }
 data "azurerm_network_interface" "bigip2-ext" {
-  name                = format("%s-ext-nic-public-0", element(split("-f5vm01", element(split("/", module.bigip2.bigip_instance_ids), 8)), 0))
+  name                = format("%s-ext-nic-public-0", element(split("-mgmt-0", element(split(".", module.bigip2.mgmtPublicDNS), 0)), 0))
   resource_group_name = azurerm_resource_group.main.name
 }
 
 # Associate the BIG-IP NIC to the ALB backend pool
 resource "azurerm_network_interface_backend_address_pool_association" "f5vm01" {
   network_interface_id    = data.azurerm_network_interface.bigip-ext.id
-  ip_configuration_name   = format("%s-secondary-ext-public-ip-0", element(split("-f5vm01", element(split("/", module.bigip.bigip_instance_ids), 8)), 0))
+  ip_configuration_name   = format("%s-secondary-ext-public-ip-0", element(split("-mgmt-0", element(split(".", module.bigip.mgmtPublicDNS), 0)), 0))
   backend_address_pool_id = azurerm_lb_backend_address_pool.backend_pool.id
 }
 
 resource "azurerm_network_interface_backend_address_pool_association" "f5vm02" {
   network_interface_id    = data.azurerm_network_interface.bigip2-ext.id
-  ip_configuration_name   = format("%s-secondary-ext-public-ip-0", element(split("-f5vm01", element(split("/", module.bigip2.bigip_instance_ids), 8)), 0))
+  ip_configuration_name   = format("%s-secondary-ext-public-ip-0", element(split("-mgmt-0", element(split(".", module.bigip2.mgmtPublicDNS), 0)), 0))
   backend_address_pool_id = azurerm_lb_backend_address_pool.backend_pool.id
 }
