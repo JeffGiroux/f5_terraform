@@ -61,6 +61,7 @@ locals {
     CFE_VER                    = split("/", var.CFE_URL)[7]
     FAST_VER                   = split("/", var.FAST_URL)[7]
     dns_server                 = var.dns_server
+    dns_suffix                 = var.dns_suffix
     ntp_server                 = var.ntp_server
     timezone                   = var.timezone
     law_id                     = azurerm_log_analytics_workspace.main.workspace_id
@@ -103,6 +104,7 @@ locals {
     CFE_VER                    = split("/", var.CFE_URL)[7]
     FAST_VER                   = split("/", var.FAST_URL)[7]
     dns_server                 = var.dns_server
+    dns_suffix                 = var.dns_suffix
     ntp_server                 = var.ntp_server
     timezone                   = var.timezone
     law_id                     = azurerm_log_analytics_workspace.main.workspace_id
@@ -132,8 +134,9 @@ locals {
 # Create F5 BIG-IP VMs
 module "bigip" {
   source                     = "F5Networks/bigip-module/azure"
-  version                    = "1.2.6"
+  version                    = "1.2.8"
   prefix                     = var.projectPrefix
+  vm_name                    = var.vm_name == "" ? format("%s-bigip1-%s", var.projectPrefix, random_id.buildSuffix.hex) : var.vm_name
   resource_group_name        = azurerm_resource_group.main.name
   f5_instance_type           = var.instance_type
   f5_image_name              = var.image_name
@@ -147,7 +150,8 @@ module "bigip" {
   external_securitygroup_ids = [data.azurerm_network_security_group.external.id]
   internal_subnet_ids        = [{ "subnet_id" = data.azurerm_subnet.internal.id, "public_ip" = false, "private_ip_primary" = "" }]
   internal_securitygroup_ids = [data.azurerm_network_security_group.internal.id]
-  availability_zone          = var.availability_zone
+  #cfe_secondary_vip_disable  = true
+  availability_zone          = var.availability_zone2
   custom_user_data           = local.f5_onboard1
   sleep_time                 = "30s"
   tags                       = local.tags
@@ -162,8 +166,9 @@ module "bigip" {
 
 module "bigip2" {
   source                     = "F5Networks/bigip-module/azure"
-  version                    = "1.2.6"
+  version                    = "1.2.8"
   prefix                     = var.projectPrefix
+  vm_name                    = var.vm_name == "" ? format("%s-bigip2-%s", var.projectPrefix, random_id.buildSuffix.hex) : var.vm_name
   resource_group_name        = azurerm_resource_group.main.name
   f5_instance_type           = var.instance_type
   f5_image_name              = var.image_name
@@ -177,6 +182,7 @@ module "bigip2" {
   external_securitygroup_ids = [data.azurerm_network_security_group.external.id]
   internal_subnet_ids        = [{ "subnet_id" = data.azurerm_subnet.internal.id, "public_ip" = false, "private_ip_primary" = "" }]
   internal_securitygroup_ids = [data.azurerm_network_security_group.internal.id]
+  #cfe_secondary_vip_disable  = false
   availability_zone          = var.availability_zone2
   custom_user_data           = local.f5_onboard2
   sleep_time                 = "30s"
