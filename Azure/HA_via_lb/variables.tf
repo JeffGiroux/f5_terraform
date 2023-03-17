@@ -67,7 +67,7 @@ variable "instance_type" {
 }
 variable "image_name" {
   type        = string
-  default     = "f5-big-best-plus-hourly-200mbps"
+  default     = "f5-big-best-plus-hourly-25mbps"
   description = "F5 SKU (image) to deploy. Note: The disk size of the VM will be determined based on the option you select.  **Important**: If intending to provision multiple modules, ensure the appropriate value is selected, such as ****AllTwoBootLocations or AllOneBootLocation****."
 }
 variable "product" {
@@ -77,7 +77,7 @@ variable "product" {
 }
 variable "bigip_version" {
   type        = string
-  default     = "16.1.302000"
+  default     = "16.1.303000"
   description = "BIG-IP Version"
 }
 variable "f5_username" {
@@ -134,6 +134,11 @@ variable "dns_server" {
   default     = "8.8.8.8"
   description = "Leave the default DNS server the BIG-IP uses, or replace the default DNS server with the one you want to use"
 }
+variable "dns_suffix" {
+  type        = string
+  default     = "example.com"
+  description = "DNS suffix for your domain in the GCP project"
+}
 variable "ntp_server" {
   type        = string
   default     = "0.us.pool.ntp.org"
@@ -146,12 +151,12 @@ variable "timezone" {
 }
 variable "DO_URL" {
   type        = string
-  default     = "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.34.0/f5-declarative-onboarding-1.34.0-5.noarch.rpm"
+  default     = "https://github.com/F5Networks/f5-declarative-onboarding/releases/download/v1.36.1/f5-declarative-onboarding-1.36.1-1.noarch.rpm"
   description = "URL to download the BIG-IP Declarative Onboarding module"
 }
 variable "AS3_URL" {
   type        = string
-  default     = "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.41.0/f5-appsvcs-3.41.0-1.noarch.rpm"
+  default     = "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.43.0/f5-appsvcs-3.43.0-2.noarch.rpm"
   description = "URL to download the BIG-IP Application Service Extension 3 (AS3) module"
 }
 variable "TS_URL" {
@@ -161,12 +166,12 @@ variable "TS_URL" {
 }
 variable "FAST_URL" {
   type        = string
-  default     = "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.22.0/f5-appsvcs-templates-1.22.0-1.noarch.rpm"
+  default     = "https://github.com/F5Networks/f5-appsvcs-templates/releases/download/v1.24.0/f5-appsvcs-templates-1.24.0-1.noarch.rpm"
   description = "URL to download the BIG-IP FAST module"
 }
 variable "INIT_URL" {
   type        = string
-  default     = "https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.5.1/dist/f5-bigip-runtime-init-1.5.1-1.gz.run"
+  default     = "https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.6.0/dist/f5-bigip-runtime-init-1.6.0-1.gz.run"
   description = "URL to download the BIG-IP runtime init"
 }
 variable "libs_dir" {
@@ -223,4 +228,12 @@ variable "resourceOwner" {
   type        = string
   default     = null
   description = "This is a tag used for object creation. Example is last name."
+}
+variable "vm_name" {
+  description = "Name of 1st BIG-IP. If empty, default is 'bigip1' string + prefix + random_id"
+  default     = ""
+}
+variable "vm2_name" {
+  description = "Name of 2nd BIG-IP. If empty, default is 'bigip2' string + prefix + random_id"
+  default     = ""
 }
